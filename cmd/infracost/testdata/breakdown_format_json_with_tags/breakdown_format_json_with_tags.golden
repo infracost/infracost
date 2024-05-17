@@ -41,20 +41,22 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
             },
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "endLine": 88,
+                  "endLine": 89,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
                   "startLine": 67
                 }
               ],
-              "checksum": "13adebe4ed01fd707c54cf97a06980aecb52eab84fe379a941727cc1ead2a93f",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 88,
+              "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "endLine": 89,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 67
             },
@@ -128,22 +130,24 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "ebs_block_device[0].foo": "ebd",
-              "root_block_device.foo": "rbd"
+              "root_block_device.foo": "rbd",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride"
             },
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app_block_tags",
-                  "endLine": 202,
+                  "endLine": 203,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 181
+                  "startLine": 182
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 202,
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "endLine": 203,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 181
+              "startLine": 182
             },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -219,15 +223,15 @@
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.launch_template",
-                  "endLine": 179,
+                  "endLine": 180,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 155
+                  "startLine": 156
                 }
               ],
               "checksum": "683ec0c113599563ccbf834223b61ffcc2abbd9ac8d6202036fc4fc6eb56a2d0",
-              "endLine": 179,
+              "endLine": 180,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 155
+              "startLine": 156
             },
             "hourlyCost": "0.2303726027397260165",
             "monthlyCost": "168.172",
@@ -310,22 +314,24 @@
               "DefaultOverride": "defaultoverride",
               "bat": "ball",
               "fizz": "buzz",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.flip": "flop"
             },
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.launch_instance",
-                  "endLine": 102,
+                  "endLine": 103,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 90
+                  "startLine": 91
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 102,
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "endLine": 103,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 90
+              "startLine": 91
             },
             "hourlyCost": "0.0586890410958904025",
             "monthlyCost": "42.843",
@@ -586,16 +592,16 @@
               "calls": [
                 {
                   "blockName": "aws_launch_template.example",
-                  "endLine": 153,
+                  "endLine": 154,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 104
+                  "startLine": 105
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 153,
+              "endLine": 154,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 104
+              "startLine": 105
             }
           }
         ],
@@ -612,20 +618,22 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
             },
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "endLine": 88,
+                  "endLine": 89,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
                   "startLine": 67
                 }
               ],
-              "checksum": "13adebe4ed01fd707c54cf97a06980aecb52eab84fe379a941727cc1ead2a93f",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 88,
+              "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "endLine": 89,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 67
             },
@@ -699,22 +707,24 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "ebs_block_device[0].foo": "ebd",
-              "root_block_device.foo": "rbd"
+              "root_block_device.foo": "rbd",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride"
             },
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app_block_tags",
-                  "endLine": 202,
+                  "endLine": 203,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 181
+                  "startLine": 182
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 202,
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "endLine": 203,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 181
+              "startLine": 182
             },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -790,15 +800,15 @@
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.launch_template",
-                  "endLine": 179,
+                  "endLine": 180,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 155
+                  "startLine": 156
                 }
               ],
               "checksum": "683ec0c113599563ccbf834223b61ffcc2abbd9ac8d6202036fc4fc6eb56a2d0",
-              "endLine": 179,
+              "endLine": 180,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 155
+              "startLine": 156
             },
             "hourlyCost": "0.2303726027397260165",
             "monthlyCost": "168.172",
@@ -881,22 +891,24 @@
               "DefaultOverride": "defaultoverride",
               "bat": "ball",
               "fizz": "buzz",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.flip": "flop"
             },
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.launch_instance",
-                  "endLine": 102,
+                  "endLine": 103,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 90
+                  "startLine": 91
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 102,
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "endLine": 103,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 90
+              "startLine": 91
             },
             "hourlyCost": "0.0586890410958904025",
             "monthlyCost": "42.843",
@@ -1157,16 +1169,16 @@
               "calls": [
                 {
                   "blockName": "aws_launch_template.example",
-                  "endLine": 153,
+                  "endLine": 154,
                   "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-                  "startLine": 104
+                  "startLine": 105
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 153,
+              "endLine": 154,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 104
+              "startLine": 105
             }
           }
         ],

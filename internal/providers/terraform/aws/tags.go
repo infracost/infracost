@@ -49,6 +49,14 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 			keysAndValues = append(keysAndValues, k, v)
 		}
 
+		if r.Type == "aws_instance" {
+			for k, v := range *defaultTags {
+				k = fmt.Sprintf("volume_tags.%s", k)
+				tags[k] = v
+				keysAndValues = append(keysAndValues, k, v)
+			}
+		}
+
 		sort.Strings(keysAndValues)
 
 		h := sha256.New()
