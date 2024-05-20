@@ -8,6 +8,8 @@
     │   └── foo.tf
     ├── bat
     │   └── bip.tf
+    ├── .hidden
+    │   └── main.tf
     ├── wildcard
     │   ├── one
     │   │   └── fip.tf
