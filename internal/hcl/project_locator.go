@@ -1463,11 +1463,13 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 
 	for _, info := range fileInfos {
 		if info.IsDir() {
-			if strings.HasPrefix(info.Name(), ".") {
+			fullPath := filepath.Join(fullPath, info.Name())
+
+			if strings.HasPrefix(info.Name(), ".") && !p.shouldIncludeDir(fullPath) {
 				continue
 			}
 
-			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1, maxSearchDepth)
+			p.walkPaths(fullPath, level+1, maxSearchDepth)
 		}
 	}
 }

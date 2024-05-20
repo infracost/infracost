@@ -3,9 +3,20 @@ autodetect:
   include_dirs:
     - apps/bat
     - apps/baz
+    - apps/.hidden
     - apps/wildcard/**
 
 projects:
+  - path: apps/.hidden
+    name: apps-.hidden-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/.hidden
+    name: apps-.hidden-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
   - path: apps/bar
     name: apps-bar-dev
     terraform_var_files:
