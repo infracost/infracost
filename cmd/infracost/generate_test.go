@@ -136,7 +136,7 @@ func assertGoldenFile(tt *testing.T, args []string, dir string) {
 		i := buf.Bytes()
 		out.Write(i)
 
-		err := os.WriteFile(path.Join(dir, "actual.txt"), out.Bytes(), os.ModePerm)
+		err := os.WriteFile(path.Join(dir, "actual.txt"), out.Bytes(), os.ModePerm) // nolint: gosec
 		assert.NoError(tt, err)
 	}
 }

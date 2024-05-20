@@ -751,7 +751,7 @@ func createTestFile(filename, contents string) string {
 		panic(err)
 	}
 	path := filepath.Join(dir, filename)
-	if err := os.WriteFile(path, []byte(contents), os.ModePerm); err != nil {
+	if err := os.WriteFile(path, []byte(contents), os.ModePerm); err != nil { // nolint: gosec
 		panic(err)
 	}
 	return path
@@ -779,11 +779,11 @@ func createTestFileWithModule(contents string, moduleContents string, moduleName
 		}
 	}
 
-	if err := os.WriteFile(filepath.Join(rootPath, "main.tf"), []byte(contents), os.ModePerm); err != nil {
+	if err := os.WriteFile(filepath.Join(rootPath, "main.tf"), []byte(contents), os.ModePerm); err != nil { // nolint: gosec
 		panic(err)
 	}
 
-	if err := os.WriteFile(filepath.Join(modulePath, "main.tf"), []byte(moduleContents), os.ModePerm); err != nil {
+	if err := os.WriteFile(filepath.Join(modulePath, "main.tf"), []byte(moduleContents), os.ModePerm); err != nil { // nolint: gosec
 		panic(err)
 	}
 
@@ -1781,7 +1781,7 @@ func Test_DynamicBlockExpandsToCorrectLength(t *testing.T) {
 	path := createTestFile("main.tf", `
 variable "my_config" {
   default = [
-    {"location": "eu1"}, 
+    {"location": "eu1"},
     {"location": "eu2"}
   ]
 }

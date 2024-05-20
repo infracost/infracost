@@ -496,7 +496,7 @@ func copyInitCacheToPath(source, destination string) error {
 						return err
 					}
 
-					if err := os.WriteFile(destPath, srcData, os.ModePerm); err != nil {
+					if err := os.WriteFile(destPath, srcData, os.ModePerm); err != nil { // nolint: gosec
 						return err
 					}
 				}
