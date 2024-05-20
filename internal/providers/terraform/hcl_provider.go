@@ -326,7 +326,7 @@ func (p *HCLProvider) LoadPlanJSON() HCLProject {
 		module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
 
 		if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
-			err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
+			err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm) // nolint: gosec
 			if err != nil {
 				p.logger.Debug().Err(err).Msg("failed to write to json dump")
 			}

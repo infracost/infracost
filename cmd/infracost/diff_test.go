@@ -220,7 +220,7 @@ projects:
 		path.Join(dir, "prod"))
 
 	configFilePath := path.Join(dir, "infracost.yml")
-	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm)
+	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm) // nolint: gosec
 	require.NoError(t, err)
 
 	defer os.Remove(configFilePath)
@@ -245,7 +245,7 @@ projects:
 		path.Join(dir, "prod"))
 
 	configFilePath := path.Join(dir, "infracost.yml")
-	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm)
+	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm) // nolint: gosec
 	require.NoError(t, err)
 
 	defer os.Remove(configFilePath)
