@@ -14,6 +14,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 	"github.com/infracost/infracost/internal/providers/terraform/azure"
@@ -28,6 +29,7 @@ type Parser struct {
 	ctx                  *config.ProjectContext
 	terraformVersion     string
 	includePastResources bool
+	providerConstraints  hcl.ProviderConstraints
 }
 
 func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
@@ -199,6 +201,15 @@ func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfigur
 	parsed := gjson.ParseBytes(j)
 
 	p.terraformVersion = parsed.Get("terraform_version").String()
+	constraints := parsed.Get("infracost_provider_constraints")
+	if constraints.Exists() {
+		var providerConstraints hcl.ProviderConstraints
+		err := json.Unmarshal([]byte(constraints.Raw), &providerConstraints)
+		if err == nil {
+			p.providerConstraints = providerConstraints
+		}
+	}
+
 	providerConf := parsed.Get("configuration.provider_config")
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
@@ -747,7 +758,8 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		case "aws":
 			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 			defaultTags := parseDefaultTags(providerConf, resConf)
-			tags = aws.ParseTags(defaultTags, resourceData)
+
+			tags = aws.ParseTags(defaultTags, resourceData, aws.TagParsingConfig{PropagateDefaultsToVolumeTags: p.providerConstraints.AWS.Check(hcl.AWSVersionConstraintVolumeTags)})
 		case "azurerm":
 			tags = azure.ParseTags(resourceData)
 		case "google":

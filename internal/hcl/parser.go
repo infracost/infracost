@@ -469,6 +469,13 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		}
 	}
 
+	// Set the root module's provider constraints we only look to do this at the root
+	// module level for now but we might look to change this in the future to parse
+	// on a per-module basis, with the same level of inheritance as the provider
+	// blocks. However, for our current use case this is not really necessary, and
+	// would just add complexity.
+	root.ProviderConstraints = NewProviderConstraints(blocks)
+
 	root.HasChanges = p.hasChanges
 	root.TerraformVarsPaths = p.tfvarsPaths
 	root.ModuleSuffix = p.moduleSuffix

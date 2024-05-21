@@ -29,7 +29,15 @@ func parseLaunchTemplateTags(tags map[string]string, r *schema.ResourceData) {
 	}
 }
 
-func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[string]string {
+// TagParsingConfig defines options that can be used to configure the ParseTags function.
+type TagParsingConfig struct {
+	// PropagateDefaultsToVolumeTags specifies whether default provider tags should be
+	// propagated to volume tags. This feature was added in Terraform AWS provider
+	// version 5.39.0.
+	PropagateDefaultsToVolumeTags bool
+}
+
+func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config TagParsingConfig) *map[string]string {
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
@@ -49,7 +57,7 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 			keysAndValues = append(keysAndValues, k, v)
 		}
 
-		if r.Type == "aws_instance" {
+		if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
 			for k, v := range *defaultTags {
 				k = fmt.Sprintf("volume_tags.%s", k)
 				tags[k] = v
