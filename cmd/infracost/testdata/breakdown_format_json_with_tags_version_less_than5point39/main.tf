@@ -13,6 +13,15 @@ provider "aws" {
   }
 }
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.0"
+    }
+  }
+}
+
 resource "aws_sns_topic_subscription" "sns_topic_noTags" {
   endpoint  = "some-dummy-endpoint"
   protocol  = "http"

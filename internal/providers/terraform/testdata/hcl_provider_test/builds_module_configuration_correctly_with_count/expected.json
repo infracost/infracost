@@ -201,5 +201,8 @@
         }
       }
     }
-  ]
+  ],
+  "infracost_provider_constraints": {
+    "aws": ""
+  }
 }

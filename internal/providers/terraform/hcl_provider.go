@@ -402,6 +402,9 @@ func (p *HCLProvider) newPlanSchema() {
 
 func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) {
 	p.newPlanSchema()
+	if rootModule.ProviderConstraints != nil {
+		p.schema.InfracostProviderConstraints = *rootModule.ProviderConstraints
+	}
 
 	mo := p.marshalModule(rootModule)
 	p.schema.Configuration.RootModule = mo.ModuleConfig
@@ -827,7 +830,8 @@ type PlanSchema struct {
 	// plan JSON output, but we omit adding it as the supported `resource_changes` key as this will cause plan inconsistencies.
 	// We copy this `infracost_resource_changes` key at a later date to `resource_changes` before sending to the Policy API.
 	// This means that we can evaluate the Rego ruleset on the known Terraform plan JSON structure.
-	InfracostResourceChanges []ResourceChangesJSON `json:"infracost_resource_changes"`
+	InfracostResourceChanges     []ResourceChangesJSON   `json:"infracost_resource_changes"`
+	InfracostProviderConstraints hcl.ProviderConstraints `json:"infracost_provider_constraints"`
 }
 
 type PlanModule struct {

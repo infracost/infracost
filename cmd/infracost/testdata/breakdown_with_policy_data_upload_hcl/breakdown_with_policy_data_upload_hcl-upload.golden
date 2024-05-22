@@ -30,6 +30,14 @@ storePolicyResources:
               "value": "bar"
             },
             {
+              "key": "volume_tags.DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "volume_tags.DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
               "key": "volume_tags.baz",
               "value": "bat"
             }
@@ -89,6 +97,14 @@ storePolicyResources:
             {
               "key": "foo",
               "value": "bar"
+            },
+            {
+              "key": "volume_tags.DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "volume_tags.DefaultOverride",
+              "value": "defaultoverride"
             },
             {
               "key": "volume_tags.baz",

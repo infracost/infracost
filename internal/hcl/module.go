@@ -48,7 +48,9 @@ type Module struct {
 	// ProviderReferences is a map of provider names (relative to the module) to
 	// the provider block that defines that provider. We keep track of this so we
 	// can re-evaluate the provider blocks when we need to.
-	ProviderReferences map[string]*Block
+	ProviderReferences  map[string]*Block
+	TerraformVersion    string
+	ProviderConstraints *ProviderConstraints
 }
 
 // Index returns the count index of the Module using the name.
