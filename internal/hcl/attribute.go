@@ -456,6 +456,8 @@ func (e *LiteralBoolValueExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl
 }
 
 type LiteralValueCollectionExpression struct {
+	// we embed the hclsyntax.LiteralValueExpr as the hcl.Expression interface
+	// has an unexported method that we need to implement.
 	*hclsyntax.LiteralValueExpr
 	Expression  hcl.Expression
 	MockedValue cty.Value
@@ -477,6 +479,49 @@ func (e *LiteralValueCollectionExpression) Value(ctx *hcl.EvalContext) (cty.Valu
 
 	if !val.CanIterateElements() {
 		return cty.ListValEmpty(cty.String), nil
+	}
+
+	return val, nil
+}
+
+type LiteralValueIndexExpression struct {
+	// we embed the hclsyntax.LiteralValueExpr as the hcl.Expression interface
+	// has an unexported method that we need to implement.
+	*hclsyntax.LiteralValueExpr
+	Expression  *hclsyntax.IndexExpr
+	MockedValue cty.Value
+}
+
+func newLiteralValueIndexExpression(mockedVal cty.Value, expr *hclsyntax.IndexExpr) *LiteralValueIndexExpression {
+	return &LiteralValueIndexExpression{
+		LiteralValueExpr: &hclsyntax.LiteralValueExpr{Val: cty.ListValEmpty(cty.String)},
+		Expression:       expr,
+		MockedValue:      mockedVal,
+	}
+}
+
+func (e *LiteralValueIndexExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+	val, diag := e.Expression.Value(ctx)
+	for _, d := range diag {
+		// if the diagnostic is an invalid index, we should try and get the first element
+		// of the collection since it should at least have the same expected type
+		if d.Summary == "Invalid index" {
+			col, colDiag := e.Expression.Collection.Value(ctx)
+
+			if !colDiag.HasErrors() && col.CanIterateElements() {
+				it := col.ElementIterator()
+				if it.Next() {
+					_, v := it.Element()
+					return v, nil
+				}
+			}
+		}
+	}
+
+	// For other diagnostics we just return the mocked value
+	// as we can't determine the correct value.
+	if diag.HasErrors() {
+		return e.MockedValue, nil
 	}
 
 	return val, nil
@@ -560,13 +605,14 @@ func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mocke
 			OpenRange: t.OpenRange,
 		}
 	case *hclsyntax.IndexExpr:
-		return &hclsyntax.IndexExpr{
+		expr := &hclsyntax.IndexExpr{
 			Collection:   newLiteralValueCollectionExpression(mockedVal, mockExpressionCalls(t.Collection, diagnostics, mockedVal)),
 			Key:          mockExpressionCalls(t.Key, diagnostics, mockedVal),
 			SrcRange:     t.SrcRange,
 			OpenRange:    t.OpenRange,
 			BracketRange: t.BracketRange,
 		}
+		return newLiteralValueIndexExpression(mockedVal, expr)
 	case *hclsyntax.ForExpr:
 		return &hclsyntax.ForExpr{
 			KeyVar:     t.KeyVar,

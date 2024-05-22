@@ -1825,6 +1825,44 @@ resource "aws_instance" "example" {
 	)
 }
 
+func Test_IndexExpressionWhenMocked(t *testing.T) {
+	path := createTestFile("main.tf", `
+variable "my_config" {
+  type    = any
+  default = [
+    {"location": "eu1"},
+    {"location": "eu2"}
+   ]
+}
+
+resource "aws_instance" "example" {
+  foo = var.my_config[data.terraform_remote_state.ground.outputs.key]
+}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+
+	parser := NewParser(
+		RootPath{DetectedPath: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+		OptionGraphEvaluator(),
+	)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"foo":{"location":"eu1"}}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
 func Test_FormatDateWithInvalidValue(t *testing.T) {
 	path := createTestFile("main.tf", `
 resource "bar" "a" {
