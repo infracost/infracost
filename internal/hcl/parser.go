@@ -366,6 +366,7 @@ func (p *Parser) DependencyPaths() []string {
 
 		sortedCalls[i] = relCall
 	}
+	sortedCalls = append(sortedCalls, p.RelativePath())
 	sort.Strings(sortedCalls)
 
 	return sortedCalls
