@@ -881,13 +881,17 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 			}
 
 			e.logger.Debug().Msgf("adding %s %s to the evaluation context", b.Type(), b.Label())
-			values[b.Labels()[0]] = e.evaluateResource(b, values)
+			values[b.Labels()[0]] = e.evaluateResourceOrData(b, values)
 		}
 
 	}
 
 	return cty.ObjectVal(values)
 }
+
+// evaluateProvider evaluates a provider block.
+// The values map is used to pass in the current context values. This is only needed
+// for the legacy evaluator and is not used for the graph evaluator.
 func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.Value {
 	provider := b.Label()
 	v, exists := values[provider]
@@ -921,7 +925,10 @@ func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.
 	return cty.ObjectVal(ob)
 }
 
-func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {
+// evaluateResourceOrData evaluates a resource or data block.
+// The values map is used to pass in the current context values. This is only needed
+// for the legacy evaluator and is not used for the graph evaluator.
+func (e *Evaluator) evaluateResourceOrData(b *Block, values map[string]cty.Value) cty.Value {
 	labels := b.Labels()
 
 	blockMap, ok := values[labels[0]]

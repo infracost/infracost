@@ -81,7 +81,7 @@ func (v *VertexData) evaluate(e *Evaluator, b *Block) error {
 		existingVals = make(map[string]cty.Value)
 	}
 
-	val := e.evaluateResource(b, existingVals)
+	val := e.evaluateResourceOrData(b, existingVals)
 
 	v.logger.Debug().Msgf("adding data %s to the evaluation context", v.ID())
 	e.ctx.SetByDot(val, fmt.Sprintf("data.%s", b.TypeLabel()))
