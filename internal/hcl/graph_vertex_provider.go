@@ -63,18 +63,11 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
-		var existingVals map[string]cty.Value
-		existingCtx := e.ctx.Get(blockInstance.TypeLabel())
-		if !existingCtx.IsNull() {
-			existingVals = existingCtx.AsValueMap()
-		} else {
-			existingVals = make(map[string]cty.Value)
-		}
-
-		val := e.evaluateProvider(blockInstance, existingVals)
+		// We don't care about the existing values, this is only needed by the legacy evaluator
+		val := e.evaluateProvider(blockInstance, map[string]cty.Value{})
 
 		v.logger.Debug().Msgf("adding %s to the evaluation context", v.ID())
-		e.ctx.Set(val, blockInstance.Label())
+		e.ctx.SetByDot(val, blockInstance.Label())
 
 		e.AddFilteredBlocks(blockInstance)
 	}
