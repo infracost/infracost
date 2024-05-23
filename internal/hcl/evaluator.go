@@ -941,17 +941,19 @@ func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.
 		blockMap = values[labels[0]]
 	}
 
-	e.logger.Info().Msg("\n\nALISTAIR START")
-	e.logger.Info().Msgf("%v\n", labels)
-	e.logger.Info().Msg(blockMap.GoString())
-	e.logger.Info().Msg(string(valueToBytes2(blockMap)))
-	e.logger.Info().Msg(string(valueToBytes2(cty.ObjectVal(values))))
-	e.logger.Info().Msg("ALISTAIR END\n\n")
+	fmt.Println()
+	fmt.Println("ALISTAIR START:", b.FullName())
+	fmt.Printf("Labels: %v\n", labels)
+	fmt.Println("blockMap.GoString()", blockMap.GoString())
+	fmt.Println("blockMap", string(valueToBytes2(blockMap)))
+	fmt.Println("values", string(valueToBytes2(cty.ObjectVal(values))))
 
 	valueMap := blockMap.AsValueMap()
 	if valueMap == nil {
 		valueMap = make(map[string]cty.Value)
 	}
+	fmt.Println("ALISTAIR END:", b.FullName())
+	fmt.Println()
 
 	if k := b.Key(); k != nil {
 		e.logger.Debug().Msgf("expanding block %s to be available for for_each key %s", b.FullName(), *k)
