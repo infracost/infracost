@@ -25,6 +25,7 @@ import (
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 	"github.com/zclconf/go-cty/cty/gocty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -921,6 +922,12 @@ func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.
 	return cty.ObjectVal(ob)
 }
 
+func valueToBytes2(v cty.Value) []byte {
+	simple := ctyJson.SimpleJSONValue{Value: v}
+	b, _ := simple.MarshalJSON()
+	return b
+}
+
 func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {
 	labels := b.Labels()
 
@@ -933,6 +940,13 @@ func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.
 		values[labels[0]] = cty.ObjectVal(make(map[string]cty.Value))
 		blockMap = values[labels[0]]
 	}
+
+	e.logger.Info().Msg("\n\nALISTAIR START")
+	e.logger.Info().Msgf("%v\n", labels)
+	e.logger.Info().Msg(blockMap.GoString())
+	e.logger.Info().Msg(string(valueToBytes2(blockMap)))
+	e.logger.Info().Msg(string(valueToBytes2(cty.ObjectVal(values))))
+	e.logger.Info().Msg("ALISTAIR END\n\n")
 
 	valueMap := blockMap.AsValueMap()
 	if valueMap == nil {
