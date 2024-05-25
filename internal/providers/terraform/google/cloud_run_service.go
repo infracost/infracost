@@ -9,7 +9,7 @@ import (
 func getCloudRunServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "google_cloud_run_service",
-		RFunc:	newCloudRunService,
+		RFunc: newCloudRunService,
 	}
 }
 
@@ -25,7 +25,7 @@ func newCloudRunService(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	if val, ok := annotations["autoscaling.knative.dev/minScale"]; ok {
 		minScale = val.Float()
 	}
-	
+
 	cpu := int64(1)
 	if val, ok := limits["cpu"]; ok {
 		cpu = int64(val.Float())
@@ -39,12 +39,12 @@ func newCloudRunService(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		}
 	}
 	r := &google.CloudRunService{
-		Address: d.Address,
-		Region:  region,
-		CpuLimit: cpu,
-		CpuMinScale : minScale,
+		Address:              d.Address,
+		Region:               region,
+		CpuLimit:             cpu,
+		CpuMinScale:          minScale,
 		CpuThrottlingEnabled: cpuThrottling,
-		MemoryLimit: memory,
+		MemoryLimit:          memory,
 	}
 	r.PopulateUsage(u)
 	return r.BuildResource()

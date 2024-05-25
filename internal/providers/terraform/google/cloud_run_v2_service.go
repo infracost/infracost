@@ -8,8 +8,8 @@ import (
 
 func getCloudRunV2ServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:      "google_cloud_run_v2_service",
-		RFunc: 		newCloudRunV2Service,
+		Name:  "google_cloud_run_v2_service",
+		RFunc: newCloudRunV2Service,
 	}
 }
 
@@ -28,7 +28,7 @@ func newCloudRunV2Service(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		}
 	}
 	isCpuIdle := true
-	if !d.IsEmpty("template.0.containers.0.resources.0.cpu_idle")  {
+	if !d.IsEmpty("template.0.containers.0.resources.0.cpu_idle") {
 		isCpuIdle = d.Get("template.0.containers.0.resources.0.cpu_idle").Bool()
 	}
 	minInstanceCount := float64(0.5)
@@ -36,12 +36,12 @@ func newCloudRunV2Service(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		minInstanceCount = d.Get("template.0.scaling.0.min_instance_count").Float()
 	}
 	r := &google.CloudRunV2Service{
-		Address:          d.Address,
-		Region:           region,
-		CpuLimit:         cpu,
-		MemoryLimit:      memory,
+		Address:             d.Address,
+		Region:              region,
+		CpuLimit:            cpu,
+		MemoryLimit:         memory,
 		IsThrottlingEnabled: isCpuIdle,
-		MinInstanceCount: minInstanceCount,
+		MinInstanceCount:    minInstanceCount,
 	}
 	r.PopulateUsage(u)
 	return r.BuildResource()

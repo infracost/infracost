@@ -9,12 +9,12 @@ import (
 )
 
 type CloudRunV2Job struct {
-	Address 			string
-	Region  			string
-	CpuLimit 			int64
-	MemoryLimit 		int64
+	Address              string
+	Region               string
+	CpuLimit             int64
+	MemoryLimit          int64
 	TaskCount            int64
-	MonthlyJobExecutions *int64 `infracost_usage:"monthly_job_executions"`
+	MonthlyJobExecutions *int64   `infracost_usage:"monthly_job_executions"`
 	AvgTaskExecutionMins *float64 `infracost_usage:"average_task_execution_mins"`
 }
 
@@ -40,17 +40,17 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 	var cpuName string
 	var memoryName string
 	if regionTier == "Tier 2" {
-		cpuName  = "CPU Allocation Time (tier 2)"
+		cpuName = "CPU Allocation Time (tier 2)"
 		memoryName = "Memory Allocation Time (tier 2)"
 	} else {
-		cpuName  = "CPU Allocation Time"
+		cpuName = "CPU Allocation Time"
 		memoryName = "Memory Allocation Time"
 	}
 	costComponents := []*schema.CostComponent{
 		{
 			Name:            cpuName,
 			Unit:            "vCPU-seconds",
-			UnitMultiplier:  decimal.NewFromInt(1), 
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateCpuSeconds()),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -65,7 +65,7 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 		{
 			Name:            memoryName,
 			Unit:            "GiB-seconds",
-			UnitMultiplier:  decimal.NewFromInt(1), 
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateGBSeconds()),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -85,7 +85,6 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 		CostComponents: costComponents,
 	}
 }
-
 
 func (r *CloudRunV2Job) calculateCpuSeconds() decimal.Decimal {
 	seconds := decimal.NewFromFloat(*r.AvgTaskExecutionMins * 60)

@@ -32,7 +32,7 @@ resource "google_cloud_run_service" "throttling_disabled" {
   }
   metadata {
     annotations = {
-      "run.googleapis.com/cpu-throttling": false
+      "run.googleapis.com/cpu-throttling" : false
     }
   }
 }

@@ -10,16 +10,16 @@ import (
 
 // Resource information: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_service/
 type CloudRunV2Service struct {
-	Address string
-	Region  string
-	CpuLimit int64
-	IsThrottlingEnabled  bool
-	MemoryLimit      int64
-	MinInstanceCount float64
-	MonthlyRequests     *int64 `infracost_usage:"monthly_requests"`
-	AverageRequestDurationMs *int64 `infracost_usage:"average_request_duration_ms"`
-	ConcurrentRequestsPerInstance  *int64 `infracost_usage:"concurrent_requests_per_instance"`
-	InstanceHrs         *int64 `infracost_usage:"instance_hrs"`
+	Address                       string
+	Region                        string
+	CpuLimit                      int64
+	IsThrottlingEnabled           bool
+	MemoryLimit                   int64
+	MinInstanceCount              float64
+	MonthlyRequests               *int64 `infracost_usage:"monthly_requests"`
+	AverageRequestDurationMs      *int64 `infracost_usage:"average_request_duration_ms"`
+	ConcurrentRequestsPerInstance *int64 `infracost_usage:"concurrent_requests_per_instance"`
+	InstanceHrs                   *int64 `infracost_usage:"instance_hrs"`
 }
 
 func (r *CloudRunV2Service) CoreType() string {
@@ -44,10 +44,10 @@ func (r *CloudRunV2Service) BuildResource() *schema.Resource {
 	var cpuName string
 	var memoryName string
 	if regionTier == "Tier 2" {
-		cpuName  = "CPU Allocation Time (tier 2)"
+		cpuName = "CPU Allocation Time (tier 2)"
 		memoryName = "Memory Allocation Time (tier 2)"
 	} else {
-		cpuName  = "CPU Allocation Time"
+		cpuName = "CPU Allocation Time"
 		memoryName = "Memory Allocation Time"
 	}
 	var costComponents []*schema.CostComponent
@@ -69,7 +69,7 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 		{
 			Name:            cpuName,
 			Unit:            "vCPU-seconds",
-			UnitMultiplier:  decimal.NewFromInt(1), 
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateCpuSeconds()),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -84,7 +84,7 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 		{
 			Name:            memoryName,
 			Unit:            "GiB-seconds",
-			UnitMultiplier:  decimal.NewFromInt(1), 
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateGBSeconds()),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -99,7 +99,7 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 		{
 			Name:            "Number of requests",
 			Unit:            "request",
-			UnitMultiplier:  decimal.NewFromInt(1), 
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.MonthlyRequests)),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -114,7 +114,6 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 				StartUsageAmount: strPtr("2000000"),
 			},
 		},
-		
 	}
 }
 func (r *CloudRunV2Service) IsThrottlingDisabledCostComponent(cpuName string, memoryName string) []*schema.CostComponent {
@@ -137,7 +136,7 @@ func (r *CloudRunV2Service) IsThrottlingDisabledCostComponent(cpuName string, me
 		{
 			Name:            memoryName,
 			Unit:            "GiB-seconds",
-			UnitMultiplier:  decimal.NewFromInt(1), 
+			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateGBSeconds()),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),

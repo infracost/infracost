@@ -4,7 +4,7 @@ provider "google" {
 }
 
 resource "google_cloud_run_v2_job" "my_job" {
-  name = "cloudrun-v2-job-test"
+  name     = "cloudrun-v2-job-test"
   location = "europe-west3"
   template {
     template {

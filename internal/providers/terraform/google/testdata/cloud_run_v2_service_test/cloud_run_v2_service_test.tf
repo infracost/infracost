@@ -6,7 +6,7 @@ provider "google" {
 resource "google_cloud_run_v2_service" "throttling_enabled" {
   name     = "cloudrun-service-test-with-cpu-idle"
   location = "europe-west3"
-  ingress = "INGRESS_TRAFFIC_ALL"
+  ingress  = "INGRESS_TRAFFIC_ALL"
 
   template {
     containers {
@@ -18,14 +18,14 @@ resource "google_cloud_run_v2_service" "throttling_enabled" {
 resource "google_cloud_run_v2_service" "throttling_disabled" {
   name     = "cloudrun-service-test-with-cpu-idle"
   location = "europe-west3"
-  ingress = "INGRESS_TRAFFIC_ALL"
+  ingress  = "INGRESS_TRAFFIC_ALL"
 
   template {
     containers {
       image = "us-docker.pkg.dev/cloudrun/container/hello"
       resources {
         limits = {
-          cpu = "1"
+          cpu    = "1"
           memory = "512Mi"
         }
         cpu_idle = false

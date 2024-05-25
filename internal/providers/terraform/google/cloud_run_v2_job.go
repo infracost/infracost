@@ -19,8 +19,8 @@ func newCloudRunV2Job(d *schema.ResourceData) schema.CoreResource {
 	taskCount := int64(1)
 	if !d.IsEmpty("template.0.task_count") {
 		taskCount = int64(d.Get("template.0.task_count").Int())
-	} 
-	
+	}
+
 	cpu := int64(1)
 	if val, ok := limits["cpu"]; ok {
 		cpu = int64(val.Float())
@@ -33,9 +33,9 @@ func newCloudRunV2Job(d *schema.ResourceData) schema.CoreResource {
 		}
 	}
 	return &google.CloudRunV2Job{
-		Address: d.Address,
-		Region:  region,
-		CpuLimit: cpu,
+		Address:     d.Address,
+		Region:      region,
+		CpuLimit:    cpu,
 		MemoryLimit: memory,
 		TaskCount:   taskCount,
 	}
