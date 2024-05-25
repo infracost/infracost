@@ -41,11 +41,11 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	var cpuName string
 	var memoryName string
 	if regionTier == "Tier 2" {
-		cpuName = "CPU Allocation Time (tier 2)"
-		memoryName = "Memory Allocation Time (tier 2)"
+		cpuName = "CPU allocation time (tier 2)"
+		memoryName = "Memory allocation time (tier 2)"
 	} else {
-		cpuName = "CPU Allocation Time"
-		memoryName = "Memory Allocation Time"
+		cpuName = "CPU allocation time"
+		memoryName = "Memory allocation time"
 	}
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
@@ -94,7 +94,7 @@ func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, memoryN
 		},
 		{
 			Name:            "Number of requests",
-			Unit:            "request",
+			Unit:            "requests",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.MonthlyRequests)),
 			ProductFilter: &schema.ProductFilter{
@@ -115,7 +115,7 @@ func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, memoryN
 func (r *CloudRunService) throttlingDisabledCostComponent() []*schema.CostComponent {
 	return []*schema.CostComponent{
 		{
-			Name:            "CPU Allocation Time (Always-on)",
+			Name:            "CPU allocation time (always-on)",
 			Unit:            "vCPU-seconds",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(false)),
@@ -130,7 +130,7 @@ func (r *CloudRunService) throttlingDisabledCostComponent() []*schema.CostCompon
 			},
 		},
 		{
-			Name:            "Memory Allocation Time (Always-on)",
+			Name:            "Memory allocation time (always-on)",
 			Unit:            "GiB-seconds",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(r.calculateGBSeconds(false)),
