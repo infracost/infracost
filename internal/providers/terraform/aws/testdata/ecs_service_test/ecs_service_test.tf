@@ -170,3 +170,42 @@ resource "aws_ecs_service" "ecs_no_fargate_2" {
   task_definition = aws_ecs_task_definition.ecs_task.arn
   desired_count   = 2
 }
+
+resource "aws_ecs_cluster" "task_set" {
+  name = "task-set"
+}
+
+resource "aws_ecs_service" "task_set" {
+  name          = "task-set"
+  launch_type   = "FARGATE"
+  desired_count = 2
+}
+
+resource "aws_ecs_task_definition" "task_set" {
+  requires_compatibilities = ["FARGATE"]
+  family                   = "ecs_task1"
+  memory                   = "4 GB"
+  cpu                      = "2 vCPU"
+  inference_accelerator {
+    device_name = "device1"
+    device_type = "eia2.medium"
+  }
+  container_definitions = <<TASK_DEFINITION
+			[
+				{
+						"command": ["sleep", "10"],
+						"entryPoint": ["/"],
+						"essential": true,
+						"image": "alpine",
+						"name": "alpine",
+						"network_mode": "none"
+				}
+			]
+			TASK_DEFINITION
+}
+
+resource "aws_ecs_task_set" "task_set" {
+  service         = aws_ecs_service.task_set.id
+  cluster         = aws_ecs_cluster.task_set.id
+  task_definition = aws_ecs_task_definition.task_set.arn
+}
