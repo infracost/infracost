@@ -55,6 +55,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getStorageBucketRegistryItem(),
 	getComputePerInstanceConfigRegistryItem(),
 	getComputeRegionPerInstanceConfigRegistryItem(),
+	getCloudRunServiceRegistryItem(),
+	getCloudRunV2JobRegistryItem(),
+	getCloudRunV2ServiceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -75,11 +78,12 @@ var FreeResources = []string{
 	"google_cloudfunctions_function_iam_binding",
 	"google_cloudfunctions_function_iam_member",
 	"google_cloudfunctions_function_iam_policy",
-	"google_cloud_run_domain_mapping",
-	"google_cloud_run_service_iam_member",
 	"google_cloud_run_service_iam_policy",
-	"google_cloud_run_v2_job_iam_member",
-	"google_cloud_run_v2_service_iam_binding",
+	"google_cloud_run_service_iam_binding",
+	"google_cloud_run_service_iam_member",
+	"google_cloud_run_domain_mapping",
+	"google_cloud_run_v2_job_iam",
+	"google_cloud_run_v2_service_iam",
 	"google_cloudfunctions2_function_iam_policy",
 	"google_compute_attached_disk",
 	"google_compute_backend_bucket",

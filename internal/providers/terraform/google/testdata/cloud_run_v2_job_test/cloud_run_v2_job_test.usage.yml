@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  google_cloud_run_v2_job.my_job:
+    monthly_job_executions: 50000
+    average_task_execution_mins: 10
