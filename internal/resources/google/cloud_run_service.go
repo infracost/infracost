@@ -38,18 +38,21 @@ func (r *CloudRunService) PopulateUsage(u *schema.UsageData) {
 
 func (r *CloudRunService) BuildResource() *schema.Resource {
 	regionTier := GetRegionTier(r.Region)
-	var cpuName string
-	var memoryName string
+	var cpuName, cpuDesc, memoryName, memoryDesc string
 	if regionTier == "Tier 2" {
 		cpuName = "CPU allocation time (tier 2)"
+		cpuDesc = "CPU Allocation Time (tier 2)"
 		memoryName = "Memory allocation time (tier 2)"
+		memoryDesc = "Memory Allocation Time (tier 2)"
 	} else {
 		cpuName = "CPU allocation time"
+		cpuDesc = "CPU Allocation Time"
 		memoryName = "Memory allocation time"
+		memoryDesc = "Memory Allocation Time"
 	}
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
-		costComponents = r.throttlingEnabledCostComponent(cpuName, memoryName)
+		costComponents = r.throttlingEnabledCostComponent(cpuName, cpuDesc, memoryName, memoryDesc)
 	} else {
 		costComponents = r.throttlingDisabledCostComponent()
 	}
@@ -60,7 +63,7 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, memoryName string) []*schema.CostComponent {
+func (r *CloudRunService) throttlingEnabledCostComponent(cpuName, cpuDesc, memoryName, memoryDesc string) []*schema.CostComponent {
 	return []*schema.CostComponent{
 		{
 			Name:            cpuName,
@@ -73,7 +76,7 @@ func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, memoryN
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(cpuName)},
+					{Key: "description", Value: strPtr(cpuDesc)},
 				},
 			},
 		},
@@ -88,7 +91,7 @@ func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, memoryN
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(memoryName)},
+					{Key: "description", Value: strPtr(memoryDesc)},
 				},
 			},
 		},

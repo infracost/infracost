@@ -41,20 +41,23 @@ func (r *CloudRunV2Service) PopulateUsage(u *schema.UsageData) {
 
 func (r *CloudRunV2Service) BuildResource() *schema.Resource {
 	regionTier := GetRegionTier(r.Region)
-	var cpuName string
-	var memoryName string
+	var cpuName, cpuDesc, memoryName, memoryDesc string
 	if regionTier == "Tier 2" {
 		cpuName = "CPU allocation time (tier 2)"
+		cpuDesc = "CPU Allocation Time (tier 2)"
 		memoryName = "Memory allocation time (tier 2)"
+		memoryDesc = "Memory Allocation Time (tier 2)"
 	} else {
-		cpuName = "CPU allocation time"
+		cpuName = "CPU allocation Time"
+		cpuDesc = "CPU Allocation time"
 		memoryName = "Memory allocation time"
+		memoryDesc = "Memory Allocation Time"
 	}
 	var costComponents []*schema.CostComponent
 	if r.IsThrottlingEnabled {
-		costComponents = r.IsThrottlingEnabledCostComponent(cpuName, memoryName)
+		costComponents = r.throttlingEnabledCostComponents(cpuName, cpuDesc, memoryName, memoryDesc)
 	} else {
-		costComponents = r.IsThrottlingDisabledCostComponent(cpuName, memoryName)
+		costComponents = r.throttlingDisabledCostComponents(cpuName, memoryName)
 	}
 
 	return &schema.Resource{
@@ -64,7 +67,7 @@ func (r *CloudRunV2Service) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, memoryName string) []*schema.CostComponent {
+func (r *CloudRunV2Service) throttlingEnabledCostComponents(cpuName, cpuDesc, memoryName, memoryDesc string) []*schema.CostComponent {
 	return []*schema.CostComponent{
 		{
 			Name:            cpuName,
@@ -77,7 +80,7 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(cpuName)},
+					{Key: "description", Value: strPtr(cpuDesc)},
 				},
 			},
 		},
@@ -92,7 +95,7 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(memoryName)},
+					{Key: "description", Value: strPtr(memoryDesc)},
 				},
 			},
 		},
@@ -116,7 +119,7 @@ func (r *CloudRunV2Service) IsThrottlingEnabledCostComponent(cpuName string, mem
 		},
 	}
 }
-func (r *CloudRunV2Service) IsThrottlingDisabledCostComponent(cpuName string, memoryName string) []*schema.CostComponent {
+func (r *CloudRunV2Service) throttlingDisabledCostComponents(cpuName, memoryName string) []*schema.CostComponent {
 	return []*schema.CostComponent{
 		{
 			Name:            cpuName,
