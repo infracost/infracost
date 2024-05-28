@@ -1,12 +1,12 @@
 package azure
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-
-	"fmt"
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -84,9 +84,9 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 
-	productNameRe := "/Virtual Machines .* Series Windows$/"
+	productNameRe := "/(Series )?Windows$/i"
 	if strings.HasPrefix(instanceType, "Basic_") {
-		productNameRe = "/Virtual Machines .* Series Basic Windows$/"
+		productNameRe = "/Basic Windows$/"
 	} else if !strings.HasPrefix(instanceType, "Standard_") {
 		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
