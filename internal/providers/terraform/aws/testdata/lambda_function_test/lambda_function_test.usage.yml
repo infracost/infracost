@@ -39,11 +39,3 @@ resource_usage:
   aws_lambda_function.lambda_duration_18B_arm:
     monthly_requests: 18250000000
     request_duration_ms: 2048
-
-  aws_lambda_function.lambda_china_withUsage:
-    monthly_requests: 100000
-    request_duration_ms: 350
-
-  aws_lambda_function.lambda_china_withUsage_arm:
-    monthly_requests: 100000
-    request_duration_ms: 350
