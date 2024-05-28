@@ -142,17 +142,6 @@
                 "monthlyCost": "416.6675",
                 "usageBased": true,
                 "priceNotFound": false
-              },
-              {
-                "name": "Duration (over 15B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000133334",
-                "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": true,
-                "priceNotFound": false
               }
             ]
           },
@@ -260,17 +249,6 @@
                 "hourlyQuantity": "0",
                 "monthlyQuantity": "0",
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": true,
-                "priceNotFound": false
-              },
-              {
-                "name": "Duration (over 15B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000133334",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
                 "usageBased": true,
@@ -471,17 +449,6 @@
                 "monthlyCost": "416.6675",
                 "usageBased": true,
                 "priceNotFound": false
-              },
-              {
-                "name": "Duration (over 15B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000133334",
-                "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": true,
-                "priceNotFound": false
               }
             ]
           },
@@ -592,17 +559,6 @@
                 "hourlyQuantity": "0",
                 "monthlyQuantity": "0",
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": true,
-                "priceNotFound": false
-              },
-              {
-                "name": "Duration (over 15B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000133334",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
                 "usageBased": true,

@@ -116,7 +116,10 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 
 			totalBacktrackChangeRecords = decimalPtr(r.calculateBacktrack(averageStatements, backtrackChangeRecords, backtrackWindowHours))
 		}
-		costComponents = append(costComponents, r.auroraBacktrackCostComponent(totalBacktrackChangeRecords))
+
+		if !isAWSChina(r.Region) {
+			costComponents = append(costComponents, r.auroraBacktrackCostComponent(totalBacktrackChangeRecords))
+		}
 	}
 
 	var snapshotExportSizeGB *decimal.Decimal

@@ -749,3 +749,7 @@ func (r rdsReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 		TermPurchaseOption: strPtr(purchaseOption),
 	}, nil
 }
+
+func isAWSChina(region string) bool {
+	return strings.HasPrefix(region, "cn-")
+}

@@ -34,6 +34,12 @@
  ├─ Backtrack                                                66,576  1M change-records                $798.91  * 
  └─ Snapshot export                                             200  GB                                 $2.00  * 
                                                                                                                  
+ aws_rds_cluster.mysql_backtrack_china                                                                           
+ ├─ Storage                                     Monthly cost depends on usage: $0.092527 per GB                  
+ ├─ I/O requests                                Monthly cost depends on usage: $0.18 per 1M requests             
+ ├─ Backup storage                              not found                                                        
+ └─ Snapshot export                             not found                                                        
+                                                                                                                 
  aws_rds_cluster.mysql_backtrack_withoutU                                                                        
  ├─ Storage                                     Monthly cost depends on usage: $0.10 per GB                      
  ├─ I/O requests                                Monthly cost depends on usage: $0.20 per 1M requests             
@@ -52,8 +58,8 @@
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-7 cloud resources were detected:
-∙ 7 were estimated
+8 cloud resources were detected:
+∙ 8 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃

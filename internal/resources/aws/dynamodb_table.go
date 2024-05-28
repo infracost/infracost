@@ -170,7 +170,7 @@ func (a *DynamoDBTable) wcuCostComponent(region string, provisionedWCU *int64, a
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
-			DescriptionRegex: strPtr("/beyond the free tier/"),
+			DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 		},
 		UsageBased: autoscaling,
 	}
@@ -202,7 +202,7 @@ func (a *DynamoDBTable) rcuCostComponent(region string, provisionedRCU *int64, a
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
-			DescriptionRegex: strPtr("/beyond the free tier/"),
+			DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 		},
 		UsageBased: autoscaling,
 	}
@@ -249,7 +249,7 @@ func (a *DynamoDBTable) newProvisionedDynamoDBGlobalTable(name string, region st
 				},
 				PriceFilter: &schema.PriceFilter{
 					PurchaseOption:   strPtr("on_demand"),
-					DescriptionRegex: strPtr("/beyond the free tier/"),
+					DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 				},
 			},
 		},
@@ -357,7 +357,7 @@ func (a *DynamoDBTable) dataStorageCostComponent(region string, storageGB *int64
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
-			DescriptionRegex: strPtr("/storage used beyond first/"),
+			DescriptionRegex: regexPtr("^(?!.*\\$0.00 per GB-Month).*$"),
 		},
 		UsageBased: true,
 	}
@@ -446,7 +446,7 @@ func (a *DynamoDBTable) streamCostComponent(region string, monthlyStreamsRRU *in
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			DescriptionRegex: strPtr("/beyond free tier/"),
+			DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 		},
 		UsageBased: true,
 	}
