@@ -37,3 +37,14 @@ resource "google_cloud_run_v2_service" "throttling_disabled" {
   }
 }
 
+resource "google_cloud_run_v2_service" "throttling_enabled_no_usage" {
+  name     = "cloudrun-service-test-with-cpu-idle"
+  location = "europe-west3"
+  ingress  = "INGRESS_TRAFFIC_ALL"
+
+  template {
+    containers {
+      image = "us-docker.pkg.dev/cloudrun/container/hello"
+    }
+  }
+}
