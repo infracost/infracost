@@ -42,6 +42,7 @@ func s3StorageVolumeTypeCostComponent(name string, service string, region string
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 				{Key: "volumeType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", volumeType))},
+				{Key: "operation", Value: strPtr("")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

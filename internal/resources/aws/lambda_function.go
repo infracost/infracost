@@ -86,6 +86,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "group", Value: strPtr(requestType)},
 				{Key: "usagetype", ValueRegex: strPtr("/Request/")},
+				{Key: "groupDescription", ValueRegex: regexPtr("^(?!.*China free tier).*$")},
 			},
 		},
 		UsageBased: true,
@@ -93,12 +94,17 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 	)
 
 	// Defaults to x86 tiers
-	gbRequestTiers := []int{6000000000, 9000000000, 15000000000}
+	gbRequestTiers := []int{6000000000, 9000000000}
 	displayNameList := []string{"Duration (first 6B)", "Duration (next 9B)", "Duration (over 15B)"}
 
 	if a.Architecture == "arm64" {
-		gbRequestTiers = []int{7500000000, 11250000000, 18750000000}
+		gbRequestTiers = []int{7500000000, 11250000000}
 		displayNameList = []string{"Duration (first 7.5B)", "Duration (next 11.25B)", "Duration (over 18.75B)"}
+	}
+
+	if isAWSChina(a.Region) {
+		gbRequestTiers = []int{}
+		displayNameList = []string{"Duration"}
 	}
 
 	if a.MonthlyRequests != nil {
@@ -109,16 +115,17 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		gbSecondQuantities := usage.CalculateTierBuckets(*gbSeconds, gbRequestTiers)
 
 		costComponents = append(costComponents, a.storageCostComponent(storageGBSeconds, storageType))
-		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", &gbSecondQuantities[0], durationType))
 
-		if gbSecondQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, a.durationCostComponent(displayNameList[1], strconv.Itoa(gbRequestTiers[0]), &gbSecondQuantities[1], durationType))
+		usageTier := 0
+		for i := 0; i < len(gbSecondQuantities); i++ {
+			// Always add the first one
+			if i == 0 || gbSecondQuantities[i].GreaterThan(decimal.NewFromInt(0)) {
+				costComponents = append(costComponents, a.durationCostComponent(displayNameList[i], strconv.Itoa(usageTier), &gbSecondQuantities[i], durationType))
+				if i < len(gbRequestTiers) {
+					usageTier += gbRequestTiers[i]
+				}
+			}
 		}
-
-		if gbSecondQuantities[2].GreaterThanOrEqual(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, a.durationCostComponent(displayNameList[2], strconv.Itoa(gbRequestTiers[2]), &gbSecondQuantities[2], durationType))
-		}
-
 	} else {
 		costComponents = append(costComponents, a.storageCostComponent(nil, storageType))
 		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", gbSeconds, durationType))
@@ -171,6 +178,7 @@ func (a *LambdaFunction) durationCostComponent(displayName string, usageTier str
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "group", Value: strPtr(durationType)},
 				{Key: "usagetype", ValueRegex: strPtr("/GB-Second/")},
+				{Key: "groupDescription", ValueRegex: regexPtr("^(?!.*China free tier).*$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -194,6 +202,7 @@ func (a *LambdaFunction) storageCostComponent(quantity *decimal.Decimal, storage
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "group", Value: strPtr(storageType)},
 				{Key: "usagetype", ValueRegex: strPtr("/GB-Second/")},
+				{Key: "groupDescription", ValueRegex: regexPtr("^(?!.*China free tier).*$")},
 			},
 		},
 	}

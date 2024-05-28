@@ -1,17 +1,17 @@
 
  Name                                                    Monthly Qty  Unit                        Monthly Cost    
                                                                                                                   
- aws_lambda_function.lambda_duration_18B_arm                                                                      
- ├─ Requests                                                  18,250  1M requests                    $3,650.00  * 
- ├─ Duration (first 7.5B)                              7,500,000,000  GB-seconds                   $100,000.50  * 
- ├─ Duration (next 11.25B)                            11,250,000,000  GB-seconds                   $135,001.13  * 
- └─ Duration (over 18.75B)                            18,750,000,000  GB-seconds                   $200,000.63  * 
-                                                                                                                  
  aws_lambda_function.lambda_duration_15B                                                                          
  ├─ Requests                                                  15,000  1M requests                    $3,000.00  * 
  ├─ Duration (first 6B)                                6,000,000,000  GB-seconds                   $100,000.20  * 
  ├─ Duration (next 9B)                                 9,000,000,000  GB-seconds                   $135,000.00  * 
- └─ Duration (over 15B)                               15,000,000,000  GB-seconds                   $200,001.00  * 
+ └─ Duration (over 15B)                               46,440,000,000  GB-seconds                   $619,203.10  * 
+                                                                                                                  
+ aws_lambda_function.lambda_duration_18B_arm                                                                      
+ ├─ Requests                                                  18,250  1M requests                    $3,650.00  * 
+ ├─ Duration (first 7.5B)                              7,500,000,000  GB-seconds                   $100,000.50  * 
+ ├─ Duration (next 11.25B)                            11,250,000,000  GB-seconds                   $135,001.13  * 
+ └─ Duration (over 18.75B)                            56,002,000,000  GB-seconds                   $597,356.53  * 
                                                                                                                   
  aws_lambda_function.lambda_duration_11B_arm                                                                      
  ├─ Requests                                                  11,250  1M requests                    $2,250.00  * 
@@ -47,6 +47,9 @@
  ├─ Requests                                                     0.1  1M requests                        $0.02  * 
  └─ Duration (first 7.5B)                                      4,375  GB-seconds                         $0.06  * 
                                                                                                                   
+ aws_lambda_function.lambda_china_withUsage                                                                       
+ └─ Requests                                                     0.1  1M requests                        $0.02  * 
+                                                                                                                  
  aws_lambda_function.lambda                                                                                       
  ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests             
  ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds      
@@ -57,16 +60,26 @@
  ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds      
  └─ Duration (first 7.5B)                        Monthly cost depends on usage: $0.0000133334 per GB-seconds      
                                                                                                                   
- OVERALL TOTAL                                                                                   $1,282,285.65 
+ aws_lambda_function.lambda_china                                                                                 
+ ├─ Requests                                     Monthly cost depends on usage: $0.19 per 1M requests             
+ ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000318 per GB-seconds      
+ └─ Duration                                     Monthly cost depends on usage: $0.0000156712 per GB-seconds      
+                                                                                                                  
+ aws_lambda_function.lambda_cina_withUsage_arm                                                                    
+ ├─ Requests                                     Monthly cost depends on usage: $0.19 per 1M requests             
+ ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000318 per GB-seconds      
+ └─ Duration                                     Monthly cost depends on usage: $0.000012537 per GB-seconds       
+                                                                                                                  
+ OVERALL TOTAL                                                                                   $2,098,843.67 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-12 cloud resources were detected:
-∙ 12 were estimated
+15 cloud resources were detected:
+∙ 15 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $0.00         ┃ $1,282,286  ┃ $1,282,286 ┃
+┃ main                                               ┃ $0.00         ┃ $2,098,844  ┃ $2,098,844 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
