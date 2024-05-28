@@ -7,9 +7,8 @@ import (
 
 func getElastiCacheClusterItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:                "aws_elasticache_cluster",
-		CoreRFunc:           NewElastiCacheCluster,
-		ReferenceAttributes: []string{"replication_group_id"},
+		Name:      "aws_elasticache_cluster",
+		CoreRFunc: NewElastiCacheCluster,
 	}
 }
 
@@ -21,6 +20,7 @@ func NewElastiCacheCluster(d *schema.ResourceData) schema.CoreResource {
 		Engine:                 d.Get("engine").String(),
 		CacheNodes:             d.Get("num_cache_nodes").Int(),
 		SnapshotRetentionLimit: d.Get("snapshot_retention_limit").Int(),
+		HasReplicationGroup:    d.Get("replication_group_id").Exists(),
 	}
 	return r
 }
