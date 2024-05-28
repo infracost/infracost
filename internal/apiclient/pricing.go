@@ -334,6 +334,8 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 			hash:  key,
 			query: query,
 		}
+
+		res[i].Query = query
 	}
 
 	// first filter any queries that have been stored in the cache. We don't need to
@@ -348,12 +350,8 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 			if ok {
 				logging.Logger.Debug().Msgf("cache hit for query hash: %d", query.hash)
 				hit++
-				res[i] = PriceQueryResult{
-					PriceQueryKey: req.keys[i],
-					Result:        v.Result,
-					filled:        true,
-					Query:         query.query,
-				}
+				res[i].Result = v.Result
+				res[i].filled = true
 			} else {
 				serverQueries = append(serverQueries, query)
 			}
