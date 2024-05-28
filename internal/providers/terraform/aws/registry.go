@@ -47,6 +47,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getECSClusterRegistryItem(),
 	getECSServiceRegistryItem(),
 	getECSTaskDefinitionRegistryItem(),
+	getECSTaskSet(),
 	getEFSFileSystemRegistryItem(),
 	getEIPRegistryItem(),
 	getEIPAssociationRegistryItem(),

@@ -15,7 +15,7 @@ func getECSServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_ecs_service",
 		CoreRFunc:           NewECSService,
-		ReferenceAttributes: []string{"cluster", "task_definition"},
+		ReferenceAttributes: []string{"cluster", "task_definition", "aws_ecs_task_set.service"},
 	}
 }
 
@@ -33,6 +33,16 @@ func NewECSService(d *schema.ResourceData) schema.CoreResource {
 		if ref.Type == "aws_ecs_task_definition" {
 			taskDefinition = ref
 			break
+		}
+	}
+
+	for _, ref := range d.References("aws_ecs_task_set.service") {
+		for _, setRef := range ref.References("task_definition") {
+			if setRef.Type == "aws_ecs_task_definition" {
+				taskDefinition = setRef
+				break
+			}
+
 		}
 	}
 

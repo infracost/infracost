@@ -16,6 +16,11 @@
  ├─ Per vCPU per hour                                3  CPU          $88.65   
  └─ Inference accelerator (eia2.medium)          2,190  hours       $262.80   
                                                                               
+ aws_ecs_service.task_set                                                     
+ ├─ Per GB per hour                                  8  GB           $25.96   
+ ├─ Per vCPU per hour                                4  CPU         $118.20   
+ └─ Inference accelerator (eia2.medium)          1,460  hours       $175.20   
+                                                                              
  aws_ecs_service.ecs_fargate2                                                 
  ├─ Per GB per hour                                  4  GB           $12.98   
  ├─ Per vCPU per hour                                2  CPU          $59.10   
@@ -41,17 +46,17 @@
  ├─ Per vCPU per hour                                1  CPU          $29.55   
  └─ Inference accelerator (eia2.medium)            730  hours        $87.60   
                                                                               
- OVERALL TOTAL                                                   $2,349.16 
+ OVERALL TOTAL                                                   $2,668.52 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-22 cloud resources were detected:
-∙ 8 were estimated
-∙ 14 were free
+26 cloud resources were detected:
+∙ 9 were estimated
+∙ 17 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $2,349        ┃ $0.00       ┃ $2,349     ┃
+┃ main                                               ┃ $2,669        ┃ $0.00       ┃ $2,669     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
