@@ -1,0 +1,68 @@
+version: 0.1
+resource_usage:
+  aws_s3_bucket.bucket_china_with_usage:
+    standard:
+      storage_gb:                      10000
+      monthly_tier_1_requests:         10000
+      monthly_tier_2_requests:         10000
+      monthly_select_data_scanned_gb:  10000
+      monthly_select_data_returned_gb: 10000
+
+    intelligent_tiering:
+      frequent_access_storage_gb:            20000
+      infrequent_access_storage_gb:          20000
+      archive_access_storage_gb:             20000
+      deep_archive_access_storage_gb:        20000
+      monthly_tier_1_requests:               20000
+      monthly_tier_2_requests:               20000
+      monthly_select_data_scanned_gb:        20000
+      monthly_select_data_returned_gb:       20000
+      monitored_objects:                     20000
+      monthly_lifecycle_transition_requests: 20000
+      early_delete_gb:                       20000
+
+    standard_infrequent_access:
+      storage_gb:                            30000
+      monthly_tier_1_requests:               30000
+      monthly_tier_2_requests:               30000
+      monthly_lifecycle_transition_requests: 30000
+      monthly_data_retrieval_gb:             30000
+      monthly_select_data_scanned_gb:        30000
+      monthly_select_data_returned_gb:       30000
+
+    one_zone_infrequent_access:
+      storage_gb:                            40000
+      monthly_tier_1_requests:               40000
+      monthly_tier_2_requests:               40000
+      monthly_lifecycle_transition_requests: 40000
+      monthly_data_retrieval_gb:             40000
+      monthly_select_data_scanned_gb:        40000
+      monthly_select_data_returned_gb:       40000
+
+    glacier_flexible_retrieval:
+      storage_gb:                                50000
+      monthly_tier_1_requests:                   50000
+      monthly_tier_2_requests:                   50000
+      monthly_lifecycle_transition_requests:     50000
+      monthly_standard_select_data_scanned_gb:   50000
+      monthly_standard_select_data_returned_gb:  50000
+      monthly_bulk_select_data_scanned_gb:       50000
+      monthly_bulk_select_data_returned_gb:      50000
+      monthly_expedited_select_data_scanned_gb:  50000
+      monthly_expedited_select_data_returned_gb: 50000
+      monthly_standard_data_retrieval_requests:  50000
+      monthly_expedited_data_retrieval_requests: 50000
+      monthly_standard_data_retrieval_gb:        50000
+      monthly_expedited_data_retrieval_gb:       50000
+      early_delete_gb:                           50000
+
+    glacier_deep_archive:
+      storage_gb:                               60000
+      monthly_tier_1_requests:                  60000
+      monthly_tier_2_requests:                  60000
+      monthly_lifecycle_transition_requests:    60000
+      monthly_standard_data_retrieval_requests: 60000
+      monthly_bulk_data_retrieval_requests:     60000
+      monthly_standard_data_retrieval_gb:       60000
+      monthly_bulk_data_retrieval_gb:           60000
+      early_delete_gb:                          60000

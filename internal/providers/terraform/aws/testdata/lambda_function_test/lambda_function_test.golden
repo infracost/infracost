@@ -47,9 +47,6 @@
  ├─ Requests                                                     0.1  1M requests                        $0.02  * 
  └─ Duration (first 7.5B)                                      4,375  GB-seconds                         $0.06  * 
                                                                                                                   
- aws_lambda_function.lambda_china_withUsage                                                                       
- └─ Requests                                                     0.1  1M requests                        $0.02  * 
-                                                                                                                  
  aws_lambda_function.lambda                                                                                       
  ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests             
  ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds      
@@ -60,23 +57,13 @@
  ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds      
  └─ Duration (first 7.5B)                        Monthly cost depends on usage: $0.0000133334 per GB-seconds      
                                                                                                                   
- aws_lambda_function.lambda_china                                                                                 
- ├─ Requests                                     Monthly cost depends on usage: $0.19 per 1M requests             
- ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000318 per GB-seconds      
- └─ Duration                                     Monthly cost depends on usage: $0.0000156712 per GB-seconds      
-                                                                                                                  
- aws_lambda_function.lambda_cina_withUsage_arm                                                                    
- ├─ Requests                                     Monthly cost depends on usage: $0.19 per 1M requests             
- ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000318 per GB-seconds      
- └─ Duration                                     Monthly cost depends on usage: $0.000012537 per GB-seconds       
-                                                                                                                  
- OVERALL TOTAL                                                                                   $2,098,843.67 
+ OVERALL TOTAL                                                                                   $2,098,843.65 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-15 cloud resources were detected:
-∙ 15 were estimated
+12 cloud resources were detected:
+∙ 12 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃

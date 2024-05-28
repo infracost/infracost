@@ -1,5 +1,5 @@
 provider "aws" {
-  region                      = "us-east-1"
+  region                      = "cn-north-1"
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
@@ -8,8 +8,8 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_s3_bucket" "bucket1" {
-  bucket = "bucket1"
+resource "aws_s3_bucket" "bucket_china" {
+  bucket = "bucket-china"
 
   lifecycle {
     ignore_changes = [
@@ -18,8 +18,8 @@ resource "aws_s3_bucket" "bucket1" {
   }
 }
 
-resource "aws_s3_bucket" "bucket_withUsage" {
-  bucket = "bucket_withUsage"
+resource "aws_s3_bucket" "bucket_china_with_usage" {
+  bucket = "bucket_china_with_usage"
 
   lifecycle {
     ignore_changes = [
@@ -27,3 +27,4 @@ resource "aws_s3_bucket" "bucket_withUsage" {
     ]
   }
 }
+

@@ -47,12 +47,6 @@
  ├─ Backtrack                                   Monthly cost depends on usage: $0.012 per 1M change-records      
  └─ Snapshot export                             Monthly cost depends on usage: $0.01 per GB                      
                                                                                                                  
- aws_rds_cluster.mysql_china                                                                                     
- ├─ Storage                                     Monthly cost depends on usage: $0.09246 per GB                   
- ├─ I/O requests                                Monthly cost depends on usage: $0.18 per 1M requests             
- ├─ Backup storage                              not found                                                        
- └─ Snapshot export                             not found                                                        
-                                                                                                                 
  aws_rds_cluster.postgres_serverless_withoutU                                                                    
  ├─ Aurora serverless                           Monthly cost depends on usage: $0.06 per ACU-hours               
  ├─ Storage                                     Monthly cost depends on usage: $0.10 per GB                      
@@ -64,8 +58,8 @@
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 9 were estimated
+8 cloud resources were detected:
+∙ 8 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
