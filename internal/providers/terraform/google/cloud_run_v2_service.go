@@ -1,9 +1,10 @@
 package google
 
 import (
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func getCloudRunV2ServiceRegistryItem() *schema.RegistryItem {
@@ -35,7 +36,7 @@ func newCloudRunV2Service(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	if !d.IsEmpty("template.0.scaling.0.min_instance_count") {
 		minInstanceCount = d.Get("template.0.scaling.0.min_instance_count").Float()
 	}
-	r := &google.CloudRunV2Service{
+	r := &google.CloudRunService{
 		Address:             d.Address,
 		Region:              region,
 		CpuLimit:            cpu,

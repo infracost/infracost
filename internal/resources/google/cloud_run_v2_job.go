@@ -3,11 +3,13 @@ package google
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
+// CloudRunV2Job represents a resource that references a container image which is run to completion.
 type CloudRunV2Job struct {
 	Address              string
 	Region               string
@@ -37,21 +39,19 @@ func (r *CloudRunV2Job) PopulateUsage(u *schema.UsageData) {
 
 func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 	regionTier := GetRegionTier(r.Region)
-	var cpuName string
-	var memoryName string
+	cpuName := "CPU allocation time"
+	memoryName := "Memory allocation time"
 	if regionTier == "Tier 2" {
 		cpuName = "CPU allocation time (tier 2)"
 		memoryName = "Memory allocation time (tier 2)"
-	} else {
-		cpuName = "CPU allocation time"
-		memoryName = "Memory allocation time"
 	}
+
 	costComponents := []*schema.CostComponent{
 		{
 			Name:            cpuName,
 			Unit:            "vCPU-seconds",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: decimalPtr(r.calculateCpuSeconds()),
+			MonthlyQuantity: r.calculateCpuSeconds(),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
 				Region:        strPtr(r.Region),
@@ -66,7 +66,7 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 			Name:            memoryName,
 			Unit:            "GiB-seconds",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: decimalPtr(r.calculateGBSeconds()),
+			MonthlyQuantity: r.calculateGBSeconds(),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
 				Region:        strPtr(r.Region),
@@ -86,15 +86,21 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunV2Job) calculateCpuSeconds() decimal.Decimal {
+func (r *CloudRunV2Job) calculateCpuSeconds() *decimal.Decimal {
+	if r.AvgTaskExecutionMins == nil || r.MonthlyJobExecutions == nil {
+		return nil
+	}
+
 	seconds := decimal.NewFromFloat(*r.AvgTaskExecutionMins * 60)
-	cpuSeconds := decimal.NewFromInt(*r.MonthlyJobExecutions).Mul(decimal.NewFromInt(r.TaskCount)).Mul(seconds).Mul(decimal.NewFromInt(r.CpuLimit))
-	return cpuSeconds
+	return decimalPtr(decimal.NewFromInt(*r.MonthlyJobExecutions).Mul(decimal.NewFromInt(r.TaskCount)).Mul(seconds).Mul(decimal.NewFromInt(r.CpuLimit)))
 }
 
-func (r *CloudRunV2Job) calculateGBSeconds() decimal.Decimal {
+func (r *CloudRunV2Job) calculateGBSeconds() *decimal.Decimal {
+	if r.AvgTaskExecutionMins == nil || r.MonthlyJobExecutions == nil {
+		return nil
+	}
+
 	seconds := decimal.NewFromFloat(*r.AvgTaskExecutionMins * 60)
 	gb := decimal.NewFromInt(r.MemoryLimit).Div(decimal.NewFromInt(1024 * 1024 * 1024))
-	memorySeconds := decimal.NewFromInt(*r.MonthlyJobExecutions).Mul(decimal.NewFromInt(r.TaskCount)).Mul(seconds).Mul(gb)
-	return memorySeconds
+	return decimalPtr(decimal.NewFromInt(*r.MonthlyJobExecutions).Mul(decimal.NewFromInt(r.TaskCount)).Mul(seconds).Mul(gb))
 }
