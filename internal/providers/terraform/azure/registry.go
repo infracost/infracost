@@ -293,6 +293,12 @@ var FreeResources = []string{
 	"azurerm_private_dns_zone_virtual_network_link",
 	"azurerm_private_dns_resolver",
 
+	// Azure Dev Test
+	"azurerm_dev_test_global_vm_shutdown_schedule",
+	"azurerm_dev_test_policy",
+	"azurerm_dev_test_schedule",
+	"azurerm_dev_test_lab",
+
 	// Azure Data Factory
 	"azurerm_data_factory_custom_dataset",
 	"azurerm_data_factory_data_flow",
