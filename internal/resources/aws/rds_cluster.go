@@ -65,6 +65,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 	switch r.Engine {
 	case "aurora", "aurora-mysql":
 		databaseEngine = "Aurora MySQL"
+		databaseEngineStorageType = "(Any|Aurora MySQL)"
 	case "aurora-postgresql":
 		databaseEngine = "Aurora PostgreSQL"
 		databaseEngineStorageType = databaseEngine
@@ -117,9 +118,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 			totalBacktrackChangeRecords = decimalPtr(r.calculateBacktrack(averageStatements, backtrackChangeRecords, backtrackWindowHours))
 		}
 
-		if !isAWSChina(r.Region) {
-			costComponents = append(costComponents, r.auroraBacktrackCostComponent(totalBacktrackChangeRecords))
-		}
+		costComponents = append(costComponents, r.auroraBacktrackCostComponent(totalBacktrackChangeRecords))
 	}
 
 	var snapshotExportSizeGB *decimal.Decimal
@@ -225,10 +224,11 @@ func (r *RDSCluster) auroraBackupStorageCostComponent(totalBackupStorageGB *deci
 
 func (r *RDSCluster) auroraBacktrackCostComponent(backtrackChangeRecords *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Backtrack",
-		Unit:            "1M change-records",
-		UnitMultiplier:  decimal.NewFromInt(1000000),
-		MonthlyQuantity: backtrackChangeRecords,
+		Name:                 "Backtrack",
+		Unit:                 "1M change-records",
+		UnitMultiplier:       decimal.NewFromInt(1000000),
+		MonthlyQuantity:      backtrackChangeRecords,
+		IgnoreIfMissingPrice: true, // Backtrack is not available in all regions
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Service:       strPtr("AmazonRDS"),
