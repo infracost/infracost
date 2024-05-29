@@ -1181,10 +1181,10 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"element":          stdlib.ElementFunc,
 		"endswith":         componentsFuncs.EndsWithFunc,
 		"chunklist":        stdlib.ChunklistFunc,
-		"file":             funcs.MakeFileFunc(baseDir, false), // modified hashicorp/go-cty-funcs/filesystem.MakeFileFunc
-		"fileexists":       funcs.MakeFileExistsFunc(baseDir),  // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileExistsFunc
-		"fileset":          funcs.MakeFileSetFunc(baseDir),     // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileSetFunc
-		"filebase64":       funcs.MakeFileFunc(baseDir, true),  // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileFunc
+		"file":             funcs.MakeFileFunc(baseDir, false),
+		"fileexists":       funcs.MakeFileExistsFunc(baseDir),
+		"fileset":          funcs.MakeFileSetFunc(baseDir),
+		"filebase64":       funcs.MakeFileFunc(baseDir, true),
 		"filebase64sha256": funcs.MakeFileBase64Sha256Func(baseDir),
 		"filebase64sha512": funcs.MakeFileBase64Sha512Func(baseDir),
 		"filemd5":          funcs.MakeFileMd5Func(baseDir),
@@ -1242,12 +1242,12 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"timestamp":        funcs.MockTimestampFunc, // custom. We want to return a deterministic value each time
 		"timeadd":          stdlib.TimeAddFunc,
 		"title":            stdlib.TitleFunc,
-		"tostring":         funcs.MakeToFunc(cty.String),                      // customized from stdlib
-		"tonumber":         funcs.MakeToFunc(cty.Number),                      // customized from stdlib
-		"tobool":           funcs.MakeToFunc(cty.Bool),                        // customized from stdlib
-		"toset":            funcs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),  // customized from stdlib
-		"tolist":           funcs.MakeToFunc(cty.List(cty.DynamicPseudoType)), // customized from stdlib
-		"tomap":            funcs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),  // customized from stdlib
+		"tostring":         componentsFuncs.MakeToFunc(cty.String),
+		"tonumber":         componentsFuncs.MakeToFunc(cty.Number),
+		"tobool":           componentsFuncs.MakeToFunc(cty.Bool),
+		"toset":            componentsFuncs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),
+		"tolist":           componentsFuncs.MakeToFunc(cty.List(cty.DynamicPseudoType)),
+		"tomap":            componentsFuncs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),
 		"transpose":        componentsFuncs.TransposeFunc,
 		"trim":             stdlib.TrimFunc,
 		"trimprefix":       stdlib.TrimPrefixFunc,

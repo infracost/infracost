@@ -5,121 +5,7 @@ import (
 	"testing"
 
 	"github.com/zclconf/go-cty/cty"
-	"golang.org/x/crypto/bcrypt"
 )
-
-func TestUUID(t *testing.T) {
-	result, err := UUID()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	resultStr := result.AsString()
-	if got, want := len(resultStr), 36; got != want {
-		t.Errorf("wrong result length %d; want %d", got, want)
-	}
-}
-
-func TestUUIDV5(t *testing.T) {
-	tests := []struct {
-		Namespace cty.Value
-		Name      cty.Value
-		Want      cty.Value
-		Err       bool
-	}{
-		{
-			cty.StringVal("dns"),
-			cty.StringVal("tada"),
-			cty.StringVal("faa898db-9b9d-5b75-86a9-149e7bb8e3b8"),
-			false,
-		},
-		{
-			cty.StringVal("url"),
-			cty.StringVal("tada"),
-			cty.StringVal("2c1ff6b4-211f-577e-94de-d978b0caa16e"),
-			false,
-		},
-		{
-			cty.StringVal("oid"),
-			cty.StringVal("tada"),
-			cty.StringVal("61eeea26-5176-5288-87fc-232d6ed30d2f"),
-			false,
-		},
-		{
-			cty.StringVal("x500"),
-			cty.StringVal("tada"),
-			cty.StringVal("7e12415e-f7c9-57c3-9e43-52dc9950d264"),
-			false,
-		},
-		{
-			cty.StringVal("6ba7b810-9dad-11d1-80b4-00c04fd430c8"),
-			cty.StringVal("tada"),
-			cty.StringVal("faa898db-9b9d-5b75-86a9-149e7bb8e3b8"),
-			false,
-		},
-		{
-			cty.StringVal("tada"),
-			cty.StringVal("tada"),
-			cty.UnknownVal(cty.String),
-			true,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("uuidv5(%#v, %#v)", test.Namespace, test.Name), func(t *testing.T) {
-			got, err := UUIDV5(test.Namespace, test.Name)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestBase64Sha256(t *testing.T) {
-	tests := []struct {
-		String cty.Value
-		Want   cty.Value
-		Err    bool
-	}{
-		{
-			cty.StringVal("test"),
-			cty.StringVal("n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg="),
-			false,
-		},
-		// This would differ because we're base64-encoding hex represantiation, not raw bytes.
-		// base64encode(sha256("test")) =
-		// "OWY4NmQwODE4ODRjN2Q2NTlhMmZlYWEwYzU1YWQwMTVhM2JmNGYxYjJiMGI4MjJjZDE1ZDZjMTViMGYwMGEwOA=="
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("base64sha256(%#v)", test.String), func(t *testing.T) {
-			got, err := Base64Sha256(test.String)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
 
 func TestFileBase64Sha256(t *testing.T) {
 	tests := []struct {
@@ -149,42 +35,6 @@ func TestFileBase64Sha256(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("filebase64sha256(%#v)", test.Path), func(t *testing.T) {
 			got, err := fileSHA256.Call([]cty.Value{test.Path})
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestBase64Sha512(t *testing.T) {
-	tests := []struct {
-		String cty.Value
-		Want   cty.Value
-		Err    bool
-	}{
-		{
-			cty.StringVal("test"),
-			cty.StringVal("7iaw3Ur350mqGo7jwQrpkj9hiYB3Lkc/iBml1JQODbJ6wYX4oOHV+E+IvIh/1nsUNzLDBMxfqa2Ob1f1ACio/w=="),
-			false,
-		},
-		// This would differ because we're base64-encoding hex represantiation, not raw bytes
-		// base64encode(sha512("test")) =
-		// "OZWUyNmIwZGQ0YWY3ZTc0OWFhMWE4ZWUzYzEwYWU5OTIzZjYxODk4MDc3MmU0NzNmODgxOWE1ZDQ5NDBlMGRiMjdhYzE4NWY4YTBlMWQ1Zjg0Zjg4YmM4ODdmZDY3YjE0MzczMmMzMDRjYzVmYTlhZDhlNmY1N2Y1MDAyOGE4ZmY="
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("base64sha512(%#v)", test.String), func(t *testing.T) {
-			got, err := Base64Sha512(test.String)
 
 			if test.Err {
 				if err == nil {
@@ -247,79 +97,6 @@ func TestFileBase64Sha512(t *testing.T) {
 	}
 }
 
-func TestBcrypt(t *testing.T) {
-	// single variable test
-	p, err := Bcrypt(cty.StringVal("test"))
-	if err != nil {
-		t.Fatalf("err: %s", err)
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(p.AsString()), []byte("test"))
-	if err != nil {
-		t.Fatalf("Error comparing hash and password: %s", err)
-	}
-
-	// testing with two parameters
-	p, err = Bcrypt(cty.StringVal("test"), cty.NumberIntVal(5))
-	if err != nil {
-		t.Fatalf("err: %s", err)
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(p.AsString()), []byte("test"))
-	if err != nil {
-		t.Fatalf("Error comparing hash and password: %s", err)
-	}
-
-	// Negative test for more than two parameters
-	_, err = Bcrypt(cty.StringVal("test"), cty.NumberIntVal(10), cty.NumberIntVal(11))
-	if err == nil {
-		t.Fatal("succeeded; want error")
-	}
-}
-
-func TestMd5(t *testing.T) {
-	tests := []struct {
-		String cty.Value
-		Want   cty.Value
-		Err    bool
-	}{
-		{
-			cty.StringVal("tada"),
-			cty.StringVal("ce47d07243bb6eaf5e1322c81baf9bbf"),
-			false,
-		},
-		{ // Confirm that we're not trimming any whitespaces
-			cty.StringVal(" tada "),
-			cty.StringVal("aadf191a583e53062de2d02c008141c4"),
-			false,
-		},
-		{ // We accept empty string too
-			cty.StringVal(""),
-			cty.StringVal("d41d8cd98f00b204e9800998ecf8427e"),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("md5(%#v)", test.String), func(t *testing.T) {
-			got, err := Md5(test.String)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
 func TestFileMD5(t *testing.T) {
 	tests := []struct {
 		Path cty.Value
@@ -348,39 +125,6 @@ func TestFileMD5(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("filemd5(%#v)", test.Path), func(t *testing.T) {
 			got, err := fileMD5.Call([]cty.Value{test.Path})
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestSha1(t *testing.T) {
-	tests := []struct {
-		String cty.Value
-		Want   cty.Value
-		Err    bool
-	}{
-		{
-			cty.StringVal("test"),
-			cty.StringVal("a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("sha1(%#v)", test.String), func(t *testing.T) {
-			got, err := Sha1(test.String)
 
 			if test.Err {
 				if err == nil {
@@ -443,39 +187,6 @@ func TestFileSHA1(t *testing.T) {
 	}
 }
 
-func TestSha256(t *testing.T) {
-	tests := []struct {
-		String cty.Value
-		Want   cty.Value
-		Err    bool
-	}{
-		{
-			cty.StringVal("test"),
-			cty.StringVal("9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("sha256(%#v)", test.String), func(t *testing.T) {
-			got, err := Sha256(test.String)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
 func TestFileSHA256(t *testing.T) {
 	tests := []struct {
 		Path cty.Value
@@ -504,39 +215,6 @@ func TestFileSHA256(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("filesha256(%#v)", test.Path), func(t *testing.T) {
 			got, err := fileSHA256.Call([]cty.Value{test.Path})
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestSha512(t *testing.T) {
-	tests := []struct {
-		String cty.Value
-		Want   cty.Value
-		Err    bool
-	}{
-		{
-			cty.StringVal("test"),
-			cty.StringVal("ee26b0dd4af7e749aa1a8ee3c10ae9923f618980772e473f8819a5d4940e0db27ac185f8a0e1d5f84f88bc887fd67b143732c304cc5fa9ad8e6f57f50028a8ff"),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("sha512(%#v)", test.String), func(t *testing.T) {
-			got, err := Sha512(test.String)
 
 			if test.Err {
 				if err == nil {
