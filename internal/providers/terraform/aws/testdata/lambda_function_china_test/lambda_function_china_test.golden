@@ -9,8 +9,8 @@
                                                                                                                    
  aws_lambda_function.lambda_china                                                                                  
  ├─ Requests                                      Monthly cost depends on usage: 1.36 元 per 1M requests           
- ├─ Ephemeral storage                             Monthly cost depends on usage: 0.0000002304 元 per GB-seconds    
- └─ Duration                                      Monthly cost depends on usage: 0.0001134365 元 per GB-seconds    
+ ├─ Ephemeral storage                             Monthly cost depends on usage: 0.0000002303 元 per GB-seconds    
+ └─ Duration                                      Monthly cost depends on usage: 0.000113477 元 per GB-seconds     
                                                                                                                    
  OVERALL TOTAL (CNY)                                                                                     0.27 元 
 
