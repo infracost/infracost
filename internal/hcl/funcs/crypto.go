@@ -2,24 +2,20 @@ package funcs
 
 import (
 	"crypto/md5"  //nolint
-	"crypto/rsa"  //nolint
 	"crypto/sha1" //nolint
 	"crypto/sha256"
 	"crypto/sha512"
-	"encoding/asn1"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
-	"strings"
 
 	uuidv5 "github.com/google/uuid"
 	"github.com/hashicorp/go-cty-funcs/crypto"
 	uuid "github.com/hashicorp/go-uuid"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
-	"golang.org/x/crypto/ssh"
 )
 
 var UUIDFunc = function.New(&function.Spec{
@@ -95,55 +91,6 @@ var Md5Func = makeStringHashFunction(md5.New, hex.EncodeToString)
 func MakeFileMd5Func(baseDir string) function.Function {
 	return makeFileHashFunction(baseDir, md5.New, hex.EncodeToString)
 }
-
-// RsaDecryptFunc constructs a function that decrypts an RSA-encrypted ciphertext.
-var RsaDecryptFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "ciphertext",
-			Type: cty.String,
-		},
-		{
-			Name: "privatekey",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
-		s := args[0].AsString()
-		key := args[1].AsString()
-
-		b, err := base64.StdEncoding.DecodeString(s)
-		if err != nil {
-			return cty.UnknownVal(cty.String), function.NewArgErrorf(0, "failed to decode input %q: cipher text must be base64-encoded", s)
-		}
-
-		rawKey, err := ssh.ParseRawPrivateKey([]byte(key))
-		if err != nil {
-			var errStr string
-			switch e := err.(type) {
-			case asn1.SyntaxError:
-				errStr = strings.ReplaceAll(e.Error(), "asn1: syntax error", "invalid ASN1 data in the given private key")
-			case asn1.StructuralError:
-				errStr = strings.ReplaceAll(e.Error(), "asn1: structure error", "invalid ASN1 data in the given private key")
-			default:
-				errStr = fmt.Sprintf("invalid private key: %s", e)
-			}
-			return cty.UnknownVal(cty.String), function.NewArgErrorf(1, errStr)
-		}
-		privateKey, ok := rawKey.(*rsa.PrivateKey)
-		if !ok {
-			return cty.UnknownVal(cty.String), function.NewArgErrorf(1, "invalid private key type %t", rawKey)
-		}
-
-		out, err := rsa.DecryptPKCS1v15(nil, privateKey, b)
-		if err != nil {
-			return cty.UnknownVal(cty.String), fmt.Errorf("failed to decrypt: %s", err)
-		}
-
-		return cty.StringVal(string(out)), nil
-	},
-})
 
 // Sha1Func constructs a function that computes the SHA1 hash of a given string
 // and encodes it with hexadecimal digits.
@@ -270,12 +217,6 @@ func Bcrypt(str cty.Value, cost ...cty.Value) (cty.Value, error) {
 // Md5 computes the MD5 hash of a given string and encodes it with hexadecimal digits.
 func Md5(str cty.Value) (cty.Value, error) {
 	return Md5Func.Call([]cty.Value{str})
-}
-
-// RsaDecrypt decrypts an RSA-encrypted ciphertext, returning the corresponding
-// cleartext.
-func RsaDecrypt(ciphertext, privatekey cty.Value) (cty.Value, error) {
-	return RsaDecryptFunc.Call([]cty.Value{ciphertext, privatekey})
 }
 
 // Sha1 computes the SHA1 hash of a given string and encodes it with hexadecimal digits.
