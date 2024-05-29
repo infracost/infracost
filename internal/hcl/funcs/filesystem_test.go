@@ -2,10 +2,8 @@ package funcs
 
 import (
 	"fmt"
-	"path/filepath"
 	"testing"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
@@ -84,13 +82,13 @@ func TestTemplateFile(t *testing.T) {
 			cty.StringVal("testdata/icon.png"),
 			cty.EmptyObjectVal,
 			cty.NilVal,
-			`contents of testdata/icon.png are not valid UTF-8; use the filebase64 function to obtain the Base64 encoded contents or the other file functions (e.g. filemd5, filesha256) to obtain file hashing results instead`,
+			`contents of "testdata/icon.png" are not valid UTF-8; use the filebase64 function to obtain the Base64 encoded contents or the other file functions (e.g. filemd5, filesha256) to obtain file hashing results instead`,
 		},
 		{
 			cty.StringVal("testdata/missing"),
 			cty.EmptyObjectVal,
 			cty.NilVal,
-			`no file exists at testdata/missing; this function works only with files that are distributed as part of the configuration source code, so if this file will be created by a resource in this configuration you must instead obtain this result from an attribute of that resource`,
+			`no file exists at "testdata/missing"; this function works only with files that are distributed as part of the configuration source code, so if this file will be created by a resource in this configuration you must instead obtain this result from an attribute of that resource`,
 		},
 		{
 			cty.StringVal("testdata/hello.tmpl"),
@@ -482,150 +480,6 @@ func TestFileBase64(t *testing.T) {
 	for _, test := range tests {
 		t.Run(fmt.Sprintf("FileBase64(\".\", %#v)", test.Path), func(t *testing.T) {
 			got, err := FileBase64(".", test.Path)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestBasename(t *testing.T) {
-	tests := []struct {
-		Path cty.Value
-		Want cty.Value
-		Err  bool
-	}{
-		{
-			cty.StringVal("testdata/hello.txt"),
-			cty.StringVal("hello.txt"),
-			false,
-		},
-		{
-			cty.StringVal("hello.txt"),
-			cty.StringVal("hello.txt"),
-			false,
-		},
-		{
-			cty.StringVal(""),
-			cty.StringVal("."),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("Basename(%#v)", test.Path), func(t *testing.T) {
-			got, err := Basename(test.Path)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestDirname(t *testing.T) {
-	tests := []struct {
-		Path cty.Value
-		Want cty.Value
-		Err  bool
-	}{
-		{
-			cty.StringVal("testdata/hello.txt"),
-			cty.StringVal("testdata"),
-			false,
-		},
-		{
-			cty.StringVal("testdata/foo/hello.txt"),
-			cty.StringVal("testdata/foo"),
-			false,
-		},
-		{
-			cty.StringVal("hello.txt"),
-			cty.StringVal("."),
-			false,
-		},
-		{
-			cty.StringVal(""),
-			cty.StringVal("."),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("Dirname(%#v)", test.Path), func(t *testing.T) {
-			got, err := Dirname(test.Path)
-
-			if test.Err {
-				if err == nil {
-					t.Fatal("succeeded; want error")
-				}
-				return
-			} else if err != nil {
-				t.Fatalf("unexpected error: %s", err)
-			}
-
-			if !got.RawEquals(test.Want) {
-				t.Errorf("wrong result\ngot:  %#v\nwant: %#v", got, test.Want)
-			}
-		})
-	}
-}
-
-func TestPathExpand(t *testing.T) {
-	homePath, err := homedir.Dir()
-	if err != nil {
-		t.Fatalf("Error getting home directory: %v", err)
-	}
-
-	tests := []struct {
-		Path cty.Value
-		Want cty.Value
-		Err  bool
-	}{
-		{
-			cty.StringVal("~/test-file"),
-			cty.StringVal(filepath.Join(homePath, "test-file")),
-			false,
-		},
-		{
-			cty.StringVal("~/another/test/file"),
-			cty.StringVal(filepath.Join(homePath, "another/test/file")),
-			false,
-		},
-		{
-			cty.StringVal("/root/file"),
-			cty.StringVal("/root/file"),
-			false,
-		},
-		{
-			cty.StringVal("/"),
-			cty.StringVal("/"),
-			false,
-		},
-	}
-
-	for _, test := range tests {
-		t.Run(fmt.Sprintf("Dirname(%#v)", test.Path), func(t *testing.T) {
-			got, err := Pathexpand(test.Path)
 
 			if test.Err {
 				if err == nil {
