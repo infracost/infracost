@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
+	componentsFuncs "github.com/turbot/terraform-components/lang/funcs"
 
 	"github.com/hashicorp/go-cty-funcs/crypto"
 	"github.com/hashicorp/go-cty-funcs/encoding"
@@ -1158,16 +1159,16 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"basename":         filesystem.BasenameFunc,
 		"base64decode":     encoding.Base64DecodeFunc,
 		"base64encode":     encoding.Base64EncodeFunc,
-		"base64gzip":       funcs.Base64GzipFunc,
-		"base64sha256":     funcs.Base64Sha256Func,
-		"base64sha512":     funcs.Base64Sha512Func,
+		"base64gzip":       componentsFuncs.Base64GzipFunc,
+		"base64sha256":     componentsFuncs.Base64Sha256Func,
+		"base64sha512":     componentsFuncs.Base64Sha512Func,
 		"bcrypt":           crypto.BcryptFunc,
 		"can":              tryfunc.CanFunc,
 		"ceil":             stdlib.CeilFunc,
 		"chomp":            stdlib.ChompFunc,
-		"cidrhost":         funcs.CidrHostFunc, // modified hashicorp/go-cty-funcs/cidr.HostFunc that supports big.Int
+		"cidrhost":         componentsFuncs.CidrHostFunc,
 		"cidrnetmask":      cidr.NetmaskFunc,
-		"cidrsubnet":       funcs.CidrSubnetFunc, // modified hashicorp/go-cty-funcs/cidr.SubnetFunc that supports big.Int
+		"cidrsubnet":       componentsFuncs.CidrSubnetFunc,
 		"cidrsubnets":      cidr.SubnetsFunc,
 		"coalesce":         funcs.CoalesceFunc, // customized from stdlib
 		"coalescelist":     stdlib.CoalesceListFunc,
@@ -1178,7 +1179,7 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"dirname":          filesystem.DirnameFunc,
 		"distinct":         stdlib.DistinctFunc,
 		"element":          stdlib.ElementFunc,
-		"endswith":         funcs.EndsWithFunc,
+		"endswith":         componentsFuncs.EndsWithFunc,
 		"chunklist":        stdlib.ChunklistFunc,
 		"file":             funcs.MakeFileFunc(baseDir, false), // modified hashicorp/go-cty-funcs/filesystem.MakeFileFunc
 		"fileexists":       funcs.MakeFileExistsFunc(baseDir),  // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileExistsFunc
@@ -1196,18 +1197,18 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"formatdate":       funcs.FormatDateFunc, // wraps stdlib.FormatDateFunc
 		"formatlist":       stdlib.FormatListFunc,
 		"indent":           stdlib.IndentFunc,
-		"index":            funcs.IndexFunc, // stdlib.IndexFunc is not compatible
+		"index":            componentsFuncs.IndexFunc,
 		"join":             stdlib.JoinFunc,
 		"jsondecode":       funcs.JSONDecodeFunc, // customized from stdlib to handle mocks
 		"jsonencode":       stdlib.JSONEncodeFunc,
 		"keys":             stdlib.KeysFunc,
-		"length":           funcs.LengthFunc,
-		"list":             funcs.ListFunc,
+		"length":           componentsFuncs.LengthFunc,
+		"list":             componentsFuncs.ListFunc,
 		"log":              stdlib.LogFunc,
-		"lookup":           funcs.LookupFunc, // customized from stdlib
+		"lookup":           componentsFuncs.LookupFunc,
 		"lower":            stdlib.LowerFunc,
-		"map":              funcs.MapFunc,
-		"matchkeys":        funcs.MatchkeysFunc,
+		"map":              componentsFuncs.MapFunc,
+		"matchkeys":        componentsFuncs.MatchkeysFunc,
 		"max":              stdlib.MaxFunc,
 		"md5":              crypto.Md5Func,
 		"merge":            funcs.MergeFunc, // customized from stdlib
@@ -1220,9 +1221,9 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"range":            stdlib.RangeFunc,
 		"regex":            stdlib.RegexFunc,
 		"regexall":         stdlib.RegexAllFunc,
-		"replace":          funcs.ReplaceFunc, // customized from stdlib
+		"replace":          componentsFuncs.ReplaceFunc,
 		"reverse":          stdlib.ReverseListFunc,
-		"rsadecrypt":       funcs.RsaDecryptFunc, // customized from hashicorp/go-cty-funcs/crypto
+		"rsadecrypt":       componentsFuncs.RsaDecryptFunc,
 		"setintersection":  stdlib.SetIntersectionFunc,
 		"setproduct":       stdlib.SetProductFunc,
 		"setsubtract":      stdlib.SetSubtractFunc,
@@ -1234,8 +1235,8 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"slice":            stdlib.SliceFunc,
 		"sort":             stdlib.SortFunc,
 		"split":            stdlib.SplitFunc,
-		"startswith":       funcs.StartsWithFunc,
-		"strcontains":      funcs.StrContainsFunc,
+		"startswith":       componentsFuncs.StartsWithFunc,
+		"strcontains":      componentsFuncs.StrContainsFunc,
 		"strrev":           stdlib.ReverseFunc,
 		"substr":           stdlib.SubstrFunc,
 		"timestamp":        funcs.MockTimestampFunc, // custom. We want to return a deterministic value each time
@@ -1247,7 +1248,7 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"toset":            funcs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),  // customized from stdlib
 		"tolist":           funcs.MakeToFunc(cty.List(cty.DynamicPseudoType)), // customized from stdlib
 		"tomap":            funcs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),  // customized from stdlib
-		"transpose":        funcs.TransposeFunc,
+		"transpose":        componentsFuncs.TransposeFunc,
 		"trim":             stdlib.TrimFunc,
 		"trimprefix":       stdlib.TrimPrefixFunc,
 		"trimspace":        stdlib.TrimSpaceFunc,
@@ -1255,8 +1256,8 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"try":              tryfunc.TryFunc,
 		"upper":            stdlib.UpperFunc,
 		"urlencode":        encoding.URLEncodeFunc,
-		"uuid":             funcs.UUIDFunc,
-		"uuidv5":           funcs.UUIDV5Func,
+		"uuid":             componentsFuncs.UUIDFunc,
+		"uuidv5":           componentsFuncs.UUIDV5Func,
 		"values":           stdlib.ValuesFunc,
 		"yamldecode":       funcs.YAMLDecodeFunc, // customized yaml.YAMLDecodeFunc
 		"yamlencode":       yaml.YAMLEncodeFunc,
