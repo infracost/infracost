@@ -116,7 +116,7 @@ require (
 	github.com/soongo/path-to-regexp v1.6.4
 	github.com/turbot/terraform-components v0.0.0-20231213122222-1f3526cab7a7
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
-	github.com/xanzy/go-gitlab v0.86.0
+	github.com/xanzy/go-gitlab v0.105.0
 	golang.org/x/oauth2 v0.8.0
 	k8s.io/apimachinery v0.29.2
 )
