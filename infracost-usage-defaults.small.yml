@@ -227,7 +227,7 @@ resource_type_default_usage:
   aws_networkfirewall_firewall:
     monthly_data_processed_gb: 76 # Monthly data processed by the Network Firewall in GB.
   aws_rds_cluster:
-    capacity_units_per_hr: 0.135 # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
+    capacity_units_per_hr: 0.5 # Number of Aurora Capacity Units per hour. Only used when engine_mode is "serverless"
     storage_gb: 50 # Storage amount in GB allocated to the aurora cluster.
     write_requests_per_sec: 4 # Total number of writes per second for the cluster.
     read_requests_per_sec: 4 # Total number of reads per second for the cluster.
@@ -238,6 +238,7 @@ resource_type_default_usage:
     snapshot_export_size_gb: 500 # Size of snapshot that's exported to s3 in parquet format.
   aws_rds_cluster_instance:
     monthly_additional_performance_insights_requests: 500000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    capacity_units_per_hr: 0.5 # Number of Aurora Capacity Units per hour. Only used for Aurora Serverless V2 (when instance class is "db.serverless")
   aws_redshift_cluster:
     managed_storage_gb: 208
     excess_concurrency_scaling_secs: 5555

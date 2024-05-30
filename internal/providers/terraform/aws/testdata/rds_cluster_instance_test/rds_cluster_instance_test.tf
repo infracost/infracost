@@ -139,3 +139,37 @@ resource "aws_rds_cluster_instance" "extended_support" {
   engine_version = each.value.version
   instance_class = "db.t3.large"
 }
+
+resource "aws_rds_cluster_instance" "aurora_serverless_v2" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster_instance" "aurora_serverless_v2_with_usage" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.default.engine
+  engine_version     = aws_rds_cluster.default.engine_version
+}
+
+resource "aws_rds_cluster" "aurora_io_optimized" {
+  cluster_identifier = "aurora-cluster-demo"
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  engine             = "aurora-mysql"
+  storage_type       = "aurora-iopt1"
+  database_name      = "mydb"
+  master_username    = "foo"
+  master_password    = "barbut8chars"
+}
+
+resource "aws_rds_cluster_instance" "aurora_io_optimized_instance" {
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.aurora_io_optimized.id
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.aurora_io_optimized.engine
+  engine_version     = aws_rds_cluster.aurora_io_optimized.engine_version
+}
