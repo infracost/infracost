@@ -21,3 +21,5 @@ resource_usage:
   aws_rds_cluster_instance.cluster_instance_3yr_all_upfront:
     reserved_instance_term: 3_year
     reserved_instance_payment_option: all_upfront
+  aws_rds_cluster_instance.serverless_v2_instance:
+    vcpu_count: 2
