@@ -6,6 +6,9 @@
  ├─ Performance Insights Long Term Retention (db.r4.8xlarge)                                 32  vCPU-month                       $165.89    
  └─ Performance Insights API                                                Monthly cost depends on usage: $0.01 per 1000 requests           
                                                                                                                                              
+ aws_rds_cluster_instance.aurora_serverless_v2_with_usage                                                                                    
+ └─ Aurora serverless v2                                                                  3,650  ACU-hours                        $438.00  * 
+                                                                                                                                             
  aws_rds_cluster_instance.extended_support["aurora-postgresql-11"]                                                                           
  ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
  └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00    
@@ -69,6 +72,12 @@
  aws_rds_cluster_instance.cluster_instance_3yr_all_upfront                                                                                   
  └─ Database instance (reserved, db.t3.medium)                                              730  hours                              $0.00    
                                                                                                                                              
+ aws_rds_cluster.aurora_io_optimized                                                                                                         
+ ├─ Storage (I/O-optimized)                                                 Monthly cost depends on usage: $0.23 per GB                      
+ ├─ I/O requests                                                            Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Backtrack                                                               Monthly cost depends on usage: $0.012 per 1M change-records      
+ └─ Snapshot export                                                         Monthly cost depends on usage: $0.01 per GB                      
+                                                                                                                                             
  aws_rds_cluster.default                                                                                                                     
  ├─ Storage                                                                 Monthly cost depends on usage: $0.10 per GB                      
  ├─ I/O requests                                                            Monthly cost depends on usage: $0.20 per 1M requests             
@@ -81,16 +90,22 @@
  ├─ Backtrack                                                               Monthly cost depends on usage: $0.012 per 1M change-records      
  └─ Snapshot export                                                         Monthly cost depends on usage: $0.01 per GB                      
                                                                                                                                              
- OVERALL TOTAL                                                                                                                  $5,817.24 
+ aws_rds_cluster_instance.aurora_io_optimized_instance                                                                                       
+ └─ Aurora serverless v2                                                    Monthly cost depends on usage: $0.12 per ACU-hours               
+                                                                                                                                             
+ aws_rds_cluster_instance.aurora_serverless_v2                                                                                               
+ └─ Aurora serverless v2                                                    Monthly cost depends on usage: $0.12 per ACU-hours               
+                                                                                                                                             
+ OVERALL TOTAL                                                                                                                  $6,255.24 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-22 cloud resources were detected:
-∙ 22 were estimated
+26 cloud resources were detected:
+∙ 26 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $5,807        ┃ $10         ┃ $5,817     ┃
+┃ main                                               ┃ $5,807        ┃ $448        ┃ $6,255     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

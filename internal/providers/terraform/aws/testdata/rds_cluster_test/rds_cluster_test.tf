@@ -36,6 +36,24 @@ resource "aws_rds_cluster" "my_sql_serverless" {
   master_password    = "barbut8chars"
 }
 
+resource "aws_rds_cluster" "postgres_serverless_io_optimized" {
+  cluster_identifier = "aurora-serverless"
+  engine             = "aurora-postgresql"
+  engine_mode        = "serverless"
+  storage_type       = "aurora-iopt1"
+  master_username    = "foo"
+  master_password    = "barbut8chars"
+}
+
+resource "aws_rds_cluster" "my_sql_serverless_io_optimized" {
+  cluster_identifier = "aurora-serverless"
+  engine             = "aurora-mysql"
+  engine_mode        = "serverless"
+  storage_type       = "aurora-iopt1"
+  master_username    = "foo"
+  master_password    = "barbut8chars"
+}
+
 resource "aws_rds_cluster" "postgres_serverlessWithBackup" {
   cluster_identifier      = "aurora-serverless"
   engine                  = "aurora-postgresql"
