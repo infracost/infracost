@@ -33,7 +33,8 @@
 
 ──────────────────────────────────
 9 cloud resources were detected:
-∙ 9 were estimated
+∙ 8 were estimated
+∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
