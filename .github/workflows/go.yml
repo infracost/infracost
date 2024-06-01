@@ -22,7 +22,7 @@ jobs:
         run: make tf_fmt_check
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.7.0
+        uses: golangci/golangci-lint-action@v6.0.1
         with:
           version: latest
           skip-pkg-cache: true
