@@ -91,7 +91,7 @@
  └─ Snapshot export                                                         Monthly cost depends on usage: $0.01 per GB                      
                                                                                                                                              
  aws_rds_cluster_instance.aurora_io_optimized_instance                                                                                       
- └─ Aurora serverless v2                                                    Monthly cost depends on usage: $0.12 per ACU-hours               
+ └─ Aurora serverless v2 (I/O-optimized)                                    Monthly cost depends on usage: $0.16 per ACU-hours               
                                                                                                                                              
  aws_rds_cluster_instance.aurora_serverless_v2                                                                                               
  └─ Aurora serverless v2                                                    Monthly cost depends on usage: $0.12 per ACU-hours               
