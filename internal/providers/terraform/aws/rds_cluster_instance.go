@@ -19,7 +19,7 @@ func NewRDSClusterInstance(d *schema.ResourceData) schema.CoreResource {
 
 	ioOptimized := false
 	clusterRefs := d.References("cluster_identifier")
-	if len(clusterRefs) == 0 {
+	if len(clusterRefs) > 0 {
 		ioOptimized = clusterRefs[0].Get("storage_type").String() == "aurora-iopt1"
 	}
 
