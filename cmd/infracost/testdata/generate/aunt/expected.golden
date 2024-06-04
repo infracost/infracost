@@ -7,46 +7,70 @@ projects:
       - ../../envs/default.tfvars
       - ../../envs/dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
   - path: apps/bar/us1
     name: apps-bar-us1-prod
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
   - path: apps/bar/us2
     name: apps-bar-us2-dev
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
   - path: apps/bar/us2
     name: apps-bar-us2-prod
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-dev
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-prod
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
   - path: apps/foo/us2
     name: apps-foo-us2-dev
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
   - path: apps/foo/us2
     name: apps-foo-us2-prod
     terraform_var_files:
       - ../../envs/default.tfvars
       - ../../envs/prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
 

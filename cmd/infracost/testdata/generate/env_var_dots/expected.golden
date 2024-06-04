@@ -10,6 +10,12 @@ projects:
       - ../config.dev.tfvars
       - ../.dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.dev.tfvars
+      - ../.dev.tfvars
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
@@ -19,6 +25,12 @@ projects:
       - ../config.prod.tfvars
       - ../.prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.prod.tfvars
+      - ../.prod.tfvars
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -28,6 +40,12 @@ projects:
       - ../config.dev.tfvars
       - ../.dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.dev.tfvars
+      - ../.dev.tfvars
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
@@ -37,4 +55,10 @@ projects:
       - ../config.prod.tfvars
       - ../.prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.prod.tfvars
+      - ../.prod.tfvars
 
