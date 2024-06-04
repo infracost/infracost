@@ -1,0 +1,16 @@
+.
+└── ./
+    ├── apps/
+    │   └── foo/
+    │       └── main.tf
+    ├── infra/
+    │   └── db/
+    │       └── main.tf
+    └── envs/
+        ├── default.tfvars
+        ├── dev/
+        │   └── dev.tfvars
+        ├── test/
+        │   └── test.tfvars
+        └── prod/
+            └── prod.tfvars

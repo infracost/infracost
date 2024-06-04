@@ -6,11 +6,15 @@ projects:
     terraform_var_files:
       - envs/dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - envs/dev.tfvars
   - path: apps
     name: apps-prod
     terraform_var_files:
       - envs/prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - envs/prod.tfvars
   - path: apps/bar
     name: apps-bar
     skip_autodetect: true

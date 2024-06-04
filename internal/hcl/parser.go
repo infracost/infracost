@@ -338,11 +338,11 @@ func (p *Parser) YAML() string {
 		}
 	}
 
-	calls := p.DependencyPaths()
-	if len(calls) > 0 {
+	dependencyFiles := append(p.DependencyPaths(), p.VarFiles()...)
+	if len(dependencyFiles) > 0 {
 		str.WriteString("    dependency_paths:\n")
-		for _, call := range calls {
-			str.WriteString(fmt.Sprintf("      - %s\n", call))
+		for _, depFile := range dependencyFiles {
+			str.WriteString(fmt.Sprintf("      - %s\n", depFile))
 		}
 	}
 
@@ -569,7 +569,6 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 
 	if p.remoteVariablesLoader != nil {
 		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
-
 		if err != nil {
 			p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
 			return combinedVars, err

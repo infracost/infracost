@@ -6,11 +6,15 @@ projects:
     terraform_var_files:
       - dev.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - dev.tfvars
   - path: dup
     name: dup-prod
     terraform_var_files:
       - prod.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - prod.tfvars
   - path: nondup
     name: nondup
 

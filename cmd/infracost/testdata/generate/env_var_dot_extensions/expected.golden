@@ -8,6 +8,10 @@ projects:
       - ../.dev-custom-ext
       - ../.config.dev.env.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.dev-custom-ext
+      - ../.config.dev.env.tfvars
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
@@ -15,6 +19,10 @@ projects:
       - ../.prod-custom-ext
       - ../.config.prod.env.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.prod-custom-ext
+      - ../.config.prod.env.tfvars
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -22,6 +30,10 @@ projects:
       - ../.dev-custom-ext
       - ../.config.dev.env.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.dev-custom-ext
+      - ../.config.dev.env.tfvars
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
@@ -29,4 +41,8 @@ projects:
       - ../.prod-custom-ext
       - ../.config.prod.env.tfvars
     skip_autodetect: true
+    dependency_paths:
+      - ../default.tfvars
+      - ../.prod-custom-ext
+      - ../.config.prod.env.tfvars
 
