@@ -190,7 +190,7 @@ func (h *githubPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 				Comments struct {
 					Nodes []struct {
 						ID          githubv4.String
-						DatabaseID  githubv4.Int
+						DatabaseID  int64
 						URL         githubv4.String
 						CreatedAt   githubv4.DateTime
 						PublishedAt githubv4.DateTime
@@ -370,7 +370,7 @@ func (h *githubCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 					Comments struct {
 						Nodes []struct {
 							ID          githubv4.String
-							DatabaseID  githubv4.Int
+							DatabaseID  int64
 							URL         githubv4.String
 							CreatedAt   githubv4.DateTime
 							PublishedAt githubv4.DateTime
