@@ -18,7 +18,7 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": "💰 Infracost estimate: *Monthly cost will not change*"
+        "text": "💰 Infracost estimate: *Monthly estimate generated*"
       }
     },
     {

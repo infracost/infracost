@@ -40,7 +40,7 @@ Key: * usage cost, ~ changed, + added, - removed
 1 cloud resource was detected:
 ∙ 1 was estimated
 
-Infracost estimate: Monthly cost will decrease by $743 ↓
+Infracost estimate: Monthly estimate decreased by $743 ↓
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Changed project                                                 ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫

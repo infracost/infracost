@@ -2,7 +2,7 @@
 
 #### 💰 Infracost report ####
 
-#### Monthly cost will increase by $41 ↑ ####
+#### Monthly estimate increased by $41 ↑ ####
 
 | **Changed project** | **Baseline cost** | **Usage cost*** | **Total change** | **New monthly cost** |
 | ----------- | --------------: | --------------: | --------------: | --------------: |
@@ -106,7 +106,7 @@ Key: * usage cost, ~ changed, + added, - removed
 ∙ 14 were estimated
 ∙ 12 were free
 
-Infracost estimate: Monthly cost will increase by $41 ↑
+Infracost estimate: Monthly estimate increased by $41 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
