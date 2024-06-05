@@ -105,26 +105,26 @@ func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace 
 // Load fetches remote variables if terraform block contains organization and
 // workspace name.
 func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error) {
-	r.logger.Debug().Msg("Downloading Terraform remote variables")
+	r.logger.Info().Msg("Downloading Terraform remote variables")
 	vars := map[string]cty.Value{}
 
 	var config TFCRemoteConfig
 	if r.remoteConfig != nil {
-		r.logger.Debug().Msgf("Using user defined remote configuration: Organization: %s, Workspace: %s", r.remoteConfig.Organization, r.remoteConfig.Workspace)
+		r.logger.Info().Msgf("Using user defined remote configuration: Organization: %s, Workspace: %s", r.remoteConfig.Organization, r.remoteConfig.Workspace)
 		config = *r.remoteConfig
 	} else {
 		var err error
-		r.logger.Debug().Msg("Trying to detect remote configuration from HCL blocks")
+		r.logger.Info().Msg("Trying to detect remote configuration from HCL blocks")
 		config = r.getCloudOrganizationWorkspace(blocks)
 		if !config.valid() {
-			r.logger.Debug().Msg("Could not detect remote configuration from cloud block, trying backend block")
+			r.logger.Info().Msg("Could not detect remote configuration from cloud block, trying backend block")
 			config, err = r.getBackendOrganizationWorkspace(blocks)
 			if err != nil {
 				return vars, err
 			}
 
 			if !config.valid() {
-				r.logger.Debug().Msg("Could not detect remote configuration from backend block")
+				r.logger.Info().Msg("Could not detect remote configuration from backend block")
 				return vars, nil
 			}
 		}
@@ -134,23 +134,23 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		r.client.SetHost(config.Host)
 	}
 
-	r.logger.Debug().Msgf("Using remote configuration: Organization: %s, Workspace: %s", config.Organization, config.Workspace)
+	r.logger.Info().Msgf("Using remote configuration: Organization: %s, Workspace: %s", config.Organization, config.Workspace)
 
 	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.Organization, config.Workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		r.logger.Debug().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.Workspace, config.Organization)
+		r.logger.Info().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		r.logger.Debug().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.Workspace, config.Organization)
+		r.logger.Info().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	if workspaceResponse.Data.Attributes.ExecutionMode == "local" {
-		r.logger.Debug().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.Workspace)
+		r.logger.Info().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.Workspace)
 		return vars, nil
 	}
 
