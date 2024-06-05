@@ -110,17 +110,21 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 
 	var config TFCRemoteConfig
 	if r.remoteConfig != nil {
+		r.logger.Debug().Msgf("Using user defined remote configuration: Organization: %s, Workspace: %s", r.remoteConfig.Organization, r.remoteConfig.Workspace)
 		config = *r.remoteConfig
 	} else {
 		var err error
+		r.logger.Debug().Msg("Trying to detect remote configuration from HCL blocks")
 		config = r.getCloudOrganizationWorkspace(blocks)
 		if !config.valid() {
+			r.logger.Debug().Msg("Could not detect remote configuration from cloud block, trying backend block")
 			config, err = r.getBackendOrganizationWorkspace(blocks)
 			if err != nil {
 				return vars, err
 			}
 
 			if !config.valid() {
+				r.logger.Debug().Msg("Could not detect remote configuration from backend block")
 				return vars, nil
 			}
 		}
@@ -129,6 +133,8 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	if config.Host != "" {
 		r.client.SetHost(config.Host)
 	}
+
+	r.logger.Debug().Msgf("Using remote configuration: Organization: %s, Workspace: %s", config.Organization, config.Workspace)
 
 	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.Organization, config.Workspace)
 	body, err := r.client.Get(endpoint)
