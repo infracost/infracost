@@ -51,6 +51,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getExpressRouteConnectionRegistryItem(),
 	getExpressRouteGatewayRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
+	getAzureRMFirewallPolicyRegistryItem(),
+	getAzureRMFirewallPolicyRuleCollectionGroupRegistryItem(),
 	getFrontdoorFirewallPolicyRegistryItem(),
 	getFrontdoorRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
@@ -390,8 +392,6 @@ var FreeResources = []string{
 	"azurerm_firewall_application_rule_collection",
 	"azurerm_firewall_nat_rule_collection",
 	"azurerm_firewall_network_rule_collection",
-	"azurerm_firewall_policy",
-	"azurerm_firewall_policy_rule_collection_group",
 
 	// Azure Front Door
 	"azurerm_frontdoor_custom_https_configuration",
