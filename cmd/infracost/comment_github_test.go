@@ -50,6 +50,18 @@ func TestCommentGitHubNoDiff(t *testing.T) {
 		nil)
 }
 
+func TestCommentGitHubCommentPath(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--comment-path", "./testdata/comment.md", "--dry-run"},
+		nil)
+}
+
+func TestCommentGitHubCommentPathMissing(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--comment-path", "./testdata/non-existing.md", "--dry-run"},
+		nil)
+}
+
 func TestCommentGitHubWithMissingAdditionalCommentPath(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{

@@ -76,6 +76,16 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 }
 
 func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) (*CommentOutput, error) {
+	commentPath, _ := cmd.Flags().GetString("comment-path")
+	if commentPath != "" {
+		commentData, err := output.LoadCommentData(commentPath)
+		if err != nil {
+			return nil, fmt.Errorf("Error loading %s used by --comment-path flag. %s", commentPath, err)
+		}
+
+		return &CommentOutput{Body: commentData}, nil
+	}
+
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
 		return nil, err
@@ -111,7 +121,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	additionalPath, _ := cmd.Flags().GetString("additional-comment-data-path")
 	if additionalPath != "" {
-		additionalCommentData, err = output.LoadAdditionalCommentData(additionalPath)
+		additionalCommentData, err = output.LoadCommentData(additionalPath)
 		if err != nil {
 			return nil, fmt.Errorf("Error loading %s used by --additional-comment-data-path flag. %s", additionalPath, err)
 		}

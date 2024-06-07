@@ -31,6 +31,12 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 
       infracost comment bitbucket --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --bitbucket-token $BITBUCKET_TOKEN`,
 		ValidArgs: []string{"--", "-"},
+		PreRun: func(cmd *cobra.Command, args []string) {
+			commentPath, _ := cmd.Flags().GetString("comment-path")
+			if commentPath == "" {
+				_ = cmd.MarkFlagRequired("path")
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.ContextValues.SetValue("platform", "bitbucket")
 
@@ -152,8 +158,10 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagRequired("bitbucket-token")
 	cmd.Flags().String("commit", "", "Commit SHA to post comment on, mutually exclusive with pull-request. Not available when bitbucket-server-url is set")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
-	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
+	cmd.Flags().String("comment-path", "", "Path to comment markdown file (experimental)")
+	_ = cmd.MarkFlagFilename("comment-path", "md")
+	_ = cmd.Flags().MarkHidden("comment-path")
 	var prNumber PRNumber
 	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on")
 	cmd.Flags().String("repo", "", "Repository in format workspace/repo")
