@@ -10,6 +10,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
+      - infra/apps/bar/us1/**
   - path: infra/apps/bar/us1
     name: infra-apps-bar-us1-prod
     terraform_var_files:
@@ -19,6 +20,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
+      - infra/apps/bar/us1/**
   - path: infra/apps/bar/us2
     name: infra-apps-bar-us2-dev
     terraform_var_files:
@@ -28,6 +30,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
+      - infra/apps/bar/us2/**
   - path: infra/apps/bar/us2
     name: infra-apps-bar-us2-prod
     terraform_var_files:
@@ -37,6 +40,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
+      - infra/apps/bar/us2/**
   - path: infra/apps/foo/us1
     name: infra-apps-foo-us1-dev
     terraform_var_files:
@@ -46,6 +50,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
+      - infra/apps/foo/us1/**
   - path: infra/apps/foo/us1
     name: infra-apps-foo-us1-prod
     terraform_var_files:
@@ -55,6 +60,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
+      - infra/apps/foo/us1/**
   - path: infra/apps/foo/us2
     name: infra-apps-foo-us2-dev
     terraform_var_files:
@@ -64,6 +70,7 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
+      - infra/apps/foo/us2/**
   - path: infra/apps/foo/us2
     name: infra-apps-foo-us2-prod
     terraform_var_files:
@@ -73,4 +80,5 @@ projects:
     dependency_paths:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
+      - infra/apps/foo/us2/**
 

@@ -10,6 +10,7 @@ projects:
     dependency_paths:
       - ../../variables/defaults.tfvars
       - ../../variables/dev/bla.tfvars
+      - infra/components/baz/**
   - path: infra/components/baz
     name: infra-components-baz-stag
     terraform_var_files:
@@ -19,6 +20,7 @@ projects:
     dependency_paths:
       - ../../variables/defaults.tfvars
       - ../../variables/stag/bop.tfvars
+      - infra/components/baz/**
   - path: infra/components/foo
     name: infra-components-foo-dev
     terraform_var_files:
@@ -28,6 +30,7 @@ projects:
     dependency_paths:
       - ../../variables/defaults.tfvars
       - ../../variables/dev/bla.tfvars
+      - infra/components/foo/**
   - path: infra/components/foo
     name: infra-components-foo-stag
     terraform_var_files:
@@ -37,4 +40,5 @@ projects:
     dependency_paths:
       - ../../variables/defaults.tfvars
       - ../../variables/stag/bop.tfvars
+      - infra/components/foo/**
 

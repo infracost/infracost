@@ -8,6 +8,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - config/dev/terraform.tfvars
+      - terraform/**
   - path: terraform
     name: terraform-prod
     terraform_var_files:
@@ -15,6 +16,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - config/prod/terraform.tfvars
+      - terraform/**
   - path: terraform/foo
     name: terraform-foo-dev
     terraform_var_files:
@@ -22,6 +24,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - dev/terraform.tfvars
+      - terraform/foo/**
   - path: terraform/foo
     name: terraform-foo-prod
     terraform_var_files:
@@ -29,4 +32,5 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - prod/terraform.tfvars
+      - terraform/foo/**
 

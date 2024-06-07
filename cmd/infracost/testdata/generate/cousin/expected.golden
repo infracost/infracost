@@ -8,6 +8,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../../variables/envs/dev/dev.tfvars
+      - infra/components/foo/**
   - path: infra/components/foo
     name: infra-components-foo-prod
     terraform_var_files:
@@ -15,6 +16,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../../variables/envs/prod/prod.tfvars
+      - infra/components/foo/**
   - path: infra/nested/components/baz
     name: infra-nested-components-baz-dev
     terraform_var_files:
@@ -23,9 +25,10 @@ projects:
       - ../../variables/envs/dev/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/envs/defaults.tfvars
       - ../../../variables/envs/dev/dev.tfvars
+      - ../../variables/envs/defaults.tfvars
       - ../../variables/envs/dev/dev.tfvars
+      - infra/nested/components/baz/**
   - path: infra/nested/components/baz
     name: infra-nested-components-baz-prod
     terraform_var_files:
@@ -33,8 +36,9 @@ projects:
       - ../../../variables/envs/prod/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/envs/defaults.tfvars
       - ../../../variables/envs/prod/prod.tfvars
+      - ../../variables/envs/defaults.tfvars
+      - infra/nested/components/baz/**
   - path: infra/nested/components/baz
     name: infra-nested-components-baz-stag
     terraform_var_files:
@@ -44,4 +48,5 @@ projects:
     dependency_paths:
       - ../../variables/envs/defaults.tfvars
       - ../../variables/envs/stag/stag.tfvars
+      - infra/nested/components/baz/**
 

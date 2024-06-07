@@ -8,8 +8,9 @@ projects:
       - ../../bip.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../default.tfvars
       - ../../bip.tfvars
+      - ../../default.tfvars
+      - infra/components/bar/**
   - path: infra/components/blah
     name: infra-components-blah-bat
     terraform_var_files:
@@ -18,9 +19,10 @@ projects:
       - ../../bat.tfvars
     skip_autodetect: true
     dependency_paths:
+      - ../../bat.tfvars
       - ../../default.tfvars
       - ../../network-bat.tfvars
-      - ../../bat.tfvars
+      - infra/components/blah/**
   - path: infra/components/blah
     name: infra-components-blah-bip
     terraform_var_files:
@@ -28,8 +30,9 @@ projects:
       - ../../bip.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../default.tfvars
       - ../../bip.tfvars
+      - ../../default.tfvars
+      - infra/components/blah/**
   - path: infra/components/foo
     name: infra-components-foo-baz
     terraform_var_files:
@@ -39,8 +42,9 @@ projects:
       - var.auto.tfvars
     skip_autodetect: true
     dependency_paths:
+      - ../../baz.tfvars
       - ../../default.tfvars
       - ../../network-baz.tfvars
-      - ../../baz.tfvars
+      - infra/components/foo/**
       - var.auto.tfvars
 

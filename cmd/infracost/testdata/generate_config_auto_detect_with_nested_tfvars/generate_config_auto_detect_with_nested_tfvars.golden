@@ -8,6 +8,7 @@ projects:
       - env/prod.tfvars
     skip_autodetect: true
     dependency_paths:
+      - app1/**
       - defaults.tfvars
       - env/prod.tfvars
   - path: app1
@@ -17,6 +18,7 @@ projects:
       - env/test.tfvars
     skip_autodetect: true
     dependency_paths:
+      - app1/**
       - defaults.tfvars
       - env/test.tfvars
   - path: app1/app3
@@ -25,6 +27,7 @@ projects:
       - qa.tfvars
     skip_autodetect: true
     dependency_paths:
+      - app1/app3/**
       - qa.tfvars
   - path: app2
     name: app2-prod
@@ -33,6 +36,7 @@ projects:
       - env/prod.tfvars
     skip_autodetect: true
     dependency_paths:
+      - app2/**
       - env/defaults.tfvars
       - env/prod.tfvars
   - path: app2
@@ -42,6 +46,7 @@ projects:
       - env/staging.tfvars
     skip_autodetect: true
     dependency_paths:
+      - app2/**
       - env/defaults.tfvars
       - env/staging.tfvars
 
