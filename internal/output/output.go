@@ -426,16 +426,16 @@ func (p PolicyCheckFailures) Error() string {
 	return out.String()
 }
 
-// LoadAdditionalCommentData reads the file at the path  into a string.
-func LoadAdditionalCommentData(path string) (string, error) {
+// LoadCommentData reads the file at the path into a string.
+func LoadCommentData(path string) (string, error) {
 	_, err := os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
-		return "", errors.New("additional-comment-data-path does not exist ")
+		return "", errors.New("comment data path does not exist ")
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("error reading additional comment data file %w", err)
+		return "", fmt.Errorf("error reading comment data file %w", err)
 	}
 
 	return string(data), nil

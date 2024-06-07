@@ -27,6 +27,12 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 
       infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN`,
 		ValidArgs: []string{"--", "-"},
+		PreRun: func(cmd *cobra.Command, args []string) {
+			commentPath, _ := cmd.Flags().GetString("comment-path")
+			if commentPath == "" {
+				_ = cmd.MarkFlagRequired("path")
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.ContextValues.SetValue("platform", "azure-repos")
 
@@ -132,8 +138,10 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("azure-access-token", "", "Azure DevOps access token")
 	_ = cmd.MarkFlagRequired("azure-access-token")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
-	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
+	cmd.Flags().String("comment-path", "", "Path to comment markdown file (experimental)")
+	_ = cmd.MarkFlagFilename("comment-path", "md")
+	_ = cmd.Flags().MarkHidden("comment-path")
 	var prNumber PRNumber
 	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on")
 	_ = cmd.MarkFlagRequired("pull-request")

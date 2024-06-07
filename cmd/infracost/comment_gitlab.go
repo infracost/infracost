@@ -31,6 +31,12 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
       infracost comment gitlab --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --gitlab-token $GITLAB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
+		PreRun: func(cmd *cobra.Command, args []string) {
+			commentPath, _ := cmd.Flags().GetString("comment-path")
+			if commentPath == "" {
+				_ = cmd.MarkFlagRequired("path")
+			}
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.ContextValues.SetValue("platform", "gitlab")
 
@@ -148,8 +154,10 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("gitlab-token", "", "GitLab token")
 	_ = cmd.MarkFlagRequired("gitlab-token")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
-	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
+	cmd.Flags().String("comment-path", "", "Path to comment markdown file (experimental)")
+	_ = cmd.MarkFlagFilename("comment-path", "md")
+	_ = cmd.Flags().MarkHidden("comment-path")
 	var mrNumber PRNumber
 	cmd.Flags().Var(&mrNumber, "merge-request", "Merge request number to post comment on, mutually exclusive with commit")
 	cmd.Flags().String("repo", "", "Repository in format owner/repo")
