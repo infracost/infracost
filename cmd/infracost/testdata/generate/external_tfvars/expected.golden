@@ -10,6 +10,7 @@ projects:
     dependency_paths:
       - ../../envs/default.tfvars
       - ../../envs/dev/dev.tfvars
+      - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
@@ -19,6 +20,7 @@ projects:
     dependency_paths:
       - ../../envs/default.tfvars
       - ../../envs/prod/prod.tfvars
+      - apps/foo/**
   - path: apps/foo
     name: apps-foo-test
     terraform_var_files:
@@ -28,6 +30,7 @@ projects:
     dependency_paths:
       - ../../envs/default.tfvars
       - ../../envs/test/test.tfvars
+      - apps/foo/**
   - path: infra/db
     name: infra-db-dev
     terraform_var_files:
@@ -37,6 +40,7 @@ projects:
     dependency_paths:
       - ../../envs/default.tfvars
       - ../../envs/dev/dev.tfvars
+      - infra/db/**
   - path: infra/db
     name: infra-db-prod
     terraform_var_files:
@@ -46,6 +50,7 @@ projects:
     dependency_paths:
       - ../../envs/default.tfvars
       - ../../envs/prod/prod.tfvars
+      - infra/db/**
   - path: infra/db
     name: infra-db-test
     terraform_var_files:
@@ -55,4 +60,5 @@ projects:
     dependency_paths:
       - ../../envs/default.tfvars
       - ../../envs/test/test.tfvars
+      - infra/db/**
 

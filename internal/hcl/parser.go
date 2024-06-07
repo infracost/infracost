@@ -338,10 +338,11 @@ func (p *Parser) YAML() string {
 		}
 	}
 
-	dependencyFiles := append(p.DependencyPaths(), p.VarFiles()...)
-	if len(dependencyFiles) > 0 {
+	depPaths := p.DependencyPaths()
+	if len(depPaths) > 0 {
 		str.WriteString("    dependency_paths:\n")
-		for _, depFile := range dependencyFiles {
+
+		for _, depFile := range depPaths {
 			str.WriteString(fmt.Sprintf("      - %s\n", depFile))
 		}
 	}
@@ -352,21 +353,28 @@ func (p *Parser) YAML() string {
 // DependencyPaths returns the list of module calls that the project depends on.
 // These are usually local module calls that have been detected in the project.
 func (p *Parser) DependencyPaths() []string {
-	if len(p.moduleCalls) == 0 {
+	if len(p.moduleCalls) == 0 && len(p.tfvarsPaths) == 0 {
 		return nil
 	}
 
-	sortedCalls := make([]string, len(p.moduleCalls))
-	for i, call := range p.moduleCalls {
+	var sortedCalls []string
+	for _, call := range p.moduleCalls {
 		relCall := call
 		dep, err := filepath.Rel(p.startingPath, call)
 		if err == nil {
 			relCall = dep
 		}
 
-		sortedCalls[i] = relCall
+		sortedCalls = append(sortedCalls, relCall+"/**")
 	}
-	sortedCalls = append(sortedCalls, p.RelativePath())
+
+	sortedCalls = append(sortedCalls, p.VarFiles()...)
+
+	if p.RelativePath() == "." {
+		sortedCalls = append(sortedCalls, `"**"`)
+	} else {
+		sortedCalls = append(sortedCalls, p.RelativePath()+"/**")
+	}
 	sort.Strings(sortedCalls)
 
 	return sortedCalls

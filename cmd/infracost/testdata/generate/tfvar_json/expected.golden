@@ -8,6 +8,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../variables/env/dev/tfvars.json
+      - terraform/**
   - path: terraform
     name: terraform-prod
     terraform_var_files:
@@ -15,4 +16,5 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../variables/env/prod/tfvars.json
+      - terraform/**
 

@@ -12,6 +12,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../envs/dev.tfvars
+      - apps/fez/**
   - path: apps/fez
     name: apps-fez-prod
     terraform_var_files:
@@ -19,6 +20,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../envs/prod.tfvars
+      - apps/fez/**
   - path: apps/foo
     name: apps-foo
 

@@ -1,22 +1,20 @@
 version: 0.1
 
 projects:
-  - path: dup
-    name: dup-dev
+  - path: .
+    name: main-dev
     terraform_var_files:
       - dev.tfvars
     skip_autodetect: true
     dependency_paths:
+      - "**"
       - dev.tfvars
-      - dup/**
-  - path: dup
-    name: dup-prod
+  - path: .
+    name: main-prod
     terraform_var_files:
       - prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - dup/**
+      - "**"
       - prod.tfvars
-  - path: nondup
-    name: nondup
 

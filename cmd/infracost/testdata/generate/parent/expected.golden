@@ -10,6 +10,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../dev.tfvars
+      - apps/bar/**
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
@@ -19,6 +20,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../prod.tfvars
+      - apps/bar/**
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -28,6 +30,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../dev.tfvars
+      - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
@@ -37,4 +40,5 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../prod.tfvars
+      - apps/foo/**
 

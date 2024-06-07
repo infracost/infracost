@@ -9,6 +9,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../envs/default.tfvars
+      - apps/bar/**
       - envs/dev.tfvars
   - path: apps/bar
     name: apps-bar-staging
@@ -18,6 +19,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../envs/default.tfvars
+      - apps/bar/**
       - envs/staging.tfvars
   - path: apps/bar/us1
     name: apps-bar-us1-dev
@@ -27,6 +29,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../../envs/default.tfvars
+      - apps/bar/us1/**
       - envs/dev.tfvars
   - path: apps/bar/us1
     name: apps-bar-us1-prod
@@ -36,6 +39,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../../envs/default.tfvars
+      - apps/bar/us1/**
       - envs/prod.tfvars
   - path: apps/foo
     name: apps-foo-dev
@@ -45,6 +49,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../envs/default.tfvars
+      - apps/foo/**
       - envs/dev.tfvars
   - path: apps/foo
     name: apps-foo-staging
@@ -54,6 +59,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../envs/default.tfvars
+      - apps/foo/**
       - envs/staging.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-dev
@@ -63,6 +69,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../../envs/default.tfvars
+      - apps/foo/us1/**
       - envs/dev.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-prod
@@ -72,5 +79,6 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - ../../envs/default.tfvars
+      - apps/foo/us1/**
       - envs/prod.tfvars
 

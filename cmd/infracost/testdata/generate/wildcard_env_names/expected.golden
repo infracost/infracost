@@ -8,6 +8,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - env/conf-dev-foo.tfvars
+      - terraform/**
   - path: terraform
     name: terraform-conf-prod-foo
     terraform_var_files:
@@ -15,6 +16,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - env/conf-prod-foo.tfvars
+      - terraform/**
   - path: terraform
     name: terraform-dev
     terraform_var_files:
@@ -22,6 +24,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - env/dev.tfvars
+      - terraform/**
   - path: terraform
     name: terraform-ops-dev
     terraform_var_files:
@@ -29,6 +32,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - env/ops-dev.tfvars
+      - terraform/**
   - path: terraform
     name: terraform-ops-prod-bar
     terraform_var_files:
@@ -36,6 +40,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - env/ops-prod-bar.tfvars
+      - terraform/**
   - path: terraform
     name: terraform-ops-prod-foo
     terraform_var_files:
@@ -43,4 +48,5 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - env/ops-prod-foo.tfvars
+      - terraform/**
 

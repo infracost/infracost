@@ -5,9 +5,9 @@ projects:
     name: infra-dev
     skip_autodetect: true
     dependency_paths:
-      - infra/dev
-      - infra/modules/is_also_called
-      - infra/modules/is_called
+      - infra/dev/**
+      - infra/modules/is_also_called/**
+      - infra/modules/is_called/**
   - path: infra/modules/is_a_project
     name: infra-modules-is_a_project
     skip_autodetect: true
@@ -15,6 +15,6 @@ projects:
     name: infra-prod
     skip_autodetect: true
     dependency_paths:
-      - infra/modules/is_called
-      - infra/prod
+      - infra/modules/is_called/**
+      - infra/prod/**
 

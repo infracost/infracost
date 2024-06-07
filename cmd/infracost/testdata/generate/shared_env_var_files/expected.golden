@@ -11,6 +11,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../dev-default.tfvars
+      - apps/bar/**
       - dev.tfvars
   - path: apps/bar
     name: apps-bar-staging
@@ -22,6 +23,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../staging-default.tfvars
+      - apps/bar/**
       - staging.tfvars
   - path: apps/foo
     name: apps-foo-dev
@@ -32,6 +34,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../dev-default.tfvars
+      - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
@@ -41,6 +44,7 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../prod-default.tfvars
+      - apps/foo/**
   - path: apps/foo
     name: apps-foo-staging
     terraform_var_files:
@@ -50,4 +54,5 @@ projects:
     dependency_paths:
       - ../default.tfvars
       - ../staging-default.tfvars
+      - apps/foo/**
 
