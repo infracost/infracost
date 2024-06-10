@@ -213,19 +213,20 @@ func (p *Parser) pathExists(base, path string) bool {
 //		- { _path: environment/prod/terraform.tfvars, _dir: environment/prod, env: prod }
 func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 	match := pathToRegexp.MustMatch(pattern, nil)
+	var parserVariables map[string]interface{}
+	b, _ := jsoniter.Marshal(p.variables)
+	_ = jsoniter.Unmarshal(b, &parserVariables)
 
 	var matches []map[interface{}]interface{}
 	_ = filepath.WalkDir(p.repoDir, func(path string, d fs.DirEntry, err error) error {
 		rel, _ := filepath.Rel(p.repoDir, path)
 		res, _ := match(rel)
 		if res != nil {
-			var out map[string]interface{}
-			params := make(map[interface{}]interface{})
+			// create a map of only the size of the parser variables and the special params
+			// from the match (_path and _dir).
+			params := make(map[interface{}]interface{}, len(parserVariables)+2)
 
-			b, _ := jsoniter.Marshal(p.variables)
-			_ = jsoniter.Unmarshal(b, &out)
-
-			for k, v := range out {
+			for k, v := range parserVariables {
 				params[k] = v
 			}
 			for k, v := range res.Params {
