@@ -8,9 +8,9 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/dev.tfvars
-      - ../envs/shared.tfvars
       - apps/bar/**
+      - apps/envs/dev.tfvars
+      - apps/envs/shared.tfvars
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
@@ -18,9 +18,9 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/prod.tfvars
-      - ../envs/shared.tfvars
       - apps/bar/**
+      - apps/envs/prod.tfvars
+      - apps/envs/shared.tfvars
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -28,8 +28,8 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/dev.tfvars
-      - ../envs/shared.tfvars
+      - apps/envs/dev.tfvars
+      - apps/envs/shared.tfvars
       - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
@@ -38,7 +38,7 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/prod.tfvars
-      - ../envs/shared.tfvars
+      - apps/envs/prod.tfvars
+      - apps/envs/shared.tfvars
       - apps/foo/**
 

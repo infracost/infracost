@@ -8,9 +8,9 @@ projects:
       - ../../envs/dev/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/dev/dev.tfvars
       - apps/foo/**
+      - envs/default.tfvars
+      - envs/dev/dev.tfvars
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
@@ -18,9 +18,9 @@ projects:
       - ../../envs/prod/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/prod/prod.tfvars
       - apps/foo/**
+      - envs/default.tfvars
+      - envs/prod/prod.tfvars
   - path: apps/foo
     name: apps-foo-test
     terraform_var_files:
@@ -28,9 +28,9 @@ projects:
       - ../../envs/test/test.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/test/test.tfvars
       - apps/foo/**
+      - envs/default.tfvars
+      - envs/test/test.tfvars
   - path: infra/db
     name: infra-db-dev
     terraform_var_files:
@@ -38,8 +38,8 @@ projects:
       - ../../envs/dev/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/dev/dev.tfvars
+      - envs/default.tfvars
+      - envs/dev/dev.tfvars
       - infra/db/**
   - path: infra/db
     name: infra-db-prod
@@ -48,8 +48,8 @@ projects:
       - ../../envs/prod/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/prod/prod.tfvars
+      - envs/default.tfvars
+      - envs/prod/prod.tfvars
       - infra/db/**
   - path: infra/db
     name: infra-db-test
@@ -58,7 +58,7 @@ projects:
       - ../../envs/test/test.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/test/test.tfvars
+      - envs/default.tfvars
+      - envs/test/test.tfvars
       - infra/db/**
 

@@ -8,9 +8,9 @@ projects:
       - envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/default.tfvars
       - apps/bar/**
-      - envs/dev.tfvars
+      - apps/bar/envs/dev.tfvars
+      - apps/envs/default.tfvars
   - path: apps/bar
     name: apps-bar-staging
     terraform_var_files:
@@ -18,9 +18,9 @@ projects:
       - envs/staging.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/default.tfvars
       - apps/bar/**
-      - envs/staging.tfvars
+      - apps/bar/envs/staging.tfvars
+      - apps/envs/default.tfvars
   - path: apps/bar/us1
     name: apps-bar-us1-dev
     terraform_var_files:
@@ -28,9 +28,9 @@ projects:
       - envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
       - apps/bar/us1/**
-      - envs/dev.tfvars
+      - apps/bar/us1/envs/dev.tfvars
+      - apps/envs/default.tfvars
   - path: apps/bar/us1
     name: apps-bar-us1-prod
     terraform_var_files:
@@ -38,9 +38,9 @@ projects:
       - envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
       - apps/bar/us1/**
-      - envs/prod.tfvars
+      - apps/bar/us1/envs/prod.tfvars
+      - apps/envs/default.tfvars
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -48,9 +48,9 @@ projects:
       - envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/default.tfvars
+      - apps/envs/default.tfvars
       - apps/foo/**
-      - envs/dev.tfvars
+      - apps/foo/envs/dev.tfvars
   - path: apps/foo
     name: apps-foo-staging
     terraform_var_files:
@@ -58,9 +58,9 @@ projects:
       - envs/staging.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/default.tfvars
+      - apps/envs/default.tfvars
       - apps/foo/**
-      - envs/staging.tfvars
+      - apps/foo/envs/staging.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-dev
     terraform_var_files:
@@ -68,9 +68,9 @@ projects:
       - envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
+      - apps/envs/default.tfvars
       - apps/foo/us1/**
-      - envs/dev.tfvars
+      - apps/foo/us1/envs/dev.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-prod
     terraform_var_files:
@@ -78,7 +78,7 @@ projects:
       - envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
+      - apps/envs/default.tfvars
       - apps/foo/us1/**
-      - envs/prod.tfvars
+      - apps/foo/us1/envs/prod.tfvars
 

@@ -9,10 +9,10 @@ projects:
       - ../baz-custom-ext
     skip_autodetect: true
     dependency_paths:
-      - ../baz-custom-ext
-      - ../common.tfvars.json
-      - ../default.tfvars
       - apps/bar/**
+      - apps/baz-custom-ext
+      - apps/common.tfvars.json
+      - apps/default.tfvars
   - path: apps/bar
     name: apps-bar-dev
     terraform_var_files:
@@ -21,10 +21,10 @@ projects:
       - ../dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../common.tfvars.json
-      - ../default.tfvars
-      - ../dev.tfvars
       - apps/bar/**
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/dev.tfvars
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
@@ -34,11 +34,11 @@ projects:
       - ../prod-custom-ext
     skip_autodetect: true
     dependency_paths:
-      - ../common.tfvars.json
-      - ../default.tfvars
-      - ../prod-custom-ext
-      - ../prod.env.tfvars
       - apps/bar/**
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/prod-custom-ext
+      - apps/prod.env.tfvars
   - path: apps/foo
     name: apps-foo-baz
     terraform_var_files:
@@ -47,9 +47,9 @@ projects:
       - ../baz-custom-ext
     skip_autodetect: true
     dependency_paths:
-      - ../baz-custom-ext
-      - ../common.tfvars.json
-      - ../default.tfvars
+      - apps/baz-custom-ext
+      - apps/common.tfvars.json
+      - apps/default.tfvars
       - apps/foo/**
   - path: apps/foo
     name: apps-foo-dev
@@ -59,9 +59,9 @@ projects:
       - ../dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../common.tfvars.json
-      - ../default.tfvars
-      - ../dev.tfvars
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/dev.tfvars
       - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
@@ -72,9 +72,9 @@ projects:
       - ../prod-custom-ext
     skip_autodetect: true
     dependency_paths:
-      - ../common.tfvars.json
-      - ../default.tfvars
-      - ../prod-custom-ext
-      - ../prod.env.tfvars
+      - apps/common.tfvars.json
+      - apps/default.tfvars
       - apps/foo/**
+      - apps/prod-custom-ext
+      - apps/prod.env.tfvars
 

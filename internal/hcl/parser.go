@@ -368,7 +368,12 @@ func (p *Parser) DependencyPaths() []string {
 		sortedCalls = append(sortedCalls, relCall+"/**")
 	}
 
-	sortedCalls = append(sortedCalls, p.VarFiles()...)
+	for _, varFile := range p.tfvarsPaths {
+		relVarFile, err := filepath.Rel(p.startingPath, varFile)
+		if err == nil {
+			sortedCalls = append(sortedCalls, relVarFile)
+		}
+	}
 
 	if p.RelativePath() == "." {
 		sortedCalls = append(sortedCalls, `"**"`)
