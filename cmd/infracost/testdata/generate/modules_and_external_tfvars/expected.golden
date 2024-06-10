@@ -8,10 +8,10 @@ projects:
       - ../../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../default.tfvars
-      - ../../envs/dev.tfvars
       - db/dev/**
       - db/modules/db_config/**
+      - default.tfvars
+      - envs/dev.tfvars
   - path: db/prod
     name: db-prod-prod
     terraform_var_files:
@@ -19,8 +19,8 @@ projects:
       - ../../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../default.tfvars
-      - ../../envs/prod.tfvars
       - db/modules/db_config/**
       - db/prod/**
+      - default.tfvars
+      - envs/prod.tfvars
 

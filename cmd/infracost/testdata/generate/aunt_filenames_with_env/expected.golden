@@ -9,10 +9,10 @@ projects:
       - ../../variables/cko-dev/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-dev/age.tfvars
-      - ../../variables/cko-dev/dev.tfvars
-      - ../../variables/default.tfvars
       - components/age/**
+      - variables/cko-dev/age.tfvars
+      - variables/cko-dev/dev.tfvars
+      - variables/default.tfvars
   - path: components/age
     name: components-age-mgmt
     terraform_var_files:
@@ -20,9 +20,9 @@ projects:
       - ../../variables/cko-mgmt/age.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-mgmt/age.tfvars
-      - ../../variables/default.tfvars
       - components/age/**
+      - variables/cko-mgmt/age.tfvars
+      - variables/default.tfvars
   - path: components/age
     name: components-age-playground
     terraform_var_files:
@@ -30,9 +30,9 @@ projects:
       - ../../variables/cko-playground/age.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-playground/age.tfvars
-      - ../../variables/default.tfvars
       - components/age/**
+      - variables/cko-playground/age.tfvars
+      - variables/default.tfvars
   - path: components/age
     name: components-age-prod
     terraform_var_files:
@@ -40,9 +40,9 @@ projects:
       - ../../variables/cko-prod/age.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-prod/age.tfvars
-      - ../../variables/default.tfvars
       - components/age/**
+      - variables/cko-prod/age.tfvars
+      - variables/default.tfvars
   - path: components/airflow
     name: components-airflow-dev
     terraform_var_files:
@@ -51,10 +51,10 @@ projects:
       - ../../variables/cko-dev/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-dev/airflow.tfvars
-      - ../../variables/cko-dev/dev.tfvars
-      - ../../variables/default.tfvars
       - components/airflow/**
+      - variables/cko-dev/airflow.tfvars
+      - variables/cko-dev/dev.tfvars
+      - variables/default.tfvars
   - path: components/airflow
     name: components-airflow-mgmt
     terraform_var_files:
@@ -62,9 +62,9 @@ projects:
       - ../../variables/cko-mgmt/airflow.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-mgmt/airflow.tfvars
-      - ../../variables/default.tfvars
       - components/airflow/**
+      - variables/cko-mgmt/airflow.tfvars
+      - variables/default.tfvars
   - path: components/airflow
     name: components-airflow-playground
     terraform_var_files:
@@ -72,9 +72,9 @@ projects:
       - ../../variables/cko-playground/airflow.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-playground/airflow.tfvars
-      - ../../variables/default.tfvars
       - components/airflow/**
+      - variables/cko-playground/airflow.tfvars
+      - variables/default.tfvars
   - path: components/airflow
     name: components-airflow-prod
     terraform_var_files:
@@ -82,9 +82,9 @@ projects:
       - ../../variables/cko-prod/airflow.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-prod/airflow.tfvars
-      - ../../variables/default.tfvars
       - components/airflow/**
+      - variables/cko-prod/airflow.tfvars
+      - variables/default.tfvars
   - path: components/apm-events
     name: components-apm-events-dev
     terraform_var_files:
@@ -93,10 +93,10 @@ projects:
       - ../../variables/cko-dev/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-dev/apm-events.tfvars
-      - ../../variables/cko-dev/dev.tfvars
-      - ../../variables/default.tfvars
       - components/apm-events/**
+      - variables/cko-dev/apm-events.tfvars
+      - variables/cko-dev/dev.tfvars
+      - variables/default.tfvars
   - path: components/apm-events
     name: components-apm-events-mgmt
     terraform_var_files:
@@ -104,9 +104,9 @@ projects:
       - ../../variables/cko-mgmt/apm-events.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-mgmt/apm-events.tfvars
-      - ../../variables/default.tfvars
       - components/apm-events/**
+      - variables/cko-mgmt/apm-events.tfvars
+      - variables/default.tfvars
   - path: components/apm-events
     name: components-apm-events-playground
     terraform_var_files:
@@ -114,9 +114,9 @@ projects:
       - ../../variables/cko-playground/apm-events.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-playground/apm-events.tfvars
-      - ../../variables/default.tfvars
       - components/apm-events/**
+      - variables/cko-playground/apm-events.tfvars
+      - variables/default.tfvars
   - path: components/apm-events
     name: components-apm-events-prod
     terraform_var_files:
@@ -124,7 +124,7 @@ projects:
       - ../../variables/cko-prod/apm-events.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../variables/cko-prod/apm-events.tfvars
-      - ../../variables/default.tfvars
       - components/apm-events/**
+      - variables/cko-prod/apm-events.tfvars
+      - variables/default.tfvars
 

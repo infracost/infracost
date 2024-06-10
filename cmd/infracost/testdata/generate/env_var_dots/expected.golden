@@ -11,12 +11,12 @@ projects:
       - ../.dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../.dev.tfvars
-      - ../.network-bat.tfvars
-      - ../.network-baz.tfvars
-      - ../config.dev.tfvars
-      - ../default.tfvars
+      - apps/.dev.tfvars
+      - apps/.network-bat.tfvars
+      - apps/.network-baz.tfvars
       - apps/bar/**
+      - apps/config.dev.tfvars
+      - apps/default.tfvars
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
@@ -27,12 +27,12 @@ projects:
       - ../.prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../.network-bat.tfvars
-      - ../.network-baz.tfvars
-      - ../.prod.tfvars
-      - ../config.prod.tfvars
-      - ../default.tfvars
+      - apps/.network-bat.tfvars
+      - apps/.network-baz.tfvars
+      - apps/.prod.tfvars
       - apps/bar/**
+      - apps/config.prod.tfvars
+      - apps/default.tfvars
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -43,11 +43,11 @@ projects:
       - ../.dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../.dev.tfvars
-      - ../.network-bat.tfvars
-      - ../.network-baz.tfvars
-      - ../config.dev.tfvars
-      - ../default.tfvars
+      - apps/.dev.tfvars
+      - apps/.network-bat.tfvars
+      - apps/.network-baz.tfvars
+      - apps/config.dev.tfvars
+      - apps/default.tfvars
       - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
@@ -59,10 +59,10 @@ projects:
       - ../.prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../.network-bat.tfvars
-      - ../.network-baz.tfvars
-      - ../.prod.tfvars
-      - ../config.prod.tfvars
-      - ../default.tfvars
+      - apps/.network-bat.tfvars
+      - apps/.network-baz.tfvars
+      - apps/.prod.tfvars
+      - apps/config.prod.tfvars
+      - apps/default.tfvars
       - apps/foo/**
 

@@ -10,11 +10,11 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/dev.tfvars
-      - ../envs/default.tfvars
-      - ../envs/dev.tfvars
+      - apps/bar/envs/default.tfvars
+      - apps/bar/envs/dev.tfvars
       - apps/bar/us1/**
+      - apps/envs/default.tfvars
+      - apps/envs/dev.tfvars
   - path: apps/bar/us1
     name: apps-bar-us1-prod
     terraform_var_files:
@@ -24,11 +24,11 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/prod.tfvars
-      - ../envs/default.tfvars
-      - ../envs/prod.tfvars
+      - apps/bar/envs/default.tfvars
+      - apps/bar/envs/prod.tfvars
       - apps/bar/us1/**
+      - apps/envs/default.tfvars
+      - apps/envs/prod.tfvars
   - path: apps/bar/us2
     name: apps-bar-us2-dev
     terraform_var_files:
@@ -38,11 +38,11 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/dev.tfvars
-      - ../envs/default.tfvars
-      - ../envs/dev.tfvars
+      - apps/bar/envs/default.tfvars
+      - apps/bar/envs/dev.tfvars
       - apps/bar/us2/**
+      - apps/envs/default.tfvars
+      - apps/envs/dev.tfvars
   - path: apps/bar/us2
     name: apps-bar-us2-prod
     terraform_var_files:
@@ -52,11 +52,11 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/prod.tfvars
-      - ../envs/default.tfvars
-      - ../envs/prod.tfvars
+      - apps/bar/envs/default.tfvars
+      - apps/bar/envs/prod.tfvars
       - apps/bar/us2/**
+      - apps/envs/default.tfvars
+      - apps/envs/prod.tfvars
   - path: apps/foo/us1
     name: apps-foo-us1-dev
     terraform_var_files:
@@ -66,10 +66,10 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/dev.tfvars
-      - ../envs/default.tfvars
-      - ../envs/dev.tfvars
+      - apps/envs/default.tfvars
+      - apps/envs/dev.tfvars
+      - apps/foo/envs/default.tfvars
+      - apps/foo/envs/dev.tfvars
       - apps/foo/us1/**
   - path: apps/foo/us1
     name: apps-foo-us1-prod
@@ -80,10 +80,10 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/prod.tfvars
-      - ../envs/default.tfvars
-      - ../envs/prod.tfvars
+      - apps/envs/default.tfvars
+      - apps/envs/prod.tfvars
+      - apps/foo/envs/default.tfvars
+      - apps/foo/envs/prod.tfvars
       - apps/foo/us1/**
   - path: apps/foo/us2
     name: apps-foo-us2-dev
@@ -94,10 +94,10 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/dev.tfvars
-      - ../envs/default.tfvars
-      - ../envs/dev.tfvars
+      - apps/envs/default.tfvars
+      - apps/envs/dev.tfvars
+      - apps/foo/envs/default.tfvars
+      - apps/foo/envs/dev.tfvars
       - apps/foo/us2/**
   - path: apps/foo/us2
     name: apps-foo-us2-prod
@@ -108,9 +108,9 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../envs/default.tfvars
-      - ../../envs/prod.tfvars
-      - ../envs/default.tfvars
-      - ../envs/prod.tfvars
+      - apps/envs/default.tfvars
+      - apps/envs/prod.tfvars
+      - apps/foo/envs/default.tfvars
+      - apps/foo/envs/prod.tfvars
       - apps/foo/us2/**
 

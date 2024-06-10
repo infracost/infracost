@@ -11,7 +11,7 @@ projects:
       - ../envs/dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/dev.tfvars
+      - apps/envs/dev.tfvars
       - apps/fez/**
   - path: apps/fez
     name: apps-fez-prod
@@ -19,7 +19,7 @@ projects:
       - ../envs/prod.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../envs/prod.tfvars
+      - apps/envs/prod.tfvars
       - apps/fez/**
   - path: apps/foo
     name: apps-foo

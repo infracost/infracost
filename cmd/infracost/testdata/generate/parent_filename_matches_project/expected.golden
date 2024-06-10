@@ -8,9 +8,9 @@ projects:
       - ../bar.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../bar.tfvars
-      - ../defaults.tfvars
+      - infra/components/bar.tfvars
       - infra/components/bar/**
+      - infra/components/defaults.tfvars
   - path: infra/components/baz
     name: infra-components-baz
     terraform_var_files:
@@ -18,9 +18,9 @@ projects:
       - ../defaults.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../baz.tfvars
-      - ../defaults.tfvars
+      - infra/baz.tfvars
       - infra/components/baz/**
+      - infra/components/defaults.tfvars
   - path: infra/components/foo
     name: infra-components-foo
     terraform_var_files:
@@ -29,8 +29,8 @@ projects:
       - ../defaults.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../../foo.tfvars
-      - ../defaults.tfvars
-      - ../foo.tfvars
+      - infra/components/defaults.tfvars
+      - infra/components/foo.tfvars
       - infra/components/foo/**
+      - infra/foo.tfvars
 

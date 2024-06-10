@@ -9,8 +9,8 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - app1/**
-      - defaults.tfvars
-      - env/prod.tfvars
+      - app1/defaults.tfvars
+      - app1/env/prod.tfvars
   - path: app1
     name: app1-test
     terraform_var_files:
@@ -19,8 +19,8 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - app1/**
-      - defaults.tfvars
-      - env/test.tfvars
+      - app1/defaults.tfvars
+      - app1/env/test.tfvars
   - path: app1/app3
     name: app1-app3-qa
     terraform_var_files:
@@ -28,7 +28,7 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - app1/app3/**
-      - qa.tfvars
+      - app1/app3/qa.tfvars
   - path: app2
     name: app2-prod
     terraform_var_files:
@@ -37,8 +37,8 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - app2/**
-      - env/defaults.tfvars
-      - env/prod.tfvars
+      - app2/env/defaults.tfvars
+      - app2/env/prod.tfvars
   - path: app2
     name: app2-staging
     terraform_var_files:
@@ -47,6 +47,6 @@ projects:
     skip_autodetect: true
     dependency_paths:
       - app2/**
-      - env/defaults.tfvars
-      - env/staging.tfvars
+      - app2/env/defaults.tfvars
+      - app2/env/staging.tfvars
 

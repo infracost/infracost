@@ -9,10 +9,10 @@ projects:
       - dev.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../default.tfvars
-      - ../dev-default.tfvars
       - apps/bar/**
-      - dev.tfvars
+      - apps/bar/dev.tfvars
+      - apps/default.tfvars
+      - apps/dev-default.tfvars
   - path: apps/bar
     name: apps-bar-staging
     terraform_var_files:
@@ -21,10 +21,10 @@ projects:
       - staging.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../default.tfvars
-      - ../staging-default.tfvars
       - apps/bar/**
-      - staging.tfvars
+      - apps/bar/staging.tfvars
+      - apps/default.tfvars
+      - apps/staging-default.tfvars
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
@@ -32,8 +32,8 @@ projects:
       - ../dev-default.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../default.tfvars
-      - ../dev-default.tfvars
+      - apps/default.tfvars
+      - apps/dev-default.tfvars
       - apps/foo/**
   - path: apps/foo
     name: apps-foo-prod
@@ -42,9 +42,9 @@ projects:
       - ../prod-default.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../default.tfvars
-      - ../prod-default.tfvars
+      - apps/default.tfvars
       - apps/foo/**
+      - apps/prod-default.tfvars
   - path: apps/foo
     name: apps-foo-staging
     terraform_var_files:
@@ -52,7 +52,7 @@ projects:
       - ../staging-default.tfvars
     skip_autodetect: true
     dependency_paths:
-      - ../default.tfvars
-      - ../staging-default.tfvars
+      - apps/default.tfvars
       - apps/foo/**
+      - apps/staging-default.tfvars
 
