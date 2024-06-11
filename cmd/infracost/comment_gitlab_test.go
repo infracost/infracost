@@ -24,6 +24,6 @@ func TestCommentGitLabCommit(t *testing.T) {
 
 func TestCommentGitLabCommentPath(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
-		[]string{"comment", "gitlab", "--gitlab-token", "abc", "--repo", "test/test", "--commit", "5", "--comment-path", "./testdata/comment.md", "--dry-run"},
+		[]string{"comment", "gitlab", "--gitlab-token", "abc", "--repo", "test/test", "--merge-request", "5", "--path", "./testdata/terraform_v0.14_breakdown.json", "--comment-path", "./testdata/comment.md", "--dry-run"},
 		nil)
 }

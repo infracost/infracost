@@ -68,6 +68,8 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
 		subCmd.Flags().String("additional-comment-data-path", "", "Path to additional comment text (experimental)")
 		_ = subCmd.Flags().MarkHidden("additional-comment-data-path")
+		subCmd.Flags().String("comment-path", "", "Path to comment content file (experimental)")
+		_ = subCmd.Flags().MarkHidden("comment-path")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -76,16 +78,6 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 }
 
 func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) (*CommentOutput, error) {
-	commentPath, _ := cmd.Flags().GetString("comment-path")
-	if commentPath != "" {
-		commentData, err := output.LoadCommentData(commentPath)
-		if err != nil {
-			return nil, fmt.Errorf("Error loading %s used by --comment-path flag. %s", commentPath, err)
-		}
-
-		return &CommentOutput{Body: commentData}, nil
-	}
-
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
 		return nil, err
@@ -117,6 +109,20 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 			combined.RunID, combined.ShareURL, combined.CloudURL, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GovernanceFailures
 			additionalCommentData = result.GovernanceComment
 		}
+	}
+
+	commentPath, _ := cmd.Flags().GetString("comment-path")
+	if commentPath != "" {
+		commentData, err := output.LoadCommentData(commentPath)
+		if err != nil {
+			return nil, fmt.Errorf("Error loading %s used by --comment-path flag. %s", commentPath, err)
+		}
+
+		return &CommentOutput{
+			Body:    commentData,
+			HasDiff: combined.HasDiff(),
+			ValidAt: &combined.TimeGenerated,
+		}, nil
 	}
 
 	additionalPath, _ := cmd.Flags().GetString("additional-comment-data-path")
