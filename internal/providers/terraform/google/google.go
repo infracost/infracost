@@ -1,8 +1,6 @@
 package google
 
 import (
-	"github.com/tidwall/gjson"
-
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -28,7 +26,9 @@ func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	return map[string]interface{}{}
 }
 
-func GetResourceRegion(resourceType string, v gjson.Result) string {
+func GetResourceRegion(d *schema.ResourceData) string {
+	v := d.RawValues
+
 	if v.Get("region").Exists() && v.Get("region").String() != "" {
 		return v.Get("region").String()
 	}

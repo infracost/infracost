@@ -18,6 +18,10 @@ type ResourceData struct {
 	CFResource    cloudformation.Resource
 	UsageData     *UsageData
 	Metadata      map[string]gjson.Result
+	// Region is the region of the resource. When building a resource callers should
+	// use this value instead of the deprecated d.Get("region").String() or
+	// lookupRegion method.
+	Region string
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {

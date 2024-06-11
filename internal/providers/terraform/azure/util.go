@@ -29,6 +29,113 @@ func toAzureCLIName(location string) string {
 	return strings.ToLower(sReg.ReplaceAllString(location, ""))
 }
 
+var lookupRegionFunctions = map[string]func(d *schema.ResourceData) string{
+	"azurerm_mssql_elasticpool": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"server_name", "resource_group_name"})
+	},
+	"azurerm_lb_rule": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"loadbalancer_id"})
+	},
+	"azurerm_data_factory_integration_runtime_azure": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
+	},
+	"azurerm_traffic_manager_external_endpoint": func(d *schema.ResourceData) string {
+		if len(d.References("profile_id")) > 0 {
+			profile := d.References("profile_id")[0]
+			return lookupRegion(profile, []string{"resource_group_name"})
+		}
+
+		return lookupRegion(d, []string{"resource_group_name"})
+	},
+	"azurerm_storage_queue": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"storage_account_name"})
+	},
+	"azurerm_data_factory_integration_runtime_azure_ssis": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
+	},
+	"azurerm_app_service_certificate_binding": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"certificate_id"})
+	},
+	"azurerm_cosmosdb_cassandra_keyspace": func(d *schema.ResourceData) string {
+		if len(d.References("account_name")) > 0 {
+			account := d.References("account_name")[0]
+			return lookupRegion(account, []string{"account_name", "resource_group_name"})
+		}
+
+		return lookupRegion(d, []string{"resource_group_name"})
+	},
+	"azurerm_monitor_diagnostic_setting": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"target_resource_id"})
+	},
+	"azurerm_sql_elasticpool": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"server_name", "resource_group_name"})
+	},
+	"azurerm_virtual_network_peering": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"virtual_network_name"})
+	},
+	"azurerm_kubernetes_cluster_node_pool": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"kubernetes_cluster_id"})
+	},
+	"azurerm_key_vault_key": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"key_vault_id"})
+	},
+	"azurerm_data_factory_integration_runtime_self_hosted": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
+	},
+	"azurerm_cognitive_deployment": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"cognitive_account_id"})
+	},
+	"azurerm_traffic_manager_nested_endpoint": func(d *schema.ResourceData) string {
+		if len(d.References("profile_id")) > 0 {
+			profile := d.References("profile_id")[0]
+			return lookupRegion(profile, []string{"resource_group_name"})
+		}
+
+		return lookupRegion(d, []string{"resource_group_name"})
+	},
+	"azurerm_lb_outbound_rule": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
+	},
+	"azurerm_synapse_sql_pool": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"synapse_workspace_id"})
+	},
+	"azurerm_dns_ns_record": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"resource_group_name"})
+	},
+	"azurerm_hdinsight_hadoop_cluster": func(d *schema.ResourceData) string { //nolint:misspell
+		return lookupRegion(d, []string{})
+	},
+	"azurerm_traffic_manager_azure_endpoint": func(d *schema.ResourceData) string {
+		if len(d.References("profile_id")) > 0 {
+			profile := d.References("profile_id")[0]
+			return lookupRegion(profile, []string{"resource_group_name"})
+		}
+
+		return lookupRegion(d, []string{"resource_group_name"})
+	},
+	"azurerm_key_vault_certificate": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"key_vault_id"})
+	},
+	"azurerm_mariadb_server": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{})
+	},
+	"azurerm_postgresql_server": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{})
+	},
+	"azurerm_data_factory_integration_runtime_managed": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
+	},
+	"azurerm_storage_share": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{"storage_account_name"})
+	},
+	"azurerm_windows_virtual_machine": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{})
+	},
+	"azurerm_integration_service_environment": func(d *schema.ResourceData) string {
+		return lookupRegion(d, []string{})
+	},
+}
+
 func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 	// First check for a location set directly on a resource
 	location := d.Get("location").String()
@@ -61,6 +168,24 @@ func convertRegion(region string) string {
 	} else {
 		return "Global"
 	}
+}
+
+// GetResourceRegion returns the region for the given azure resource data. By default,
+// this uses the "location" property, but if that is not set it will traverse the
+// references to find a location. The default references used are the resource
+// group name. However, some resources specify different resources to get the
+// location from, in which case a custom function is used that specifies which
+// references to use.
+func GetResourceRegion(d *schema.ResourceData) string {
+	if d == nil {
+		return ""
+	}
+
+	if v, ok := lookupRegionFunctions[d.Type]; ok {
+		return v(d)
+	}
+
+	return lookupRegion(d, []string{"resource_group_name"})
 }
 
 // locationNameMapping returns a display name for a given location name.

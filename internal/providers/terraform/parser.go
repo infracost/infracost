@@ -140,6 +140,12 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResou
 	p.populateUsageData(resData, usage)
 
 	for _, d := range resData {
+		// get the region for the resource now that we have built all the
+		// references on the resources.
+		region := p.getRegion(confLoader, d, providerConf, vars)
+		d.RawValues = schema.AddRawValue(d.RawValues, "region", region)
+		d.Region = region
+
 		resources = append(resources, p.createParsedResource(d, d.UsageData))
 	}
 
@@ -411,24 +417,6 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 
 		v := r.Get("values")
 
-		resConf := confLoader.GetResourceConfJSON(addr)
-
-		// Override the region when requested
-		region := overrideRegion(addr, t, p.ctx.RunContext.Config)
-
-		// If not overridden try getting the region from the ARN
-		if region == "" {
-			region = resourceRegion(t, v)
-		}
-
-		// Otherwise use region from the provider conf
-		if region == "" {
-			region = providerRegion(addr, providerConf, vars, t, resConf)
-		}
-
-		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
-		// the entire underlying parsed json from being garbage collected.
-		v = schema.AddRawValue(v, "region", strings.Clone(region))
 		data := schema.NewResourceData(strings.Clone(t), strings.Clone(provider), strings.Clone(addr), nil, v)
 
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
@@ -445,6 +433,27 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 	}
 
 	return resources
+}
+
+func (p *Parser) getRegion(confLoader *ConfLoader, d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result) string {
+	resConf := confLoader.GetResourceConfJSON(d.Address)
+
+	// Override the region when requested
+	region := overrideRegion(d, p.ctx.RunContext.Config)
+
+	// If not overridden try getting the region from the ARN
+	if region == "" {
+		region = resourceRegion(d)
+	}
+
+	// Otherwise use region from the provider conf
+	if region == "" {
+		region = providerRegion(d, providerConf, vars, resConf)
+	}
+
+	// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+	// the entire underlying parsed json from being garbage collected.
+	return strings.Clone(region)
 }
 
 func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
@@ -481,9 +490,9 @@ func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
 	return &defaultTags
 }
 
-func overrideRegion(addr string, resourceType string, config *config.Config) string {
+func overrideRegion(d *schema.ResourceData, config *config.Config) string {
 	region := ""
-	providerPrefix := getProviderPrefix(resourceType)
+	providerPrefix := getProviderPrefix(d.Type)
 
 	switch providerPrefix {
 	case "aws":
@@ -497,29 +506,29 @@ func overrideRegion(addr string, resourceType string, config *config.Config) str
 	}
 
 	if region != "" {
-		logging.Logger.Debug().Msgf("Overriding region (%s) for %s", region, addr)
+		logging.Logger.Debug().Msgf("Overriding region (%s) for %s", region, d.Address)
 	}
 
 	return region
 }
 
-func resourceRegion(resourceType string, v gjson.Result) string {
-	providerPrefix := getProviderPrefix(resourceType)
+func resourceRegion(d *schema.ResourceData) string {
+	providerPrefix := getProviderPrefix(d.Type)
 
 	switch providerPrefix {
 	case "aws":
-		return aws.GetResourceRegion(resourceType, v)
+		return aws.GetResourceRegion(d)
 	case "azurerm":
-		return azure.GetResourceRegion(resourceType, v)
+		return azure.GetResourceRegion(d)
 	case "google":
-		return google.GetResourceRegion(resourceType, v)
+		return google.GetResourceRegion(d)
 	default:
 		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		return ""
 	}
 }
 
-func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
+func providerRegion(d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result, resConf gjson.Result) string {
 	var region string
 
 	providerKey := parseProviderKey(resConf)
@@ -532,7 +541,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 
 	if region == "" {
 		// Try to get the provider key from the first part of the resource
-		providerPrefix := getProviderPrefix(resourceType)
+		providerPrefix := getProviderPrefix(d.Type)
 		region = parseRegion(providerConf, vars, providerPrefix)
 
 		if region == "" {
@@ -549,7 +558,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 			// Don't show this log for azurerm users since they have a different method of looking up the region.
 			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
 			if region != "" && providerPrefix != "azurerm" {
-				logging.Logger.Debug().Msgf("Falling back to default region (%s) for %s", region, addr)
+				logging.Logger.Debug().Msgf("Falling back to default region (%s) for %s", region, d.Address)
 			}
 		}
 	}

@@ -142,6 +142,7 @@ type policy2Resource struct {
 	Values       json.RawMessage          `json:"values"`
 	References   []policy2Reference       `json:"references"`
 	Metadata     policy2InfracostMetadata `json:"infracostMetadata"`
+	Region       string                   `json:"region"`
 }
 
 type policy2InfracostMetadata struct {
@@ -237,6 +238,7 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 			Filename:  rd.Metadata["filename"].String(),
 			StartLine: rd.Metadata["startLine"].Int(),
 		},
+		Region: rd.Region,
 	}
 }
 

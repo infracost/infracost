@@ -535,7 +535,8 @@ func TestParseResourceData(t *testing.T) {
           "name": "instance1",
           "provider_name": "registry.terraform.io/hashicorp/aws",
           "schema_version": 0,
-          "values": {}
+          "values": {},
+          "region": "eu-west-2"
 				},
 				{
 					"address": "aws_instance.instance2",
@@ -544,7 +545,8 @@ func TestParseResourceData(t *testing.T) {
           "name": "instance2",
           "provider_name": "registry.terraform.io/hashicorp/aws",
           "schema_version": 0,
-          "values": {}
+          "values": {},
+          "region": "eu-west-2"
         }
 			],
 			"child_modules": [
@@ -558,7 +560,8 @@ func TestParseResourceData(t *testing.T) {
 							"name": "nat1",
 							"provider_name": "registry.terraform.io/hashicorp/aws",
 							"schema_version": 0,
-							"values": {}
+							"values": {},
+							"region": "eu-west-2"
 						},
 						{
 							"address": "module.module1.aws_nat_gateway.nat2",
@@ -567,7 +570,8 @@ func TestParseResourceData(t *testing.T) {
 							"name": "nat2",
 							"provider_name": "registry.terraform.io/hashicorp/aws",
 							"schema_version": 0,
-							"values": {}
+							"values": {},
+							"region": "eu-west-2"
 						}
 					]
 				}
@@ -664,38 +668,29 @@ func TestParseResourceData(t *testing.T) {
 	}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
-	actual := p.parseResourceData(false, NewConfLoader(conf), providerConf, planVals, vars)
+	loader := NewConfLoader(conf)
+	actual := p.parseResourceData(false, loader, providerConf, planVals, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)
 		assert.Equal(t, expected[k].ProviderName, v.ProviderName)
 		assert.Equal(t, expected[k].Type, v.Type)
-		assert.Equal(t, expectedRegions[k], v.Get("region").String())
+
+		region := p.getRegion(loader, v, providerConf, vars)
+		assert.Equal(t, expectedRegions[k], region)
 	}
 }
 
 func TestParseReferences_plan(t *testing.T) {
-	vol1 := schema.NewResourceData(
-		"aws_ebs_volume",
-		"aws",
-		"aws_ebs_volume.volume1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw:  `{}`,
-		},
-	)
+	vol1 := schema.NewResourceData("aws_ebs_volume", "aws", "aws_ebs_volume.volume1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw:  `{}`,
+	})
 
-	snap1 := schema.NewResourceData(
-		"aws_ebs_snapshot",
-		"aws",
-		"aws_ebs_snapshot.snapshot1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw:  `{}`,
-		},
-	)
+	snap1 := schema.NewResourceData("aws_ebs_snapshot", "aws", "aws_ebs_snapshot.snapshot1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw:  `{}`,
+	})
 
 	resData := map[string]*schema.ResourceData{
 		vol1.Address:  vol1,
@@ -739,31 +734,19 @@ func TestParseReferences_plan(t *testing.T) {
 }
 
 func TestParseReferences_state(t *testing.T) {
-	vol1 := schema.NewResourceData(
-		"aws_ebs_volume",
-		"aws",
-		"aws_ebs_volume.volume1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	vol1 := schema.NewResourceData("aws_ebs_volume", "aws", "aws_ebs_volume.volume1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"id": "vol-12345"
 			}`,
-		},
-	)
+	})
 
-	snap1 := schema.NewResourceData(
-		"aws_ebs_snapshot",
-		"aws",
-		"aws_ebs_snapshot.snapshot1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	snap1 := schema.NewResourceData("aws_ebs_snapshot", "aws", "aws_ebs_snapshot.snapshot1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"volume_id": "vol-12345"
 			}`,
-		},
-	)
+	})
 
 	resData := map[string]*schema.ResourceData{
 		vol1.Address:  vol1,
@@ -779,14 +762,9 @@ func TestParseReferences_state(t *testing.T) {
 }
 
 func TestParseKnownModuleRefs(t *testing.T) {
-	res := schema.NewResourceData(
-		"aws_autoscaling_group",
-		"registry.terraform.io/hashicorp/aws",
-		"module.worker_groups_launch_template.aws_autoscaling_group.workers_launch_template[0]",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	res := schema.NewResourceData("aws_autoscaling_group", "registry.terraform.io/hashicorp/aws", "module.worker_groups_launch_template.aws_autoscaling_group.workers_launch_template[0]", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"capacity_rebalance":false,
 				"desired_capacity":6,
 				"enabled_metrics":null,
@@ -824,17 +802,11 @@ func TestParseKnownModuleRefs(t *testing.T) {
 				"wait_for_capacity_timeout":"10m",
 				"wait_for_elb_capacity":null,
 				"warm_pool":[]}`,
-		},
-	)
+	})
 
-	lt := schema.NewResourceData(
-		"aws_launch_template",
-		"registry.terraform.io/hashicorp/aws",
-		"module.worker_groups_launch_template.aws_launch_template.workers_launch_template[0]",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	lt := schema.NewResourceData("aws_launch_template", "registry.terraform.io/hashicorp/aws", "module.worker_groups_launch_template.aws_launch_template.workers_launch_template[0]", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"block_device_mappings":[
 					{
 						"device_name":"/dev/xvda",
@@ -924,8 +896,7 @@ func TestParseKnownModuleRefs(t *testing.T) {
 				"update_default_version":false,
 				"vpc_security_group_ids":null
 			}`,
-		},
-	)
+	})
 
 	resData := map[string]*schema.ResourceData{
 		res.Address: res,
