@@ -14,16 +14,21 @@ func getCognitiveDeploymentRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"cognitive_account_id",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			region := lookupRegion(d, []string{"cognitive_account_id"})
+
+			cognitiveAccountRefs := d.References("cognitive_account_id")
+			if region == "" && len(cognitiveAccountRefs) > 0 {
+				region = lookupRegion(cognitiveAccountRefs[0], []string{"resource_group_name"})
+			}
+
+			return region
+		},
 	}
 }
 
 func newCognitiveDeployment(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"cognitive_account_id"})
-
-	cognitiveAccountRefs := d.References("cognitive_account_id")
-	if region == "" && len(cognitiveAccountRefs) > 0 {
-		region = lookupRegion(cognitiveAccountRefs[0], []string{"resource_group_name"})
-	}
+	region := d.Region
 
 	return &azure.CognitiveDeployment{
 		Address: d.Address,

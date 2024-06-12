@@ -18,7 +18,7 @@ func getWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 func NewWindowsVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.WindowsVirtualMachine{
 		Address:                               d.Address,
-		Region:                                lookupRegion(d, []string{}),
+		Region:                                d.Region,
 		Size:                                  d.Get("size").String(),
 		LicenseType:                           d.Get("license_type").String(),
 		AdditionalCapabilitiesUltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),

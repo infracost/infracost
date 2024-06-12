@@ -15,11 +15,14 @@ func getStorageQueueRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"storage_account_name",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"storage_account_name"})
+		},
 	}
 }
 
 func newStorageQueue(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"storage_account_name"})
+	region := d.Region
 
 	accountReplicationType := "LRS"
 	accountKind := "StorageV2"

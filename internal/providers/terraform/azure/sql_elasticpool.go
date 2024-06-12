@@ -16,6 +16,9 @@ func getSQLElasticPoolRegistryItem() *schema.RegistryItem {
 			"server_name",
 			"resource_group_name",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"server_name", "resource_group_name"})
+		},
 	}
 }
 
@@ -24,7 +27,7 @@ func newSQLElasticPool(d *schema.ResourceData) schema.CoreResource {
 	sku := fmt.Sprintf("%sPool", strings.ToTitle(tier))
 	dtu := d.Get("dtu").Int()
 
-	region := lookupRegion(d, []string{"server_name", "resource_group_name"})
+	region := d.Region
 	r := &azure.MSSQLElasticPool{
 		Address:       d.Address,
 		Region:        region,

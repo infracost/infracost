@@ -1,8 +1,6 @@
 package terraform
 
 import (
-	"sync"
-
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
@@ -10,56 +8,63 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/google"
 )
 
-type ResourceRegistryMap map[string]*schema.RegistryItem
+type RegistryItemMap map[string]*schema.RegistryItem
 
 var (
-	resourceRegistryMap ResourceRegistryMap
-	once                sync.Once
+	ResourceRegistryMap = buildResourceRegistryMap()
 )
 
-func GetResourceRegistryMap() *ResourceRegistryMap {
-	once.Do(func() {
-		resourceRegistryMap = make(ResourceRegistryMap)
+func buildResourceRegistryMap() *RegistryItemMap {
+	resourceRegistryMap := make(RegistryItemMap)
 
-		// Merge all resource registries
-		for _, registryItem := range aws.ResourceRegistry {
-			if registryItem.CloudResourceIDFunc == nil {
-				registryItem.CloudResourceIDFunc = aws.DefaultCloudResourceIDFunc
-			}
-			resourceRegistryMap[registryItem.Name] = registryItem
-			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = aws.GetDefaultRefIDFunc
+	// Merge all resource registries
+	for _, registryItem := range aws.ResourceRegistry {
+		if registryItem.CloudResourceIDFunc == nil {
+			registryItem.CloudResourceIDFunc = aws.DefaultCloudResourceIDFunc
 		}
-		for _, registryItem := range createFreeResources(aws.FreeResources, aws.GetDefaultRefIDFunc, aws.DefaultCloudResourceIDFunc) {
-			resourceRegistryMap[registryItem.Name] = registryItem
-		}
+		resourceRegistryMap[registryItem.Name] = registryItem
+		resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = aws.GetDefaultRefIDFunc
+	}
+	for _, registryItem := range createFreeResources(aws.FreeResources, aws.GetDefaultRefIDFunc, aws.DefaultCloudResourceIDFunc) {
+		resourceRegistryMap[registryItem.Name] = registryItem
+	}
 
-		for _, registryItem := range azure.ResourceRegistry {
-			if registryItem.CloudResourceIDFunc == nil {
-				registryItem.CloudResourceIDFunc = azure.DefaultCloudResourceIDFunc
-			}
-			resourceRegistryMap[registryItem.Name] = registryItem
-			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = azure.GetDefaultRefIDFunc
+	for _, registryItem := range azure.ResourceRegistry {
+		if registryItem.CloudResourceIDFunc == nil {
+			registryItem.CloudResourceIDFunc = azure.DefaultCloudResourceIDFunc
 		}
-		for _, registryItem := range createFreeResources(azure.FreeResources, azure.GetDefaultRefIDFunc, azure.DefaultCloudResourceIDFunc) {
-			resourceRegistryMap[registryItem.Name] = registryItem
-		}
+		resourceRegistryMap[registryItem.Name] = registryItem
+		resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = azure.GetDefaultRefIDFunc
+	}
+	for _, registryItem := range createFreeResources(azure.FreeResources, azure.GetDefaultRefIDFunc, azure.DefaultCloudResourceIDFunc) {
+		resourceRegistryMap[registryItem.Name] = registryItem
+	}
 
-		for _, registryItem := range google.ResourceRegistry {
-			if registryItem.CloudResourceIDFunc == nil {
-				registryItem.CloudResourceIDFunc = google.DefaultCloudResourceIDFunc
-			}
-			resourceRegistryMap[registryItem.Name] = registryItem
-			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = google.GetDefaultRefIDFunc
+	for _, registryItem := range google.ResourceRegistry {
+		if registryItem.CloudResourceIDFunc == nil {
+			registryItem.CloudResourceIDFunc = google.DefaultCloudResourceIDFunc
 		}
-		for _, registryItem := range createFreeResources(google.FreeResources, google.GetDefaultRefIDFunc, google.DefaultCloudResourceIDFunc) {
-			resourceRegistryMap[registryItem.Name] = registryItem
-		}
-	})
+		resourceRegistryMap[registryItem.Name] = registryItem
+		resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = google.GetDefaultRefIDFunc
+	}
+	for _, registryItem := range createFreeResources(google.FreeResources, google.GetDefaultRefIDFunc, google.DefaultCloudResourceIDFunc) {
+		resourceRegistryMap[registryItem.Name] = registryItem
+	}
 
 	return &resourceRegistryMap
 }
 
-func (r *ResourceRegistryMap) GetReferenceAttributes(resourceDataType string) []string {
+// GetRegion returns the region lookup function for the given resource data type if it exists.
+func (r *RegistryItemMap) GetRegion(resourceDataType string) schema.RegionLookupFunc {
+	item, ok := (*r)[resourceDataType]
+	if ok {
+		return item.GetRegion
+	}
+
+	return nil
+}
+
+func (r *RegistryItemMap) GetReferenceAttributes(resourceDataType string) []string {
 	var refAttrs []string
 	item, ok := (*r)[resourceDataType]
 	if ok {
@@ -68,7 +73,7 @@ func (r *ResourceRegistryMap) GetReferenceAttributes(resourceDataType string) []
 	return refAttrs
 }
 
-func (r *ResourceRegistryMap) GetCustomRefIDFunc(resourceDataType string) schema.ReferenceIDFunc {
+func (r *RegistryItemMap) GetCustomRefIDFunc(resourceDataType string) schema.ReferenceIDFunc {
 	item, ok := (*r)[resourceDataType]
 	if ok {
 		return item.CustomRefIDFunc
@@ -76,7 +81,7 @@ func (r *ResourceRegistryMap) GetCustomRefIDFunc(resourceDataType string) schema
 	return nil
 }
 
-func (r *ResourceRegistryMap) GetDefaultRefIDFunc(resourceDataType string) schema.ReferenceIDFunc {
+func (r *RegistryItemMap) GetDefaultRefIDFunc(resourceDataType string) schema.ReferenceIDFunc {
 	item, ok := (*r)[resourceDataType]
 	if ok {
 		return item.DefaultRefIDFunc

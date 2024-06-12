@@ -17,7 +17,7 @@ func getPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 }
 
 func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 	sku := d.Get("sku_name").String()
 	storage := d.Get("storage_mb").Int()
 

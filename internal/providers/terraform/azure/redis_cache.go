@@ -18,7 +18,7 @@ func GetAzureRMRedisCacheRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	skuName := d.Get("sku_name").String()
 	family := d.Get("family").String()

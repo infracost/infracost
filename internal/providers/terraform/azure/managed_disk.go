@@ -15,7 +15,7 @@ func getManagedDiskRegistryItem() *schema.RegistryItem {
 func NewManagedDisk(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ManagedDisk{
 		Address: d.Address,
-		Region:  lookupRegion(d, []string{}),
+		Region:  d.Region,
 		ManagedDiskData: azure.ManagedDiskData{
 			DiskType:          d.Get("storage_account_type").String(),
 			DiskSizeGB:        d.Get("disk_size_gb").Int(),

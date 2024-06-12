@@ -20,7 +20,7 @@ func getIoTHubDPSRegistryItem() *schema.RegistryItem {
 }
 
 func newIoTHub(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	sku := d.Get("sku.0.name").String()
 	capacity := d.Get("sku.0.capacity").Int()
@@ -36,7 +36,7 @@ func newIoTHub(d *schema.ResourceData) schema.CoreResource {
 }
 
 func newIoTHubDPS(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	sku := d.Get("sku.0.name").String()
 

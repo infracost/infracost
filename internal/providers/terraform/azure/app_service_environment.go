@@ -17,7 +17,7 @@ func getAppServiceEnvironmentRegistryItem() *schema.RegistryItem {
 func NewAppServiceEnvironment(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.AppServiceEnvironment{
 		Address:     d.Address,
-		Region:      lookupRegion(d, []string{"resource_group_name"}),
+		Region:      d.Region,
 		PricingTier: d.Get("pricing_tier").String(),
 	}
 	return r

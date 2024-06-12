@@ -12,6 +12,6 @@ func getActiveDirectoryDomainServiceRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewActiveDirectoryDomainService(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.ActiveDirectoryDomainService{Address: d.Address, Region: lookupRegion(d, []string{}), SKU: d.Get("sku").String()}
+	r := &azure.ActiveDirectoryDomainService{Address: d.Address, Region: d.Region, SKU: d.Get("sku").String()}
 	return r
 }

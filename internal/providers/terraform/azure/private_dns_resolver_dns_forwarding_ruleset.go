@@ -18,7 +18,7 @@ func getPrivateDnsResolverDnsForwardingRulesetRegistryItem() *schema.RegistryIte
 }
 
 func newPrivateDnsResolverDnsForwardingRuleset(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"

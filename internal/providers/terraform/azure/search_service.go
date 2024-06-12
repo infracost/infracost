@@ -24,7 +24,7 @@ func GetAzureRMSearchServiceRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMSearchService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 	costComponents := []*schema.CostComponent{}
 
 	sku := strings.ToLower(d.Get("sku").String())

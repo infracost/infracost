@@ -22,7 +22,7 @@ func getFunctionAppRegistryItem() *schema.RegistryItem {
 func newFunctionApp(d *schema.ResourceData) *azure.FunctionApp {
 	appServicePlan := d.References("app_service_plan_id")
 	servicePlan := d.References("service_plan_id")
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	if len(appServicePlan) == 0 && len(servicePlan) == 0 {
 		return &azure.FunctionApp{
@@ -42,7 +42,7 @@ func newFunctionApp(d *schema.ResourceData) *azure.FunctionApp {
 }
 
 func newFunctionAppFromAppServicePlanRef(d *schema.ResourceData, data *schema.ResourceData) *azure.FunctionApp {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	tier := "standard"
 	// support for the legacy azurerm_app_service_plan resource. This is only applicable for the legacy azurerm_function_app resource.

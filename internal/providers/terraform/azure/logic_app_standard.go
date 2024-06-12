@@ -17,7 +17,7 @@ func getLogicAppStandardRegistryItem() *schema.RegistryItem {
 }
 
 func newLogicAppStandard(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	var sku *string
 	appServicePlans := d.References("app_service_plan_id")

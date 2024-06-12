@@ -23,7 +23,7 @@ func GetAzureRMCDNEndpointRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := regionToCDNZone(lookupRegion(d, []string{}))
+	region := regionToCDNZone(d.Region)
 
 	var costComponents []*schema.CostComponent
 

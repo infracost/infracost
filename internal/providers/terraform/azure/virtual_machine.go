@@ -14,7 +14,7 @@ func getVirtualMachineRegistryItem() *schema.RegistryItem {
 func NewVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.VirtualMachine{
 		Address:                    d.Address,
-		Region:                     lookupRegion(d, []string{}),
+		Region:                     d.Region,
 		StorageImageReferenceOffer: d.Get("storage_image_reference.0.offer").String(),
 		StorageOSDiskOSType:        d.Get("storage_os_disk.0.os_type").String(),
 		LicenseType:                d.Get("license_type").String(),

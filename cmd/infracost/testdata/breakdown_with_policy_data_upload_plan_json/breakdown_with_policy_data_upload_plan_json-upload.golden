@@ -61,7 +61,8 @@ storePolicyResources:
             "endLine": 0,
             "filename": "",
             "startLine": 0
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }

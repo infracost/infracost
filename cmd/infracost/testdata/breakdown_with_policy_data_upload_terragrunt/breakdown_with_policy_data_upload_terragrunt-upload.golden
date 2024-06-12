@@ -68,7 +68,8 @@ storePolicyResources:
             "endLine": 22,
             "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
             "startLine": 1
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }
@@ -137,7 +138,8 @@ storePolicyResources:
             "endLine": 22,
             "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
             "startLine": 1
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }

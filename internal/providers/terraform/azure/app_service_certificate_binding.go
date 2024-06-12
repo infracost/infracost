@@ -12,9 +12,12 @@ func getAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"certificate_id",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"certificate_id"})
+		},
 	}
 }
 func NewAppServiceCertificateBinding(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.AppServiceCertificateBinding{Address: d.Address, Region: lookupRegion(d, []string{"certificate_id"}), SSLState: d.Get("ssl_state").String()}
+	r := &azure.AppServiceCertificateBinding{Address: d.Address, Region: d.Region, SSLState: d.Get("ssl_state").String()}
 	return r
 }

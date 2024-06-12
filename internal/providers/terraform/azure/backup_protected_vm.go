@@ -29,7 +29,7 @@ func getBackupProtectedVmRegistryItem() *schema.RegistryItem {
 // newBackupProtectedVm returns a azure.BackupProtectedVM with attributes parsed from HCL.
 // Note: archive tier not supported https://github.com/hashicorp/terraform-provider-azurerm/issues/21051 by the provider.
 func newBackupProtectedVm(d *schema.ResourceData) *azure.BackupProtectedVM {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	vms := d.References("source_vm_id")
 	if len(vms) == 0 {
 		logging.Logger.Warn().Msgf("skipping resource %s as cannot find referenced source vm", d.Address)

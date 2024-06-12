@@ -18,7 +18,7 @@ func getLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 func NewAzureLinuxVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.LinuxVirtualMachine{
 		Address:         d.Address,
-		Region:          lookupRegion(d, []string{}),
+		Region:          d.Region,
 		Size:            d.Get("size").String(),
 		UltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
 	}

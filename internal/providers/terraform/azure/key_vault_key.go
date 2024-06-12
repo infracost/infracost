@@ -20,11 +20,14 @@ func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"key_vault_id"})
+		},
 	}
 }
 
 func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"key_vault_id"})
+	region := d.Region
 
 	var skuName, keyType, keySize, meterName string
 	keyVault := d.References("key_vault_id")

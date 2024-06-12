@@ -17,11 +17,14 @@ func GetAzureRMSynapseSQLPoolRegistryItem() *schema.RegistryItem {
 			"synapse_workspace_id",
 		},
 		Notes: []string{"the total costs consist of several resources that should be viewed as a whole"},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"synapse_workspace_id"})
+		},
 	}
 }
 
 func NewAzureRMSynapseSQLPool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"synapse_workspace_id"})
+	region := d.Region
 
 	costComponents := make([]*schema.CostComponent, 0)
 

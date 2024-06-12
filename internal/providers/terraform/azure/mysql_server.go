@@ -18,7 +18,7 @@ func GetAzureRMMySQLServerRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	serviceName := "Azure Database for MySQL"
 	var costComponents []*schema.CostComponent

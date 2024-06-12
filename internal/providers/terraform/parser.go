@@ -49,13 +49,11 @@ type parsedResource struct {
 }
 
 func (p *Parser) createParsedResource(d *schema.ResourceData, u *schema.UsageData) parsedResource {
-	registryMap := GetResourceRegistryMap()
-
 	for cKey, cValue := range getSpecialContext(d) {
 		p.ctx.ContextValues.SetValue(cKey, cValue)
 	}
 
-	if registryItem, ok := (*registryMap)[d.Type]; ok {
+	if registryItem, ok := (*ResourceRegistryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
 			resource := &schema.Resource{
 				Name:        d.Address,
@@ -140,10 +138,27 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResou
 	p.populateUsageData(resData, usage)
 
 	for _, d := range resData {
+		p.setRegion(confLoader, d, providerConf, vars)
+
 		resources = append(resources, p.createParsedResource(d, d.UsageData))
 	}
 
 	return resources
+}
+
+// setRegion sets the region on the given resource data and any references it has.
+func (p *Parser) setRegion(confLoader *ConfLoader, d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result) {
+	region := p.getRegion(confLoader, d, providerConf, vars)
+	d.RawValues = schema.AddRawValue(d.RawValues, "region", region)
+	d.Region = region
+
+	for _, references := range d.ReferencesMap {
+		for _, ref := range references {
+			if ref.Region == "" {
+				p.setRegion(confLoader, ref, providerConf, vars)
+			}
+		}
+	}
 }
 
 // populateUsageData finds the UsageData for each ResourceData and sets the ResourceData.UsageData field
@@ -411,24 +426,6 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 
 		v := r.Get("values")
 
-		resConf := confLoader.GetResourceConfJSON(addr)
-
-		// Override the region when requested
-		region := overrideRegion(addr, t, p.ctx.RunContext.Config)
-
-		// If not overridden try getting the region from the ARN
-		if region == "" {
-			region = resourceRegion(t, v)
-		}
-
-		// Otherwise use region from the provider conf
-		if region == "" {
-			region = providerRegion(addr, providerConf, vars, t, resConf)
-		}
-
-		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
-		// the entire underlying parsed json from being garbage collected.
-		v = schema.AddRawValue(v, "region", strings.Clone(region))
 		data := schema.NewResourceData(strings.Clone(t), strings.Clone(provider), strings.Clone(addr), nil, v)
 
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
@@ -445,6 +442,27 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 	}
 
 	return resources
+}
+
+func (p *Parser) getRegion(confLoader *ConfLoader, d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result) string {
+	resConf := confLoader.GetResourceConfJSON(d.Address)
+
+	// Override the region when requested
+	region := overrideRegion(d, p.ctx.RunContext.Config)
+
+	// If not overridden try getting the region from the ARN
+	if region == "" {
+		region = resourceRegion(d)
+	}
+
+	// Otherwise use region from the provider conf
+	if region == "" {
+		region = providerRegion(d, providerConf, vars, resConf)
+	}
+
+	// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+	// the entire underlying parsed json from being garbage collected.
+	return strings.Clone(region)
 }
 
 func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
@@ -481,9 +499,9 @@ func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
 	return &defaultTags
 }
 
-func overrideRegion(addr string, resourceType string, config *config.Config) string {
+func overrideRegion(d *schema.ResourceData, config *config.Config) string {
 	region := ""
-	providerPrefix := getProviderPrefix(resourceType)
+	providerPrefix := getProviderPrefix(d.Type)
 
 	switch providerPrefix {
 	case "aws":
@@ -497,29 +515,40 @@ func overrideRegion(addr string, resourceType string, config *config.Config) str
 	}
 
 	if region != "" {
-		logging.Logger.Debug().Msgf("Overriding region (%s) for %s", region, addr)
+		logging.Logger.Debug().Msgf("Overriding region (%s) for %s", region, d.Address)
 	}
 
 	return region
 }
 
-func resourceRegion(resourceType string, v gjson.Result) string {
-	providerPrefix := getProviderPrefix(resourceType)
+func resourceRegion(d *schema.ResourceData) string {
+	// let's check if the resource has a specific region lookup function. Resources
+	// can define specific region lookup functions over the default provider logic,
+	// as some resources require us to infer the region by traversing resource
+	// references and other attributes.
+	regionFunc := ResourceRegistryMap.GetRegion(d.Type)
+	if regionFunc != nil {
+		region := regionFunc(d)
+		if region != "" {
+			return region
+		}
+	}
 
+	providerPrefix := getProviderPrefix(d.Type)
 	switch providerPrefix {
 	case "aws":
-		return aws.GetResourceRegion(resourceType, v)
+		return aws.GetResourceRegion(d)
 	case "azurerm":
-		return azure.GetResourceRegion(resourceType, v)
+		return azure.GetResourceRegion(d)
 	case "google":
-		return google.GetResourceRegion(resourceType, v)
+		return google.GetResourceRegion(d)
 	default:
 		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		return ""
 	}
 }
 
-func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
+func providerRegion(d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result, resConf gjson.Result) string {
 	var region string
 
 	providerKey := parseProviderKey(resConf)
@@ -532,7 +561,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 
 	if region == "" {
 		// Try to get the provider key from the first part of the resource
-		providerPrefix := getProviderPrefix(resourceType)
+		providerPrefix := getProviderPrefix(d.Type)
 		region = parseRegion(providerConf, vars, providerPrefix)
 
 		if region == "" {
@@ -549,7 +578,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 			// Don't show this log for azurerm users since they have a different method of looking up the region.
 			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
 			if region != "" && providerPrefix != "azurerm" {
-				logging.Logger.Debug().Msgf("Falling back to default region (%s) for %s", region, addr)
+				logging.Logger.Debug().Msgf("Falling back to default region (%s) for %s", region, d.Address)
 			}
 		}
 	}
@@ -605,15 +634,13 @@ func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 }
 
 func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader) {
-	registryMap := GetResourceRegistryMap()
-
 	// Create a map of id -> resource data so we can lookup references
 	idMap := make(map[string][]*schema.ResourceData)
 
 	for _, d := range resData {
 
 		// check for any "default" ids declared by the provider for this resource
-		if f := registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
+		if f := ResourceRegistryMap.GetDefaultRefIDFunc(d.Type); f != nil {
 			for _, defaultID := range f(d) {
 				if _, ok := idMap[defaultID]; !ok {
 					idMap[defaultID] = []*schema.ResourceData{}
@@ -623,7 +650,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 		}
 
 		// check for any "custom" ids specified by the resource and add them.
-		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
+		if f := ResourceRegistryMap.GetCustomRefIDFunc(d.Type); f != nil {
 			for _, customID := range f(d) {
 				if _, ok := idMap[customID]; !ok {
 					idMap[customID] = []*schema.ResourceData{}
@@ -642,11 +669,11 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 		if isInfracostResource(d) {
 			refAttrs = []string{"resources"}
 		} else {
-			refAttrs = registryMap.GetReferenceAttributes(d.Type)
+			refAttrs = ResourceRegistryMap.GetReferenceAttributes(d.Type)
 		}
 
 		for _, attr := range refAttrs {
-			found := p.parseConfReferences(resData, confLoader, d, attr, registryMap)
+			found := p.parseConfReferences(resData, confLoader, d, attr, ResourceRegistryMap)
 
 			if found {
 				continue
@@ -663,7 +690,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 				if ok {
 
 					for _, ref := range idRefs {
-						reverseRefAttrs := registryMap.GetReferenceAttributes(ref.Type)
+						reverseRefAttrs := ResourceRegistryMap.GetReferenceAttributes(ref.Type)
 						d.AddReference(attr, ref, reverseRefAttrs)
 					}
 				}
@@ -672,7 +699,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 	}
 }
 
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *RegistryItemMap) bool {
 	// Check if there's a reference in the conf
 	resConf := confLoader.GetResourceConfJSON(d.Address)
 	exps := resConf.Get("expressions").Get(attr)

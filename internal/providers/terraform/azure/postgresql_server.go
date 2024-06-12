@@ -18,7 +18,7 @@ func GetAzureRMPostgreSQLServerRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMPostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	var costComponents []*schema.CostComponent
 	serviceName := "Azure Database for PostgreSQL"

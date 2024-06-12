@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"github.com/tidwall/gjson"
-
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -19,10 +17,6 @@ func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
 
 func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	return map[string]interface{}{}
-}
-
-func GetResourceRegion(resourceType string, v gjson.Result) string {
-	return ""
 }
 
 func ParseTags(r *schema.ResourceData) *map[string]string {

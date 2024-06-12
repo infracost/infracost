@@ -14,7 +14,7 @@ func getWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 func NewWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.WindowsVirtualMachineScaleSet{
 		Address:                               d.Address,
-		Region:                                lookupRegion(d, []string{}),
+		Region:                                d.Region,
 		SKU:                                   d.Get("sku").String(),
 		LicenseType:                           d.Get("license_type").String(),
 		AdditionalCapabilitiesUltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),

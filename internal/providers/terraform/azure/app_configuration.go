@@ -18,7 +18,7 @@ func getAppConfigurationRegistryItem() *schema.RegistryItem {
 }
 
 func newAppConfiguration(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	sku := strings.ToLower(strings.TrimSpace(d.Get("sku").String()))
 	if sku == "" {
 		sku = "free"

@@ -16,7 +16,7 @@ func getDataFactoryRegistryItem() *schema.RegistryItem {
 }
 
 func newDataFactory(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	r := &azure.DataFactory{
 		Address: d.Address,

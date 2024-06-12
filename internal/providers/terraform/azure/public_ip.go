@@ -18,7 +18,7 @@ func GetAzureRMPublicIPRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	var meterName string
 	sku := "Basic"

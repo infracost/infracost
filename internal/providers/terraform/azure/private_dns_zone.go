@@ -16,6 +16,6 @@ func getDNSPrivateZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewPrivateDNSZone(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.PrivateDNSZone{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.PrivateDNSZone{Address: d.Address, Region: d.Region}
 	return r
 }

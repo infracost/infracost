@@ -11,7 +11,7 @@ func getEventgridTopicRegistryItem() *schema.RegistryItem {
 		CoreRFunc: func(d *schema.ResourceData) schema.CoreResource {
 			return &azure.EventGridTopic{
 				Address: d.Address,
-				Region:  lookupRegion(d, []string{"resource_group_name"}),
+				Region:  d.Region,
 			}
 		},
 		ReferenceAttributes: []string{

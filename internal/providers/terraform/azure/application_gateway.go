@@ -23,7 +23,7 @@ func NewApplicationGateway(d *schema.ResourceData) schema.CoreResource {
 		SKUName:                d.Get("sku.0.name").String(),
 		SKUCapacity:            d.Get("sku.0.capacity").Int(),
 		AutoscalingMinCapacity: autoscalingMinCapacity,
-		Region:                 lookupRegion(d, []string{}),
+		Region:                 d.Region,
 	}
 
 	return r

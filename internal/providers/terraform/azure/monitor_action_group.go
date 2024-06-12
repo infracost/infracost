@@ -17,7 +17,7 @@ func getMonitorActionGroupRegistryItem() *schema.RegistryItem {
 }
 
 func newMonitorActionGroup(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	smsByCountryCode := make(map[int]int)
 	for _, sms := range d.Get("sms_receiver").Array() {

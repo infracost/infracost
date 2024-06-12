@@ -19,7 +19,7 @@ func GetAzureRMFirewallRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	var costComponents []*schema.CostComponent
 

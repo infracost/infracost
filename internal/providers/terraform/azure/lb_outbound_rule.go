@@ -14,11 +14,14 @@ func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {
 			"loadbalancer_id",
 			"resource_group_name",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
+		},
 	}
 }
 
 func NewAzureRMLoadBalancerOutboundRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
+	region := d.Region
 	region = convertRegion(region)
 
 	lbSku := getParentLbSku(d.References("loadbalancer_id"))

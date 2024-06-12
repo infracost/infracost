@@ -68,7 +68,8 @@ storePolicyResources:
             "endLine": 37,
             "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
             "startLine": 16
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }
@@ -137,7 +138,8 @@ storePolicyResources:
             "endLine": 37,
             "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
             "startLine": 16
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }

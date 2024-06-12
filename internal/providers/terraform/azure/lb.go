@@ -18,7 +18,7 @@ func getLoadBalancerRegistryItem() *schema.RegistryItem {
 func NewLB(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.LB{
 		Address: d.Address,
-		Region:  lookupRegion(d, []string{"resource_group_name"}),
+		Region:  d.Region,
 		SKU:     d.Get("sku").String(),
 	}
 	return r

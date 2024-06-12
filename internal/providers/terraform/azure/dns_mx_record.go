@@ -15,6 +15,6 @@ func getDNSMXRecordRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewDNSMXRecord(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.DNSMXRecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.DNSMXRecord{Address: d.Address, Region: d.Region}
 	return r
 }

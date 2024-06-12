@@ -16,8 +16,7 @@ func generateSupportedResourcesDocs(docsTemplatesPath string, outputPath string)
 	if err != nil {
 		return err
 	}
-	resourceRegistryMap := terraform.GetResourceRegistryMap()
-	err = tmpl.Execute(f, resourceRegistryMap)
+	err = tmpl.Execute(f, terraform.ResourceRegistryMap)
 	if err != nil {
 		return err
 	}

@@ -12,6 +12,6 @@ func getDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewDatabricksWorkspace(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.DatabricksWorkspace{Address: d.Address, Region: lookupRegion(d, []string{}), SKU: d.Get("sku").String()}
+	r := &azure.DatabricksWorkspace{Address: d.Address, Region: d.Region, SKU: d.Get("sku").String()}
 	return r
 }

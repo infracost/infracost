@@ -63,6 +63,18 @@ func convertRegion(region string) string {
 	}
 }
 
+// GetResourceRegion returns the default azure region lookup function. Many
+// resources in azure define a custom region lookup function, This can be found
+// in their RegistryItem.GetRegion field. This function is used as a fallback
+// when a custom region lookup function is not defined.
+func GetResourceRegion(d *schema.ResourceData) string {
+	if d == nil {
+		return ""
+	}
+
+	return lookupRegion(d, []string{"resource_group_name"})
+}
+
 // locationNameMapping returns a display name for a given location name.
 // Up-to-date mapping can be found by running the following command:
 //

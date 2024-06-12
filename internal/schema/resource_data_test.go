@@ -8,10 +8,9 @@ import (
 )
 
 func TestResourceDataEmpty(t *testing.T) {
-	r := NewResourceData("somettype", "someprovider", "some.address", nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{	
+	r := NewResourceData("somettype", "someprovider", "some.address", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{	
 					"someresource": {
 						"number": 0,
 						"string": "string",
@@ -37,7 +36,7 @@ func TestResourceDataEmpty(t *testing.T) {
 						}
 					}
 				}`,
-		})
+	})
 
 	tests := []struct {
 		key  string
