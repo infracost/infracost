@@ -21,7 +21,7 @@ func getStorageAccountRegistryItem() *schema.RegistryItem {
 }
 
 func newAzureRMStorageAccount(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	accountKind := "StorageV2"
 	if !d.IsEmpty("account_kind") {

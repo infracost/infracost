@@ -31,7 +31,7 @@ func NewAzureRMVirtualNetworkGatewayConnection(d *schema.ResourceData, u *schema
 		sku = vpnGateway.Get("sku").String()
 	}
 
-	region := lookupRegion(d, []string{})
+	region := d.Region
 	if strings.ToLower(sku) == "basic" {
 		return &schema.Resource{
 			Name:      d.Address,

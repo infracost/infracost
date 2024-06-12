@@ -15,6 +15,6 @@ func getDNSCNameRecordRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewDNSCNameRecord(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.DNSCNameRecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.DNSCNameRecord{Address: d.Address, Region: d.Region}
 	return r
 }

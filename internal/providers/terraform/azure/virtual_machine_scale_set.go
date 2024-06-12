@@ -18,7 +18,7 @@ func getVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 func NewVirtualMachineScaleSet(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.VirtualMachineScaleSet{
 		Address:     d.Address,
-		Region:      lookupRegion(d, []string{}),
+		Region:      d.Region,
 		SKUName:     d.Get("sku.0.name").String(),
 		SKUCapacity: d.Get("sku.0.capacity").Int(),
 		LicenseType: d.Get("license_type").String(),

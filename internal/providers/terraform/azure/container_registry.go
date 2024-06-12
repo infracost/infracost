@@ -14,7 +14,7 @@ func getContainerRegistryRegistryItem() *schema.RegistryItem {
 func NewContainerRegistry(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ContainerRegistry{
 		Address:                 d.Address,
-		Region:                  lookupRegion(d, []string{}),
+		Region:                  d.Region,
 		GeoReplicationLocations: len(d.Get("georeplications").Array()),
 		SKU:                     d.Get("sku").String(),
 	}

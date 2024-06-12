@@ -18,7 +18,7 @@ func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	region = convertRegion(region)
 
 	var monthlyDataProcessedGb *decimal.Decimal

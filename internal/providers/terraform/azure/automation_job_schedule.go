@@ -15,6 +15,6 @@ func getAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewAutomationJobSchedule(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.AutomationJobSchedule{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.AutomationJobSchedule{Address: d.Address, Region: d.Region}
 	return r
 }

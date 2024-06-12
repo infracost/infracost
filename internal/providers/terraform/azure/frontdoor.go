@@ -22,7 +22,7 @@ func getFrontdoorRegistryItem() *schema.RegistryItem {
 
 // newFrontdoor parses Terraform's data and uses it to build a new resource
 func newFrontdoor(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"

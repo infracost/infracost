@@ -16,11 +16,14 @@ func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"key_vault_id"})
+		},
 	}
 }
 
 func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"key_vault_id"})
+	region := d.Region
 
 	var costComponents []*schema.CostComponent
 

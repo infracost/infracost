@@ -16,7 +16,7 @@ func getPowerBIEmbeddedRegistryItem() *schema.RegistryItem {
 }
 
 func newPowerBIEmbedded(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.PowerBIEmbedded{
 		Address: d.Address,
 		Region:  region,

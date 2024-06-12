@@ -19,7 +19,7 @@ func getMonitorScheduledQueryRulesAlertV2RegistryItem() *schema.RegistryItem {
 }
 
 func newMonitorScheduledQueryRulesAlertV2(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	freq := int64(1)
 	ef, err := duration.FromString(d.Get("evaluation_frequency").String())

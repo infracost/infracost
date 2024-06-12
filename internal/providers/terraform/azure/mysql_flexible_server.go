@@ -17,7 +17,7 @@ func getMySQLFlexibleServerRegistryItem() *schema.RegistryItem {
 }
 
 func newMySQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 	sku := d.Get("sku_name").String()
 	storage := d.GetInt64OrDefault("storage.0.size_gb", 0)
 	iops := d.GetInt64OrDefault("storage.0.iops", 0)

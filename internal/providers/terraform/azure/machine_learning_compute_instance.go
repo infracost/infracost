@@ -16,7 +16,7 @@ func getMachineLearningComputeInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func newMachineLearningComputeInstance(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.MachineLearningComputeInstance{
 		Address:      d.Address,
 		Region:       region,

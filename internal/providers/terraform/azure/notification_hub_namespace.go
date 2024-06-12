@@ -19,7 +19,7 @@ func GetAzureRMNotificationHubNamespaceRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMNotificationHubNamespace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	var monthlyAdditionalPushes *decimal.Decimal
 	sku := "Basic"

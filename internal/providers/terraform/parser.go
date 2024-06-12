@@ -49,13 +49,11 @@ type parsedResource struct {
 }
 
 func (p *Parser) createParsedResource(d *schema.ResourceData, u *schema.UsageData) parsedResource {
-	registryMap := GetResourceRegistryMap()
-
 	for cKey, cValue := range getSpecialContext(d) {
 		p.ctx.ContextValues.SetValue(cKey, cValue)
 	}
 
-	if registryItem, ok := (*registryMap)[d.Type]; ok {
+	if registryItem, ok := (*ResourceRegistryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
 			resource := &schema.Resource{
 				Name:        d.Address,
@@ -513,8 +511,19 @@ func overrideRegion(d *schema.ResourceData, config *config.Config) string {
 }
 
 func resourceRegion(d *schema.ResourceData) string {
-	providerPrefix := getProviderPrefix(d.Type)
+	// let's check if the resource has a specific region lookup function. Resources
+	// can define specific region lookup functions over the default provider logic,
+	// as some resources require us to infer the region by traversing resource
+	// references and other attributes.
+	regionFunc := ResourceRegistryMap.GetRegion(d.Type)
+	if regionFunc != nil {
+		region := regionFunc(d)
+		if region != "" {
+			return region
+		}
+	}
 
+	providerPrefix := getProviderPrefix(d.Type)
 	switch providerPrefix {
 	case "aws":
 		return aws.GetResourceRegion(d)
@@ -614,15 +623,13 @@ func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 }
 
 func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader) {
-	registryMap := GetResourceRegistryMap()
-
 	// Create a map of id -> resource data so we can lookup references
 	idMap := make(map[string][]*schema.ResourceData)
 
 	for _, d := range resData {
 
 		// check for any "default" ids declared by the provider for this resource
-		if f := registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
+		if f := ResourceRegistryMap.GetDefaultRefIDFunc(d.Type); f != nil {
 			for _, defaultID := range f(d) {
 				if _, ok := idMap[defaultID]; !ok {
 					idMap[defaultID] = []*schema.ResourceData{}
@@ -632,7 +639,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 		}
 
 		// check for any "custom" ids specified by the resource and add them.
-		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
+		if f := ResourceRegistryMap.GetCustomRefIDFunc(d.Type); f != nil {
 			for _, customID := range f(d) {
 				if _, ok := idMap[customID]; !ok {
 					idMap[customID] = []*schema.ResourceData{}
@@ -651,11 +658,11 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 		if isInfracostResource(d) {
 			refAttrs = []string{"resources"}
 		} else {
-			refAttrs = registryMap.GetReferenceAttributes(d.Type)
+			refAttrs = ResourceRegistryMap.GetReferenceAttributes(d.Type)
 		}
 
 		for _, attr := range refAttrs {
-			found := p.parseConfReferences(resData, confLoader, d, attr, registryMap)
+			found := p.parseConfReferences(resData, confLoader, d, attr, ResourceRegistryMap)
 
 			if found {
 				continue
@@ -672,7 +679,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 				if ok {
 
 					for _, ref := range idRefs {
-						reverseRefAttrs := registryMap.GetReferenceAttributes(ref.Type)
+						reverseRefAttrs := ResourceRegistryMap.GetReferenceAttributes(ref.Type)
 						d.AddReference(attr, ref, reverseRefAttrs)
 					}
 				}
@@ -681,7 +688,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 	}
 }
 
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *RegistryItemMap) bool {
 	// Check if there's a reference in the conf
 	resConf := confLoader.GetResourceConfJSON(d.Address)
 	exps := resConf.Get("expressions").Get(attr)

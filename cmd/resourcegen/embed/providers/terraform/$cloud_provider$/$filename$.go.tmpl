@@ -22,11 +22,7 @@ func {{.RegistryFuncName}}() *schema.RegistryItem {
 }
 
 func {{ .RFuncName }}(d *schema.ResourceData) schema.CoreResource {
-	{{- if (eq .CloudProvider "azure") }}
-	region := lookupRegion(d, []string{"resource_group_name"})
-	{{- else }}
-	region := d.Get("region").String()
-	{{- end }}
+	region := d.Region
 	{{- if .WithHelp }}
 
 	// In {{.RFuncName}} we parse the resource data coming from d

@@ -12,6 +12,6 @@ func getBastionHostRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewBastionHost(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.BastionHost{Address: d.Address, Region: lookupRegion(d, []string{})}
+	r := &azure.BastionHost{Address: d.Address, Region: d.Region}
 	return r
 }

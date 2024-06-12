@@ -27,7 +27,7 @@ func getRecoveryServicesVaultRegistryItem() *schema.RegistryItem {
 }
 
 func newRecoveryServicesVault(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	vms := d.References("azurerm_backup_protected_vm.recovery_vault_name")
 
 	var protectedVMs []*azure.BackupProtectedVM

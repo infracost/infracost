@@ -17,7 +17,7 @@ func getApplicationInsightsWebTestRegistryItem() *schema.RegistryItem {
 func NewApplicationInsightsWebTest(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ApplicationInsightsWebTest{
 		Address: d.Address,
-		Region:  lookupRegion(d, []string{"resource_group_name"}),
+		Region:  d.Region,
 		Enabled: d.Get("enabled").Bool(),
 		Kind:    d.Get("kind").String(),
 	}

@@ -19,6 +19,14 @@ func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
 			"account_name",
 			"resource_group_name",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			if len(d.References("account_name")) > 0 {
+				account := d.References("account_name")[0]
+				return lookupRegion(account, []string{"account_name", "resource_group_name"})
+			}
+
+			return ""
+		},
 	}
 }
 
@@ -44,7 +52,7 @@ func NewAzureRMCosmosdb(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account *schema.ResourceData) []*schema.CostComponent {
 	// Find the region in from the passed-in account
-	region := lookupRegion(account, []string{"account_name", "resource_group_name"})
+	region := d.Region
 	geoLocations := account.Get("geo_location").Array()
 
 	// The geo_location attribute is a required attribute however it can be an empty list because of

@@ -14,7 +14,7 @@ func getApplicationInsightsRegistryItem() *schema.RegistryItem {
 func NewApplicationInsights(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ApplicationInsights{
 		Address:         d.Address,
-		Region:          lookupRegion(d, []string{}),
+		Region:          d.Region,
 		RetentionInDays: d.Get("retention_in_days").Int(),
 	}
 	return r

@@ -40,7 +40,7 @@ func NewKubernetesCluster(d *schema.ResourceData) schema.CoreResource {
 
 	r := &azure.KubernetesCluster{
 		Address:                       d.Address,
-		Region:                        lookupRegion(d, []string{}),
+		Region:                        d.Region,
 		SKUTier:                       d.Get("sku_tier").String(),
 		NetworkProfileLoadBalancerSKU: d.Get("network_profile.0.load_balancer_sku").String(),
 		DefaultNodePoolNodeCount:      nodeCount,

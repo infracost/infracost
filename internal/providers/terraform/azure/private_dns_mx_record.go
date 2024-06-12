@@ -15,6 +15,6 @@ func getPrivateDNSMXRecordRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewPrivateDNSMXRecord(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.PrivateDNSMXRecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.PrivateDNSMXRecord{Address: d.Address, Region: d.Region}
 	return r
 }

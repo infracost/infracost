@@ -56,11 +56,14 @@ func getMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"server_id",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"server_id"})
+		},
 	}
 }
 
 func newAzureRMMSSQLDatabase(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"server_id"})
+	region := d.Region
 
 	sku := d.GetStringOrDefault("sku_name", "GP_S_Gen5_2")
 

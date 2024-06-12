@@ -15,7 +15,7 @@ func getLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 func NewLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.LinuxVirtualMachineScaleSet{
 		Address:         d.Address,
-		Region:          lookupRegion(d, []string{}),
+		Region:          d.Region,
 		SKU:             d.Get("sku").String(),
 		UltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
 	}

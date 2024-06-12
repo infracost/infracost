@@ -148,7 +148,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 
 	var policyClient *apiclient.PolicyAPIClient
 	if runCtx.Config.PoliciesEnabled {
-		policyClient, _ = apiclient.NewPolicyAPIClient(runCtx)
+		policyClient, err = apiclient.NewPolicyAPIClient(runCtx)
 		if err != nil {
 			logger.Err(err).Msgf("failed to initialize policy client")
 		}

@@ -16,7 +16,7 @@ func getFederatedIdentityCredentialRegistryItem() *schema.RegistryItem {
 }
 
 func newFederatedIdentityCredential(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.FederatedIdentityCredential{
 		Address: d.Address,
 		Region:  region,

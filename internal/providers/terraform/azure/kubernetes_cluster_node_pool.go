@@ -16,6 +16,9 @@ func getKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"kubernetes_cluster_id",
 		},
+		GetRegion: func(d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"kubernetes_cluster_id"})
+		},
 	}
 }
 
@@ -43,7 +46,7 @@ func NewKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
 
 	r := &azure.KubernetesClusterNodePool{
 		Address:      d.Address,
-		Region:       lookupRegion(d, []string{"kubernetes_cluster_id"}),
+		Region:       d.Region,
 		VMSize:       d.Get("vm_size").String(),
 		OS:           os,
 		OSDiskType:   d.Get("os_disk_type").String(),

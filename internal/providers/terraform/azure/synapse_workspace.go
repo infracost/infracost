@@ -22,7 +22,7 @@ func GetAzureRMSynapseWorkspacRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMSynapseWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	costComponents := make([]*schema.CostComponent, 0)
 

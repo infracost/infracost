@@ -16,7 +16,7 @@ func getNetworkWatcherRegistryItem() *schema.RegistryItem {
 }
 
 func newNetworkWatcher(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.NetworkWatcher{
 		Address: d.Address,
 		Region:  region,

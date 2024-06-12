@@ -12,6 +12,6 @@ func getAutomationAccountRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewAutomationAccount(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.AutomationAccount{Address: d.Address, Region: lookupRegion(d, []string{})}
+	r := &azure.AutomationAccount{Address: d.Address, Region: d.Region}
 	return r
 }

@@ -23,7 +23,7 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	var includedRetention decimal.Decimal
 	sku := "Basic"
 	meterName := ""
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()

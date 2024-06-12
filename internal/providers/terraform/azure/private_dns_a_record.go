@@ -15,6 +15,6 @@ func getPrivateDNSARecordRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewPrivateDNSARecord(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.PrivateDNSARecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.PrivateDNSARecord{Address: d.Address, Region: d.Region}
 	return r
 }

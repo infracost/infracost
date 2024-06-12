@@ -15,6 +15,6 @@ func getAPIManagementRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewAPIManagement(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.APIManagement{Address: d.Address, SKUName: d.Get("sku_name").String(), Region: lookupRegion(d, []string{})}
+	r := &azure.APIManagement{Address: d.Address, SKUName: d.Get("sku_name").String(), Region: d.Region}
 	return r
 }

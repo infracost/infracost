@@ -17,7 +17,7 @@ func getActiveDirectoryDomainServiceReplicaSetRegistryItem() *schema.RegistryIte
 func NewActiveDirectoryDomainServiceReplicaSet(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ActiveDirectoryDomainServiceReplicaSet{
 		Address: d.Address,
-		Region:  lookupRegion(d, []string{}),
+		Region:  d.Region,
 	}
 	if len(d.References("domain_service_id")) > 0 {
 		r.DomainServiceIDSKU = d.References("domain_service_id")[0].Get("sku").String()

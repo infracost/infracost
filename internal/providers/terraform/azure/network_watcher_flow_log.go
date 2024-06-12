@@ -31,7 +31,7 @@ func newNetworkWatcherFlowLog(d *schema.ResourceData) schema.CoreResource {
 		trafficAnalyticsAcceleratedProcessing = d.Get("traffic_analytics.0.interval_in_minutes").Int() == int64(10)
 	}
 
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.NetworkWatcherFlowLog{
 		Address:                               d.Address,
 		Region:                                region,

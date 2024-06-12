@@ -16,7 +16,7 @@ func getNetworkDdosProtectionPlanRegistryItem() *schema.RegistryItem {
 }
 
 func newNetworkDdosProtectionPlan(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.NetworkDdosProtectionPlan{
 		Address: d.Address,
 		Region:  region,

@@ -15,6 +15,6 @@ func getDNSARecordRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewDNSARecord(d *schema.ResourceData) schema.CoreResource {
-	r := &azure.DNSARecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
+	r := &azure.DNSARecord{Address: d.Address, Region: d.Region}
 	return r
 }
