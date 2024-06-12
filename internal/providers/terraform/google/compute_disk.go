@@ -12,17 +12,20 @@ func getComputeDiskRegistryItem() *schema.RegistryItem {
 		Name:                "google_compute_disk",
 		CoreRFunc:           newComputeDisk,
 		ReferenceAttributes: []string{"image", "snapshot"},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			region := d.Get("region").String()
+
+			zone := d.Get("zone").String()
+			if zone != "" {
+				region = zoneToRegion(zone)
+			}
+
+			return region
+		},
 	}
 }
 
 func newComputeDisk(d *schema.ResourceData) schema.CoreResource {
-	region := d.Get("region").String()
-
-	zone := d.Get("zone").String()
-	if zone != "" {
-		region = zoneToRegion(zone)
-	}
-
 	diskType := d.Get("type").String()
 	size := computeDiskSize(d)
 
@@ -30,7 +33,7 @@ func newComputeDisk(d *schema.ResourceData) schema.CoreResource {
 
 	r := &google.ComputeDisk{
 		Address: d.Address,
-		Region:  region,
+		Region:  d.Region,
 		Type:    diskType,
 		Size:    size,
 		IOPS:    iops,

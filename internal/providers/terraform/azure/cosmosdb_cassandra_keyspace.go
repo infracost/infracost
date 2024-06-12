@@ -19,7 +19,7 @@ func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
 			"account_name",
 			"resource_group_name",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			if len(d.References("account_name")) > 0 {
 				account := d.References("account_name")[0]
 				return lookupRegion(account, []string{"account_name", "resource_group_name"})

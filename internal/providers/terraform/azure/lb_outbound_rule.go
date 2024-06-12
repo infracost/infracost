@@ -14,7 +14,7 @@ func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {
 			"loadbalancer_id",
 			"resource_group_name",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"loadbalancer_id", "resource_group_name"})
 		},
 	}

@@ -12,7 +12,7 @@ func getMonitorDiagnosticSettingRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"target_resource_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"target_resource_id"})
 		},
 	}

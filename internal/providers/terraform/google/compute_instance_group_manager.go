@@ -14,16 +14,20 @@ func getComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			return []string{d.Get("name").String()}
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			var region string
+
+			zone := d.Get("zone").String()
+			if zone != "" {
+				region = zoneToRegion(zone)
+			}
+
+			return region
+		},
 	}
 }
 
 func newComputeInstanceGroupManager(d *schema.ResourceData) schema.CoreResource {
-	var region string
-	zone := d.Get("zone").String()
-	if zone != "" {
-		region = zoneToRegion(zone)
-	}
-
 	targetSize := int64(1)
 	if d.Get("target_size").Exists() {
 		targetSize = d.Get("target_size").Int()
@@ -72,7 +76,7 @@ func newComputeInstanceGroupManager(d *schema.ResourceData) schema.CoreResource 
 
 	r := &google.ComputeInstanceGroupManager{
 		Address:           d.Address,
-		Region:            region,
+		Region:            d.Region,
 		MachineType:       machineType,
 		PurchaseOption:    purchaseOption,
 		TargetSize:        targetSize,

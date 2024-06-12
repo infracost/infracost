@@ -20,6 +20,29 @@ func getContainerNodePoolRegistryItem() *schema.RegistryItem {
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
 			"Custom machine types are not supported.",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			var location string
+
+			var cluster *schema.ResourceData
+			if len(d.References("cluster")) > 0 {
+				cluster = d.References("cluster")[0]
+			}
+
+			if cluster != nil {
+				location = cluster.Get("location").String()
+			}
+
+			if d.Get("location").String() != "" {
+				location = d.Get("location").String()
+			}
+
+			region := location
+			if isZone(location) {
+				region = zoneToRegion(location)
+			}
+
+			return region
+		},
 	}
 }
 

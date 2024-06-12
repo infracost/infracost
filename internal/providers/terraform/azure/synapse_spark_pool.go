@@ -18,7 +18,7 @@ func GetAzureRMSynapseSparkPoolRegistryItem() *schema.RegistryItem {
 			"synapse_workspace_id",
 		},
 		Notes: []string{"the total costs consist of several resources that should be viewed as a whole"},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"synapse_workspace_id"})
 		},
 	}

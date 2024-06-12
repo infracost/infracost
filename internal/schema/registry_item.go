@@ -9,7 +9,7 @@ type CloudResourceIDFunc func(d *ResourceData) []string
 // RegionLookupFunc is used to look up the region of a resource, this is used to
 // calculate the region of a resource if the region requires a lookup from
 // reference attributes.
-type RegionLookupFunc func(d *ResourceData) string
+type RegionLookupFunc func(defaultRegion string, d *ResourceData) string
 
 type RegistryItem struct {
 	Name                string

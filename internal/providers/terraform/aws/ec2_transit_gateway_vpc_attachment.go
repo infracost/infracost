@@ -15,6 +15,28 @@ func getEC2TransitGatewayVpcAttachmentRegistryItem() *schema.RegistryItem {
 			"transit_gateway_id",
 			"vpc_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			var region string
+			vpcRefs := d.References("vpc_id")
+			for _, ref := range vpcRefs {
+				if strings.ToLower(ref.Type) == "aws_default_vpc" || strings.ToLower(ref.Type) == "aws_vpc" {
+					region = ref.Get("region").String()
+					break
+				}
+			}
+
+			// Try to get the region from the transit gateway
+			transitGatewayRefs := d.References("transit_gateway_id")
+			if len(transitGatewayRefs) > 0 {
+				region = transitGatewayRefs[0].Get("region").String()
+			}
+
+			if region != "" {
+				return region
+			}
+
+			return defaultRegion
+		},
 	}
 }
 func NewEc2TransitGatewayVpcAttachment(d *schema.ResourceData) schema.CoreResource {

@@ -12,6 +12,17 @@ func getEC2TransitGatewayPeeringAttachmentRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"transit_gateway_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			transitGatewayRefs := d.References("transit_gateway_id")
+			if len(transitGatewayRefs) > 0 {
+				region := transitGatewayRefs[0].Get("region").String()
+				if region != "" {
+					return region
+				}
+			}
+
+			return defaultRegion
+		},
 	}
 }
 func NewEC2TransitGatewayPeeringAttachment(d *schema.ResourceData) schema.CoreResource {
