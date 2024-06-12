@@ -68,6 +68,8 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
 		subCmd.Flags().String("additional-comment-data-path", "", "Path to additional comment text (experimental)")
 		_ = subCmd.Flags().MarkHidden("additional-comment-data-path")
+		subCmd.Flags().String("comment-path", "", "Path to comment content file (experimental)")
+		_ = subCmd.Flags().MarkHidden("comment-path")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -76,16 +78,6 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 }
 
 func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) (*CommentOutput, error) {
-	commentPath, _ := cmd.Flags().GetString("comment-path")
-	if commentPath != "" {
-		commentData, err := output.LoadCommentData(commentPath)
-		if err != nil {
-			return nil, fmt.Errorf("Error loading %s used by --comment-path flag. %s", commentPath, err)
-		}
-
-		return &CommentOutput{Body: commentData}, nil
-	}
-
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
 		return nil, err
@@ -119,11 +111,19 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		}
 	}
 
-	additionalPath, _ := cmd.Flags().GetString("additional-comment-data-path")
-	if additionalPath != "" {
-		additionalCommentData, err = output.LoadCommentData(additionalPath)
+	var out *CommentOutput
+
+	commentPath, _ := cmd.Flags().GetString("comment-path")
+	if commentPath != "" {
+		commentData, err := output.LoadCommentData(commentPath)
 		if err != nil {
-			return nil, fmt.Errorf("Error loading %s used by --additional-comment-data-path flag. %s", additionalPath, err)
+			return nil, fmt.Errorf("Error loading %s used by --comment-path flag. %s", commentPath, err)
+		}
+
+		out = &CommentOutput{
+			Body:    commentData,
+			HasDiff: combined.HasDiff(),
+			ValidAt: &combined.TimeGenerated,
 		}
 	}
 
@@ -139,30 +139,40 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		ctx.ContextValues.SetValue("failedPolicyCount", len(policyChecks.Failures))
 	}
 
-	opts := output.Options{
-		DashboardEndpoint: ctx.Config.DashboardEndpoint,
-		NoColor:           ctx.Config.NoColor,
-		PolicyOutput:      output.NewPolicyOutput(policyChecks),
-	}
-	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
-	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
-	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
+	if out == nil {
+		opts := output.Options{
+			DashboardEndpoint: ctx.Config.DashboardEndpoint,
+			NoColor:           ctx.Config.NoColor,
+			PolicyOutput:      output.NewPolicyOutput(policyChecks),
+		}
+		opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
+		opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
+		opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-	mdOpts.Additional = additionalCommentData
-	md, err := output.ToMarkdown(combined, opts, mdOpts)
-	if err != nil {
-		return nil, err
-	}
+		additionalPath, _ := cmd.Flags().GetString("additional-comment-data-path")
+		if additionalPath != "" {
+			additionalCommentData, err = output.LoadCommentData(additionalPath)
+			if err != nil {
+				return nil, fmt.Errorf("Error loading %s used by --additional-comment-data-path flag. %s", additionalPath, err)
+			}
+		}
 
-	b := md.Msg
-	ctx.ContextValues.SetValue("truncated", md.OriginalMsgSize != md.RuneLen)
-	ctx.ContextValues.SetValue("originalLength", md.OriginalMsgSize)
+		mdOpts.Additional = additionalCommentData
+		md, err := output.ToMarkdown(combined, opts, mdOpts)
+		if err != nil {
+			return nil, err
+		}
 
-	out := &CommentOutput{
-		Body:           string(b),
-		HasDiff:        combined.HasDiff(),
-		ValidAt:        &combined.TimeGenerated,
-		AddRunResponse: result,
+		b := md.Msg
+		ctx.ContextValues.SetValue("truncated", md.OriginalMsgSize != md.RuneLen)
+		ctx.ContextValues.SetValue("originalLength", md.OriginalMsgSize)
+
+		out = &CommentOutput{
+			Body:           string(b),
+			HasDiff:        combined.HasDiff(),
+			ValidAt:        &combined.TimeGenerated,
+			AddRunResponse: result,
+		}
 	}
 
 	if policyChecks.HasFailed() {

@@ -34,12 +34,6 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
       infracost comment github --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --github-token $GITHUB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
-		PreRun: func(cmd *cobra.Command, args []string) {
-			commentPath, _ := cmd.Flags().GetString("comment-path")
-			if commentPath == "" {
-				_ = cmd.MarkFlagRequired("path")
-			}
-		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.ContextValues.SetValue("platform", "github")
 
@@ -192,10 +186,8 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("github-tls-key-file", "", "Path to optional client key file when communicating with GitHub Enterprise API")
 	cmd.Flags().Bool("github-tls-insecure-skip-verify", false, "Skip TLS certificate checks for GitHub Enterprise API")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
+	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
-	cmd.Flags().String("comment-path", "", "Path to comment markdown file (experimental)")
-	_ = cmd.MarkFlagFilename("comment-path", "md")
-	_ = cmd.Flags().MarkHidden("comment-path")
 	var prNumber PRNumber
 	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on, mutually exclusive with commit")
 	cmd.Flags().String("repo", "", "Repository in format owner/repo")
