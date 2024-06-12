@@ -138,16 +138,27 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResou
 	p.populateUsageData(resData, usage)
 
 	for _, d := range resData {
-		// get the region for the resource now that we have built all the
-		// references on the resources.
-		region := p.getRegion(confLoader, d, providerConf, vars)
-		d.RawValues = schema.AddRawValue(d.RawValues, "region", region)
-		d.Region = region
+		p.setRegion(confLoader, d, providerConf, vars)
 
 		resources = append(resources, p.createParsedResource(d, d.UsageData))
 	}
 
 	return resources
+}
+
+// setRegion sets the region on the given resource data and any references it has.
+func (p *Parser) setRegion(confLoader *ConfLoader, d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result) {
+	region := p.getRegion(confLoader, d, providerConf, vars)
+	d.RawValues = schema.AddRawValue(d.RawValues, "region", region)
+	d.Region = region
+
+	for _, references := range d.ReferencesMap {
+		for _, ref := range references {
+			if ref.Region == "" {
+				p.setRegion(confLoader, ref, providerConf, vars)
+			}
+		}
+	}
 }
 
 // populateUsageData finds the UsageData for each ResourceData and sets the ResourceData.UsageData field
