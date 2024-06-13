@@ -30,16 +30,22 @@ func getContainerClusterRegistryItem() *schema.RegistryItem {
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
 			"Custom machine types are not supported.",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			region := d.Get("location").String()
+			isZone := isZone(region)
+
+			if isZone {
+				region = zoneToRegion(region)
+			}
+
+			return region
+		},
 	}
 }
 
 func newContainerCluster(d *schema.ResourceData) schema.CoreResource {
-	region := d.Get("location").String()
+	region := d.Region
 	isZone := isZone(region)
-
-	if isZone {
-		region = zoneToRegion(region)
-	}
 
 	autopilotEnabled := d.Get("enable_autopilot").Bool()
 

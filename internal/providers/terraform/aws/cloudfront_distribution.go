@@ -13,6 +13,14 @@ func getCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 			"origin.0.domain_name",
 			"origin.0.origin_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			orignShieldRegion := d.Get("origin.0.origin_shield.0.origin_shield_region").String()
+			if orignShieldRegion != "" {
+				return orignShieldRegion
+			}
+
+			return defaultRegion
+		},
 	}
 }
 func newCloudfrontDistribution(d *schema.ResourceData) schema.CoreResource {

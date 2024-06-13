@@ -20,7 +20,7 @@ func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"key_vault_id"})
 		},
 	}

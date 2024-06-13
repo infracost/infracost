@@ -16,7 +16,7 @@ func getVirtualNetworkPeeringRegistryItem() *schema.RegistryItem {
 			"remote_virtual_network_id",
 			"resource_group_name",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"virtual_network_name"})
 		},
 	}

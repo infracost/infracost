@@ -16,7 +16,7 @@ func getKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"kubernetes_cluster_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"kubernetes_cluster_id"})
 		},
 	}

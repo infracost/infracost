@@ -56,7 +56,7 @@ func getMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"server_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"server_id"})
 		},
 	}

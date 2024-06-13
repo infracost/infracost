@@ -522,30 +522,33 @@ func overrideRegion(d *schema.ResourceData, config *config.Config) string {
 }
 
 func resourceRegion(d *schema.ResourceData) string {
+	providerPrefix := getProviderPrefix(d.Type)
+	var defaultRegion string
+	switch providerPrefix {
+	case "aws":
+		defaultRegion = aws.GetResourceRegion(d)
+	case "azurerm":
+		defaultRegion = azure.GetResourceRegion(d)
+	case "google":
+		defaultRegion = google.GetResourceRegion(d)
+	default:
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
+		return ""
+	}
+
 	// let's check if the resource has a specific region lookup function. Resources
 	// can define specific region lookup functions over the default provider logic,
 	// as some resources require us to infer the region by traversing resource
 	// references and other attributes.
 	regionFunc := ResourceRegistryMap.GetRegion(d.Type)
 	if regionFunc != nil {
-		region := regionFunc(d)
+		region := regionFunc(defaultRegion, d)
 		if region != "" {
 			return region
 		}
 	}
 
-	providerPrefix := getProviderPrefix(d.Type)
-	switch providerPrefix {
-	case "aws":
-		return aws.GetResourceRegion(d)
-	case "azurerm":
-		return azure.GetResourceRegion(d)
-	case "google":
-		return google.GetResourceRegion(d)
-	default:
-		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
-		return ""
-	}
+	return defaultRegion
 }
 
 func providerRegion(d *schema.ResourceData, providerConf gjson.Result, vars gjson.Result, resConf gjson.Result) string {

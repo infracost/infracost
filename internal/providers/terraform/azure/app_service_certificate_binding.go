@@ -12,7 +12,7 @@ func getAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"certificate_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			return lookupRegion(d, []string{"certificate_id"})
 		},
 	}

@@ -12,7 +12,7 @@ func getTrafficManagerExternalEndpointRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"profile_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			if len(d.References("profile_id")) > 0 {
 				profile := d.References("profile_id")[0]
 				return lookupRegion(profile, []string{"resource_group_name"})

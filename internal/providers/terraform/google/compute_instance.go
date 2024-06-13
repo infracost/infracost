@@ -20,19 +20,24 @@ func getComputeInstanceRegistryItem() *schema.RegistryItem {
 			"Custom machine types are not supported.",
 			"Sole-tenant VMs are not supported.",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			region := d.Get("region").String()
+
+			zone := d.Get("zone").String()
+			if zone != "" {
+				region = zoneToRegion(zone)
+			}
+
+			return region
+		},
 	}
 }
 
 func newComputeInstance(d *schema.ResourceData) schema.CoreResource {
 	machineType := d.Get("machine_type").String()
 
-	region := d.Get("region").String()
+	region := d.Region
 	size := int64(1)
-
-	zone := d.Get("zone").String()
-	if zone != "" {
-		region = zoneToRegion(zone)
-	}
 
 	purchaseOption := getComputePurchaseOption(d.RawValues)
 

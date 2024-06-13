@@ -14,7 +14,7 @@ func getCognitiveDeploymentRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"cognitive_account_id",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			region := lookupRegion(d, []string{"cognitive_account_id"})
 
 			cognitiveAccountRefs := d.References("cognitive_account_id")

@@ -19,7 +19,7 @@ func getDataFactoryIntegrationRuntimeManagedRegistryItem() *schema.RegistryItem 
 			"data_factory_name",
 			"resource_group_name",
 		},
-		GetRegion: func(d *schema.ResourceData) string {
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
 			region := lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
 
 			dataFactoryIdRefs := d.References("data_factory_id")
