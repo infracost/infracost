@@ -11,10 +11,6 @@ import (
 	"github.com/infracost/infracost/internal/usage/aws"
 )
 
-type PointInTimeRecovery struct {
-	Enabled bool `infracost_usage:"enabled"`
-}
-
 type DynamoDBTable struct {
 	// "required" args that can't really be missing.
 	Address        string
@@ -27,8 +23,8 @@ type DynamoDBTable struct {
 	WriteCapacity *int64
 	ReadCapacity  *int64
 
-	AppAutoscalingTarget []*AppAutoscalingTarget
-	PointInTypeRecovery  *PointInTimeRecovery
+	AppAutoscalingTarget       []*AppAutoscalingTarget
+	PointInTimeRecoveryEnabled bool
 
 	// "usage" args
 	MonthlyWriteRequestUnits       *int64 `infracost_usage:"monthly_write_request_units"`
@@ -106,7 +102,7 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	// Data storage
 	costComponents = append(costComponents, a.dataStorageCostComponent(a.Region, a.StorageGB))
 	// Continuous backups (PITR)
-	if a.PointInTypeRecovery != nil && a.PointInTypeRecovery.Enabled {
+	if a.PointInTimeRecoveryEnabled {
 		costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
 	}
 

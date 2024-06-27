@@ -114,14 +114,14 @@
               "calls": [
                 {
                   "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
-                  "endLine": 41,
+                  "endLine": 45,
                   "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 24
                 }
               ],
-              "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
+              "checksum": "4cbbaf5c99cb877fda5defe78120dc37a0e59e1e3e48cfc8d624138e0cc90219",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 41,
+              "endLine": 45,
               "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 24
             },
@@ -218,16 +218,16 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 57,
+                  "endLine": 61,
                   "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 51
+                  "startLine": 55
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 57,
+              "endLine": 61,
               "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 51
+              "startLine": 55
             }
           },
           {
@@ -241,16 +241,16 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 49,
+                  "endLine": 53,
                   "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 43
+                  "startLine": 47
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 49,
+              "endLine": 53,
               "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 43
+              "startLine": 47
             }
           }
         ],
@@ -350,14 +350,14 @@
               "calls": [
                 {
                   "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
-                  "endLine": 41,
+                  "endLine": 45,
                   "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 24
                 }
               ],
-              "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
+              "checksum": "4cbbaf5c99cb877fda5defe78120dc37a0e59e1e3e48cfc8d624138e0cc90219",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 41,
+              "endLine": 45,
               "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 24
             },
@@ -454,16 +454,16 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 57,
+                  "endLine": 61,
                   "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 51
+                  "startLine": 55
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 57,
+              "endLine": 61,
               "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 51
+              "startLine": 55
             }
           },
           {
@@ -477,16 +477,16 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 49,
+                  "endLine": 53,
                   "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 43
+                  "startLine": 47
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 49,
+              "endLine": 53,
               "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 43
+              "startLine": 47
             }
           }
         ],

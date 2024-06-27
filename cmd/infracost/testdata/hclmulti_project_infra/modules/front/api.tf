@@ -14,6 +14,10 @@ resource "aws_dynamodb_table" "sessions" {
     attribute_name = "expires"
     enabled        = true
   }
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "random_password" "app_secret" {
