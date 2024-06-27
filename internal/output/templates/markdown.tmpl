@@ -109,10 +109,6 @@ Cost details were left out because expandable comment sections are not supported
 ## ✅ Policies passed ##
   {{- end }}
 {{- end}}
-{{- if .MarkdownOptions.Additional }}
-
-{{ .MarkdownOptions.Additional }}
-{{- end }}
 {{- if .Root.CloudURL }}
 
 View report in [Infracost Cloud]({{ .Root.CloudURL }}).

@@ -30,8 +30,8 @@ type AddRunResponse struct {
 	ShareURL           string                    `json:"shareUrl"`
 	CloudURL           string                    `json:"cloudUrl"`
 	PullRequestURL     string                    `json:"pullRequestUrl"`
+	CommentMarkdown    string                    `json:"commentMarkdown"`
 	GovernanceFailures output.GovernanceFailures `json:"governanceFailures"`
-	GovernanceComment  string                    `json:"governanceComment"`
 	GovernanceResults  []GovernanceResult        `json:"governanceResults"`
 }
 
@@ -120,14 +120,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	}, nil
 }
 
-type CommentFormat string
-
-var (
-	CommentFormatMarkdownHTML CommentFormat = "MARKDOWN_HTML"
-	CommentFormatMarkdown     CommentFormat = "MARKDOWN"
-)
-
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, commentFormat CommentFormat) (AddRunResponse, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
 	ri, err := newRunInput(ctx, out)
@@ -136,12 +129,11 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 	}
 
 	v := map[string]interface{}{
-		"run":           *ri,
-		"commentFormat": commentFormat,
+		"run": *ri,
 	}
 
 	q := `
-	mutation AddRun($run: RunInput!, $commentFormat: CommentFormat!) {
+	mutation AddRun($run: RunInput!) {
 			addRun(run: $run) {
 				id
 				shareUrl
@@ -161,7 +153,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 					unblocked
 				}
 
-				governanceComment(format: $commentFormat)
+				commentMarkdown
 			}
 		}
 	`
