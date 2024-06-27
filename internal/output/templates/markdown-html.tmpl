@@ -146,9 +146,6 @@ in project `{{ index .ProjectNames 0 }}`
   {{- end }}
 {{- end}}
 
-{{- if .MarkdownOptions.Additional }}
-{{ .MarkdownOptions.Additional }}
-{{- end }}
 {{- if displaySub  }}
 <sub>
 {{- if .Root.CloudURL }}View report in <a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">Infracost Cloud</a>. {{ end }}
