@@ -40,6 +40,13 @@ func NewDynamoDBTableResource(d *schema.ResourceData) schema.CoreResource {
 		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
 	}
 
+	pitr := &aws.PointInTimeRecovery{Enabled: false}
+	if d.Get("point_in_time_recovery").Exists() {
+		pitr = &aws.PointInTimeRecovery{
+			Enabled: d.Get("point_in_time_recovery").Array()[0].Get("enabled").Bool(),
+		}
+	}
+
 	a := &aws.DynamoDBTable{
 		Address:              d.Address,
 		Region:               d.Get("region").String(),
@@ -49,6 +56,7 @@ func NewDynamoDBTableResource(d *schema.ResourceData) schema.CoreResource {
 		ReadCapacity:         intPtr(d.Get("read_capacity").Int()),
 		ReplicaRegions:       replicaRegions,
 		AppAutoscalingTarget: targets,
+		PointInTypeRecovery:  pitr,
 	}
 	return a
 }
