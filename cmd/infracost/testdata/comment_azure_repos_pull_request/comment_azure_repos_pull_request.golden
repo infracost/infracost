@@ -24,7 +24,7 @@
 *Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
 
-<summary>Cost details </summary>
+<summary>Estimate details </summary>
 
 ```
 Key: * usage cost, ~ changed, + added, - removed

@@ -10,7 +10,7 @@
 
 *Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 
-Cost details were left out because expandable comment sections are not supported.
+Estimate details were left out because expandable comment sections are not supported.
 
 This comment will be updated when code changes.
 
