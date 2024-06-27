@@ -106,7 +106,7 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	// Data storage
 	costComponents = append(costComponents, a.dataStorageCostComponent(a.Region, a.StorageGB))
 	// Continuous backups (PITR)
-	if a.PointInTypeRecovery.Enabled {
+	if a.PointInTypeRecovery != nil && a.PointInTypeRecovery.Enabled {
 		costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
 	}
 
