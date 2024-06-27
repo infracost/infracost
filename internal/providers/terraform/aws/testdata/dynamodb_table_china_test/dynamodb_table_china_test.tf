@@ -25,4 +25,8 @@ resource "aws_dynamodb_table" "my_dynamodb_table_china" {
     name = "GameTitle"
     type = "S"
   }
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
