@@ -30,6 +30,16 @@ func formatCost(currency string, d *decimal.Decimal) string {
 	return formatRoundedDecimalCurrency(currency, *d)
 }
 
+func formatUsageCost(out Root, cost *decimal.Decimal) string {
+	noUsageCosts := cost == nil || cost.Equals(decimal.Zero)
+
+	if usageCostsEnabled(out) || noUsageCosts {
+		return formatCost(out.Currency, cost)
+	} else {
+		return "-"
+	}
+}
+
 func FormatCost2DP(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return "-"

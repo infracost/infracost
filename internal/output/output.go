@@ -1056,3 +1056,7 @@ func addIntPtrs(i1 *int, i2 *int) *int {
 	res := val1 + val2
 	return &res
 }
+
+func usageCostsEnabled(out Root) bool {
+	return out.Metadata.UsageApiEnabled || out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile
+}

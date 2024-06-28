@@ -421,18 +421,11 @@ func breakdownSummaryTable(out Root, _ Options) string {
 			baseline = decimalPtr(baseline.Sub(*project.Breakdown.TotalMonthlyUsageCost))
 		}
 
-		var usageCost string
-		if out.Metadata.UsageApiEnabled {
-			usageCost = formatCost(out.Currency, project.Breakdown.TotalMonthlyUsageCost)
-		} else {
-			usageCost = "-"
-		}
-
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Label(), 64, "..."),
 				formatCost(out.Currency, baseline),
-				usageCost,
+				formatUsageCost(out, project.Breakdown.TotalMonthlyUsageCost),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)
