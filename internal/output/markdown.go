@@ -193,7 +193,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, false)
 		},
 		"formatUsageCostChangeWithoutPercent": func(pastCost, cost *decimal.Decimal) string {
-			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, usageCostsEnabled(out))
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, !usageCostsEnabled(out))
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {

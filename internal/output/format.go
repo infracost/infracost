@@ -31,9 +31,9 @@ func formatCost(currency string, d *decimal.Decimal) string {
 }
 
 func formatUsageCost(out Root, cost *decimal.Decimal) string {
-	noUsageCosts := cost == nil || cost.Equals(decimal.Zero)
+	hasUsageCosts := cost != nil && !cost.Equals(decimal.Zero)
 
-	if usageCostsEnabled(out) || noUsageCosts {
+	if usageCostsEnabled(out) || hasUsageCosts {
 		return formatCost(out.Currency, cost)
 	} else {
 		return "-"

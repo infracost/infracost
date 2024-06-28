@@ -192,7 +192,7 @@ func tableForDiff(out Root, opts Options) string {
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
 				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true, false),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true, usageCostsEnabled(out)),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true, !usageCostsEnabled(out)),
 				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false, false),
 			},
 		)
