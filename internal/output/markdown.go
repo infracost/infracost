@@ -131,6 +131,7 @@ type MarkdownCtx struct {
 	RunQuotaMsg                  string
 	UsageCostsMsg                string
 	CostDetailsMsg               string
+	UsageApiEnabled              bool
 }
 
 // MarkdownOutput holds the message converted to markdown with additional
@@ -306,6 +307,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		RunQuotaMsg:                  runQuotaMsg,
 		UsageCostsMsg:                usageCostsMessage(out, true),
 		CostDetailsMsg:               costsDetailsMessage(out),
+		UsageApiEnabled:              out.Metadata.UsageApiEnabled,
 	})
 	if err != nil {
 		return MarkdownOutput{}, err

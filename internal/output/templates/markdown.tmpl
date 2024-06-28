@@ -38,7 +38,7 @@
 {{- end }}
 
 {{- define "summaryRow"}}
-| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }} | {{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }} | {{- if .UsageApiEnabled }}{{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }}{{- else}}-{{- end}} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
 {{- end }}
 
 #### 💰 Infracost report ####
@@ -54,6 +54,7 @@
       {{- if showProject . }}
         {{- template "summaryRow" dict
                      "Name" .Name
+                     "UsageApiEnabled" $.UsageApiEnabled
                      "MetadataFields" (. | metadataFields)
                      "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
                      "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
@@ -67,6 +68,7 @@
     {{- range .Root.Projects }}
       {{- template "summaryRow" dict
                    "Name" .Name
+                   "UsageApiEnabled" $.UsageApiEnabled
                    "MetadataFields" (. | metadataFields)
                    "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
                    "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
