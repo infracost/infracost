@@ -192,19 +192,19 @@ Key: * usage cost, ~ changed, + added, - removed
 ∙ 18 were estimated
 
 Infracost estimate: Monthly estimate decreased by $750 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ my first project                                   ┃         -$420 ┃        +$0 ┃ -$420 (-57%) ┃
-┃ my first project again                             ┃         -$420 ┃        +$0 ┃ -$420 (-57%) ┃
-┃ my terragrunt dev project                          ┃           -$8 ┃        +$0 ┃   -$8 (-14%) ┃
-┃ my terragrunt multi project                        ┃          +$52 ┃        +$0 ┃         +$52 ┃
-┃ my terragrunt multi project                        ┃         +$280 ┃        +$0 ┃ +$280 (+60%) ┃
-┃ my terragrunt prod project                         ┃         -$561 ┃        +$0 ┃ -$561 (-43%) ┃
-┃ my terragrunt workspace                            ┃        +$0.88 ┃        +$0 ┃ +$0.88 (+2%) ┃
-┃ my terragrunt workspace                            ┃         +$748 ┃        +$0 ┃        +$748 ┃
-┃ my workspace project                               ┃         -$420 ┃        +$0 ┃ -$420 (-57%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ my first project                                   ┃         -$420 ┃           - ┃ -$420 (-57%) ┃
+┃ my first project again                             ┃         -$420 ┃           - ┃ -$420 (-57%) ┃
+┃ my terragrunt dev project                          ┃           -$8 ┃           - ┃   -$8 (-14%) ┃
+┃ my terragrunt multi project                        ┃          +$52 ┃           - ┃         +$52 ┃
+┃ my terragrunt multi project                        ┃         +$280 ┃           - ┃ +$280 (+60%) ┃
+┃ my terragrunt prod project                         ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt workspace                            ┃        +$0.88 ┃           - ┃ +$0.88 (+2%) ┃
+┃ my terragrunt workspace                            ┃         +$748 ┃           - ┃        +$748 ┃
+┃ my workspace project                               ┃         -$420 ┃           - ┃ -$420 (-57%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

@@ -111,15 +111,15 @@ Key: * usage cost, ~ changed, + added, - removed
 ∙ 18 were estimated
 
 Infracost estimate: Monthly estimate decreased by $3,364 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ my first project                                   ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my first project again                             ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my terragrunt multi project                        ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my terragrunt prod project                         ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my terragrunt workspace                            ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my workspace project                               ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ my first project                                   ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my first project again                             ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt multi project                        ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt prod project                         ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt workspace                            ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my workspace project                               ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 

@@ -117,8 +117,8 @@ Module path: testdata/hclmulti_project_infra/prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ testdata-hclmulti_project_infra-dev                ┃ $112          ┃ $0.00       ┃ $112       ┃
-┃ testdata-hclmulti_project_infra-prod               ┃ $152          ┃ $0.00       ┃ $152       ┃
+┃ testdata-hclmulti_project_infra-dev                ┃          $112 ┃           - ┃       $112 ┃
+┃ testdata-hclmulti_project_infra-prod               ┃          $152 ┃           - ┃       $152 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
