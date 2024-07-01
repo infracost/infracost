@@ -1,6 +1,6 @@
 
 <h4>💰 Infracost report</h4>
-<h4>Monthly cost will increase by $1,402 📈</h4>
+<h4>Monthly estimate increased by $1,402 📈</h4>
 <table>
   <thead>
     <td>Changed project</td>
@@ -31,7 +31,7 @@
 *Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
 
-<summary>Cost details </summary>
+<summary>Estimate details </summary>
 
 ```
 Key: * usage cost, ~ changed, + added, - removed
@@ -186,13 +186,13 @@ Key: * usage cost, ~ changed, + added, - removed
 ∙ 14 were estimated
 ∙ 12 were free
 
-Infracost estimate: Monthly cost will increase by $1,402 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata                       ┃       +$1,361 ┃          - ┃      +$1,361 ┃
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃          +$41 ┃          - ┃ +$41 (+100%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $1,402 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata                       ┃       +$1,361 ┃           - ┃      +$1,361 ┃
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃          +$41 ┃           - ┃ +$41 (+100%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 

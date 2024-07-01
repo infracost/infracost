@@ -47,5 +47,5 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                                      ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃ $1,485        ┃ $0.00       ┃ $1,485     ┃
+┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃        $1,485 ┃           - ┃     $1,485 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

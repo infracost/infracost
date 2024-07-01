@@ -48,12 +48,12 @@ Key: * usage cost, ~ changed, + added, - removed
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-Infracost estimate: Monthly cost will increase by $743 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terraform             ┃         +$743 ┃        +$0 ┃        +$743 ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $743 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terraform             ┃         +$743 ┃           - ┃        +$743 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

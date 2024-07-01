@@ -176,14 +176,14 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/regi
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ testdata-breakdown_terragrunt_a...on_config_file_output-app1-dev ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ testdata-breakdown_terragrunt_a...n_config_file_output-app1-prod ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ testdata-breakdown_terragrunt_a...on_config_file_output-app2-dev ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ testdata-breakdown_terragrunt_a...n_config_file_output-app2-prod ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ region1-override                                                 ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ region1-override                                                 ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ region1-override                                                 ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ region1-override                                                 ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ testdata-breakdown_terragrunt_a...on_config_file_output-app1-dev ┃           $52 ┃           - ┃        $52 ┃
+┃ testdata-breakdown_terragrunt_a...n_config_file_output-app1-prod ┃          $748 ┃           - ┃       $748 ┃
+┃ testdata-breakdown_terragrunt_a...on_config_file_output-app2-dev ┃           $52 ┃           - ┃        $52 ┃
+┃ testdata-breakdown_terragrunt_a...n_config_file_output-app2-prod ┃          $748 ┃           - ┃       $748 ┃
+┃ region1-override                                                 ┃           $52 ┃           - ┃        $52 ┃
+┃ region1-override                                                 ┃          $748 ┃           - ┃       $748 ┃
+┃ region1-override                                                 ┃           $52 ┃           - ┃        $52 ┃
+┃ region1-override                                                 ┃          $748 ┃           - ┃       $748 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

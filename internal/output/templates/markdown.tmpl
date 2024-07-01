@@ -38,7 +38,7 @@
 {{- end }}
 
 {{- define "summaryRow"}}
-| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }} | {{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }} | {{ formatUsageCostChangeWithoutPercent .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
 {{- end }}
 
 #### 💰 Infracost report ####
@@ -85,14 +85,14 @@
 
 {{- if displayOutput  }}
 
-##### Cost details {{ .CostDetailsMsg }} #####
+##### Estimate details {{ .CostDetailsMsg }} #####
 
 ```
 {{ .DiffOutput }}
 ```
 {{- else }}
 
-Cost details were left out because expandable comment sections are not supported.{{ if .Root.CloudURL }} See [Infracost Cloud]({{.Root.CloudURL}}) for full cost details{{ if .CostDetailsMsg }} {{.CostDetailsMsg }}.{{ else }}.{{end}}{{end}}
+Estimate details were left out because expandable comment sections are not supported.{{ if .Root.CloudURL }} See [Infracost Cloud]({{.Root.CloudURL}}) for full cost details{{ if .CostDetailsMsg }} {{.CostDetailsMsg }}.{{ else }}.{{end}}{{end}}
 {{- end }}
 
 {{- if gt (len .Options.PolicyOutput.Checks) 0 }}
@@ -109,10 +109,6 @@ Cost details were left out because expandable comment sections are not supported
 ## ✅ Policies passed ##
   {{- end }}
 {{- end}}
-{{- if .Root.CloudURL }}
-
-View report in [Infracost Cloud]({{ .Root.CloudURL }}).
-{{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when code changes.

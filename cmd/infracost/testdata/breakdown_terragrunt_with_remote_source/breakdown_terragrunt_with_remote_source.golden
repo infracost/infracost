@@ -167,12 +167,12 @@ Module path: testdata/breakdown_terragrunt_with_remote_source/ref2
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                                        ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref1   ┃ $2,430        ┃ $0.00       ┃ $2,430     ┃
-┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref1-2 ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref3   ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
-┃ testdata-breakdown_terragrunt_with_remote_source-ref1          ┃ $386          ┃ $0.00       ┃ $386       ┃
-┃ testdata-breakdown_terragrunt_with_remote_source-ref1-submod   ┃ $33           ┃ $0.00       ┃ $33        ┃
-┃ testdata-breakdown_terragrunt_with_remote_source-ref2          ┃ $386          ┃ $0.00       ┃ $386       ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref1   ┃        $2,430 ┃           - ┃     $2,430 ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref1-2 ┃          $748 ┃           - ┃       $748 ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref3   ┃        $1,308 ┃           - ┃     $1,308 ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-ref1          ┃          $386 ┃           - ┃       $386 ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-ref1-submod   ┃           $33 ┃           - ┃        $33 ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-ref2          ┃          $386 ┃           - ┃       $386 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

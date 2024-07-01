@@ -21,8 +21,12 @@ import (
 //go:embed templates/*
 var templatesFS embed.FS
 
-func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus, skipPercent bool) string {
+func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus, skipPercent, skipIfZero bool) string {
 	if pastCost == nil && cost == nil {
+		return "-"
+	}
+
+	if skipIfZero && (pastCost == nil || pastCost.IsZero()) && (cost == nil || cost.IsZero()) {
 		return "-"
 	}
 
@@ -71,21 +75,21 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 	}
 
 	if pastCost == nil {
-		return "Monthly cost will increase by " + formatCost(currency, cost) + " " + up
+		return "Monthly estimate increased by " + formatCost(currency, cost) + " " + up
 	}
 
 	diff := cost.Sub(*pastCost).Abs()
 	change := formatCost(currency, &diff)
 
 	if pastCost.Equals(*cost) {
-		return "Monthly cost will not change"
+		return "Monthly estimate generated"
 	}
 
 	if pastCost.GreaterThan(*cost) {
-		return "Monthly cost will decrease by " + change + " " + down
+		return "Monthly estimate decreased by " + change + " " + down
 	}
 
-	return "Monthly cost will increase by " + change + " " + up
+	return "Monthly estimate increased by " + change + " " + up
 }
 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
@@ -170,6 +174,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		filename = "run-quota-exceeded.tmpl"
 	}
 
+	skipUsageCostIfZero := !usageCostsEnabled(out)
+
 	tmpl := template.New(filename)
 	tmpl.Funcs(sprig.TxtFuncMap())
 	tmpl.Funcs(template.FuncMap{
@@ -179,11 +185,17 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 			}
 			return formatCost(out.Currency, d)
 		},
+		"formatUsageCost": func(d *decimal.Decimal) string {
+			return formatUsageCost(out, d)
+		},
 		"formatCostChange": func(pastCost, cost *decimal.Decimal) string {
-			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, false)
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, false, false)
 		},
 		"formatCostChangeWithoutPercent": func(pastCost, cost *decimal.Decimal) string {
-			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true)
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, false)
+		},
+		"formatUsageCostChangeWithoutPercent": func(pastCost, cost *decimal.Decimal) string {
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, skipUsageCostIfZero)
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {

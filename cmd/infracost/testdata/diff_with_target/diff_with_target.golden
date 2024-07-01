@@ -21,12 +21,12 @@ Key: * usage cost, ~ changed, + added, - removed
 1 cloud resource was detected:
 ∙ 1 was estimated
 
-Infracost estimate: Monthly cost will increase by $8 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/plan_with_target.json ┃           +$8 ┃        +$0 ┃   +$8 (+88%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $8 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata/plan_with_target.json ┃           +$8 ┃           - ┃   +$8 (+88%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

@@ -397,7 +397,7 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 	return filteredResources
 }
 
-func breakdownSummaryTable(out Root, opts Options) string {
+func breakdownSummaryTable(out Root, _ Options) string {
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault
@@ -410,9 +410,9 @@ func breakdownSummaryTable(out Root, opts Options) string {
 
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Name: "Project", WidthMin: 50},
-		{Name: "Baseline cost", WidthMin: 10},
-		{Name: "Usage cost*", WidthMin: 10},
-		{Name: "Total monthly cost", WidthMin: 10},
+		{Name: "Baseline cost", WidthMin: 10, Align: text.AlignRight},
+		{Name: "Usage cost*", WidthMin: 10, Align: text.AlignRight},
+		{Name: "Total cost", WidthMin: 10, Align: text.AlignRight},
 	})
 
 	for _, project := range out.Projects {
@@ -425,7 +425,7 @@ func breakdownSummaryTable(out Root, opts Options) string {
 			table.Row{
 				truncateMiddle(project.Label(), 64, "..."),
 				formatCost(out.Currency, baseline),
-				formatCost(out.Currency, project.Breakdown.TotalMonthlyUsageCost),
+				formatUsageCost(out, project.Breakdown.TotalMonthlyUsageCost),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)

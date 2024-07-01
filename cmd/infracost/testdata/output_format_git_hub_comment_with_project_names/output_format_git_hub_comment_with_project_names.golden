@@ -1,6 +1,6 @@
 
 <h4>💰 Infracost report</h4>
-<h4>Monthly cost will decrease by $2,242 📉</h4>
+<h4>Monthly estimate decreased by $2,242 📉</h4>
 <table>
   <thead>
     <td>Changed project</td>
@@ -52,7 +52,7 @@
 *Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
 
-<summary>Cost details </summary>
+<summary>Estimate details </summary>
 
 ```
 Key: * usage cost, ~ changed, + added, - removed
@@ -131,16 +131,16 @@ Key: * usage cost, ~ changed, + added, - removed
 10 cloud resources were detected:
 ∙ 10 were estimated
 
-Infracost estimate: Monthly cost will decrease by $2,242 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ my first project                                   ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my first project again                             ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my terragrunt dev project                          ┃        +$0.88 ┃          - ┃ +$0.88 (+2%) ┃
-┃ my terragrunt prod project                         ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my workspace project                               ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate decreased by $2,242 ↓
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ my first project                                   ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my first project again                             ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt dev project                          ┃        +$0.88 ┃           - ┃ +$0.88 (+2%) ┃
+┃ my terragrunt prod project                         ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my workspace project                               ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 

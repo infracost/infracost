@@ -172,14 +172,14 @@ func tableForDiff(out Root, opts Options) string {
 	t.AppendHeader(table.Row{
 		"Changed project",
 		"Baseline cost",
-		"Usage cost",
+		"Usage cost*",
 		"Total change",
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Name: "Changed project", WidthMin: 50},
 		{Name: "Baseline cost", WidthMin: 10, Align: text.AlignRight},
-		{Name: "Usage cost", WidthMin: 10, Align: text.AlignRight},
+		{Name: "Usage cost*", WidthMin: 10, Align: text.AlignRight},
 		{Name: "Total change", WidthMin: 10, Align: text.AlignRight},
 	})
 
@@ -191,9 +191,9 @@ func tableForDiff(out Root, opts Options) string {
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true, false),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true, !usageCostsEnabled(out)),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false, false),
 			},
 		)
 

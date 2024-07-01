@@ -1,6 +1,6 @@
 
 <h4>💰 Infracost report</h4>
-<h4>Monthly cost will increase by $41 📈</h4>
+<h4>Monthly estimate increased by $41 📈</h4>
 <table>
   <thead>
     <td>Changed project</td>
@@ -31,7 +31,7 @@
 *Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
 
-<summary>Cost details </summary>
+<summary>Estimate details </summary>
 
 ```
 Key: * usage cost, ~ changed, + added, - removed
@@ -130,13 +130,13 @@ Run the following command to see its breakdown: infracost breakdown --path=/path
 ∙ 14 were estimated
 ∙ 12 were free
 
-Infracost estimate: Monthly cost will increase by $41 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃          +$41 ┃          - ┃ +$41 (+100%) ┃
-┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           +$0 ┃          - ┃          +$0 ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $41 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃          +$41 ┃           - ┃ +$41 (+100%) ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           +$0 ┃           - ┃          +$0 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 
