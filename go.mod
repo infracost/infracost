@@ -38,7 +38,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/zclconf/go-cty v1.14.1
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/mod v0.14.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -117,13 +117,12 @@ require (
 	github.com/turbot/terraform-components v0.0.0-20231213122222-1f3526cab7a7
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	github.com/xanzy/go-gitlab v0.86.0
-	golang.org/x/oauth2 v0.8.0
+	golang.org/x/oauth2 v0.21.0
 	k8s.io/apimachinery v0.29.2
 )
 
 require (
-	cloud.google.com/go/compute v1.19.1 // indirect
-	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
 	filippo.io/age v1.0.0 // indirect
@@ -246,7 +245,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-getter v1.7.4
 	github.com/hashicorp/go-safetemp v1.0.0
-	github.com/hashicorp/go-uuid v1.0.3
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.6.0
 	github.com/heimdalr/dag v1.3.1
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
