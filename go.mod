@@ -38,7 +38,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tidwall/gjson v1.17.0
 	github.com/zclconf/go-cty v1.14.1
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/mod v0.14.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/yaml.v2 v2.4.0
@@ -246,7 +246,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2
 	github.com/hashicorp/go-getter v1.7.4
 	github.com/hashicorp/go-safetemp v1.0.0
-	github.com/hashicorp/go-uuid v1.0.3
+	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/hashicorp/go-version v1.6.0
 	github.com/heimdalr/dag v1.3.1
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
@@ -276,4 +276,4 @@ replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 //replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231211141424-6a52de9a284a
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20240501143558-4c01e72103df
 
-replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94
+replace github.com/heimdalr/dag => github.com/hugorut/dag v0.0.0-20240703093743-92b5650a35ee
