@@ -2,12 +2,9 @@ package hcl
 
 import (
 	"sync"
-
-	"github.com/rs/zerolog"
 )
 
 type VertexModuleExit struct {
-	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }

@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
@@ -211,7 +210,7 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string, loaderOpts ..
 		}
 
 		client := extclient.NewAuthedAPIClient(host, token)
-		p.remoteVariablesLoader = NewRemoteVariablesLoader(client, localWorkspace, p.logger, loaderOpts...)
+		p.remoteVariablesLoader = NewRemoteVariablesLoader(client, localWorkspace, loaderOpts...)
 	}
 }
 
@@ -230,7 +229,7 @@ func OptionWithTerraformWorkspace(name string) Option {
 	name = strings.TrimSpace(name)
 	return func(p *Parser) {
 		if name != "" {
-			p.logger.Debug().Msgf("setting HCL parser to use user provided Terraform workspace: '%s'", name)
+			logging.Logger.Trace().Msgf("setting HCL parser to use user provided Terraform workspace: '%s'", name)
 
 			p.workspaceName = name
 		}
@@ -266,7 +265,6 @@ type Parser struct {
 	hclParser             *modules.SharedHCLParser
 	blockBuilder          BlockBuilder
 	remoteVariablesLoader *RemoteVariablesLoader
-	logger                zerolog.Logger
 	isGraph               bool
 	hasChanges            bool
 	moduleSuffix          string
@@ -275,11 +273,7 @@ type Parser struct {
 }
 
 // NewParser creates a new parser for the given RootPath.
-func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
-	parserLogger := logger.With().Str(
-		"parser_path", projectRoot.DetectedPath,
-	).Logger()
-
+func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *modules.ModuleLoader, options ...Option) *Parser {
 	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
@@ -289,8 +283,7 @@ func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *m
 		moduleCalls:         projectRoot.ModuleCalls,
 		workspaceName:       defaultTerraformWorkspaceName,
 		hclParser:           hclParser,
-		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
-		logger:              parserLogger,
+		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, HCLParser: hclParser},
 		moduleLoader:        moduleLoader,
 		envMatcher:          envMatcher,
 	}
@@ -403,11 +396,11 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		}
 	}()
 
-	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.detectedProjectPath)
+	logging.Logger.Trace().Msgf("Beginning parse for directory '%s'...", p.detectedProjectPath)
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
-	files, err := loadDirectory(p.hclParser, p.logger, p.detectedProjectPath, false)
+	files, err := loadDirectory(p.hclParser, p.detectedProjectPath, false)
 	if err != nil {
 		return m, err
 	}
@@ -422,7 +415,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, errors.New("No valid terraform files found given path, try a different directory")
 	}
 
-	p.logger.Debug().Msg("Loading TFVars...")
+	logging.Logger.Trace().Msg("Loading TFVars...")
 	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
 	if err != nil {
 		return m, err
@@ -434,7 +427,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, fmt.Errorf("Error loading Terraform modules: %w", err)
 	}
 
-	p.logger.Debug().Msg("Evaluating expressions...")
+	logging.Logger.Trace().Msg("Evaluating expressions...")
 	workingDir, err := os.Getwd()
 	if err != nil {
 		return m, fmt.Errorf("Error could not evaluate current working directory %w", err)
@@ -456,7 +449,6 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 		p.workspaceName,
 		p.blockBuilder,
-		p.logger,
 		p.isGraph,
 	)
 
@@ -466,7 +458,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	if evaluator.isGraph {
 		logging.Logger.Debug().Msg("Building project with experimental graph runner")
 
-		g, err := NewGraphWithRoot(p.logger, nil)
+		g, err := NewGraphWithRoot(nil)
 		if err != nil {
 			return m, err
 		}
@@ -555,12 +547,12 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 	for _, file := range files {
 		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
-			p.logger.Debug().Msgf("skipping file could not load blocks err: %s", err)
+			logging.Logger.Debug().Err(err).Msg("skipping file could not load blocks")
 			continue
 		}
 
 		if len(fileBlocks) > 0 {
-			p.logger.Debug().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			logging.Logger.Trace().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 
 		for _, fileBlock := range fileBlocks {
@@ -583,7 +575,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 	if p.remoteVariablesLoader != nil {
 		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
 		if err != nil {
-			p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
+			logging.Logger.Debug().Err(err).Msg("could not load vars from Terraform Cloud")
 			return combinedVars, err
 		}
 
@@ -648,9 +640,9 @@ func (p *Parser) loadVarFile(filename string) (map[string]cty.Value, error) {
 		// We can safely ignore these Attribute errors and continue to get the raw attributes.
 		// The first value for the variable will be used.
 		if areDiagnosticsAttributeErrors(diags) {
-			p.logger.Debug().Err(errors.New(diags.Error())).Msgf("duplicate variables detected parsing file %s, using the first values defined", filename)
+			logging.Logger.Debug().Err(errors.New(diags.Error())).Msgf("duplicate variables detected parsing file %s, using the first values defined", filename)
 		} else {
-			p.logger.Debug().Err(errors.New(diags.Error())).Msgf("could not parse supplied var file %s", filename)
+			logging.Logger.Debug().Err(errors.New(diags.Error())).Msgf("could not parse supplied var file %s", filename)
 
 			return inputVars, nil
 		}
@@ -661,7 +653,7 @@ func (p *Parser) loadVarFile(filename string) (map[string]cty.Value, error) {
 	for _, attr := range attrs {
 		value, diag := attr.Expr.Value(&hcl.EvalContext{})
 		if diag.HasErrors() {
-			p.logger.Debug().Err(errors.New(diag.Error())).Msgf("problem evaluating input var %s", attr.Name)
+			logging.Logger.Debug().Err(errors.New(diag.Error())).Msgf("problem evaluating input var %s", attr.Name)
 		}
 
 		inputVars[attr.Name] = value
@@ -685,7 +677,7 @@ type file struct {
 	hclFile *hcl.File
 }
 
-func loadDirectory(hclParser *modules.SharedHCLParser, logger zerolog.Logger, fullPath string, stopOnHCLError bool) ([]file, error) {
+func loadDirectory(hclParser *modules.SharedHCLParser, fullPath string, stopOnHCLError bool) ([]file, error) {
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
 		return nil, err
@@ -719,7 +711,7 @@ func loadDirectory(hclParser *modules.SharedHCLParser, logger zerolog.Logger, fu
 				return nil, diag
 			}
 
-			logger.Debug().Msgf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			logging.Logger.Debug().Err(err).Msgf("skipping file: %s hcl parsing error", path)
 			continue
 		}
 

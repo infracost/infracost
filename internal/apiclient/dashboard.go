@@ -69,7 +69,7 @@ type projectResultInput struct {
 
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	client := retryablehttp.NewClient()
-	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	client.Logger = &LeveledLogger{Logger: logging.Logger}
 
 	return &DashboardAPIClient{
 		APIClient: APIClient{

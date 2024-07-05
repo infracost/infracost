@@ -10,7 +10,6 @@ import (
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
-	"github.com/rs/zerolog"
 
 	"github.com/infracost/infracost/internal/logging"
 )
@@ -18,15 +17,12 @@ import (
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
-	cache  sync.Map
-	logger zerolog.Logger
+	cache sync.Map
 }
 
 // NewPackageFetcher constructs a new package fetcher
-func NewPackageFetcher(logger zerolog.Logger) *PackageFetcher {
-	return &PackageFetcher{
-		logger: logger,
-	}
+func NewPackageFetcher() *PackageFetcher {
+	return &PackageFetcher{}
 }
 
 // fetch downloads the remote module using the go-getter library
@@ -35,7 +31,7 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 	if v, ok := r.cache.Load(moduleAddr); ok {
 		prevDest, _ := v.(string)
 
-		r.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
+		logging.Logger.Trace().Msgf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
 
 		err := os.Mkdir(dest, os.ModePerm)
 		if err != nil {
@@ -67,7 +63,7 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 		return true
 	})
 
-	r.logger.Debug().Strs("cached_module_addresses", cached).Msgf("module %s does not exist in cache, proceeding to download", moduleAddr)
+	logging.Logger.Trace().Strs("cached_module_addresses", cached).Msgf("module %s does not exist in cache, proceeding to download", moduleAddr)
 
 	decompressors := map[string]getter.Decompressor{}
 	for k, decompressor := range getter.Decompressors {

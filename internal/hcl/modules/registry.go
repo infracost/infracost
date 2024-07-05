@@ -16,7 +16,6 @@ import (
 	svchost "github.com/hashicorp/terraform-svchost"
 	"github.com/hashicorp/terraform-svchost/auth"
 	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/rs/zerolog"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/logging"
@@ -52,7 +51,6 @@ type RegistryURL struct {
 // Therefore, it is advisable to use Disco per project and pass it to all required clients.
 type Disco struct {
 	disco      *disco.Disco
-	logger     zerolog.Logger
 	httpClient *retryablehttp.Client
 
 	locks sync.Map
@@ -60,8 +58,8 @@ type Disco struct {
 
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
-func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *Disco {
-	return &Disco{disco: disco.NewWithCredentialsSource(credentialsSource), logger: logger, httpClient: newRetryableClient()}
+func NewDisco(credentialsSource auth.CredentialsSource) *Disco {
+	return &Disco{disco: disco.NewWithCredentialsSource(credentialsSource), httpClient: newRetryableClient()}
 }
 
 // ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
@@ -130,7 +128,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 
 	downloadURL := serviceURL.ResolveReference(u)
 
-	d.logger.Debug().Msgf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
+	logging.Logger.Trace().Msgf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
 
 	req, _ := http.NewRequest("GET", downloadURL.String(), nil)
 	moduleURL.Credentials.PrepareRequest(req)
@@ -148,7 +146,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	}
 
 	if strings.HasPrefix(location, "/") || strings.HasPrefix(location, "./") || strings.HasPrefix(location, "../") {
-		d.logger.Debug().Msgf("Detected relative path for location returned by download URL %s", downloadURL.String())
+		logging.Logger.Trace().Msgf("Detected relative path for location returned by download URL %s", downloadURL.String())
 
 		locationURL, err := url.Parse(location)
 		if err != nil {
@@ -163,7 +161,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 
 func newRetryableClient() *retryablehttp.Client {
 	httpClient := retryablehttp.NewClient()
-	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger}
 	return httpClient
 }
 
@@ -171,16 +169,14 @@ func newRetryableClient() *retryablehttp.Client {
 type RegistryLoader struct {
 	packageFetcher *PackageFetcher
 	disco          *Disco
-	logger         zerolog.Logger
 	httpClient     *retryablehttp.Client
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zerolog.Logger) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco) *RegistryLoader {
 	return &RegistryLoader{
 		packageFetcher: packageFetcher,
 		disco:          disco,
-		logger:         logger,
 		httpClient:     newRetryableClient(),
 	}
 }
@@ -190,7 +186,7 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zero
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+		logging.Logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
@@ -199,7 +195,7 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
 	if !ok {
 		if err != nil {
-			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+			logging.Logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
 		}
 		return &RegistryLookupResult{
 			OK: false,
@@ -286,7 +282,7 @@ func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest
 		return fmt.Errorf("could not find download location: %w", err)
 	}
 	// Deliberately not logging the download URL since it contains a token
-	r.logger.Debug().Msgf("Downloading module %s", lookupResult.ModuleURL.RawSource)
+	logging.Logger.Trace().Msgf("Downloading module %s", lookupResult.ModuleURL.RawSource)
 
 	return r.packageFetcher.fetch(downloadURL, dest)
 }

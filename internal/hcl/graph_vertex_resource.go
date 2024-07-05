@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type VertexResource struct {
 	moduleConfigs *ModuleConfigs
-	logger        zerolog.Logger
 	block         *Block
 }
 
@@ -67,7 +67,7 @@ func (v *VertexResource) evaluate(e *Evaluator, b *Block) error {
 	// We don't care about the existing values, this is only needed by the legacy evaluator
 	val := e.evaluateResourceOrData(b, map[string]cty.Value{})
 
-	v.logger.Debug().Msgf("adding resource %s to the evaluation context", v.ID())
+	logging.Logger.Trace().Msgf("adding resource %s to the evaluation context", v.ID())
 	e.ctx.SetByDot(val, b.TypeLabel())
 
 	return nil

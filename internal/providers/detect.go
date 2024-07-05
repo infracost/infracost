@@ -33,7 +33,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 
 	forceCLI := project.TerraformForceCLI
 	projectType := DetectProjectType(project.Path, forceCLI)
-	projectContext := config.NewProjectContext(ctx, project, nil)
+	projectContext := config.NewProjectContext(ctx, project)
 	if projectType != ProjectTypeAutodetect {
 		projectContext.ContextValues.SetValue("project_type", projectType)
 	}
@@ -87,7 +87,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		locatorConfig.WorkingDirectory = ctx.Config.WorkingDirectory()
 	}
 
-	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
+	pl := hcl.NewProjectLocator(locatorConfig)
 	rootPaths := pl.FindRootModules(project.Path)
 	if len(rootPaths) == 0 {
 		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", project.Path)
@@ -95,7 +95,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 
 	var autoProviders []schema.Provider
 	for _, rootPath := range rootPaths {
-		detectedProjectContext := config.NewProjectContext(ctx, project, nil)
+		detectedProjectContext := config.NewProjectContext(ctx, project)
 		if rootPath.IsTerragrunt {
 			detectedProjectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
 			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, detectedProjectContext))

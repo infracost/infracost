@@ -130,7 +130,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	}
 
 	client := retryablehttp.NewClient()
-	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	client.Logger = &LeveledLogger{Logger: logging.Logger}
 	client.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tlsConfig
 	client.HTTPClient.Timeout = time.Second * 30
 

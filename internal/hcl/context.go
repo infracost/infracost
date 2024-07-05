@@ -4,17 +4,15 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type Context struct {
 	ctx    *hcl.EvalContext
 	parent *Context
-	logger zerolog.Logger
 }
 
-func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *Context {
+func NewContext(ctx *hcl.EvalContext, parent *Context) *Context {
 	if ctx.Variables == nil {
 		ctx.Variables = make(map[string]cty.Value)
 	}
@@ -22,12 +20,11 @@ func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *C
 	return &Context{
 		ctx:    ctx,
 		parent: parent,
-		logger: logger,
 	}
 }
 
 func (c *Context) NewChild() *Context {
-	return NewContext(c.ctx.NewChild(), c, c.logger)
+	return NewContext(c.ctx.NewChild(), c)
 }
 
 func (c *Context) Parent() *Context {

@@ -5,8 +5,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var moduleCallArgs = []string{"source", "version", "for_each", "count", "providers", "depends_on", "lifecycle"}
@@ -30,7 +31,6 @@ func attrIsVarInput(name string) bool {
 }
 
 type VertexModuleCall struct {
-	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -85,7 +85,7 @@ func (v *VertexModuleCall) evaluate(e *Evaluator, b *Block, mutex *sync.Mutex) e
 		return fmt.Errorf("module block %s has no label", b.FullName())
 	}
 
-	v.logger.Debug().Msgf("adding module %s to the evaluation context", b.FullName())
+	logging.Logger.Trace().Msgf("adding module %s to the evaluation context", b.FullName())
 	e.ctx.SetByDot(b.Values(), b.LocalName())
 
 	return nil
@@ -125,7 +125,6 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
-			e.logger,
 			e.isGraph,
 		)
 

@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type VertexData struct {
-	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -83,7 +83,7 @@ func (v *VertexData) evaluate(e *Evaluator, b *Block) error {
 
 	val := e.evaluateResourceOrData(b, existingVals)
 
-	v.logger.Debug().Msgf("adding data %s to the evaluation context", v.ID())
+	logging.Logger.Trace().Msgf("adding data %s to the evaluation context", v.ID())
 	e.ctx.SetByDot(val, fmt.Sprintf("data.%s", b.TypeLabel()))
 
 	return nil

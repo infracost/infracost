@@ -3,10 +3,11 @@ package funcs
 import (
 	"fmt"
 
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 // PrintArgs prints any number of args to the std out using fmt.
@@ -72,7 +73,7 @@ func valueToBytes(v cty.Value) []byte {
 //
 //	time="2022-12-06T10:27:40Z" level=debug enable_cloud_org=false ... attribute_name=volume_size provider=terraform_dir block_name=root_block_device. sync_usage=false msg="fetching attribute value"
 //	time="2022-12-06T10:27:40Z" level=debug ... msg="terraform print "test":cty.StringVal(\"foo\")"
-func LogArgs(logger zerolog.Logger) function.Function {
+func LogArgs() function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
 			{
@@ -92,7 +93,7 @@ func LogArgs(logger zerolog.Logger) function.Function {
 			return args[1].Type(), nil
 		},
 		Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-			logger.Debug().Msgf("terraform print %q:%s", args[0], args[1].GoString())
+			logging.Logger.Debug().Msgf("terraform print %q:%s", args[0], args[1].GoString())
 
 			return args[1], nil
 		},

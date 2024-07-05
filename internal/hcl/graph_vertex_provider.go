@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type VertexProvider struct {
-	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -66,7 +66,7 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 		// We don't care about the existing values, this is only needed by the legacy evaluator
 		val := e.evaluateProvider(blockInstance, map[string]cty.Value{})
 
-		v.logger.Debug().Msgf("adding %s to the evaluation context", v.ID())
+		logging.Logger.Trace().Msgf("adding %s to the evaluation context", v.ID())
 		e.ctx.SetByDot(val, blockInstance.Label())
 
 		e.AddFilteredBlocks(blockInstance)

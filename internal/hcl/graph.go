@@ -7,8 +7,9 @@ import (
 	"sync"
 
 	"github.com/heimdalr/dag"
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -54,7 +55,6 @@ func (m *ModuleConfigs) Get(moduleAddress string) []ModuleConfig {
 
 type Graph struct {
 	dag           *dag.DAG
-	logger        zerolog.Logger
 	rootVertex    Vertex
 	vertexMutex   *sync.Mutex
 	moduleConfigs *ModuleConfigs
@@ -73,13 +73,12 @@ type VertexReference struct {
 	Key           string
 }
 
-func NewGraphWithRoot(logger zerolog.Logger, vertexMutex *sync.Mutex) (*Graph, error) {
+func NewGraphWithRoot(vertexMutex *sync.Mutex) (*Graph, error) {
 	if vertexMutex == nil {
 		vertexMutex = &sync.Mutex{}
 	}
 	g := &Graph{
 		dag:           dag.NewDAG(),
-		logger:        logger,
 		moduleConfigs: NewModuleConfigs(),
 		vertexMutex:   vertexMutex,
 	}
@@ -111,7 +110,6 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		case "locals":
 			for _, attr := range block.GetAttributes() {
 				vertexes = append(vertexes, &VertexLocal{
-					logger:        g.logger,
 					moduleConfigs: g.moduleConfigs,
 					block:         block,
 					attr:          attr,
@@ -119,42 +117,35 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			}
 		case "module":
 			vertexes = append(vertexes, &VertexModuleCall{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
 			vertexes = append(vertexes, &VertexModuleExit{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
 		case "variable":
 			vertexes = append(vertexes, &VertexVariable{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
 		case "output":
 			vertexes = append(vertexes, &VertexOutput{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
 		case "provider":
 			vertexes = append(vertexes, &VertexProvider{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
 		case "resource":
 			vertexes = append(vertexes, &VertexResource{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
 		case "data":
 			vertexes = append(vertexes, &VertexData{
-				logger:        g.logger,
 				moduleConfigs: g.moduleConfigs,
 				block:         block,
 			})
@@ -208,13 +199,13 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	for _, vertex := range vertexes {
 		id := vertex.ID()
 
-		g.logger.Debug().Msgf("adding vertex: %s", id)
+		logging.Logger.Trace().Msgf("adding vertex: %s", id)
 		err := g.dag.AddVertexByID(id, vertex)
 		if err != nil {
 			// We don't actually mind if blocks are added multiple times
 			// since this helps us support cases like _override.tf files
 			// and in-progress changes.
-			g.logger.Debug().Err(err).Msgf("error adding vertex %q", id)
+			logging.Logger.Debug().Err(err).Msgf("error adding vertex %q", id)
 		}
 	}
 
@@ -225,21 +216,21 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		modAddr := vertex.ModuleAddress()
 
 		if modAddr == "" {
-			g.logger.Debug().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
+			logging.Logger.Trace().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
 			edges = append(edges, dag.EdgeInput{
 				SrcID: g.rootVertex.ID(),
 				DstID: id,
 			})
 		} else {
 			// Add the module call edge
-			g.logger.Debug().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
+			logging.Logger.Trace().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
 			edges = append(edges, dag.EdgeInput{
 				SrcID: moduleCallID(modAddr),
 				DstID: id,
 			})
 
 			// Add the module exit edge
-			g.logger.Debug().Msgf("adding edge: %s, %s", id, modAddr)
+			logging.Logger.Trace().Msgf("adding edge: %s, %s", id, modAddr)
 			edges = append(edges, dag.EdgeInput{
 				SrcID: id,
 				DstID: modAddr,
@@ -307,7 +298,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 					// Check this vertex exists
 					_, err := g.dag.GetVertex(dstID)
 					if err != nil {
-						g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcID, dstID)
+						logging.Logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcID, dstID)
 						continue
 					}
 				}
@@ -323,7 +314,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			// Check if the source vertex exists
 			_, err := g.dag.GetVertex(srcID)
 			if err == nil {
-				g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
+				logging.Logger.Trace().Msgf("adding edge: %s, %s", srcID, dstID)
 				edges = append(edges, dag.EdgeInput{
 					SrcID: srcID,
 					DstID: dstID,
@@ -341,7 +332,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				// Check if the source vertex exists
 				_, err := g.dag.GetVertex(srcID)
 				if err == nil {
-					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
+					logging.Logger.Trace().Msgf("adding edge: %s, %s", srcID, dstID)
 					edges = append(edges, dag.EdgeInput{
 						SrcID: srcID,
 						DstID: dstID,
@@ -384,7 +375,7 @@ func (g *Graph) AsJSON() ([]byte, error) {
 }
 
 func (g *Graph) Walk() {
-	v := NewGraphVisitor(g.logger, g.vertexMutex)
+	v := NewGraphVisitor(g.vertexMutex)
 
 	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
 		vertex, _ := d.GetVertex(id)
@@ -413,24 +404,22 @@ func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
 }
 
 type GraphVisitor struct {
-	logger      zerolog.Logger
 	vertexMutex *sync.Mutex
 }
 
-func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisitor {
+func NewGraphVisitor(vertexMutex *sync.Mutex) *GraphVisitor {
 	return &GraphVisitor{
-		logger:      logger,
 		vertexMutex: vertexMutex,
 	}
 }
 
 func (v *GraphVisitor) Visit(id string, vertex interface{}) {
-	v.logger.Debug().Msgf("visiting vertex %q", id)
+	logging.Logger.Trace().Msgf("visiting vertex %q", id)
 
 	vert := vertex.(Vertex)
 	err := vert.Visit(v.vertexMutex)
 	if err != nil {
-		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
+		logging.Logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
 	}
 }
 
@@ -458,7 +447,6 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 				map[string]map[string]cty.Value{},
 				evaluator.workspace,
 				evaluator.blockBuilder,
-				evaluator.logger,
 				evaluator.isGraph,
 			)
 

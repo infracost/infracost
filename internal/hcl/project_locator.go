@@ -14,12 +14,12 @@ import (
 	"github.com/gruntwork-io/terragrunt/options"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -246,7 +246,6 @@ type ProjectLocator struct {
 	excludedDirs      []string
 	changedObjects    []string
 	useAllPaths       bool
-	logger            zerolog.Logger
 
 	basePath           string
 	discoveredVarFiles map[string][]RootPathVarFile
@@ -315,7 +314,7 @@ func newPathOverride(override PathOverrideConfig) pathOverride {
 }
 
 // NewProjectLocator returns safely initialized ProjectLocator.
-func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *ProjectLocator {
+func NewProjectLocator(config *ProjectLocatorConfig) *ProjectLocator {
 	matcher := CreateEnvFileMatcher(nil, nil)
 	if config != nil {
 		extensions := defaultExtensions
@@ -345,7 +344,6 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			changedObjects:     config.ChangedObjects,
 			includedDirs:       config.IncludedDirs,
 			pathOverrides:      overrides,
-			logger:             logger,
 			envMatcher:         matcher,
 			useAllPaths:        config.UseAllPaths,
 			skip:               config.SkipAutoDetection,
@@ -368,7 +366,6 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 	return &ProjectLocator{
 		modules:                    make(map[string]struct{}),
 		discoveredVarFiles:         make(map[string][]RootPathVarFile),
-		logger:                     logger,
 		envMatcher:                 matcher,
 		terraformVarFileExtensions: defaultExtensions,
 		hclParser:                  hclparse.NewParser(),
@@ -1150,7 +1147,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 		}
 	}
 
-	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", startingPath, len(p.discoveredProjects))
+	logging.Logger.Trace().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", startingPath, len(p.discoveredProjects))
 
 	var projects []RootPath
 	projectMap := map[string]bool{}
@@ -1277,7 +1274,7 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 
 func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) bool {
 	if p.shouldSkipDir(dir.path) {
-		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
+		logging.Logger.Trace().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
 
 		return false
 	}
@@ -1315,7 +1312,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	}
 
 	if _, ok := p.modules[dir.path]; ok && !p.useAllPaths {
-		p.logger.Debug().Msgf("skipping directory %s as it has been called as a module", dir.path)
+		logging.Logger.Trace().Msgf("skipping directory %s as it has been called as a module", dir.path)
 
 		return false
 	}
@@ -1382,10 +1379,10 @@ func (p *ProjectLocator) maxSearchDepth() int {
 }
 
 func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth int) {
-	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
+	logging.Logger.Trace().Msgf("walking path %s to discover terraform files", fullPath)
 
 	if level >= maxSearchDepth {
-		p.logger.Debug().Msgf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
+		logging.Logger.Trace().Msgf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
 		return
 	}
 
@@ -1393,7 +1390,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
-		p.logger.Debug().Err(err).Msgf("could not get file information for path %s skipping evaluation", fullPath)
+		logging.Logger.Debug().Err(err).Msgf("could not get file information for path %s skipping evaluation", fullPath)
 		return
 	}
 
@@ -1443,7 +1440,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 		path := filepath.Join(fullPath, name)
 		_, diag := parseFunc(path)
 		if diag != nil && diag.HasErrors() {
-			p.logger.Debug().Msgf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			logging.Logger.Debug().Err(diag).Msgf("skipping file: %s hcl parsing error", path)
 			continue
 		}
 	}
@@ -1593,7 +1590,7 @@ func (p *ProjectLocator) shallowDecodeTerraformBlocks(fullPath string, files map
 
 		body, content, diags := file.Body.PartialContent(terraformAndProviderBlocks)
 		if diags != nil && diags.HasErrors() {
-			p.logger.Debug().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
+			logging.Logger.Debug().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
 			continue
 		}
 
@@ -1618,14 +1615,14 @@ func (p *ProjectLocator) shallowDecodeTerraformBlocks(fullPath string, files map
 				val, _ := src.Expr.Value(nil)
 
 				if val.Type() != cty.String {
-					p.logger.Debug().Str("module", strings.Join(module.Labels, ".")).Msgf("got unexpected cty value for module source string in file %s", file)
+					logging.Logger.Debug().Str("module", strings.Join(module.Labels, ".")).Msgf("got unexpected cty value for module source string in file %s", file)
 					continue
 				}
 
 				var realPath string
 				err := gocty.FromCtyValue(val, &realPath)
 				if err != nil {
-					p.logger.Debug().Err(err).Str("module", strings.Join(module.Labels, ".")).Msg("could not read source value of module as string")
+					logging.Logger.Debug().Err(err).Str("module", strings.Join(module.Labels, ".")).Msg("could not read source value of module as string")
 					continue
 				}
 
@@ -1658,7 +1655,7 @@ func (p *ProjectLocator) findTerragruntDirs(fullPath string) {
 		DownloadDir: terragruntDownloadDir,
 	})
 	if err != nil {
-		p.logger.Debug().Err(err).Msgf("failed to find terragrunt files in path %s", fullPath)
+		logging.Logger.Debug().Err(err).Msgf("failed to find terragrunt files in path %s", fullPath)
 	}
 
 	if len(terragruntConfigFiles) > 0 {

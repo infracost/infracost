@@ -258,7 +258,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("  Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
-			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: config.NewProjectContext(r.runCtx, p, map[string]interface{}{})})
+			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: config.NewProjectContext(r.runCtx, p)})
 			i++
 			continue
 		}

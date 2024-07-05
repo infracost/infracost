@@ -43,7 +43,7 @@ func TestLookupModule(t *testing.T) {
 	logger := zerolog.New(io.Discard)
 
 	cache := &Cache{
-		disco:  NewDisco(nil, logger),
+		disco:  NewDisco(nil),
 		logger: logger,
 	}
 
