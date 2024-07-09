@@ -3,7 +3,6 @@ package terraform
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"path"
 	"strings"
 	"testing"
@@ -11,8 +10,6 @@ import (
 
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/rs/zerolog"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
@@ -178,11 +175,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			pathName := strings.ReplaceAll(strings.ToLower(tt.name), " ", "_")
 			testPath := path.Join("testdata/hcl_provider_test", pathName)
 
-			logger := zerolog.New(io.Discard)
-
-			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
+			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{})
 			moduleParser := modules.NewSharedHCLParser()
-			pl := hcl.NewProjectLocator(logger, nil)
+			pl := hcl.NewProjectLocator(nil)
 			mods := pl.FindRootModules(testPath)
 			options := []hcl.Option{hcl.OptionWithBlockBuilder(
 				hcl.BlockBuilder{
@@ -190,7 +185,6 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 						return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
 					},
 					SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
-					Logger:        logger,
 					HCLParser:     moduleParser,
 				},
 			)}
@@ -202,14 +196,12 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			parser := hcl.NewParser(
 				mods[0],
 				hcl.CreateEnvFileMatcher([]string{}, nil),
-				modules.NewModuleLoader(testPath, moduleParser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
-				logger,
+				modules.NewModuleLoader(testPath, moduleParser, nil, config.TerraformSourceMap{}, &sync.KeyMutex{}),
 				options...,
 			)
 
 			p := HCLProvider{
 				Parser: parser,
-				logger: logger,
 				ctx:    ctx,
 			}
 			root := p.LoadPlanJSON()

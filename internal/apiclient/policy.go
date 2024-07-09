@@ -29,7 +29,7 @@ type PolicyAPIClient struct {
 // NewPolicyAPIClient retrieves resource allow-list info from Infracost Cloud and returns a new policy client
 func NewPolicyAPIClient(ctx *config.RunContext) (*PolicyAPIClient, error) {
 	client := retryablehttp.NewClient()
-	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	client.Logger = &LeveledLogger{Logger: logging.Logger}
 	c := PolicyAPIClient{
 		APIClient: APIClient{
 			httpClient: client.StandardClient(),

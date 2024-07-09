@@ -1,12 +1,7 @@
 package config
 
 import (
-	"context"
 	"sync"
-
-	"github.com/rs/zerolog"
-
-	"github.com/infracost/infracost/internal/logging"
 )
 
 type ProjectContexter interface {
@@ -16,7 +11,6 @@ type ProjectContexter interface {
 type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
-	logger        zerolog.Logger
 	ContextValues *ContextValues
 	mu            *sync.RWMutex
 
@@ -24,26 +18,10 @@ type ProjectContext struct {
 	CacheErr   string
 }
 
-func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields interface{}) *ProjectContext {
-	ctx := logging.Logger.With().
-		Str("project_name", projectCfg.Name).
-		Str("project_path", projectCfg.Path)
-
-	if logFields != nil {
-		switch v := logFields.(type) {
-		case context.Context:
-			ctx = ctx.Ctx(v)
-		default:
-			ctx = ctx.Fields(v)
-		}
-	}
-
-	contextLogger := ctx.Logger()
-
+func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext {
 	return &ProjectContext{
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
-		logger:        contextLogger,
 		ContextValues: NewContextValues(map[string]interface{}{}),
 		mu:            &sync.RWMutex{},
 	}
@@ -58,10 +36,6 @@ func (c *ProjectContext) SetProjectType(projectType string) {
 
 	projectTypes = append(projectTypes, projectType)
 	c.RunContext.ContextValues.SetValue("projectTypes", projectTypes)
-}
-
-func (c *ProjectContext) Logger() zerolog.Logger {
-	return c.logger
 }
 
 func (c *ProjectContext) SetFrom(d ProjectContexter) {

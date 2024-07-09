@@ -14,12 +14,12 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -284,7 +284,6 @@ type Block struct {
 	parent *Block
 	// verbose determines whether the block uses verbose debug logging.
 	verbose bool
-	logger  zerolog.Logger
 	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
 	isGraph    bool
 	newMock    func(attr *Attribute) cty.Value
@@ -300,7 +299,6 @@ type Block struct {
 type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
-	Logger        zerolog.Logger
 	HCLParser     *modules.SharedHCLParser
 	isGraph       bool
 }
@@ -308,7 +306,7 @@ type BlockBuilder struct {
 // NewBlock returns a Block with Context and child Blocks initialised.
 func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, parent *Block, moduleBlock *Block) *Block {
 	if ctx == nil {
-		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
+		ctx = NewContext(&hcl.EvalContext{}, nil)
 	}
 
 	// if the filepath is absolute let's make it relative to the working directory so
@@ -339,8 +337,6 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			parent:      parent,
 		}
 
-		block.setLogger(b.Logger)
-
 		for _, f := range b.SetAttributes {
 			f(block)
 		}
@@ -356,7 +352,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 	// This might be because the *hcl.Block represents a whole file contents.
 	content, _, diag := hclBlock.Body.PartialContent(terraformSchemaV012)
 	if diag != nil && diag.HasErrors() {
-		b.Logger.Debug().Msgf("error loading partial content from hcl file %s", diag.Error())
+		logging.Logger.Debug().Err(diag).Msg("error loading partial content from hcl file")
 
 		block := &Block{
 			Filename:    filename,
@@ -371,7 +367,6 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			isGraph:     b.isGraph,
 			newMock:     b.MockFunc,
 		}
-		block.setLogger(b.Logger)
 
 		return block
 	}
@@ -395,7 +390,6 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		block.childBlocks[i] = b.NewBlock(filename, rootPath, hb, ctx, block, moduleBlock)
 	}
 
-	block.setLogger(b.Logger)
 	return block
 }
 
@@ -406,7 +400,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 	if block.context != nil {
 		childCtx = block.context.NewChild()
 	} else {
-		childCtx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
+		childCtx = NewContext(&hcl.EvalContext{}, nil)
 	}
 
 	cloneHCL := *block.HCLBlock
@@ -426,7 +420,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 			case cty.String:
 				labels[position] = fmt.Sprintf("%s[%q]", clone.HCLBlock.Labels[position], index.AsString())
 			default:
-				b.Logger.Debug().Msgf("Invalid key type in iterable: %#v", index.Type())
+				logging.Logger.Debug().Msgf("Invalid key type in iterable: %#v", index.Type())
 				labels[position] = fmt.Sprintf("%s[%#v]", clone.HCLBlock.Labels[position], index)
 			}
 		} else {
@@ -447,12 +441,12 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 // BuildModuleBlocks loads all the Blocks for the module at the given path
 func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPath string) (Blocks, error) {
 	var blocks Blocks
-	moduleFiles, err := loadDirectory(b.HCLParser, b.Logger, modulePath, true)
+	moduleFiles, err := loadDirectory(b.HCLParser, modulePath, true)
 	if err != nil {
 		return blocks, fmt.Errorf("failed to load module %s: %w", block.Label(), err)
 	}
 
-	moduleCtx := NewContext(&hcl.EvalContext{}, nil, b.Logger)
+	moduleCtx := NewContext(&hcl.EvalContext{}, nil)
 	for _, file := range moduleFiles {
 		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
@@ -460,7 +454,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPat
 		}
 
 		if len(fileBlocks) > 0 {
-			b.Logger.Debug().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			logging.Logger.Trace().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 
 		for _, fileBlock := range fileBlocks {
@@ -655,16 +649,6 @@ type ModuleMetadata struct {
 	BlockName string `json:"blockName"`
 	StartLine int    `json:"startLine,omitempty"`
 	EndLine   int    `json:"endLine,omitempty"`
-}
-
-func (b *Block) setLogger(logger zerolog.Logger) {
-	// Use the provided logger as is initially so we avoid a nil pointer in the case where we need to log
-	// an error while calculating b.FullName().
-	b.logger = logger
-
-	blockLogger := logger.With().Str("block_name", b.FullName()).Logger()
-
-	b.logger = blockLogger
 }
 
 // CallDetails returns the tree of module calls that were used to create this resource. Each step of the tree
@@ -883,9 +867,6 @@ func (b *Block) GetAttributes() []*Attribute {
 				HCLAttr: v,
 				Ctx:     b.context,
 				Verbose: b.verbose,
-				Logger: b.logger.With().Str(
-					"attribute_name", k,
-				).Logger(),
 				isGraph: b.isGraph,
 			})
 			continue
@@ -896,9 +877,6 @@ func (b *Block) GetAttributes() []*Attribute {
 			HCLAttr: hclAttributes[k],
 			Ctx:     b.context,
 			Verbose: b.verbose,
-			Logger: b.logger.With().Str(
-				"attribute_name", hclAttributes[k].Name,
-			).Logger(),
 			isGraph: b.isGraph,
 		})
 	}
@@ -916,7 +894,7 @@ func (b *Block) loadFileContentsToAttributes(attributes []*Attribute) []*Attribu
 		if attribute.Name() == "filename" {
 			content, err := funcs.File(b.rootPath, attribute.Value())
 			if err != nil {
-				b.logger.Debug().Err(err).Msgf("failed to load %s file contents", b.FullName())
+				logging.Logger.Debug().Err(err).Msgf("failed to load %s file contents", b.FullName())
 				break
 			}
 
@@ -954,9 +932,6 @@ func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
 		HCLAttr: hclAttr,
 		Ctx:     b.context,
 		Verbose: b.verbose,
-		Logger: b.logger.With().Str(
-			"attribute_name", name,
-		).Logger(),
 		isGraph: b.isGraph,
 	}
 }
@@ -1089,7 +1064,7 @@ func (b *Block) values() cty.Value {
 			if v, ok := values[key]; ok {
 				list := append(v.AsValueSlice(), child.values())
 				if !cty.CanListVal(list) {
-					b.logger.Debug().Msgf("ignoring child block %#v value with inconsistent list element types", key)
+					logging.Logger.Trace().Msgf("ignoring child block %#v value with inconsistent list element types", key)
 					continue
 				}
 				values[key] = cty.ListVal(list)
@@ -1148,7 +1123,7 @@ func (b *Block) Reference() *Reference {
 	parts = append(parts, b.Labels()...)
 	ref, err := newReference(parts)
 	if err != nil {
-		b.logger.Debug().Err(err).Msgf(
+		logging.Logger.Debug().Err(err).Msgf(
 			"returning empty block reference because we encountered an error generating a new reference",
 		)
 		ref = &Reference{}
@@ -1467,7 +1442,7 @@ func randomShuffleValues(b *Block) cty.Value {
 	var x = 1
 	err := gocty.FromCtyValue(count, &x)
 	if err != nil {
-		b.logger.Debug().Err(err).Msgf("couldn't load result_count to int for random_shuffle")
+		logging.Logger.Debug().Err(err).Msgf("couldn't load result_count to int for random_shuffle")
 	}
 
 	if x > len(elements)-1 {
@@ -1499,7 +1474,7 @@ func googleComputeZonesValues(b *Block) cty.Value {
 		if err == nil {
 			region = str
 		} else {
-			b.logger.Debug().Err(err).Msgf("could not parse gcp compute zone region")
+			logging.Logger.Debug().Err(err).Msgf("could not parse gcp compute zone region")
 		}
 	}
 

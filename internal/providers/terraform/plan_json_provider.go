@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rs/zerolog"
-
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
@@ -17,7 +15,6 @@ type PlanJSONProvider struct {
 	Path                 string
 	includePastResources bool
 	policyClient         *apiclient.PolicyAPIClient
-	logger               zerolog.Logger
 }
 
 func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
@@ -35,7 +32,6 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		policyClient:         policyClient,
-		logger:               ctx.Logger(),
 	}
 }
 
@@ -112,7 +108,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte)
 	if p.policyClient != nil {
 		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
 		if err != nil {
-			p.logger.Err(err).Msgf("Terraform project %s failed to upload policy data", project.Name)
+			logging.Logger.Debug().Err(err).Msgf("Terraform project %s failed to upload policy data", project.Name)
 		}
 	}
 

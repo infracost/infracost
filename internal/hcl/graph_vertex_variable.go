@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type VertexVariable struct {
-	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -62,7 +62,7 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
 		}
 
-		v.logger.Debug().Msgf("adding variable %s to the evaluation context", v.ID())
+		logging.Logger.Trace().Msgf("adding variable %s to the evaluation context", v.ID())
 		key := fmt.Sprintf("var.%s", blockInstance.Label())
 		e.ctx.SetByDot(val, key)
 

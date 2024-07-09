@@ -4,11 +4,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/rs/zerolog"
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type VertexOutput struct {
-	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -51,7 +50,7 @@ func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not evaluate output %s: %w", v.ID(), err)
 		}
 
-		v.logger.Debug().Msgf("adding output %s to the evaluation context", v.ID())
+		logging.Logger.Trace().Msgf("adding output %s to the evaluation context", v.ID())
 		e.ctx.SetByDot(val, key)
 
 		parentEvaluator := moduleInstance.parentEvaluator

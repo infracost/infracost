@@ -60,14 +60,13 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 		cmd.Env = append(cmd.Env, fmt.Sprintf("TF_CLI_CONFIG_FILE=%s", opts.TerraformConfigFile))
 	}
 
-	subLogger := logging.Logger.With().Str("binary", "terraform").Logger().Level(zerolog.DebugLevel)
 	logWriter := &cmdLogWriter{
-		logger: subLogger,
+		logger: logging.Logger,
 		level:  zerolog.DebugLevel,
 	}
 
 	terraformLogWriter := &cmdLogWriter{
-		logger: subLogger,
+		logger: logging.Logger,
 		level:  zerolog.DebugLevel,
 	}
 

@@ -8,10 +8,11 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -44,7 +45,6 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
-	Logger  zerolog.Logger
 	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
 	isGraph bool
 	// newMock generates a mock value for the attribute if it's value is missing.
@@ -77,7 +77,7 @@ func (attr *Attribute) AsInt() int64 {
 		var err error
 		v, err = convert.Convert(v, cty.Number)
 		if err != nil {
-			attr.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.Number", v.Type())
+			logging.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.Number", v.Type())
 			return 0
 		}
 	}
@@ -85,7 +85,7 @@ func (attr *Attribute) AsInt() int64 {
 	var i int64
 	err := gocty.FromCtyValue(v, &i)
 	if err != nil {
-		attr.Logger.Debug().Err(err).Msg("could not return attribute value as int64")
+		logging.Logger.Debug().Err(err).Msg("could not return attribute value as int64")
 	}
 
 	return i
@@ -107,7 +107,7 @@ func (attr *Attribute) AsString() string {
 		var err error
 		v, err = convert.Convert(v, cty.String)
 		if err != nil {
-			attr.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.String", v.Type())
+			logging.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.String", v.Type())
 			return ""
 		}
 	}
@@ -115,7 +115,7 @@ func (attr *Attribute) AsString() string {
 	var s string
 	err := gocty.FromCtyValue(v, &s)
 	if err != nil {
-		attr.Logger.Debug().Err(err).Msg("could not return attribute value as string")
+		logging.Logger.Debug().Err(err).Msg("could not return attribute value as string")
 	}
 
 	return s
@@ -129,7 +129,7 @@ func (attr *Attribute) Value() cty.Value {
 		return cty.DynamicVal
 	}
 
-	attr.Logger.Trace().Msg("fetching attribute value")
+	logging.Logger.Trace().Msg("fetching attribute value")
 	var val cty.Value
 	if attr.isGraph {
 		val = attr.graphValue()
@@ -207,7 +207,7 @@ func (attr *Attribute) HasChanged() (change bool) {
 	defer func() {
 		e := recover()
 		if e != nil {
-			attr.Logger.Debug().Msgf("HasChanged panicked with cty.Value comparison %s", e)
+			logging.Logger.Debug().Msgf("HasChanged panicked with cty.Value comparison %s", e)
 			change = true
 		}
 	}()
@@ -226,7 +226,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			trace := debug.Stack()
-			attr.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
+			logging.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
 		}
 	}()
 
@@ -318,7 +318,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		if attr.Verbose {
-			attr.Logger.Debug().Msgf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
+			logging.Logger.Debug().Msgf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
 	}
 
@@ -398,7 +398,7 @@ func (attr *Attribute) graphValue() (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			trace := debug.Stack()
-			attr.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
+			logging.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
 		}
 	}()
 
@@ -931,7 +931,7 @@ func (attr *Attribute) Equals(val interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(val, cty.Number)
 		if err != nil {
-			attr.Logger.Debug().Msgf("Error converting number for equality check. %s", err)
+			logging.Logger.Debug().Msgf("Error converting number for equality check. %s", err)
 			return false
 		}
 		return attr.Value().RawEquals(checkNumber)
@@ -965,13 +965,13 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	case cty.Number:
 		var intVal int
 		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			attr.Logger.Debug().Err(err).Msg("could not unpack int from block index attr, returning 0")
+			logging.Logger.Debug().Err(err).Msg("could not unpack int from block index attr, returning 0")
 			return "0"
 		}
 
 		return fmt.Sprintf("%d", intVal)
 	default:
-		attr.Logger.Debug().Msgf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
+		logging.Logger.Debug().Msgf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
 		return "0"
 	}
 }
@@ -1153,15 +1153,15 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.LiteralValueExpr:
-		attr.Logger.Trace().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
+		logging.Logger.Trace().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
 	default:
 		name := fmt.Sprintf("%T", t)
 		if strings.HasPrefix(name, "*hclsyntax") {
 			// if we get here then that means we have encountered an expression type that we don't support.
 			// Adding support for newly added expressions is critical to graph evaluation, so let's log an error.
-			attr.Logger.Error().Msgf("cannot create references for unsupported expression type %q", name)
+			logging.Logger.Trace().Msgf("cannot create references for unsupported expression type %q", name)
 		} else {
-			attr.Logger.Debug().Msgf("cannot create references for expression type: %q", name)
+			logging.Logger.Trace().Msgf("cannot create references for expression type: %q", name)
 		}
 	}
 

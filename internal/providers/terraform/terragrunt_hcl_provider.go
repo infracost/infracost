@@ -2,7 +2,6 @@ package terraform
 
 import (
 	"bufio"
-	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -31,7 +30,6 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
@@ -42,6 +40,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	infSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
@@ -106,23 +105,17 @@ type TerragruntHCLProvider struct {
 	excludedPaths []string
 	env           map[string]string
 	sourceCache   map[string]string
-	logger        zerolog.Logger
 }
 
 // NewTerragruntHCLProvider creates a new provider initialized with the configured project path (usually the terragrunt
 // root directory).
 func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext) schema.Provider {
-	logger := ctx.Logger().With().Str(
-		"provider", "terragrunt_dir",
-	).Logger()
-
 	return &TerragruntHCLProvider{
 		ctx:           ctx,
 		Path:          rootPath,
 		excludedPaths: ctx.ProjectConfig.ExcludePaths,
 		env:           getEnvVars(ctx),
 		sourceCache:   map[string]string{},
-		logger:        logger,
 	}
 }
 
@@ -284,7 +277,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 					continue
 				}
 
-				p.logger.Debug().Msgf("Found terragrunt HCL working dir: %v", di.workingDir)
+				logging.Logger.Trace().Msgf("Found terragrunt HCL working dir: %v", di.workingDir)
 
 				// HCLProvider.LoadResources never returns an error.
 				projects, _ := di.provider.LoadResources(usage)
@@ -376,7 +369,7 @@ func (p *TerragruntHCLProvider) initTerraformVarFiles(tfVarFiles []string, extra
 			absBasePath, _ := filepath.Abs(basePath)
 			relPath, err := filepath.Rel(absBasePath, f)
 			if err != nil {
-				p.logger.Debug().Msgf("Error processing var-file, could not get relative path for %s from %s", f, basePath)
+				logging.Logger.Debug().Err(err).Msgf("Error processing var-file, could not get relative path for %s from %s", f, basePath)
 				continue
 			}
 
@@ -456,7 +449,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			return
 		},
 		Functions: func(baseDir string) map[string]function.Function {
-			funcs := hcl.ExpFunctions(baseDir, p.logger)
+			funcs := hcl.ExpFunctions(baseDir)
 
 			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("run_cmd-mock"))
 			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("sops_decrypt_file-mock"))
@@ -590,15 +583,13 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	var ops []hcl.Option
 	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
 	if err != nil {
-		p.logger.Debug().Msgf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
+		logging.Logger.Debug().Err(err).Msgf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
 	} else {
 		ops = append(ops, hcl.OptionWithRawCtyInput(inputs))
 	}
 
-	logCtx := p.logger.With().Str("parent_provider", "terragrunt_dir").Ctx(context.Background())
-
 	h, err := NewHCLProvider(
-		config.NewProjectContext(p.ctx.RunContext, &pconfig, logCtx),
+		config.NewProjectContext(p.ctx.RunContext, &pconfig),
 		hcl.RootPath{
 			DetectedPath: pconfig.Path,
 		},
@@ -624,7 +615,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			path = mod.Module.RootPath
 		}
 		info.addWarning(schema.NewDiagTerragruntModuleEvaluationFailure(mod.Error))
-		p.logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
+		logging.Logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 	}
 
 	info.provider = h
@@ -725,12 +716,12 @@ var (
 func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) cty.Value {
 	moduleOutputs, err := p.fetchModuleOutputs(opts)
 	if err != nil {
-		p.logger.Debug().Err(err).Msg("failed to fetch real module outputs, defaulting to mocked outputs from file regexp")
+		logging.Logger.Debug().Err(err).Msg("failed to fetch real module outputs, defaulting to mocked outputs from file regexp")
 	}
 
 	file, err := os.Open(opts.TerragruntConfigPath)
 	if err != nil {
-		p.logger.Debug().Err(err).Msg("could not open Terragrunt file for dependency regexps")
+		logging.Logger.Debug().Err(err).Msg("could not open Terragrunt file for dependency regexps")
 		return moduleOutputs
 	}
 
@@ -750,11 +741,11 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 	}
 
 	if err := scanner.Err(); err != nil {
-		p.logger.Debug().Err(err).Msg("error scanning Terragrunt file lines matching whole file with regexp")
+		logging.Logger.Debug().Err(err).Msg("error scanning Terragrunt file lines matching whole file with regexp")
 
 		b, err := os.ReadFile(opts.TerragruntConfigPath)
 		if err != nil {
-			p.logger.Debug().Err(err).Msg("could not read Terragrunt file for dependency regxps")
+			logging.Logger.Debug().Err(err).Msg("could not read Terragrunt file for dependency regxps")
 		}
 
 		matches = depRegexp.FindAllString(string(b), -1)
@@ -994,7 +985,7 @@ func (p *TerragruntHCLProvider) decodeTerragruntDepsToValue(targetConfig string,
 			return encoded, nil
 		}
 
-		p.logger.Debug().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
+		logging.Logger.Debug().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
 	}
 
 	return cty.EmptyObjectVal, nil

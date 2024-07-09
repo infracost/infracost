@@ -23,7 +23,7 @@ type AuthedAPIClient struct {
 // NewAuthedAPIClient returns a new API client.
 func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
 	client := retryablehttp.NewClient()
-	client.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	client.Logger = &apiclient.LeveledLogger{Logger: logging.Logger}
 	client.HTTPClient.Timeout = time.Second * 30
 	return &AuthedAPIClient{
 		host:   host,
