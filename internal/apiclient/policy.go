@@ -139,7 +139,7 @@ type policy2Resource struct {
 	ProviderName   string                   `json:"providerName"`
 	Address        string                   `json:"address"`
 	Tags           *[]policy2Tag            `json:"tags,omitempty"`
-	TagPropagation TagPropagation           `json:"tagPropagation,omitempty"`
+	TagPropagation *TagPropagation          `json:"tagPropagation,omitempty"`
 	Values         json.RawMessage          `json:"values"`
 	References     []policy2Reference       `json:"references"`
 	Metadata       policy2InfracostMetadata `json:"infracostMetadata"`
@@ -244,9 +244,9 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		checksum = calcChecksum(rd)
 	}
 
-	var tagPropagation TagPropagation
+	var tagPropagation *TagPropagation
 	if rd.TagPropagation != nil {
-		tagPropagation = TagPropagation{
+		tagPropagation = &TagPropagation{
 			To:        rd.TagPropagation.To,
 			From:      rd.TagPropagation.From,
 			Tags:      propagatedTagsPtr,

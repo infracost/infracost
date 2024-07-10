@@ -67,7 +67,7 @@
  google_container_node_pool.autoscaling_zonal                                                     
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)                4,380  hours       $146.76   
  └─ Standard provisioned storage (pd-standard)                         600  GB           $24.00   
-                                                                                                  
+
  google_container_cluster.default_regional                                                        
  ├─ Cluster management fee                                             730  hours        $73.00   
  └─ default_pool                                                                                  
