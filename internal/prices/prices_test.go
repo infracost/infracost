@@ -57,7 +57,7 @@ func Test_notFound_Add(t *testing.T) {
 			}
 
 			actual := p.MissingPricesComponents()
-			assert.Equal(t, tt.want, actual)
+			assert.EqualValues(t, tt.want, actual)
 		})
 	}
 }
