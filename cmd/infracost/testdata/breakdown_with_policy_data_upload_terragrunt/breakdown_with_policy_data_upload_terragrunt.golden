@@ -110,6 +110,11 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "tagPropagation": {
+              "to": "replica",
+              "from": "",
+              "attribute": "replica.0.propagate_tags"
+            },
             "metadata": {
               "calls": [
                 {
@@ -345,6 +350,11 @@
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
+            },
+            "tagPropagation": {
+              "to": "replica",
+              "from": "",
+              "attribute": "replica.0.propagate_tags"
             },
             "metadata": {
               "calls": [

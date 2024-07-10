@@ -42,6 +42,12 @@ storePolicyResources:
               "value": "bat"
             }
           ],
+          "tagPropagation": {
+            "to": "",
+            "from": null,
+            "tags": null,
+            "attribute": ""
+          },
           "values": {
             "ebs_block_device": [
               {
