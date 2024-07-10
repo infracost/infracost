@@ -37,13 +37,73 @@ type TagParsingConfig struct {
 	PropagateDefaultsToVolumeTags bool
 }
 
+type TagPropagationConfig struct {
+	ResourceType string
+	Attribute    string
+	To           string
+	RefMap       map[string]string
+}
+
+// ExpectedPropagations describe known tag propagation configurations
+var ExpectedPropagations = []TagPropagationConfig{
+	{
+		ResourceType: "aws_ecs_service",
+		Attribute:    "propagate_tags",
+		To:           "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "task_definition",
+			"SERVICE":         "", // empty string means self-reference
+		},
+	},
+	{
+		ResourceType: "aws_scheduler_schedule",
+		Attribute:    "ecs_parameters.0.propagate_tags",
+		To:           "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "ecs_parameters.0.task_definition_arn",
+		},
+	},
+	{
+		ResourceType: "aws_batch_job_definition",
+		Attribute:    "propagate_tags",
+		To:           "task",
+		RefMap: map[string]string{
+			"true": "", // empty string means self-reference
+		},
+	},
+	{
+		ResourceType: "aws_dynamodb_table",
+		Attribute:    "replica.0.propagate_tags",
+		To:           "replica",
+		RefMap: map[string]string{
+			"true": "", // empty string means self-reference
+		},
+	},
+	{
+		ResourceType: "aws_pipes_pipe",
+		Attribute:    "target_parameters.0.ecs_task_parameters.0.propagate_tags",
+		To:           "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "\"target_parameters.0.ecs_task_parameters.0.task_definition_arn",
+		},
+	},
+}
+
 func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config TagParsingConfig) *map[string]string {
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
+	supportsTagPropagation := false
+	for _, ep := range ExpectedPropagations {
+		if ep.ResourceType == r.Type {
+			supportsTagPropagation = true
+			break
+		}
+	}
+
 	rTags := r.Get("tags").Map()
 	rTagsAll := r.Get("tags_all").Map()
-	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
+	if !supportsTags && !supportsTagBlock && !supportsTagPropagation && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil
 	}
 

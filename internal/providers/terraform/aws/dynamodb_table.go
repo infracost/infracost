@@ -14,7 +14,7 @@ func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 		},
 		// this is a reverse reference, it depends on the aws_appautoscaling_target RegistryItem
 		// defining "resource_id" as a ReferenceAttribute
-		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
+		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id", "replica.0.propagate_tags"},
 		CoreRFunc:           NewDynamoDBTableResource,
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			// returns a table name that will match the custom format used by aws_appautoscaling_target.resource_id

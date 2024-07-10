@@ -51,11 +51,12 @@ type CoreResourceWithUsageParams interface {
 // top level functions that can supply additional provider-agnostic information
 // (such as Infracost Cloud usage estimates) before the resource is built.
 type PartialResource struct {
-	Type      string
-	Address   string
-	Tags      *map[string]string
-	UsageData *UsageData
-	Metadata  map[string]gjson.Result
+	Type           string
+	Address        string
+	Tags           *map[string]string
+	TagPropagation *TagPropagation
+	UsageData      *UsageData
+	Metadata       map[string]gjson.Result
 
 	// CoreResource is the new/preferred struct for providing an intermediate-object
 	// that contains all provider-derived information, but has not yet been built into
@@ -76,6 +77,7 @@ func NewPartialResource(d *ResourceData, r *Resource, cr CoreResource, cloudReso
 		Type:             d.Type,
 		Address:          d.Address,
 		Tags:             d.Tags,
+		TagPropagation:   d.TagPropagation,
 		UsageData:        d.UsageData,
 		Metadata:         d.Metadata,
 		CoreResource:     cr,
@@ -109,6 +111,7 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 
 	res.ResourceType = partial.Type
 	res.Tags = partial.Tags
+	res.TagPropagation = partial.TagPropagation
 	res.Metadata = partial.Metadata
 	return res
 }
