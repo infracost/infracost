@@ -804,10 +804,7 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 }
 
 func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.TagPropagation {
-	for _, expected := range aws.ExpectedPropagations {
-		if expected.ResourceType != resource.Type {
-			continue
-		}
+	if expected, ok := aws.ExpectedPropagations[resource.Type]; ok {
 		propagateTags := resource.GetStringOrDefault(expected.Attribute, "")
 		propagation := &schema.TagPropagation{
 			From:      &propagateTags,
