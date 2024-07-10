@@ -58,6 +58,11 @@ type runInput struct {
 	Metadata       map[string]interface{} `json:"metadata"`
 }
 
+type runCommentInput struct {
+	RunID   string `json:"runId,omitempty"`
+	Comment string `json:"comment,omitempty"`
+}
+
 type projectResultInput struct {
 	ProjectName     string                  `json:"projectName"`
 	ProjectMetadata *schema.ProjectMetadata `json:"projectMetadata"`
@@ -118,6 +123,17 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		TimeGenerated:  out.TimeGenerated.UTC(),
 		Metadata:       ctxValues,
 	}, nil
+}
+
+func (c *DashboardAPIClient) SavePostedPrComment(ctx *config.RunContext, runId, comment string) error {
+	q := `mutation SavePostedPrComment($runId: String!, $comment: String!) {
+			savePostedPrComment(runId: $runId, comment: $comment) 
+}`
+	_, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{"runId": runId, "comment": comment}}})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
