@@ -16,9 +16,9 @@
  └─ NVIDIA L4 (on-demand)                                                  730  hours       $286.18   
                                                                                                       
  google_compute_instance.preemptible_gpu                                                              
- ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $125.74   
+ ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $138.34   
  ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
- └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $379.60   
+ └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $436.54   
                                                                                                       
  google_compute_instance.sud_20_perc_with_hours                                                       
  ├─ Instance usage (Linux/UNIX, on-demand, n2-standard-8)                  730  hours       $226.87   
@@ -56,8 +56,8 @@
  └─ Local SSD provisioned storage                                          750  GB           $60.00   
                                                                                                       
  google_compute_instance.custom_preemptible                                                           
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $33.42   
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $14.28   
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $36.79   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $15.71   
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
                                                                                                       
  google_compute_instance.custom_n2d                                                                   
@@ -86,7 +86,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       100  hours         $0.76   
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
                                                                                                       
- OVERALL TOTAL                                                                          $10,197.26 
+ OVERALL TOTAL                                                                          $10,271.61 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -99,7 +99,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $10,197 ┃           - ┃    $10,197 ┃
+┃ main                                               ┃       $10,272 ┃           - ┃    $10,272 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
