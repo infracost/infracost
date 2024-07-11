@@ -487,7 +487,9 @@ func governanceTestEndpoint(garr governanceAddRunResponse) *httptest.Server {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "mutation AddRun($run: RunInput!)") {
+		if strings.Contains(graphqlQuery, "mutation SavePostedPrComment($runId: String!, $comment: String!)") {
+			fmt.Fprintf(w, `[{"data": {"savePostedPrComment": true}}]\n`)
+		} else if strings.Contains(graphqlQuery, "mutation AddRun($run: RunInput!)") {
 			guardrailJson, _ := json.Marshal(garr)
 
 			fmt.Fprintf(w, `[{"data": {"addRun":

@@ -92,6 +92,13 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 					return err
 				}
 
+				if res.Posted && ctx.IsCloudUploadExplicitlyEnabled() {
+					dashboardClient := apiclient.NewDashboardAPIClient(ctx)
+					if err := dashboardClient.SavePostedPrComment(ctx, commentOut.AddRunResponse.RunID, commentOut.Body); err != nil {
+						logging.Logger.Err(err).Msg("could not save posted PR comment")
+					}
+				}
+
 				pricingClient := apiclient.GetPricingAPIClient(ctx)
 				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
 				if err != nil {

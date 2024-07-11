@@ -120,6 +120,17 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	}, nil
 }
 
+func (c *DashboardAPIClient) SavePostedPrComment(ctx *config.RunContext, runId, comment string) error {
+	q := `mutation SavePostedPrComment($runId: String!, $comment: String!) {
+			savePostedPrComment(runId: $runId, comment: $comment) 
+}`
+	_, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{"runId": runId, "comment": comment}}})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
