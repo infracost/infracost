@@ -2,9 +2,13 @@ package terraform
 
 import (
 	"bytes"
+	json2 "encoding/json"
+	"flag"
 	"fmt"
 	"io"
+	"os"
 	"path"
+	"reflect"
 	"strings"
 	"testing"
 	"text/template"
@@ -18,10 +22,13 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/credentials"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/sync"
 )
+
+var update = flag.Bool("update", false, "update .golden files")
 
 func setMockAttributes(blockAtts map[string]map[string]string) hcl.SetAttributesFunc {
 	count := map[string]int{}
@@ -172,6 +179,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 		{
 			name: "builds module configuration correctly with count",
 		},
+		{
+			name: "adds_source_url_from_remote_module",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -202,7 +212,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			parser := hcl.NewParser(
 				mods[0],
 				hcl.CreateEnvFileMatcher([]string{}, nil),
-				modules.NewModuleLoader(testPath, moduleParser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
+				modules.NewModuleLoader(testPath, moduleParser, &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
 				logger,
 				options...,
 			)
@@ -232,7 +242,19 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			expected := exp.String()
 			actual := string(root.JSON)
-			assert.JSONEq(t, expected, actual)
+			if !assert.JSONEq(t, expected, actual) {
+				var prettyJSON bytes.Buffer
+				err = json2.Indent(&prettyJSON, root.JSON, "", "  ")
+				assert.NoError(t, err)
+
+				if update != nil && *update {
+					err = os.WriteFile(path.Join(testPath, "expected.json"), append(prettyJSON.Bytes(), "\n"...), 0600)
+					assert.NoError(t, err)
+				} else {
+					err = os.WriteFile(path.Join(testPath, "actual.json"), append(prettyJSON.Bytes(), "\n"...), 0600)
+					assert.NoError(t, err)
+				}
+			}
 
 			codes := make([]int, len(root.Module.Warnings))
 			for i, w := range root.Module.Warnings {
@@ -242,5 +264,33 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			assert.Len(t, codes, len(tt.warnings), "unexpected warning length")
 			assert.ElementsMatch(t, codes, tt.warnings)
 		})
+	}
+}
+
+func TestTransformSSHToHTTPS(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected string
+	}{
+		{"git@github.com:user/repo.git", "https://github.com/user/repo.git"},
+		{"git@gitlab.com:group/project.git", "https://gitlab.com/group/project.git"},
+		{"git@bitbucket.org:team/repo.git", "https://bitbucket.org/team/repo.git"},
+		{"git@myserver.com:2222:user/repo.git", "https://myserver.com/user/repo.git"},                                    // with port
+		{"git@ssh.dev.azure.com:v3/organization/project/repo", "https://ssh.dev.azure.com/v3/organization/project/repo"}, // Azure Repos
+		{"invalid-url", "invalid-url"},                                     // invalid SSH URL
+		{"user@github.com:user/repo.git", "user@github.com:user/repo.git"}, // unexpected username
+	}
+
+	for _, test := range tests {
+		output, err := transformSSHToHTTPS(test.input)
+		if err != nil {
+			if test.expected != "" {
+				t.Errorf("transformSSHToHTTPS(%q) returned an error: %v", test.input, err)
+			}
+		} else {
+			if !reflect.DeepEqual(output, test.expected) {
+				t.Errorf("transformSSHToHTTPS(%q) = %q, want %q", test.input, output, test.expected)
+			}
+		}
 	}
 }

@@ -146,11 +146,12 @@ type policy2Resource struct {
 }
 
 type policy2InfracostMetadata struct {
-	Calls     []policy2InfracostMetadataCall `json:"calls"`
-	Checksum  string                         `json:"checksum"`
-	EndLine   int64                          `json:"endLine"`
-	Filename  string                         `json:"filename"`
-	StartLine int64                          `json:"startLine"`
+	Calls          []policy2InfracostMetadataCall `json:"calls"`
+	Checksum       string                         `json:"checksum"`
+	EndLine        int64                          `json:"endLine"`
+	Filename       string                         `json:"filename"`
+	StartLine      int64                          `json:"startLine"`
+	ModuleFilename string                         `json:"moduleFilename,omitempty"`
 }
 
 type policy2InfracostMetadataCall struct {
@@ -232,11 +233,12 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		Values:       valuesJSON,
 		References:   references,
 		Metadata: policy2InfracostMetadata{
-			Calls:     mdCalls,
-			Checksum:  checksum,
-			EndLine:   rd.Metadata["endLine"].Int(),
-			Filename:  rd.Metadata["filename"].String(),
-			StartLine: rd.Metadata["startLine"].Int(),
+			Calls:          mdCalls,
+			Checksum:       checksum,
+			EndLine:        rd.Metadata["endLine"].Int(),
+			Filename:       rd.Metadata["filename"].String(),
+			StartLine:      rd.Metadata["startLine"].Int(),
+			ModuleFilename: rd.Metadata["moduleFilename"].String(),
 		},
 		Region: rd.Region,
 	}
