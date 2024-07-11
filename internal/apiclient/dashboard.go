@@ -121,10 +121,6 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 }
 
 func (c *DashboardAPIClient) SavePostedPrComment(ctx *config.RunContext, runId, comment string) error {
-	if !*ctx.Config.EnableCloud {
-		return nil
-	}
-
 	q := `mutation SavePostedPrComment($runId: String!, $comment: String!) {
 			savePostedPrComment(runId: $runId, comment: $comment) 
 }`
