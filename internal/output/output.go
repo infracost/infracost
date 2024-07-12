@@ -109,10 +109,11 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 		var tagProp *schema.TagPropagation
 		if resource.TagPropagation != nil {
 			tagProp = &schema.TagPropagation{
-				To:        resource.TagPropagation.To,
-				From:      resource.TagPropagation.From,
-				Tags:      resource.TagPropagation.Tags,
-				Attribute: resource.TagPropagation.Attribute,
+				To:                    resource.TagPropagation.To,
+				From:                  resource.TagPropagation.From,
+				Tags:                  resource.TagPropagation.Tags,
+				Attribute:             resource.TagPropagation.Attribute,
+				HasRequiredAttributes: resource.TagPropagation.HasRequiredAttributes,
 			}
 		}
 
@@ -316,10 +317,11 @@ type Resource struct {
 }
 
 type TagPropagation struct {
-	To        string             `json:"to"`
-	From      *string            `json:"from,omitempty"`
-	Tags      *map[string]string `json:"tags,omitempty"`
-	Attribute string             `json:"attribute"`
+	To                    string             `json:"to"`
+	From                  *string            `json:"from,omitempty"`
+	Tags                  *map[string]string `json:"tags,omitempty"`
+	Attribute             string             `json:"attribute"`
+	HasRequiredAttributes bool               `json:"hasRequiredAttributes,omitempty"`
 }
 type Summary struct {
 	TotalResources            *int `json:"totalResources,omitempty"`
@@ -539,10 +541,11 @@ func newResource(r *schema.Resource, comps []CostComponent, actualCosts []Actual
 	var tagProp *TagPropagation
 	if r.TagPropagation != nil {
 		tagProp = &TagPropagation{
-			To:        r.TagPropagation.To,
-			From:      r.TagPropagation.From,
-			Tags:      r.TagPropagation.Tags,
-			Attribute: r.TagPropagation.Attribute,
+			To:                    r.TagPropagation.To,
+			From:                  r.TagPropagation.From,
+			Tags:                  r.TagPropagation.Tags,
+			Attribute:             r.TagPropagation.Attribute,
+			HasRequiredAttributes: r.TagPropagation.HasRequiredAttributes,
 		}
 	}
 

@@ -672,6 +672,9 @@
         },
         "attribute": {
           "type": "string"
+        },
+        "hasRequiredAttributes": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
