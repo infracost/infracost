@@ -41,6 +41,7 @@ type TagPropagationConfig struct {
 	Attribute string
 	To        string
 	RefMap    map[string]string
+	Requires  []string
 }
 
 // ExpectedPropagations describe known tag propagation configurations
@@ -73,6 +74,7 @@ var ExpectedPropagations = map[string]TagPropagationConfig{
 		RefMap: map[string]string{
 			"true": "", // empty string means self-reference
 		},
+		Requires: []string{"replica.0.region_name"},
 	},
 	"aws_pipes_pipe": {
 		Attribute: "target_parameters.0.ecs_task_parameters.0.propagate_tags",

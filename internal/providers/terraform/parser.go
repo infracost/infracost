@@ -811,6 +811,11 @@ func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.Ta
 			To:        expected.To,
 			Attribute: expected.Attribute,
 		}
+		hasRequired := true
+		for _, required := range expected.Requires {
+			hasRequired = hasRequired && resource.Get(required).Exists()
+		}
+		propagation.HasRequiredAttributes = hasRequired
 		if expected.RefMap != nil {
 			if attr, ok := expected.RefMap[propagateTags]; ok {
 				if ref, ok := resource.ReferencesMap[attr]; ok && len(ref) == 1 {

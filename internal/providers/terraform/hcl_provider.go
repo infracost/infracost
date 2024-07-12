@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"math/big"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -29,7 +30,11 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-var json = jsoniter.ConfigCompatibleWithStandardLibrary
+var (
+	json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+	moduleCacheRegex = regexp.MustCompile(`.+\.infracost/terraform_modules/[^/]+/(.+)`)
+)
 
 type HCLProvider struct {
 	policyClient   *apiclient.PolicyAPIClient
@@ -442,7 +447,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 	configResources := map[string]struct{}{}
 	for _, block := range module.Blocks {
 		if block.Type() == "resource" {
-			out := p.getResourceOutput(block)
+			out := p.getResourceOutput(block, module.SourceURL)
 
 			if _, ok := configResources[out.Configuration.Address]; !ok {
 				moduleConfig.Resources = append(moduleConfig.Resources, out.Configuration)
@@ -481,23 +486,35 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 	}
 }
 
-func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
+func (p *HCLProvider) getResourceOutput(block *hcl.Block, moduleSourceURL string) ResourceOutput {
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
 	p.marshalBlock(block, jsonValues)
+	calls := block.CallDetails()
+	metadata := map[string]interface{}{
+		"filename":  block.Filename,
+		"startLine": block.StartLine,
+		"endLine":   block.EndLine,
+		"calls":     calls,
+		"checksum":  generateChecksum(jsonValues),
+	}
+
+	// if there is a non-empty module source url, this means that resource comes from a remote module
+	// in this case we should add the module source url to the metadata.
+	if moduleSourceURL != "" && moduleCacheRegex.MatchString(block.Filename) {
+		filename := buildModuleFilename(block.Filename, moduleSourceURL)
+		if filename != "" {
+			metadata["moduleFilename"] = filename
+		}
+	}
+
 	planned := ResourceJSON{
-		Address:       block.FullName(),
-		Mode:          "managed",
-		Type:          block.TypeLabel(),
-		Name:          stripCountOrForEach(block.NameLabel()),
-		Index:         block.Index(),
-		SchemaVersion: 0,
-		InfracostMetadata: map[string]interface{}{
-			"filename":  block.Filename,
-			"startLine": block.StartLine,
-			"endLine":   block.EndLine,
-			"calls":     block.CallDetails(),
-			"checksum":  generateChecksum(jsonValues),
-		},
+		Address:           block.FullName(),
+		Mode:              "managed",
+		Type:              block.TypeLabel(),
+		Name:              stripCountOrForEach(block.NameLabel()),
+		Index:             block.Index(),
+		SchemaVersion:     0,
+		InfracostMetadata: metadata,
 	}
 
 	changes := ResourceChangesJSON{
@@ -531,6 +548,70 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Changes:       changes,
 		Configuration: configuration,
 	}
+}
+
+func buildModuleFilename(filename string, moduleSourceURL string) string {
+	httpsURL, err := transformSSHToHTTPS(moduleSourceURL)
+	if err != nil {
+		logging.Logger.Debug().Err(err).Msgf("failed to build module filename, could not transform url %s to https", moduleSourceURL)
+		return ""
+	}
+
+	u, err := url.Parse(httpsURL)
+	if err != nil {
+		logging.Logger.Debug().Err(err).Msgf("failed to build module filename,could not parse url %s", httpsURL)
+		return ""
+	}
+
+	ref := "HEAD"
+	queryRef := u.Query().Get("ref")
+	if queryRef != "" {
+		ref = queryRef
+	}
+	u.Path += "/blob/" + ref + "/"
+	u.RawQuery = ""
+
+	matches := moduleCacheRegex.FindStringSubmatch(filename)
+	moduleFilename := u.String() + matches[1]
+	return moduleFilename
+}
+
+func transformSSHToHTTPS(sshURL string) (string, error) {
+	if !strings.HasPrefix(sshURL, "git@") {
+		// nothing to do, the URL is not an SSH URL
+		return sshURL, nil
+	}
+
+	colonCount := strings.Count(sshURL, ":")
+	var domainAndPort, path string
+
+	switch colonCount {
+	case 1:
+		components := strings.SplitN(sshURL, ":", 2)
+		userAndDomain := strings.Split(components[0], "@")
+		if len(userAndDomain) != 2 {
+			return "", fmt.Errorf("invalid SSH URL format")
+		}
+		domainAndPort = userAndDomain[1]
+		path = components[1]
+	case 2:
+		// case with a port in the url
+		components := strings.SplitN(sshURL, ":", 3)
+		userAndDomain := strings.Split(components[0], "@")
+		if len(userAndDomain) != 2 {
+			return "", fmt.Errorf("invalid SSH URL format")
+		}
+		domainAndPort = userAndDomain[1]
+		path = components[2]
+	default:
+		return "", fmt.Errorf("invalid SSH URL format")
+	}
+
+	// remove port if it exists
+	domainComponents := strings.SplitN(domainAndPort, ":", 2)
+	domain := domainComponents[0]
+
+	return strings.TrimSuffix(fmt.Sprintf("https://%s/%s", domain, path), "/"), nil
 }
 
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {

@@ -26,10 +26,11 @@ type ResourceData struct {
 }
 
 type TagPropagation struct {
-	To        string             // a human-readable name of the type being propagated to - will not always have a tf type
-	From      *string            // e.g. SERVICE, TASK_DEFINITION
-	Tags      *map[string]string // tags that were propagated from the above resource, if any
-	Attribute string             // the attribute that can be used to configured propagation, e.g. propagate_tags
+	To                    string             // a human-readable name of the type being propagated to - will not always have a tf type
+	From                  *string            // e.g. SERVICE, TASK_DEFINITION
+	Tags                  *map[string]string // tags that were propagated from the above resource, if any
+	Attribute             string             // the attribute that can be used to configured propagation, e.g. propagate_tags
+	HasRequiredAttributes bool               // whether the resource has the required attributes to warrant propagating tags
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {

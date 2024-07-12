@@ -147,18 +147,20 @@ type policy2Resource struct {
 }
 
 type TagPropagation struct {
-	To        string        `json:"to"`
-	From      *string       `json:"from"`
-	Tags      *[]policy2Tag `json:"tags"`
-	Attribute string        `json:"attribute"`
+	To                    string        `json:"to"`
+	From                  *string       `json:"from"`
+	Tags                  *[]policy2Tag `json:"tags"`
+	Attribute             string        `json:"attribute"`
+	HasRequiredAttributes bool          `json:"hasRequiredAttributes"`
 }
 
 type policy2InfracostMetadata struct {
-	Calls     []policy2InfracostMetadataCall `json:"calls"`
-	Checksum  string                         `json:"checksum"`
-	EndLine   int64                          `json:"endLine"`
-	Filename  string                         `json:"filename"`
-	StartLine int64                          `json:"startLine"`
+	Calls          []policy2InfracostMetadataCall `json:"calls"`
+	Checksum       string                         `json:"checksum"`
+	EndLine        int64                          `json:"endLine"`
+	Filename       string                         `json:"filename"`
+	StartLine      int64                          `json:"startLine"`
+	ModuleFilename string                         `json:"moduleFilename,omitempty"`
 }
 
 type policy2InfracostMetadataCall struct {
@@ -247,10 +249,11 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	var tagPropagation *TagPropagation
 	if rd.TagPropagation != nil {
 		tagPropagation = &TagPropagation{
-			To:        rd.TagPropagation.To,
-			From:      rd.TagPropagation.From,
-			Tags:      propagatedTagsPtr,
-			Attribute: rd.TagPropagation.Attribute,
+			To:                    rd.TagPropagation.To,
+			From:                  rd.TagPropagation.From,
+			Tags:                  propagatedTagsPtr,
+			Attribute:             rd.TagPropagation.Attribute,
+			HasRequiredAttributes: rd.TagPropagation.HasRequiredAttributes,
 		}
 	}
 
@@ -263,11 +266,12 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		Values:         valuesJSON,
 		References:     references,
 		Metadata: policy2InfracostMetadata{
-			Calls:     mdCalls,
-			Checksum:  checksum,
-			EndLine:   rd.Metadata["endLine"].Int(),
-			Filename:  rd.Metadata["filename"].String(),
-			StartLine: rd.Metadata["startLine"].Int(),
+			Calls:          mdCalls,
+			Checksum:       checksum,
+			EndLine:        rd.Metadata["endLine"].Int(),
+			Filename:       rd.Metadata["filename"].String(),
+			StartLine:      rd.Metadata["startLine"].Int(),
+			ModuleFilename: rd.Metadata["moduleFilename"].String(),
 		},
 		Region: rd.Region,
 	}
