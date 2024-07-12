@@ -78,7 +78,7 @@ var ExpectedPropagations = map[string]TagPropagationConfig{
 		Attribute: "target_parameters.0.ecs_task_parameters.0.propagate_tags",
 		To:        "task",
 		RefMap: map[string]string{
-			"TASK_DEFINITION": "\"target_parameters.0.ecs_task_parameters.0.task_definition_arn",
+			"TASK_DEFINITION": "target_parameters.0.ecs_task_parameters.0.task_definition_arn",
 		},
 	},
 }
