@@ -191,7 +191,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 				Context:  1,
 			})
 
-			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
+			t.Errorf(fmt.Sprintf("\nOutput does not match golden file (%s): \n\n%s\n", goldenFilePath, diff))
 		}
 	}
 

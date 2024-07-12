@@ -412,6 +412,10 @@
           },
           "type": "object"
         },
+        "tagPropagation": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/TagPropagation"
+        },
         "metadata": {
           "patternProperties": {
             ".*": {
@@ -553,6 +557,10 @@
           },
           "type": "object"
         },
+        "tagPropagation": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/TagPropagation"
+        },
         "metadata": {
           "patternProperties": {
             ".*": {
@@ -637,6 +645,33 @@
             }
           },
           "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TagPropagation": {
+      "required": [
+        "to",
+        "attribute"
+      ],
+      "properties": {
+        "to": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "tags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "attribute": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

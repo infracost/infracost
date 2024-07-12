@@ -799,7 +799,28 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		}
 
 		resourceData.Tags = tags
+		resourceData.TagPropagation = p.getTagPropagationInfo(resourceData)
 	}
+}
+
+func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.TagPropagation {
+	if expected, ok := aws.ExpectedPropagations[resource.Type]; ok {
+		propagateTags := resource.GetStringOrDefault(expected.Attribute, "")
+		propagation := &schema.TagPropagation{
+			From:      &propagateTags,
+			To:        expected.To,
+			Attribute: expected.Attribute,
+		}
+		if expected.RefMap != nil {
+			if attr, ok := expected.RefMap[propagateTags]; ok {
+				if ref, ok := resource.ReferencesMap[attr]; ok && len(ref) == 1 {
+					propagation.Tags = ref[0].Tags
+				}
+			}
+		}
+		return propagation
+	}
+	return nil
 }
 
 func isInfracostResource(res *schema.ResourceData) bool {

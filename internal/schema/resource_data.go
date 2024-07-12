@@ -9,19 +9,27 @@ import (
 )
 
 type ResourceData struct {
-	Type          string
-	ProviderName  string
-	Address       string
-	Tags          *map[string]string
-	RawValues     gjson.Result
-	ReferencesMap map[string][]*ResourceData
-	CFResource    cloudformation.Resource
-	UsageData     *UsageData
-	Metadata      map[string]gjson.Result
+	Type           string
+	ProviderName   string
+	Address        string
+	Tags           *map[string]string
+	TagPropagation *TagPropagation
+	RawValues      gjson.Result
+	ReferencesMap  map[string][]*ResourceData
+	CFResource     cloudformation.Resource
+	UsageData      *UsageData
+	Metadata       map[string]gjson.Result
 	// Region is the region of the resource. When building a resource callers should
 	// use this value instead of the deprecated d.Get("region").String() or
 	// lookupRegion method.
 	Region string
+}
+
+type TagPropagation struct {
+	To        string             // a human-readable name of the type being propagated to - will not always have a tf type
+	From      *string            // e.g. SERVICE, TASK_DEFINITION
+	Tags      *map[string]string // tags that were propagated from the above resource, if any
+	Attribute string             // the attribute that can be used to configured propagation, e.g. propagate_tags
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {

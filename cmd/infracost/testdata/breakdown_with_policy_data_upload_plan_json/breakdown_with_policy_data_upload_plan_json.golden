@@ -113,6 +113,11 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "tagPropagation": {
+              "to": "replica",
+              "from": "",
+              "attribute": "replica.0.propagate_tags"
+            },
             "metadata": {
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
             },
