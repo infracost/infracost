@@ -147,10 +147,11 @@ type policy2Resource struct {
 }
 
 type TagPropagation struct {
-	To        string        `json:"to"`
-	From      *string       `json:"from"`
-	Tags      *[]policy2Tag `json:"tags"`
-	Attribute string        `json:"attribute"`
+	To                    string        `json:"to"`
+	From                  *string       `json:"from"`
+	Tags                  *[]policy2Tag `json:"tags"`
+	Attribute             string        `json:"attribute"`
+	HasRequiredAttributes bool          `json:"hasRequiredAttributes"`
 }
 
 type policy2InfracostMetadata struct {
@@ -247,10 +248,11 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	var tagPropagation *TagPropagation
 	if rd.TagPropagation != nil {
 		tagPropagation = &TagPropagation{
-			To:        rd.TagPropagation.To,
-			From:      rd.TagPropagation.From,
-			Tags:      propagatedTagsPtr,
-			Attribute: rd.TagPropagation.Attribute,
+			To:                    rd.TagPropagation.To,
+			From:                  rd.TagPropagation.From,
+			Tags:                  propagatedTagsPtr,
+			Attribute:             rd.TagPropagation.Attribute,
+			HasRequiredAttributes: rd.TagPropagation.HasRequiredAttributes,
 		}
 	}
 
