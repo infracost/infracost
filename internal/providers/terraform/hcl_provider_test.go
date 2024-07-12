@@ -75,6 +75,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 	tests := []struct {
 		name     string
 		attrs    map[string]map[string]string
+		chdir    bool
 		warnings []int
 	}{
 		{
@@ -182,6 +183,10 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 		{
 			name: "adds_source_url_from_remote_module",
 		},
+		{
+			name:  "adds_source_url_from_remote_module_chdir",
+			chdir: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -193,7 +198,16 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
 			moduleParser := modules.NewSharedHCLParser()
 			pl := hcl.NewProjectLocator(logger, nil)
-			mods := pl.FindRootModules(testPath)
+			startingPath := testPath
+			initialPath, err := os.Getwd()
+			require.NoError(t, err)
+			if tt.chdir {
+				err := os.Chdir(testPath)
+				require.NoError(t, err)
+				startingPath = "."
+			}
+
+			mods := pl.FindRootModules(startingPath)
 			options := []hcl.Option{hcl.OptionWithBlockBuilder(
 				hcl.BlockBuilder{
 					MockFunc: func(a *hcl.Attribute) cty.Value {
@@ -212,7 +226,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			parser := hcl.NewParser(
 				mods[0],
 				hcl.CreateEnvFileMatcher([]string{}, nil),
-				modules.NewModuleLoader(testPath, moduleParser, &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
+				modules.NewModuleLoader(startingPath, moduleParser, &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
 				logger,
 				options...,
 			)
@@ -225,6 +239,10 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			root := p.LoadPlanJSON()
 
 			require.NoError(t, root.Error)
+			if tt.chdir {
+				err = os.Chdir(initialPath)
+				require.NoError(t, err)
+			}
 
 			// uncomment and run `make test` to update the expectations
 			// var prettyJSON bytes.Buffer
