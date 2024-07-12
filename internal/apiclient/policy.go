@@ -233,9 +233,9 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	for _, c := range rd.Metadata["calls"].Array() {
 		mdCalls = append(mdCalls, policy2InfracostMetadataCall{
 			BlockName: c.Get("blockName").String(),
-			EndLine:   rd.Metadata["endLine"].Int(),
-			Filename:  rd.Metadata["filename"].String(),
-			StartLine: rd.Metadata["startLine"].Int(),
+			EndLine:   c.Get("endLine").Int(),
+			Filename:  c.Get("filename").String(),
+			StartLine: c.Get("startLine").Int(),
 		})
 	}
 
