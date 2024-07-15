@@ -54,6 +54,7 @@ type PartialResource struct {
 	Type           string
 	Address        string
 	Tags           *map[string]string
+	DefaultTags    *map[string]string
 	TagPropagation *TagPropagation
 	UsageData      *UsageData
 	Metadata       map[string]gjson.Result
@@ -77,6 +78,7 @@ func NewPartialResource(d *ResourceData, r *Resource, cr CoreResource, cloudReso
 		Type:             d.Type,
 		Address:          d.Address,
 		Tags:             d.Tags,
+		DefaultTags:      d.DefaultTags,
 		TagPropagation:   d.TagPropagation,
 		UsageData:        d.UsageData,
 		Metadata:         d.Metadata,

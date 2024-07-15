@@ -4,6 +4,7 @@ import (
 	"bytes"
 	stdJson "encoding/json"
 	"fmt"
+	"github.com/hashicorp/go-version"
 	"regexp"
 	"sort"
 	"strconv"
@@ -784,6 +785,7 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 	for _, resourceData := range data {
 		providerPrefix := getProviderPrefix(resourceData.Type)
 		var tags *map[string]string
+		var defaultTags *map[string]string
 		switch providerPrefix {
 		case "aws":
 			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
@@ -799,8 +801,28 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		}
 
 		resourceData.Tags = tags
+		resourceData.DefaultTags = defaultTags
+		resourceData.SupportForDefaultTags = p.areDefaultTagsSupported(providerPrefix)
 		resourceData.TagPropagation = p.getTagPropagationInfo(resourceData)
 	}
+}
+
+func (p *Parser) areDefaultTagsSupported(providerPrefix string) bool {
+	// we only support default tags for aws atm
+	if providerPrefix != "aws" {
+		return false
+	}
+	// default tags were added in aws provider v3.38.0 - if the constraints allow a version before this,
+	// we can't rely on default tag support
+	// if there are no constraints, assume we're using a recent provider version and defaults are supported
+	if len(p.providerConstraints.AWS) == 0 {
+		return true
+	}
+	v, err := version.NewVersion("v3.37.99")
+	if err != nil {
+		return false
+	}
+	return !p.providerConstraints.AWS.Check(v)
 }
 
 func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.TagPropagation {

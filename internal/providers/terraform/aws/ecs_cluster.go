@@ -27,6 +27,7 @@ func NewECSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		Name:         d.Address,
 		ResourceType: d.Type,
 		Tags:         d.Tags,
+		DefaultTags:  d.DefaultTags,
 		IsSkipped:    true,
 		NoPrice:      true,
 		SkipMessage:  "Free resource.",

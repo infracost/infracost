@@ -17,6 +17,7 @@ func NewECSClusterCapacityProviders(d *schema.ResourceData, u *schema.UsageData)
 		Name:         d.Address,
 		ResourceType: d.Type,
 		Tags:         d.Tags,
+		DefaultTags:  d.DefaultTags,
 		IsSkipped:    true,
 		NoPrice:      true,
 		SkipMessage:  "Free resource.",

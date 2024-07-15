@@ -31,6 +31,7 @@ type Resource struct {
 	SkipMessage       string
 	ResourceType      string
 	Tags              *map[string]string
+	DefaultTags       *map[string]string
 	TagPropagation    *TagPropagation
 	UsageSchema       []*UsageItem
 	EstimateUsage     EstimateFunc
