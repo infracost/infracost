@@ -115,6 +115,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLambdaProvisionedConcurrencyConfigRegistryItem(),
 	getKinesisStreamRegistryItem(),
 	getCloudHSMv2HSMRegistryItem(),
+	getSchedulerScheduleRegistryItem(),
+	getPipesPipeRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

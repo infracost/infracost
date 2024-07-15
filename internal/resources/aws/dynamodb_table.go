@@ -23,7 +23,8 @@ type DynamoDBTable struct {
 	WriteCapacity *int64
 	ReadCapacity  *int64
 
-	AppAutoscalingTarget []*AppAutoscalingTarget
+	AppAutoscalingTarget       []*AppAutoscalingTarget
+	PointInTimeRecoveryEnabled bool
 
 	// "usage" args
 	MonthlyWriteRequestUnits       *int64 `infracost_usage:"monthly_write_request_units"`
@@ -101,7 +102,10 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	// Data storage
 	costComponents = append(costComponents, a.dataStorageCostComponent(a.Region, a.StorageGB))
 	// Continuous backups (PITR)
-	costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
+	if a.PointInTimeRecoveryEnabled {
+		costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
+	}
+
 	// OnDemand backups
 	costComponents = append(costComponents, a.onDemandBackupCostComponent(a.Region, a.OnDemandBackupStorageGB))
 	// Restoring tables

@@ -52,8 +52,8 @@ Workspace: yellow
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ testdata-hclmulti_workspace-blue                   ┃ $743          ┃ $0.00       ┃ $743       ┃
-┃ testdata-hclmulti_workspace-yellow                 ┃ $743          ┃ $0.00       ┃ $743       ┃
+┃ testdata-hclmulti_workspace-blue                   ┃          $743 ┃           - ┃       $743 ┃
+┃ testdata-hclmulti_workspace-yellow                 ┃          $743 ┃           - ┃       $743 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

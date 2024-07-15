@@ -62,6 +62,6 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata                       ┃ $1,361        ┃ -           ┃ $1,361     ┃
-┃ infracost/infracost/cmd/infraco...tdata/azure_firewall_plan.json ┃ $4,019        ┃ -           ┃ $4,019     ┃
+┃ infracost/infracost/cmd/infracost/testdata                       ┃        $1,361 ┃           - ┃     $1,361 ┃
+┃ infracost/infracost/cmd/infraco...tdata/azure_firewall_plan.json ┃        $4,019 ┃           - ┃     $4,019 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

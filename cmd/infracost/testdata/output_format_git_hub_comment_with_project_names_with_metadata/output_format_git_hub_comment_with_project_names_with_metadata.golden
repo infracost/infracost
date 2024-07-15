@@ -1,6 +1,6 @@
 
 <h4>💰 Infracost report</h4>
-<h4>Monthly cost will decrease by $2,241 📉</h4>
+<h4>Monthly estimate decreased by $2,241 📉</h4>
 <table>
   <thead>
     <td>Changed project</td>
@@ -73,7 +73,7 @@
 *Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
 
-<summary>Cost details </summary>
+<summary>Estimate details </summary>
 
 ```
 Key: * usage cost, ~ changed, + added, - removed
@@ -171,17 +171,17 @@ Key: * usage cost, ~ changed, + added, - removed
 12 cloud resources were detected:
 ∙ 12 were estimated
 
-Infracost estimate: Monthly cost will decrease by $2,241 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ my terragrunt project                              ┃        +$0.88 ┃          - ┃ +$0.88 (+2%) ┃
-┃ my terragrunt project                              ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my terragrunt project                              ┃        +$0.88 ┃          - ┃ +$0.88 (+2%) ┃
-┃ my terragrunt project                              ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my tf project                                      ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┃ my tf project                                      ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate decreased by $2,241 ↓
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ my terragrunt project                              ┃        +$0.88 ┃           - ┃ +$0.88 (+2%) ┃
+┃ my terragrunt project                              ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt project                              ┃        +$0.88 ┃           - ┃ +$0.88 (+2%) ┃
+┃ my terragrunt project                              ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my tf project                                      ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my tf project                                      ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 

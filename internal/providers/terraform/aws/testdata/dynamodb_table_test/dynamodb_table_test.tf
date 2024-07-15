@@ -31,6 +31,9 @@ resource "aws_dynamodb_table" "my_dynamodb_table_usage" {
   replica {
     region_name = "us-west-1"
   }
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "aws_dynamodb_table" "my_dynamodb_table" {
@@ -58,6 +61,9 @@ resource "aws_dynamodb_table" "my_dynamodb_table" {
   replica {
     region_name = "us-west-1"
   }
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "aws_dynamodb_table" "my_dynamodb_table_with_no_billing_mode" {
@@ -84,6 +90,10 @@ resource "aws_dynamodb_table" "my_dynamodb_table_with_no_billing_mode" {
   replica {
     region_name = "us-west-1"
   }
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "aws_dynamodb_table" "autoscale_dynamodb_table" {
@@ -102,6 +112,10 @@ resource "aws_dynamodb_table" "autoscale_dynamodb_table" {
   attribute {
     name = "GameTitle"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
 
@@ -138,6 +152,10 @@ resource "aws_dynamodb_table" "autoscale_dynamodb_table_usage" {
     name = "GameTitle"
     type = "S"
   }
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "aws_appautoscaling_target" "autoscale_dynamodb_table_write_target_usage" {
@@ -172,6 +190,10 @@ resource "aws_dynamodb_table" "autoscale_dynamodb_table_literal_ref" {
   attribute {
     name = "GameTitle"
     type = "S"
+  }
+
+  point_in_time_recovery {
+    enabled = true
   }
 }
 

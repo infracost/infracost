@@ -37,13 +37,63 @@ type TagParsingConfig struct {
 	PropagateDefaultsToVolumeTags bool
 }
 
+type TagPropagationConfig struct {
+	Attribute string
+	To        string
+	RefMap    map[string]string
+	Requires  []string
+}
+
+// ExpectedPropagations describe known tag propagation configurations
+var ExpectedPropagations = map[string]TagPropagationConfig{
+	"aws_ecs_service": {
+		Attribute: "propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "task_definition",
+			"SERVICE":         "", // empty string means self-reference
+		},
+	},
+	"aws_scheduler_schedule": {
+		Attribute: "ecs_parameters.0.propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "ecs_parameters.0.task_definition_arn",
+		},
+	},
+	"aws_batch_job_definition": {
+		Attribute: "propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"true": "", // empty string means self-reference
+		},
+	},
+	"aws_dynamodb_table": {
+		Attribute: "replica.0.propagate_tags",
+		To:        "replica",
+		RefMap: map[string]string{
+			"true": "", // empty string means self-reference
+		},
+		Requires: []string{"replica.0.region_name"},
+	},
+	"aws_pipes_pipe": {
+		Attribute: "target_parameters.0.ecs_task_parameters.0.propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "target_parameters.0.ecs_task_parameters.0.task_definition_arn",
+		},
+	},
+}
+
 func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config TagParsingConfig) *map[string]string {
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
+	_, supportsTagPropagation := ExpectedPropagations[r.Type]
+
 	rTags := r.Get("tags").Map()
 	rTagsAll := r.Get("tags_all").Map()
-	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
+	if !supportsTags && !supportsTagBlock && !supportsTagPropagation && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil
 	}
 

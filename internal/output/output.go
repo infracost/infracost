@@ -105,6 +105,18 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 	resources := make([]*schema.Resource, len(outResources))
 
 	for i, resource := range outResources {
+
+		var tagProp *schema.TagPropagation
+		if resource.TagPropagation != nil {
+			tagProp = &schema.TagPropagation{
+				To:                    resource.TagPropagation.To,
+				From:                  resource.TagPropagation.From,
+				Tags:                  resource.TagPropagation.Tags,
+				Attribute:             resource.TagPropagation.Attribute,
+				HasRequiredAttributes: resource.TagPropagation.HasRequiredAttributes,
+			}
+		}
+
 		resources[i] = &schema.Resource{
 			Name:             resource.Name,
 			IsSkipped:        skip,
@@ -113,6 +125,7 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 			ActualCosts:      convertActualCosts(resource.ActualCosts),
 			SubResources:     convertOutputResources(resource.SubResources, skip),
 			Tags:             resource.Tags,
+			TagPropagation:   tagProp,
 			HourlyCost:       resource.HourlyCost,
 			MonthlyCost:      resource.MonthlyCost,
 			MonthlyUsageCost: resource.MonthlyUsageCost,
@@ -293,6 +306,7 @@ type Resource struct {
 	Name             string                 `json:"name"`
 	ResourceType     string                 `json:"resourceType,omitempty"`
 	Tags             *map[string]string     `json:"tags,omitempty"`
+	TagPropagation   *TagPropagation        `json:"tagPropagation,omitempty"`
 	Metadata         map[string]interface{} `json:"metadata"`
 	HourlyCost       *decimal.Decimal       `json:"hourlyCost,omitempty"`
 	MonthlyCost      *decimal.Decimal       `json:"monthlyCost,omitempty"`
@@ -302,6 +316,13 @@ type Resource struct {
 	SubResources     []Resource             `json:"subresources,omitempty"`
 }
 
+type TagPropagation struct {
+	To                    string             `json:"to"`
+	From                  *string            `json:"from,omitempty"`
+	Tags                  *map[string]string `json:"tags,omitempty"`
+	Attribute             string             `json:"attribute"`
+	HasRequiredAttributes bool               `json:"hasRequiredAttributes,omitempty"`
+}
 type Summary struct {
 	TotalResources            *int `json:"totalResources,omitempty"`
 	TotalDetectedResources    *int `json:"totalDetectedResources,omitempty"`
@@ -517,11 +538,23 @@ func newResource(r *schema.Resource, comps []CostComponent, actualCosts []Actual
 		metadata[k] = v.Value()
 	}
 
+	var tagProp *TagPropagation
+	if r.TagPropagation != nil {
+		tagProp = &TagPropagation{
+			To:                    r.TagPropagation.To,
+			From:                  r.TagPropagation.From,
+			Tags:                  r.TagPropagation.Tags,
+			Attribute:             r.TagPropagation.Attribute,
+			HasRequiredAttributes: r.TagPropagation.HasRequiredAttributes,
+		}
+	}
+
 	return Resource{
 		Name:             r.Name,
 		ResourceType:     r.ResourceType,
 		Metadata:         metadata,
 		Tags:             r.Tags,
+		TagPropagation:   tagProp,
 		HourlyCost:       r.HourlyCost,
 		MonthlyCost:      r.MonthlyCost,
 		MonthlyUsageCost: r.MonthlyUsageCost,
@@ -1055,4 +1088,8 @@ func addIntPtrs(i1 *int, i2 *int) *int {
 
 	res := val1 + val2
 	return &res
+}
+
+func usageCostsEnabled(out Root) bool {
+	return out.Metadata.UsageApiEnabled || out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile
 }

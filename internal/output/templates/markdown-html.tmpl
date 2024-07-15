@@ -59,7 +59,7 @@ in project `{{ index .ProjectNames 0 }}`
       <td>{{ truncateMiddle . 64 "..." }}</td>
   {{- end }}
       <td align="right">{{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }}</td>
-      <td align="right">{{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }}</td>
+      <td align="right">{{ formatUsageCostChangeWithoutPercent .PastUsageCost .UsageCost }}</td>
       <td align="right">{{ formatCostChange .PastCost .Cost }}</td>
       <td align="right">{{ formatCost .Cost }}</td>
     </tr>
@@ -121,7 +121,7 @@ in project `{{ index .ProjectNames 0 }}`
 {{- if displayOutput  }}
 <details>
 
-<summary>Cost details {{ .CostDetailsMsg }}</summary>
+<summary>Estimate details {{ .CostDetailsMsg }}</summary>
 
 ```
 {{ .DiffOutput }}
@@ -146,12 +146,8 @@ in project `{{ index .ProjectNames 0 }}`
   {{- end }}
 {{- end}}
 
-{{- if .MarkdownOptions.Additional }}
-{{ .MarkdownOptions.Additional }}
-{{- end }}
 {{- if displaySub  }}
 <sub>
-{{- if .Root.CloudURL }}View report in <a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">Infracost Cloud</a>. {{ end }}
 {{- if .MarkdownOptions.WillUpdate }}This comment will be updated when code changes.{{- end}}
 {{- if .MarkdownOptions.WillReplace }}This comment will be replaced when code changes.{{- end}}
 </sub>
