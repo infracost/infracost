@@ -33,7 +33,7 @@ import (
 var (
 	json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-	moduleCacheRegex = regexp.MustCompile(`.+\.infracost/terraform_modules/[^/]+/(.+)`)
+	moduleCacheRegex = regexp.MustCompile(`(?:.+)?\.infracost/terraform_modules/[^/]+/(.+)`)
 )
 
 type HCLProvider struct {
