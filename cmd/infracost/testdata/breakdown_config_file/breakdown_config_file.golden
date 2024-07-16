@@ -17,7 +17,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
       "displayName": "testdata-breakdown_config_file-dev",
       "metadata": {
-        "path": "/Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
+        "path": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
         "type": "terraform_dir",
         "configSha": "1234",
         "terraformModulePath": "testdata/breakdown_config_file/dev",
