@@ -62,6 +62,8 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"startsWith": p.startsWith,
 		"endsWith":   p.endsWith,
 		"contains":   p.contains,
+		"trimPrefix": p.trimPrefix,
+		"trimSuffix": p.trimSuffix,
 		"pathExists": p.pathExists,
 		"matchPaths": p.matchPaths,
 		"list":       p.list,
@@ -150,6 +152,16 @@ func (p *Parser) endsWith(s, suffix string) bool {
 // contains reports whether substr is within s.
 func (p *Parser) contains(s, substr string) bool {
 	return strings.Contains(s, substr)
+}
+
+// trimPrefix returns s without the provided prefix string.
+func (p *Parser) trimPrefix(s, prefix string) string {
+	return strings.TrimPrefix(s, prefix)
+}
+
+// trimSuffix returns s without the provided suffix string.
+func (p *Parser) trimSuffix(s, suffix string) string {
+	return strings.TrimSuffix(s, suffix)
 }
 
 // pathExists reports whether path is a subpath within base.
