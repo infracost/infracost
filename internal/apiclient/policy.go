@@ -273,15 +273,14 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	}
 
 	return policy2Resource{
-		ResourceType:          rd.Type,
-		ProviderName:          rd.ProviderName,
-		Address:               rd.Address,
-		Tags:                  tagsPtr,
-		DefaultTags:           defaultTagsPtr,
-		TagPropagation:        tagPropagation,
-		SupportForDefaultTags: rd.SupportForDefaultTags,
-		Values:                valuesJSON,
-		References:            references,
+		ResourceType:   rd.Type,
+		ProviderName:   rd.ProviderName,
+		Address:        rd.Address,
+		Tags:           tagsPtr,
+		DefaultTags:    defaultTagsPtr,
+		TagPropagation: tagPropagation,
+		Values:         valuesJSON,
+		References:     references,
 		Metadata: policy2InfracostMetadata{
 			Calls:          mdCalls,
 			Checksum:       checksum,

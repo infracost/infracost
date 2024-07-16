@@ -2,9 +2,11 @@ package hcl
 
 import (
 	"encoding/json"
-
+	"fmt"
 	"github.com/hashicorp/go-version"
 	"github.com/zclconf/go-cty/cty/gocty"
+	"regexp"
+	"strings"
 )
 
 var (
@@ -12,7 +14,7 @@ var (
 	// provider that supports propagating default tags to volume tags. See
 	// https://github.com/hashicorp/terraform-provider-aws/issues/19890 for more
 	// information.
-	AWSVersionConstraintVolumeTags = version.Must(version.NewVersion("5.39.0"))
+	AWSVersionConstraintVolumeTags = "5.39.0"
 )
 
 // ProviderConstraints represents the constraints for a providers within a
@@ -20,6 +22,65 @@ var (
 // a given run.
 type ProviderConstraints struct {
 	AWS version.Constraints
+}
+
+var constraintRegexp *regexp.Regexp
+
+func init() {
+	var ops []string
+	for _, k := range []string{
+		"",
+		"=",
+		"!=",
+		">",
+		"<",
+		">=",
+		"<=",
+		"~>",
+	} {
+		ops = append(ops, regexp.QuoteMeta(k))
+	}
+	constraintRegexp = regexp.MustCompile(fmt.Sprintf(
+		`^\s*(%s)\s*(%s)\s*$`,
+		strings.Join(ops, "|"),
+		version.VersionRegexpRaw))
+}
+
+// ConstraintsEnforceAtLeastVersion checks if the given constraints enforce at least the given minVersion.
+// If the constraints are empty, it returns the defaultForNoConstraints.
+func ConstraintsEnforceAtLeastVersion(constraints version.Constraints, minVersion string, defaultForNoConstraints bool) bool {
+
+	if len(constraints) == 0 {
+		return defaultForNoConstraints
+	}
+
+	requiredMinVersion, err := version.NewVersion(minVersion)
+	if err != nil {
+		return false
+	}
+
+	for _, c := range constraints {
+		matches := constraintRegexp.FindStringSubmatch(c.String())
+		if len(matches) != 3 {
+			continue
+		}
+		check, err := version.NewVersion(matches[2])
+		if err != nil {
+			continue
+		}
+		switch matches[1] {
+		case ">=", ">", "~>":
+			if check.GreaterThanOrEqual(requiredMinVersion) {
+				return true
+			}
+		case "", "=":
+			if check.Equal(requiredMinVersion) {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // UnmarshalJSON parses the JSON representation of the ProviderConstraints and
