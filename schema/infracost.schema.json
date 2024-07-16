@@ -412,9 +412,20 @@
           },
           "type": "object"
         },
+        "defaultTags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "tagPropagation": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/TagPropagation"
+        },
+        "providerSupportsDefaultTags": {
+          "type": "boolean"
         },
         "metadata": {
           "patternProperties": {
@@ -557,9 +568,20 @@
           },
           "type": "object"
         },
+        "defaultTags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
         "tagPropagation": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/TagPropagation"
+        },
+        "providerSupportsDefaultTags": {
+          "type": "boolean"
         },
         "metadata": {
           "patternProperties": {

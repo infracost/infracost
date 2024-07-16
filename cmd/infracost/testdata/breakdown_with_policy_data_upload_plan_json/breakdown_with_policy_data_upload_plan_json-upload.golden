@@ -42,6 +42,17 @@ storePolicyResources:
               "value": "bat"
             }
           ],
+          "defaultTags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "supportForDefaultTags": false,
           "values": {
             "ebs_block_device": [
               {

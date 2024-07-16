@@ -37,6 +37,7 @@
             "metadata": {},
             "monthlyCost": "742.64",
             "name": "aws_instance.web_app",
+            "providerSupportsDefaultTags": true,
             "resourceType": "aws_instance",
             "subresources": [
               {
@@ -105,6 +106,7 @@
             "metadata": {},
             "monthlyCost": "742.64",
             "name": "aws_instance.zero_cost_instance",
+            "providerSupportsDefaultTags": true,
             "resourceType": "aws_instance",
             "subresources": [
               {
@@ -193,6 +195,7 @@
             ],
             "metadata": {},
             "name": "aws_lambda_function.hello_world",
+            "providerSupportsDefaultTags": true,
             "resourceType": "aws_lambda_function",
             "tags": {}
           },
@@ -233,12 +236,14 @@
             ],
             "metadata": {},
             "name": "aws_lambda_function.zero_cost_lambda",
+            "providerSupportsDefaultTags": true,
             "resourceType": "aws_lambda_function",
             "tags": {}
           },
           {
             "metadata": {},
             "name": "aws_s3_bucket.usage",
+            "providerSupportsDefaultTags": true,
             "resourceType": "aws_s3_bucket",
             "subresources": [
               {

@@ -38,8 +38,6 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "foo": "bar",
               "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
@@ -54,7 +52,6 @@
                 }
               ],
               "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 98,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 76
@@ -126,8 +123,6 @@
             "name": "aws_instance.web_app_block_tags",
             "resourceType": "aws_instance",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "ebs_block_device[0].foo": "ebd",
               "root_block_device.foo": "rbd"
             },
@@ -141,7 +136,6 @@
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 212,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 191
@@ -307,8 +301,6 @@
             "name": "aws_instance.launch_instance",
             "resourceType": "aws_instance",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "bat": "ball",
               "fizz": "buzz",
               "volume_tags.flip": "flop"
@@ -323,7 +315,6 @@
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 112,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 100
@@ -501,10 +492,7 @@
           {
             "name": "aws_sqs_queue.sqs_noTags",
             "resourceType": "aws_sqs_queue",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
+            "tags": {},
             "metadata": {
               "calls": [
                 {
@@ -515,7 +503,6 @@
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 43,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 41
@@ -538,7 +525,6 @@
             "name": "aws_sqs_queue.sqs_withTags",
             "resourceType": "aws_sqs_queue",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
@@ -552,7 +538,6 @@
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 52,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 45
@@ -577,8 +562,6 @@
             "name": "aws_launch_template.example",
             "resourceType": "aws_launch_template",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "tag_specifications.fizz": "buzz",
               "tag_specifications.flip": "flop",
               "tag_specifications.no": "cap"
@@ -593,7 +576,6 @@
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 163,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 114
@@ -610,8 +592,6 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "foo": "bar",
               "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
@@ -626,7 +606,6 @@
                 }
               ],
               "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 98,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 76
@@ -698,8 +677,6 @@
             "name": "aws_instance.web_app_block_tags",
             "resourceType": "aws_instance",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "ebs_block_device[0].foo": "ebd",
               "root_block_device.foo": "rbd"
             },
@@ -713,7 +690,6 @@
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 212,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 191
@@ -879,8 +855,6 @@
             "name": "aws_instance.launch_instance",
             "resourceType": "aws_instance",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "bat": "ball",
               "fizz": "buzz",
               "volume_tags.flip": "flop"
@@ -895,7 +869,6 @@
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 112,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 100
@@ -1073,10 +1046,7 @@
           {
             "name": "aws_sqs_queue.sqs_noTags",
             "resourceType": "aws_sqs_queue",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
+            "tags": {},
             "metadata": {
               "calls": [
                 {
@@ -1087,7 +1057,6 @@
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 43,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 41
@@ -1110,7 +1079,6 @@
             "name": "aws_sqs_queue.sqs_withTags",
             "resourceType": "aws_sqs_queue",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
@@ -1124,7 +1092,6 @@
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 52,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 45
@@ -1149,8 +1116,6 @@
             "name": "aws_launch_template.example",
             "resourceType": "aws_launch_template",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
               "tag_specifications.fizz": "buzz",
               "tag_specifications.flip": "flop",
               "tag_specifications.no": "cap"
@@ -1165,7 +1130,6 @@
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 163,
               "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 114

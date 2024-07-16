@@ -45,6 +45,11 @@
               "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -134,6 +139,11 @@
               "volume_tags.DefaultNotOverride": "defaultnotoverride",
               "volume_tags.DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -219,6 +229,11 @@
               "fizz": "buzz",
               "foo": "bar"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -318,6 +333,11 @@
               "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.flip": "flop"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -422,6 +442,11 @@
             "tags": {
               "foo": "bar"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -440,6 +465,11 @@
           {
             "name": "aws_sns_topic_subscription.sns_topic_noTags",
             "resourceType": "aws_sns_topic_subscription",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -475,6 +505,11 @@
               "DefaultOverride": "sns-def",
               "ResourceTag": "sns-ghi"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -510,6 +545,11 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -547,6 +587,11 @@
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -588,6 +633,11 @@
               "tag_specifications.flip": "flop",
               "tag_specifications.no": "cap"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -622,6 +672,11 @@
               "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -711,6 +766,11 @@
               "volume_tags.DefaultNotOverride": "defaultnotoverride",
               "volume_tags.DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -796,6 +856,11 @@
               "fizz": "buzz",
               "foo": "bar"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -895,6 +960,11 @@
               "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.flip": "flop"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -999,6 +1069,11 @@
             "tags": {
               "foo": "bar"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -1017,6 +1092,11 @@
           {
             "name": "aws_sns_topic_subscription.sns_topic_noTags",
             "resourceType": "aws_sns_topic_subscription",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -1052,6 +1132,11 @@
               "DefaultOverride": "sns-def",
               "ResourceTag": "sns-ghi"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -1087,6 +1172,11 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -1124,6 +1214,11 @@
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -1165,6 +1260,11 @@
               "tag_specifications.flip": "flop",
               "tag_specifications.no": "cap"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {

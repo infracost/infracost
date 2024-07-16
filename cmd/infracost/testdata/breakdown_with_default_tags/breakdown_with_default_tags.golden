@@ -49,6 +49,15 @@
               "SomeDynamicFloat": "1.1",
               "SomeDynamicNumber": "1"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -138,6 +147,15 @@
               "SomeNumber": "1",
               "lambdaTag": "hello"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -206,6 +224,15 @@
               "SomeDynamicFloat": "1.1",
               "SomeDynamicNumber": "1"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
@@ -295,6 +322,15 @@
               "SomeNumber": "1",
               "lambdaTag": "hello"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
