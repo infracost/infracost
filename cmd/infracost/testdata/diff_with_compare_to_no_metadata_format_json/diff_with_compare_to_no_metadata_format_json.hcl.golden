@@ -173,6 +173,7 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "calls": [
                 {
