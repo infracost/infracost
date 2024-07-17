@@ -2,6 +2,9 @@ provider "google" {
   credentials = "{\"type\":\"service_account\"}"
   project     = "my-project"
   region      = "us-central1"
+  default_labels = {
+    DefaultLabel = "this is a default label"
+  }
 }
 
 resource "google_compute_disk" "gcd1" {
