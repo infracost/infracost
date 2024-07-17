@@ -40,6 +40,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -125,6 +126,7 @@
               "attribute": "replica.0.propagate_tags"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -234,6 +236,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -262,6 +265,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -301,6 +305,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -386,6 +391,7 @@
               "attribute": "replica.0.propagate_tags"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -495,6 +501,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
@@ -523,6 +530,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_terragrunt/provider.tf:2",
             "metadata": {
               "calls": [
                 {
