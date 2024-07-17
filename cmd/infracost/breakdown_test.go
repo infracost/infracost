@@ -827,6 +827,7 @@ func TestBreakdownWithPrivateHttpsModulePopulatesErrors(t *testing.T) {
 
 func TestBreakdownWithPrivateTerraformRegistryModulePopulatesErrors(t *testing.T) {
 	t.Setenv("INFRACOST_TERRAFORM_CLOUD_TOKEN", "badkey")
+	_ = os.MkdirAll(fmt.Sprintf(".infracost%cterraform_modules", os.PathSeparator), 0o600)
 
 	GoldenFileCommandTest(
 		t,
