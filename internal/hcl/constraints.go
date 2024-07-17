@@ -21,7 +21,8 @@ var (
 // module. This can be used to check if Infracost functionality is applicable to
 // a given run.
 type ProviderConstraints struct {
-	AWS version.Constraints
+	AWS    version.Constraints
+	Google version.Constraints
 }
 
 var constraintRegexp *regexp.Regexp
@@ -124,6 +125,7 @@ func (p *ProviderConstraints) MarshalJSON() ([]byte, error) {
 // struct from the required_providers configuration. Currently, we only support
 // AWS provider constraints.
 func NewProviderConstraints(blocks Blocks) *ProviderConstraints {
+	var allConstraints ProviderConstraints
 	terraformBlocks := blocks.OfType("terraform")
 	for _, block := range terraformBlocks {
 		req := block.GetChildBlock("required_providers")
@@ -131,40 +133,45 @@ func NewProviderConstraints(blocks Blocks) *ProviderConstraints {
 			continue
 		}
 
-		def := req.Values().AsValueMap()
-		for provider, body := range def {
-			if provider != "aws" {
-				continue
-			}
-
-			if body.IsNull() || !body.IsKnown() {
-				continue
-			}
-
-			var source string
-			var constraintVersion string
-			if body.Type().IsObjectType() {
-				// v0.13 required provider definition
-				constraintDef := body.AsValueMap()
-				_ = gocty.FromCtyValue(constraintDef["source"], &source)
-				if source != "hashicorp/aws" {
-					continue
-				}
-
-				_ = gocty.FromCtyValue(constraintDef["version"], &constraintVersion)
-			} else {
-				// support v0.12 provider definition
-				// https://developer.hashicorp.com/terraform/language/providers/requirements#v0-12-compatible-provider-requirements
-				_ = gocty.FromCtyValue(body, &constraintVersion)
-			}
-
-			// parse the version and return it
-			constraints, err := version.NewConstraint(constraintVersion)
-			if err == nil {
-				return &ProviderConstraints{AWS: constraints}
-			}
+		if constraints, err := readProviderConstraints(req, "aws"); err == nil {
+			allConstraints.AWS = constraints
+		}
+		if constraints, err := readProviderConstraints(req, "google"); err == nil {
+			allConstraints.Google = constraints
 		}
 	}
+	return &allConstraints
+}
 
-	return nil
+func readProviderConstraints(requiredProviderBlock *Block, provider string) (version.Constraints, error) {
+	def := requiredProviderBlock.Values().AsValueMap()
+
+	body, ok := def[provider]
+	if !ok {
+		return nil, fmt.Errorf("provider %s not found", provider)
+	}
+
+	if body.IsNull() || !body.IsKnown() {
+		return nil, fmt.Errorf("provider %s is not a known type", provider)
+	}
+
+	var source string
+	var constraintVersion string
+	if body.Type().IsObjectType() {
+		// v0.13 required provider definition
+		constraintDef := body.AsValueMap()
+		_ = gocty.FromCtyValue(constraintDef["source"], &source)
+		if source != fmt.Sprintf("hashicorp/%s", provider) {
+			return nil, fmt.Errorf("provider %s has an unsupported source: %s", provider, source)
+		}
+
+		_ = gocty.FromCtyValue(constraintDef["version"], &constraintVersion)
+	} else {
+		// support v0.12 provider definition
+		// https://developer.hashicorp.com/terraform/language/providers/requirements#v0-12-compatible-provider-requirements
+		_ = gocty.FromCtyValue(body, &constraintVersion)
+	}
+
+	// parse the version and return it
+	return version.NewConstraint(constraintVersion)
 }

@@ -481,7 +481,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	}
 }
 
-func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
+func parseAWSDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
 	// this only works for aws, we'll need to review when other providers support default tags
 	providerKey := parseProviderKey(resConf)
 	dTagsArray := providerConf.Get(fmt.Sprintf("%s.expressions.default_tags", gjsonEscape(providerKey))).Array()
@@ -496,6 +496,15 @@ func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
 		}
 	}
 
+	return &defaultTags
+}
+
+func parseGoogleDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
+	defaultTags := make(map[string]string)
+	providerKey := parseProviderKey(resConf)
+	for k, v := range providerConf.Get(fmt.Sprintf("%s.expressions.default_labels.constant_value", gjsonEscape(providerKey))).Map() {
+		defaultTags[k] = v.String()
+	}
 	return &defaultTags
 }
 
@@ -788,28 +797,32 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		defaultTagSupport := p.areDefaultTagsSupported(providerPrefix)
 		var tags *map[string]string
 		var defaultTags *map[string]string
+		resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 		switch providerPrefix {
 		case "aws":
-			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 			if defaultTagSupport {
-				defaultTags = parseDefaultTags(providerConf, resConf)
+				defaultTags = parseAWSDefaultTags(providerConf, resConf)
 			}
 			tags = aws.ParseTags(defaultTags, resourceData, awsTagParsingConfig)
 		case "azurerm":
 			tags = azure.ParseTags(resourceData)
 		case "google":
-			tags = google.ParseTags(resourceData)
+			if defaultTagSupport {
+				defaultTags = parseGoogleDefaultTags(providerConf, resConf)
+			}
+			tags = google.ParseTags(resourceData, defaultTags)
 		default:
 			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
 
-		if conf := providerConf.Get(providerPrefix); conf.Exists() {
+		if conf := providerConf.Get(gjsonEscape(parseProviderKey(resConf))); conf.Exists() {
 			if metadata := conf.Get("infracost_metadata"); metadata.Exists() {
 				providerLink := metadata.Get("filename").String()
 				if providerLine := metadata.Get("start_line").Int(); providerLine > 0 {
 					providerLink = fmt.Sprintf("%s:%d", providerLink, providerLine)
 				}
 				resourceData.ProviderLink = providerLink
+
 			}
 		}
 
@@ -821,14 +834,18 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 }
 
 func (p *Parser) areDefaultTagsSupported(providerPrefix string) bool {
-	// we only support default tags for aws atm
-	if providerPrefix != "aws" {
+	switch providerPrefix {
+	case "aws":
+		// default tags were added in aws provider v3.38.0 - if the constraints allow a version before this,
+		// we can't rely on default tag support
+		return hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.AWS, "v3.38.0", true)
+	case "google":
+		// default tags (labels) were added in google provider v5.0.0 - if the constraints allow a version before this,
+		// we can't rely on default tag support
+		return hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.Google, "v5.0.0", true)
+	default:
 		return false
 	}
-
-	// default tags were added in aws provider v3.38.0 - if the constraints allow a version before this,
-	// we can't rely on default tag support
-	return hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.AWS, "v3.38.0", true)
 }
 
 func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.TagPropagation {

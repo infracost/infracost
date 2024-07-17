@@ -36,7 +36,7 @@ func GetResourceRegion(d *schema.ResourceData) string {
 	return ""
 }
 
-func ParseTags(r *schema.ResourceData) *map[string]string {
+func ParseTags(r *schema.ResourceData, defaultLabels *map[string]string) *map[string]string {
 	_, supportsLabels := provider_schemas.GoogleLabelsSupport[r.Type]
 	rLabels := r.Get("labels").Map()
 
@@ -53,6 +53,11 @@ func ParseTags(r *schema.ResourceData) *map[string]string {
 	}
 
 	tags := make(map[string]string)
+	if defaultLabels != nil {
+		for k, v := range *defaultLabels {
+			tags[k] = v
+		}
+	}
 	for k, v := range rLabels {
 		tags[k] = v.String()
 	}
