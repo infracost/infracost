@@ -117,6 +117,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getCloudHSMv2HSMRegistryItem(),
 	getSchedulerScheduleRegistryItem(),
 	getPipesPipeRegistryItem(),
+	getCloudwatchEventTargetRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -372,7 +373,6 @@ var FreeResources = []string{
 	"aws_cloudwatch_event_connection",
 	"aws_cloudwatch_event_permission",
 	"aws_cloudwatch_event_rule",
-	"aws_cloudwatch_event_target",
 
 	// "AWS Global Accelerator Listener
 	"aws_globalaccelerator_listener",
