@@ -56,6 +56,7 @@ type PartialResource struct {
 	Tags                        *map[string]string
 	DefaultTags                 *map[string]string
 	ProviderSupportsDefaultTags bool
+	ProviderLink                string
 	TagPropagation              *TagPropagation
 	UsageData                   *UsageData
 	Metadata                    map[string]gjson.Result
@@ -81,6 +82,7 @@ func NewPartialResource(d *ResourceData, r *Resource, cr CoreResource, cloudReso
 		Tags:                        d.Tags,
 		DefaultTags:                 d.DefaultTags,
 		ProviderSupportsDefaultTags: d.ProviderSupportsDefaultTags,
+		ProviderLink:                d.ProviderLink,
 		TagPropagation:              d.TagPropagation,
 		UsageData:                   d.UsageData,
 		Metadata:                    d.Metadata,
@@ -117,6 +119,7 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 	res.Tags = partial.Tags
 	res.DefaultTags = partial.DefaultTags
 	res.ProviderSupportsDefaultTags = partial.ProviderSupportsDefaultTags
+	res.ProviderLink = partial.ProviderLink
 	res.TagPropagation = partial.TagPropagation
 	res.Metadata = partial.Metadata
 	return res

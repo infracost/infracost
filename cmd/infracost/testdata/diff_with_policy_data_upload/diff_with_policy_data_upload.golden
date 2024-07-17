@@ -136,6 +136,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_with_policy_data_upload/main.tf:1",
             "metadata": {
               "calls": [
                 {

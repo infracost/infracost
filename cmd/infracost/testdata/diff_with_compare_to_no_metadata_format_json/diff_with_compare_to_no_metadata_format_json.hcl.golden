@@ -174,6 +174,7 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_with_compare_to_no_metadata_format_json/main.tf:1",
             "metadata": {
               "calls": [
                 {

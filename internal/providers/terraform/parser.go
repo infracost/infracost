@@ -803,6 +803,16 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
 
+		if conf := providerConf.Get(providerPrefix); conf.Exists() {
+			if metadata := conf.Get("infracost_metadata"); metadata.Exists() {
+				providerLink := metadata.Get("filename").String()
+				if providerLine := metadata.Get("start_line").Int(); providerLine > 0 {
+					providerLink = fmt.Sprintf("%s:%d", providerLink, providerLine)
+				}
+				resourceData.ProviderLink = providerLink
+			}
+		}
+
 		resourceData.Tags = tags
 		resourceData.DefaultTags = defaultTags
 		resourceData.ProviderSupportsDefaultTags = defaultTagSupport

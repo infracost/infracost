@@ -170,6 +170,7 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {

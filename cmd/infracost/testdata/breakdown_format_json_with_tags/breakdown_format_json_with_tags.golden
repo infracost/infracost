@@ -50,6 +50,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -144,6 +145,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -234,6 +236,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -338,6 +341,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -447,6 +451,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -470,6 +475,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -510,6 +516,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -550,6 +557,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -592,6 +600,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -638,6 +647,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -677,6 +687,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -771,6 +782,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -861,6 +873,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -965,6 +978,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1074,6 +1088,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1097,6 +1112,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1137,6 +1153,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1177,6 +1194,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1219,6 +1237,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1265,6 +1284,7 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_format_json_with_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {

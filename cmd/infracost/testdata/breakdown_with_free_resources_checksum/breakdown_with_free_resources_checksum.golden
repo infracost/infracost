@@ -35,6 +35,7 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -119,6 +120,7 @@
             "resourceType": "aws_codepipeline",
             "tags": {},
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -146,6 +148,7 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -230,6 +233,7 @@
             "resourceType": "aws_codepipeline",
             "tags": {},
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {

@@ -427,6 +427,9 @@
         "providerSupportsDefaultTags": {
           "type": "boolean"
         },
+        "providerLink": {
+          "type": "string"
+        },
         "metadata": {
           "patternProperties": {
             ".*": {
@@ -582,6 +585,9 @@
         },
         "providerSupportsDefaultTags": {
           "type": "boolean"
+        },
+        "providerLink": {
+          "type": "string"
         },
         "metadata": {
           "patternProperties": {

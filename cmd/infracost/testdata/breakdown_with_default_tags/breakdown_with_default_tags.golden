@@ -58,6 +58,7 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -156,6 +157,7 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -233,6 +235,7 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -331,6 +334,7 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {

@@ -15,6 +15,7 @@ type ResourceData struct {
 	Tags                        *map[string]string
 	DefaultTags                 *map[string]string
 	ProviderSupportsDefaultTags bool
+	ProviderLink                string
 	TagPropagation              *TagPropagation
 	RawValues                   gjson.Result
 	ReferencesMap               map[string][]*ResourceData

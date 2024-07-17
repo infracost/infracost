@@ -34,6 +34,7 @@ type Resource struct {
 	DefaultTags                 *map[string]string
 	TagPropagation              *TagPropagation
 	ProviderSupportsDefaultTags bool
+	ProviderLink                string
 	UsageSchema                 []*UsageItem
 	EstimateUsage               EstimateFunc
 	EstimationSummary           map[string]bool

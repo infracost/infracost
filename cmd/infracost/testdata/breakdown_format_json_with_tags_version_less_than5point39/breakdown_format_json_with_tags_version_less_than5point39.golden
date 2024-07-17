@@ -42,6 +42,7 @@
               "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -126,6 +127,7 @@
               "ebs_block_device[0].foo": "ebd",
               "root_block_device.foo": "rbd"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -210,6 +212,7 @@
               "fizz": "buzz",
               "foo": "bar"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -305,6 +308,7 @@
               "fizz": "buzz",
               "volume_tags.flip": "flop"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -408,6 +412,7 @@
             "tags": {
               "foo": "bar"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -426,6 +431,7 @@
           {
             "name": "aws_sns_topic_subscription.sns_topic_noTags",
             "resourceType": "aws_sns_topic_subscription",
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -461,6 +467,7 @@
               "DefaultOverride": "sns-def",
               "ResourceTag": "sns-ghi"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -493,6 +500,7 @@
             "name": "aws_sqs_queue.sqs_noTags",
             "resourceType": "aws_sqs_queue",
             "tags": {},
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -528,6 +536,7 @@
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -566,6 +575,7 @@
               "tag_specifications.flip": "flop",
               "tag_specifications.no": "cap"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -596,6 +606,7 @@
               "volume_tags.DefaultOverride": "volume_tag_overwritten",
               "volume_tags.baz": "bat"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -680,6 +691,7 @@
               "ebs_block_device[0].foo": "ebd",
               "root_block_device.foo": "rbd"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -764,6 +776,7 @@
               "fizz": "buzz",
               "foo": "bar"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -859,6 +872,7 @@
               "fizz": "buzz",
               "volume_tags.flip": "flop"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -962,6 +976,7 @@
             "tags": {
               "foo": "bar"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -980,6 +995,7 @@
           {
             "name": "aws_sns_topic_subscription.sns_topic_noTags",
             "resourceType": "aws_sns_topic_subscription",
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1015,6 +1031,7 @@
               "DefaultOverride": "sns-def",
               "ResourceTag": "sns-ghi"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1047,6 +1064,7 @@
             "name": "aws_sqs_queue.sqs_noTags",
             "resourceType": "aws_sqs_queue",
             "tags": {},
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1082,6 +1100,7 @@
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -1120,6 +1139,7 @@
               "tag_specifications.flip": "flop",
               "tag_specifications.no": "cap"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {

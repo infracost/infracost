@@ -128,6 +128,7 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 			DefaultTags:                 resource.DefaultTags,
 			TagPropagation:              tagProp,
 			ProviderSupportsDefaultTags: resource.ProviderSupportsDefaultTags,
+			ProviderLink:                resource.ProviderLink,
 			HourlyCost:                  resource.HourlyCost,
 			MonthlyCost:                 resource.MonthlyCost,
 			MonthlyUsageCost:            resource.MonthlyUsageCost,
@@ -311,6 +312,7 @@ type Resource struct {
 	DefaultTags                 *map[string]string     `json:"defaultTags,omitempty"`
 	TagPropagation              *TagPropagation        `json:"tagPropagation,omitempty"`
 	ProviderSupportsDefaultTags bool                   `json:"providerSupportsDefaultTags,omitempty"`
+	ProviderLink                string                 `json:"providerLink,omitempty"`
 	Metadata                    map[string]interface{} `json:"metadata"`
 	HourlyCost                  *decimal.Decimal       `json:"hourlyCost,omitempty"`
 	MonthlyCost                 *decimal.Decimal       `json:"monthlyCost,omitempty"`
@@ -561,6 +563,7 @@ func newResource(r *schema.Resource, comps []CostComponent, actualCosts []Actual
 		DefaultTags:                 r.DefaultTags,
 		TagPropagation:              tagProp,
 		ProviderSupportsDefaultTags: r.ProviderSupportsDefaultTags,
+		ProviderLink:                r.ProviderLink,
 		HourlyCost:                  r.HourlyCost,
 		MonthlyCost:                 r.MonthlyCost,
 		MonthlyUsageCost:            r.MonthlyUsageCost,
