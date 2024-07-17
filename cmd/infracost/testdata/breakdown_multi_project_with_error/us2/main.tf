@@ -6,9 +6,11 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
+variable "instance_type" {}
+
 resource "aws_instance" "web_app" {
   ami           = "ami-674cbc1e"
-  instance_type = "m5.8xlarge"
+  instance_type = var.instance_type
 
   root_block_device {
     volume_size = 50
