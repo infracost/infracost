@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/infracost/infracost/internal/logging"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
@@ -341,11 +342,12 @@ func (p *Parser) readFile(path string) string {
 
 // parseYaml decodes provided yaml contents and assigns decoded values into a
 // generic out value. This can be used as a simple object in the templates.
+// This returns an empty map if the yaml is invalid.
 func (p *Parser) parseYaml(contents string) map[string]interface{} {
 	var out map[string]interface{}
 	err := yaml.Unmarshal([]byte(contents), &out)
 	if err != nil {
-		panic(err)
+		logging.Logger.Error().Err(err).Msg("failed to unmarshal yaml when calling parseYaml in the config template")
 	}
 
 	return out
@@ -353,11 +355,12 @@ func (p *Parser) parseYaml(contents string) map[string]interface{} {
 
 // parseJson decodes the provided json contents and assigns decoded values into a
 // generic out value. This can be used as a simple object in the templates.
+// This returns an empty map if the json is invalid.
 func (p *Parser) parseJson(contents string) map[string]interface{} {
 	var out map[string]interface{}
 	err := jsoniter.Unmarshal([]byte(contents), &out)
 	if err != nil {
-		panic(err)
+		logging.Logger.Error().Err(err).Msg("failed to unmarshal json when calling parseJson in the config template")
 	}
 
 	return out
