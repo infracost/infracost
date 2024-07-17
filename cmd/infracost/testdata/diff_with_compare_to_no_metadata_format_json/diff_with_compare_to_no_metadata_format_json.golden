@@ -171,6 +171,7 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
             "metadata": {},
             "hourlyCost": "1.785315068493150679",
             "monthlyCost": "1303.28",

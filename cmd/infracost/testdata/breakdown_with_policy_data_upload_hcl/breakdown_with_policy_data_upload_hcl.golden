@@ -47,6 +47,12 @@
               "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -122,11 +128,17 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
             "tagPropagation": {
               "to": "replica",
               "from": "",
               "attribute": "replica.0.propagate_tags"
             },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -231,6 +243,12 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -254,6 +272,12 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -288,6 +312,12 @@
               "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -363,11 +393,17 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
             "tagPropagation": {
               "to": "replica",
               "from": "",
               "attribute": "replica.0.propagate_tags"
             },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -472,6 +508,12 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -495,6 +537,12 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {

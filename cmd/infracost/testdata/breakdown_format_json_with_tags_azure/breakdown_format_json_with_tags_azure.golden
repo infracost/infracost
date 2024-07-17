@@ -36,6 +36,7 @@
             "tags": {
               "AzureLabel": "azure-tag"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -69,6 +70,7 @@
             "name": "azurerm_redis_cache.arc2",
             "resourceType": "azurerm_redis_cache",
             "tags": {},
+            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -111,6 +113,7 @@
             "tags": {
               "AzureLabel": "azure-tag"
             },
+            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -144,6 +147,7 @@
             "name": "azurerm_redis_cache.arc2",
             "resourceType": "azurerm_redis_cache",
             "tags": {},
+            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {

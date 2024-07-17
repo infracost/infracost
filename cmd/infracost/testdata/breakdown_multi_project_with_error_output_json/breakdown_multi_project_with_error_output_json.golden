@@ -35,6 +35,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -123,6 +125,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -244,6 +248,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -332,6 +338,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {

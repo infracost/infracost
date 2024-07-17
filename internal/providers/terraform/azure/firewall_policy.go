@@ -17,6 +17,7 @@ func newAzureRMFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *sche
 		Name:         d.Address,
 		ResourceType: d.Type,
 		Tags:         d.Tags,
+		DefaultTags:  d.DefaultTags,
 		IsSkipped:    true,
 		NoPrice:      true,
 		SkipMessage:  "Free resource.",

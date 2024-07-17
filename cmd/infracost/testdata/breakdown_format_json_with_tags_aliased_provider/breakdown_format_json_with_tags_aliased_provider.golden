@@ -4,6 +4,10 @@
       "breakdown": {
         "resources": [
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "aws_sqs_queue.sqs_withTags",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -12,6 +16,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "aws_sqs_queue.sqs_withTags_provider",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -20,6 +28,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "module.mymod_aliased.aws_sqs_queue.sqs_withTags_mymod_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -28,6 +40,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "module.mymod_aliased.module.mysub_aliased.aws_sqs_queue.sqs_withTags_mysub_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -36,6 +52,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_aliased.aws_sqs_queue.sqs_withTag_mysubsub_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -44,6 +64,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -52,6 +76,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
@@ -60,6 +88,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "module.mymod_aliased.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -68,6 +100,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
             "name": "module.mymod_aliased.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
@@ -76,6 +112,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
             "name": "module.mymod_aliased.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
@@ -84,6 +124,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "module.mymod_implicit.aws_sqs_queue.sqs_withTags_mymod_implicit",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -92,6 +136,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "module.mymod_implicit.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -100,6 +148,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "module.mymod_implicit.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -108,6 +160,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
             "name": "module.mymod_implicit.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
@@ -116,6 +172,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
+              "DefaultOverride": "defaultoverride-own-aliased-provider"
+            },
             "name": "module.mymod_own_aliased.aws_sqs_queue.sqs_withTags_mymod_own_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
@@ -124,6 +184,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
+              "DefaultOverride": "defaultoverride-own-aliased-provider"
+            },
             "name": "module.mymod_own_aliased.module.mysub_aliased.aws_sqs_queue.sqs_withTags_mysub_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
@@ -132,6 +196,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
+              "DefaultOverride": "defaultoverride-own-aliased-provider"
+            },
             "name": "module.mymod_own_aliased.module.mysub_aliased.module.mysubsub_aliased.aws_sqs_queue.sqs_withTag_mysubsub_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
@@ -140,6 +208,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "module.mymod_own_aliased.module.mysub_aliased.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -148,6 +220,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
             "name": "module.mymod_own_aliased.module.mysub_aliased.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
@@ -156,6 +232,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "module.mymod_own_aliased.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -164,6 +244,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
             "name": "module.mymod_own_aliased.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
@@ -172,6 +256,10 @@
             }
           },
           {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
             "name": "module.mymod_own_aliased.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",

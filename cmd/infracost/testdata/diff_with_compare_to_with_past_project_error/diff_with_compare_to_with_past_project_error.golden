@@ -161,6 +161,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_with_compare_to_with_past_project_error/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {

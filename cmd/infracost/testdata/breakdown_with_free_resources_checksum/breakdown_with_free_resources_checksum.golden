@@ -34,6 +34,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -117,6 +119,8 @@
             "name": "aws_codepipeline.codepipeline",
             "resourceType": "aws_codepipeline",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -143,6 +147,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -226,6 +232,8 @@
             "name": "aws_codepipeline.codepipeline",
             "resourceType": "aws_codepipeline",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {

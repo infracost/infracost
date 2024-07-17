@@ -131,6 +131,12 @@
               "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_with_policy_data_upload/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -216,6 +222,10 @@
               "volume_tags.DefaultNotOverride": "defaultnotoverride",
               "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
             },
             "metadata": {},
             "hourlyCost": "0.576",

@@ -41,6 +41,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_prior_empty_project_json/main.tf:1",
             "metadata": {
               "calls": [
                 {
@@ -129,6 +131,8 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "testdata/diff_prior_empty_project_json/main.tf:1",
             "metadata": {
               "calls": [
                 {

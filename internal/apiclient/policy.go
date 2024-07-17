@@ -135,15 +135,17 @@ type policy2Reference struct {
 }
 
 type policy2Resource struct {
-	ResourceType   string                   `json:"resourceType"`
-	ProviderName   string                   `json:"providerName"`
-	Address        string                   `json:"address"`
-	Tags           *[]policy2Tag            `json:"tags,omitempty"`
-	TagPropagation *TagPropagation          `json:"tagPropagation,omitempty"`
-	Values         json.RawMessage          `json:"values"`
-	References     []policy2Reference       `json:"references"`
-	Metadata       policy2InfracostMetadata `json:"infracostMetadata"`
-	Region         string                   `json:"region"`
+	ResourceType          string                   `json:"resourceType"`
+	ProviderName          string                   `json:"providerName"`
+	Address               string                   `json:"address"`
+	Tags                  *[]policy2Tag            `json:"tags,omitempty"`
+	DefaultTags           *[]policy2Tag            `json:"defaultTags,omitempty"`
+	SupportForDefaultTags bool                     `json:"supportForDefaultTags"`
+	TagPropagation        *TagPropagation          `json:"tagPropagation,omitempty"`
+	Values                json.RawMessage          `json:"values"`
+	References            []policy2Reference       `json:"references"`
+	Metadata              policy2InfracostMetadata `json:"infracostMetadata"`
+	Region                string                   `json:"region"`
 }
 
 type TagPropagation struct {
@@ -197,6 +199,19 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		})
 
 		tagsPtr = &tags
+	}
+
+	var defaultTagsPtr *[]policy2Tag
+	if rd.DefaultTags != nil {
+		tags := make([]policy2Tag, 0, len(*rd.DefaultTags))
+		for k, v := range *rd.DefaultTags {
+			tags = append(tags, policy2Tag{Key: k, Value: v})
+		}
+		sort.Slice(tags, func(i, j int) bool {
+			return tags[i].Key < tags[j].Key
+		})
+
+		defaultTagsPtr = &tags
 	}
 
 	var propagatedTagsPtr *[]policy2Tag
@@ -262,6 +277,7 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		ProviderName:   rd.ProviderName,
 		Address:        rd.Address,
 		Tags:           tagsPtr,
+		DefaultTags:    defaultTagsPtr,
 		TagPropagation: tagPropagation,
 		Values:         valuesJSON,
 		References:     references,

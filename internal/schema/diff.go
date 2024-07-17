@@ -84,6 +84,7 @@ func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string
 		SkipMessage:  baseResource.SkipMessage,
 		ResourceType: baseResource.ResourceType,
 		Tags:         baseResource.Tags,
+		DefaultTags:  baseResource.DefaultTags,
 
 		HourlyCost:       diffDecimals(current.HourlyCost, past.HourlyCost),
 		MonthlyCost:      diffDecimals(current.MonthlyCost, past.MonthlyCost),

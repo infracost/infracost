@@ -781,15 +781,20 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 }
 
 func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *ConfLoader, providerConf gjson.Result) {
+	awsTagParsingConfig := aws.TagParsingConfig{PropagateDefaultsToVolumeTags: hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.AWS, hcl.AWSVersionConstraintVolumeTags, true)}
 	for _, resourceData := range data {
+
 		providerPrefix := getProviderPrefix(resourceData.Type)
+		defaultTagSupport := p.areDefaultTagsSupported(providerPrefix)
 		var tags *map[string]string
+		var defaultTags *map[string]string
 		switch providerPrefix {
 		case "aws":
 			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
-			defaultTags := parseDefaultTags(providerConf, resConf)
-
-			tags = aws.ParseTags(defaultTags, resourceData, aws.TagParsingConfig{PropagateDefaultsToVolumeTags: p.providerConstraints.AWS.Check(hcl.AWSVersionConstraintVolumeTags)})
+			if defaultTagSupport {
+				defaultTags = parseDefaultTags(providerConf, resConf)
+			}
+			tags = aws.ParseTags(defaultTags, resourceData, awsTagParsingConfig)
 		case "azurerm":
 			tags = azure.ParseTags(resourceData)
 		case "google":
@@ -798,9 +803,32 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
 
+		if conf := providerConf.Get(providerPrefix); conf.Exists() {
+			if metadata := conf.Get("infracost_metadata"); metadata.Exists() {
+				providerLink := metadata.Get("filename").String()
+				if providerLine := metadata.Get("start_line").Int(); providerLine > 0 {
+					providerLink = fmt.Sprintf("%s:%d", providerLink, providerLine)
+				}
+				resourceData.ProviderLink = providerLink
+			}
+		}
+
 		resourceData.Tags = tags
+		resourceData.DefaultTags = defaultTags
+		resourceData.ProviderSupportsDefaultTags = defaultTagSupport
 		resourceData.TagPropagation = p.getTagPropagationInfo(resourceData)
 	}
+}
+
+func (p *Parser) areDefaultTagsSupported(providerPrefix string) bool {
+	// we only support default tags for aws atm
+	if providerPrefix != "aws" {
+		return false
+	}
+
+	// default tags were added in aws provider v3.38.0 - if the constraints allow a version before this,
+	// we can't rely on default tag support
+	return hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.AWS, "v3.38.0", true)
 }
 
 func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.TagPropagation {
