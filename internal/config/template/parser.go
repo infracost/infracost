@@ -65,6 +65,8 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"trimPrefix": p.trimPrefix,
 		"trimSuffix": p.trimSuffix,
 		"replace":    p.replace,
+		"quote":      p.quote,
+		"squote":     p.squote,
 		"pathExists": p.pathExists,
 		"matchPaths": p.matchPaths,
 		"list":       p.list,
@@ -168,6 +170,30 @@ func (p *Parser) trimSuffix(s, suffix string) string {
 // replace returns s with all instances of old replaced by new.
 func (p *Parser) replace(s, old, new string) string {
 	return strings.ReplaceAll(s, old, new)
+}
+
+// quote wraps the provided strings in double quotes.
+// Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L83
+func (p *Parser) quote(str ...interface{}) string {
+	out := make([]string, 0, len(str))
+	for _, s := range str {
+		if s != nil {
+			out = append(out, fmt.Sprintf("%q", strval(s)))
+		}
+	}
+	return strings.Join(out, " ")
+}
+
+// squote wraps the provided strings in single quotes.
+// Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L93C1-L101C2
+func (p *Parser) squote(str ...interface{}) string {
+	out := make([]string, 0, len(str))
+	for _, s := range str {
+		if s != nil {
+			out = append(out, fmt.Sprintf("'%v'", s))
+		}
+	}
+	return strings.Join(out, " ")
 }
 
 // pathExists reports whether path is a subpath within base.
@@ -360,4 +386,21 @@ func isSubdirectory(base, target string) bool {
 	}
 
 	return !strings.HasPrefix(relPath, "..") && fileInfo.Mode()&os.ModeSymlink == 0
+}
+
+// strval returns the string representation of v.
+// Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L174
+func strval(v interface{}) string {
+	switch v := v.(type) {
+	case string:
+		return v
+	case []byte:
+		return string(v)
+	case error:
+		return v.Error()
+	case fmt.Stringer:
+		return v.String()
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }
