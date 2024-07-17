@@ -52,6 +52,22 @@
             }
           },
           {
+            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_account_request_processor",
+            "tags": {}
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_controltower_event_logger",
+            "tags": {}
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_invoke_aft_account_provisioning_framework",
+            "tags": {}
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_management_event_bus",
+            "tags": {}
+          },
+          {
             "name": "module.aft.module.aft_account_request_framework.aws_default_security_group.aft_vpc_default_sg[0]",
             "tags": {
               "Name": "aft-vpc-default-sg",
