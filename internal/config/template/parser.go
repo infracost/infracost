@@ -169,7 +169,7 @@ func (p *Parser) trimSuffix(s, suffix string) string {
 }
 
 // replace returns s with all instances of old replaced by new.
-func (p *Parser) replace(s, old, new string) string {
+func (p *Parser) replace(old, new, s string) string {
 	return strings.ReplaceAll(s, old, new)
 }
 
