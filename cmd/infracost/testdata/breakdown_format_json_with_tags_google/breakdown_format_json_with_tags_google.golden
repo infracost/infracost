@@ -36,6 +36,8 @@
             "tags": {
               "GoogleLabel": "compute-disk-label"
             },
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -70,6 +72,8 @@
             "name": "google_compute_disk.gcd2",
             "resourceType": "google_compute_disk",
             "tags": {},
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -106,6 +110,8 @@
             "tags": {
               "GoogleSettingsUserLabel": "sql-db-label"
             },
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -175,6 +181,8 @@
             "tags": {
               "GoogleUserLabel": "monitoring-custom-service-label"
             },
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -204,6 +212,8 @@
             "tags": {
               "GoogleLabel": "compute-disk-label"
             },
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -238,6 +248,8 @@
             "name": "google_compute_disk.gcd2",
             "resourceType": "google_compute_disk",
             "tags": {},
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -274,6 +286,8 @@
             "tags": {
               "GoogleSettingsUserLabel": "sql-db-label"
             },
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
@@ -343,6 +357,8 @@
             "tags": {
               "GoogleUserLabel": "monitoring-custom-service-label"
             },
+            "defaultTags": {},
+            "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
