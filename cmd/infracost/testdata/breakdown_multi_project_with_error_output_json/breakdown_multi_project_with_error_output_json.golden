@@ -13,7 +13,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1",
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1-dev",
       "displayName": "us1-dev",
       "metadata": {
         "path": "testdata/breakdown_multi_project_with_error_output_json/us1",
@@ -58,7 +58,7 @@
       }
     },
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1",
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1-prod",
       "displayName": "us1-prod",
       "metadata": {
         "path": "testdata/breakdown_multi_project_with_error_output_json/us1",

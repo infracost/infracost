@@ -392,8 +392,9 @@ func (p *Parser) DependencyPaths() []string {
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
 func (p *Parser) ParseDirectory() (m *Module, err error) {
 	m = &Module{
-		RootPath:   p.detectedProjectPath,
-		ModulePath: p.detectedProjectPath,
+		RootPath:     p.detectedProjectPath,
+		ModulePath:   p.detectedProjectPath,
+		ModuleSuffix: p.moduleSuffix,
 	}
 
 	defer func() {
