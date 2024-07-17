@@ -83,6 +83,14 @@ var ExpectedPropagations = map[string]TagPropagationConfig{
 			"TASK_DEFINITION": "target_parameters.0.ecs_task_parameters.0.task_definition_arn",
 		},
 	},
+	"aws_cloudwatch_event_target": {
+		Attribute: "ecs_target.0.propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "ecs_target.0.task_definition_arn",
+		},
+		Requires: []string{"ecs_target.0.task_definition_arn"},
+	},
 }
 
 func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config TagParsingConfig) *map[string]string {
