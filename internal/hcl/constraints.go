@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/hashicorp/go-version"
 	"github.com/zclconf/go-cty/cty/gocty"
-	"regexp"
 	"strings"
 )
 
@@ -14,7 +13,7 @@ var (
 	// provider that supports propagating default tags to volume tags. See
 	// https://github.com/hashicorp/terraform-provider-aws/issues/19890 for more
 	// information.
-	AWSVersionConstraintVolumeTags = "5.39.0"
+	AWSVersionConstraintVolumeTags = version.Must(version.NewVersion("5.39.0"))
 )
 
 // ProviderConstraints represents the constraints for a providers within a
@@ -25,63 +24,64 @@ type ProviderConstraints struct {
 	Google version.Constraints
 }
 
-var constraintRegexp *regexp.Regexp
+const constraintOpChars = "=><!~"
 
-func init() {
-	var ops []string
-	for _, k := range []string{
-		"",
-		"=",
-		"!=",
-		">",
-		"<",
-		">=",
-		"<=",
-		"~>",
-	} {
-		ops = append(ops, regexp.QuoteMeta(k))
+func splitConstraint(c string) (string, string) {
+	c = strings.TrimSpace(c)
+	ver := c
+	var op string
+	for i, r := range c {
+		if !strings.ContainsRune(constraintOpChars, r) {
+			break
+		}
+		op = c[:i+1]
+		ver = c[i+1:]
 	}
-	constraintRegexp = regexp.MustCompile(fmt.Sprintf(
-		`^\s*(%s)\s*(%s)\s*$`,
-		strings.Join(ops, "|"),
-		version.VersionRegexpRaw))
+	return op, strings.TrimSpace(ver)
 }
 
-// ConstraintsEnforceAtLeastVersion checks if the given constraints enforce at least the given minVersion.
-// If the constraints are empty, it returns the defaultForNoConstraints.
-func ConstraintsEnforceAtLeastVersion(constraints version.Constraints, minVersion string, defaultForNoConstraints bool) bool {
-
-	if len(constraints) == 0 {
-		return defaultForNoConstraints
-	}
-
-	requiredMinVersion, err := version.NewVersion(minVersion)
-	if err != nil {
-		return false
-	}
+// ConstraintsAllowVersionOrAbove checks if the given constraints enforce at least the given minVersion.
+func ConstraintsAllowVersionOrAbove(constraints version.Constraints, requiredVersion *version.Version) bool {
 
 	for _, c := range constraints {
-		matches := constraintRegexp.FindStringSubmatch(c.String())
-		if len(matches) != 3 {
-			continue
-		}
-		check, err := version.NewVersion(matches[2])
+
+		op, ver := splitConstraint(c.String())
+		check, err := version.NewVersion(ver)
 		if err != nil {
 			continue
 		}
-		switch matches[1] {
-		case ">=", ">", "~>":
-			if check.GreaterThanOrEqual(requiredMinVersion) {
-				return true
+		switch op {
+		case "~>":
+			segments := check.Segments()
+			if len(segments) < 2 {
+				continue
+			}
+			requiredSegments := requiredVersion.Segments()
+			if len(requiredSegments) < 2 {
+				continue
+			}
+			if segments[0] < requiredSegments[0] {
+				return false
+			}
+			if segments[1] < requiredSegments[1] {
+				return false
+			}
+		case "<":
+			if check.LessThanOrEqual(requiredVersion) {
+				return false
+			}
+		case "<=":
+			if check.LessThan(requiredVersion) {
+				return false
 			}
 		case "", "=":
-			if check.Equal(requiredMinVersion) {
-				return true
+			if check.LessThan(requiredVersion) {
+				return false
 			}
 		}
 	}
 
-	return false
+	return true
 }
 
 // UnmarshalJSON parses the JSON representation of the ProviderConstraints and

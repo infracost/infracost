@@ -4,6 +4,7 @@ import (
 	"bytes"
 	stdJson "encoding/json"
 	"fmt"
+	"github.com/hashicorp/go-version"
 	"regexp"
 	"sort"
 	"strconv"
@@ -790,7 +791,7 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 }
 
 func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *ConfLoader, providerConf gjson.Result) {
-	awsTagParsingConfig := aws.TagParsingConfig{PropagateDefaultsToVolumeTags: hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.AWS, hcl.AWSVersionConstraintVolumeTags, true)}
+	awsTagParsingConfig := aws.TagParsingConfig{PropagateDefaultsToVolumeTags: hcl.ConstraintsAllowVersionOrAbove(p.providerConstraints.AWS, hcl.AWSVersionConstraintVolumeTags)}
 	for _, resourceData := range data {
 
 		providerPrefix := getProviderPrefix(resourceData.Type)
@@ -833,16 +834,21 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 	}
 }
 
+var (
+	versionAWSProviderForDefaultTagSupport = version.Must(version.NewVersion("3.38.0"))
+	versionGoogleProviderForDefaultTags    = version.Must(version.NewVersion("5.0.0"))
+)
+
 func (p *Parser) areDefaultTagsSupported(providerPrefix string) bool {
 	switch providerPrefix {
 	case "aws":
 		// default tags were added in aws provider v3.38.0 - if the constraints allow a version before this,
 		// we can't rely on default tag support
-		return hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.AWS, "v3.38.0", true)
+		return hcl.ConstraintsAllowVersionOrAbove(p.providerConstraints.AWS, versionAWSProviderForDefaultTagSupport)
 	case "google":
 		// default tags (labels) were added in google provider v5.0.0 - if the constraints allow a version before this,
 		// we can't rely on default tag support
-		return hcl.ConstraintsEnforceAtLeastVersion(p.providerConstraints.Google, "v5.0.0", true)
+		return hcl.ConstraintsAllowVersionOrAbove(p.providerConstraints.Google, versionGoogleProviderForDefaultTags)
 	default:
 		return false
 	}
