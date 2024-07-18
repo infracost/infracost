@@ -1379,6 +1379,10 @@ func launchTemplateValues(b *Block) cty.Value {
 	v, ok := launchTemplateData["name"]
 
 	if !ok || v.IsNull() {
+		if launchTemplateData == nil {
+			launchTemplateData = make(map[string]cty.Value)
+		}
+
 		h := sha256.New()
 		h.Write([]byte(b.FullName()))
 		addressSha := hex.EncodeToString(h.Sum(nil))
