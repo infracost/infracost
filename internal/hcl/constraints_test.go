@@ -8,10 +8,6 @@ import (
 )
 
 func TestConstraintsAllowVersionOrAbove(t *testing.T) {
-	type args struct {
-		constraints     string
-		requiredVersion *version.Version
-	}
 	tests := []struct {
 		name            string
 		constraints     string
