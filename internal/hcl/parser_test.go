@@ -1975,3 +1975,38 @@ func BenchmarkParserEvaluate(b *testing.B) {
 		b.StartTimer()
 	}
 }
+
+func Test_VersionConstraintsParsing(t *testing.T) {
+	path := createTestFile("contraints.tf", `
+terraform {
+  required_providers {
+    aws = {
+      version = "~> 5.52.0"
+	  source = "hashicorp/aws"
+    }
+    google = {
+      version = ">= 5.0.0,< 5.0.4"
+	  source = "hashicorp/google"
+    }
+  }
+
+  required_version = "~> 1.1.9"
+}
+
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{DetectedPath: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+	)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	assert.Equal(t, "~> 5.52.0", module.ProviderConstraints.AWS.String())
+	assert.Equal(t, ">= 5.0.0,< 5.0.4", module.ProviderConstraints.Google.String())
+
+}

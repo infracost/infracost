@@ -617,7 +617,8 @@ func transformSSHToHTTPS(sshURL string) (string, error) {
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 	providerConfigKey := block.Values().GetAttr("config_key").AsString()
 
-	name := block.TypeLabel()
+	providerType := block.TypeLabel()
+	name := providerType
 	if a := block.GetAttribute("alias"); a != nil {
 		name = name + "." + a.AsString()
 	}
@@ -638,15 +639,21 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 		},
 	}
 
-	defaultTags := p.marshalDefaultTagsBlock(block)
-	if defaultTags != nil {
-		p.schema.Configuration.ProviderConfig[providerConfigKey].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
+	switch providerType {
+	case "aws":
+		if defaultTags := p.marshalAWSDefaultTagsBlock(block); defaultTags != nil {
+			p.schema.Configuration.ProviderConfig[providerConfigKey].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
+		}
+	case "google":
+		if defaultLabels := p.marshalGoogleDefaultTagsBlock(block); defaultLabels != nil {
+			p.schema.Configuration.ProviderConfig[providerConfigKey].Expressions["default_labels"] = defaultLabels
+		}
 	}
 
 	return name
 }
 
-func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
+func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
 	b := providerBlock.GetChildBlock("default_tags")
 	if b == nil {
 		return nil
@@ -708,6 +715,64 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 		"tags": map[string]interface{}{
 			"constant_value": marshalledTags,
 		},
+	}
+}
+
+func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
+	tags := providerBlock.GetAttribute("default_labels")
+	if tags == nil {
+		return nil
+	}
+
+	marshalledTags := make(map[string]interface{})
+
+	value := tags.Value()
+	if value.IsNull() || !value.IsKnown() || !value.CanIterateElements() {
+		return nil
+	}
+
+	for tag, val := range value.AsValueMap() {
+		if !val.IsKnown() {
+			p.logger.Debug().Msgf("tag %s has unknown value, cannot marshal", tag)
+			continue
+		}
+
+		if val.Type().Equals(cty.Bool) {
+			var tagValue bool
+			err := gocty.FromCtyValue(val, &tagValue)
+			if err != nil {
+				p.logger.Debug().Err(err).Msgf("could not marshal tag %s to bool value", tag)
+				continue
+			}
+
+			marshalledTags[tag] = fmt.Sprintf("%t", tagValue)
+			continue
+		}
+
+		if val.Type() == cty.Number {
+			var tagValue big.Float
+			err := gocty.FromCtyValue(val, &tagValue)
+			if err != nil {
+				p.logger.Debug().Err(err).Msgf("could not marshal tag %s to number value", tag)
+				continue
+			}
+
+			marshalledTags[tag] = tagValue.String()
+			continue
+		}
+
+		var tagValue string
+		err := gocty.FromCtyValue(val, &tagValue)
+		if err != nil {
+			p.logger.Debug().Err(err).Msgf("could not marshal tag %s to string value", tag)
+			continue
+		}
+
+		marshalledTags[tag] = tagValue
+	}
+
+	return map[string]interface{}{
+		"constant_value": marshalledTags,
 	}
 }
 
