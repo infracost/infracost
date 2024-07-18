@@ -26,7 +26,7 @@ var (
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost (v|preview).*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
-	pathRegex        = regexp.MustCompile(`(/?.*/)(infracost/cmd/infracost/testdata/.*)`)
+	pathRegex        = regexp.MustCompile(`(/?.+/)(infracost/cmd/infracost/testdata/.*)`)
 	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
 )
 
