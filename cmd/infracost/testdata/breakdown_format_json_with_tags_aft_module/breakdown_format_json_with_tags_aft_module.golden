@@ -79,34 +79,6 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_account_request_processor",
-            "tags": {}
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_controltower_event_logger",
-            "tags": {}
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_invoke_aft_account_provisioning_framework",
-            "tags": {}
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_management_event_bus",
-            "tags": {}
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_account_request_framework.aws_default_security_group.aft_vpc_default_sg[0]",
             "tags": {
               "Name": "aft-vpc-default-sg",
@@ -1327,15 +1299,6 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_backend.aws_kms_key.aft_access_logs_primary_backend_bucket",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-primary-region",
             "tags": {
               "Name": "aft-backend-REGEX_FILTER-primary-region-kms-key",
@@ -1643,20 +1606,6 @@
             ],
             "tags": {
               "Name": "aft-backend-REGEX_FILTER",
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket.aft_access_logs_primary_backend_bucket",
-            "subresources": [
-              {
-                "name": "Standard"
-              }
-            ],
-            "tags": {
               "managed_by": "AFT"
             }
           },
