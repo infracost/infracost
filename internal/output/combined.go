@@ -56,6 +56,13 @@ func Load(p string) (Root, error) {
 		return out, fmt.Errorf("invalid Infracost JSON file version. Supported versions are %s ≤ x ≤ %s", minOutputVersion, maxOutputVersion)
 	}
 
+	for i, p := range out.Projects {
+		if p.Metadata == nil {
+			p.Metadata = &schema.ProjectMetadata{}
+			out.Projects[i] = p
+		}
+	}
+
 	return out, nil
 }
 
