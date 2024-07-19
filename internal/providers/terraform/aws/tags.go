@@ -97,11 +97,9 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config Ta
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
-	_, supportsTagPropagation := ExpectedPropagations[r.Type]
-
 	rTags := r.Get("tags").Map()
 	rTagsAll := r.Get("tags_all").Map()
-	if !supportsTags && !supportsTagBlock && !supportsTagPropagation && len(rTags) == 0 && len(rTagsAll) == 0 {
+	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil
 	}
 
