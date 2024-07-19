@@ -63,7 +63,7 @@ func ConstraintsAllowVersionOrAbove(constraints version.Constraints, requiredVer
 			if segments[0] < requiredSegments[0] {
 				return false
 			}
-			if segments[1] < requiredSegments[1] {
+			if segments[0] == requiredSegments[0] && segments[1] < requiredSegments[1] {
 				return false
 			}
 		case "<":
