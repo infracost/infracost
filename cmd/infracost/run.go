@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -46,7 +47,7 @@ type projectResult struct {
 
 func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag. Provided files must be relative to the --path flag")
-	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag")
+	cmd.Flags().StringArray("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
@@ -776,7 +777,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.Path = rootPath
 
 		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
-		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
+		tfVars, _ := cmd.Flags().GetStringArray("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.Name, _ = cmd.Flags().GetString("project-name")
@@ -855,19 +856,26 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	return nil
 }
 
-func tfVarsToMap(vars []string) map[string]string {
+func tfVarsToMap(vars []string) map[string]interface{} {
 	if len(vars) == 0 {
 		return nil
 	}
 
-	m := make(map[string]string, len(vars))
+	m := make(map[string]interface{}, len(vars))
 	for _, v := range vars {
 		pieces := strings.Split(v, "=")
 		if len(pieces) != 2 {
 			continue
 		}
 
-		m[pieces[0]] = pieces[1]
+		var v interface{}
+		err := json.Unmarshal([]byte(pieces[1]), &v)
+		if err != nil {
+			// If there's an error it could just be a raw string value, so we use that
+			v = pieces[1]
+		}
+
+		m[pieces[0]] = v
 	}
 
 	return m
