@@ -63,7 +63,7 @@
         "terraform_vars": {
           "patternProperties": {
             ".*": {
-              "type": "string"
+              "additionalProperties": true
             }
           },
           "type": "object"
