@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -14,6 +15,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -163,16 +165,59 @@ func OptionWithPlanFlagVars(vs []string) Option {
 	}
 }
 
+func convertToStringKeyMap(value interface{}) interface{} {
+	switch v := value.(type) {
+	case map[interface{}]interface{}:
+		result := make(map[string]interface{})
+		for key, val := range v {
+			strKey := fmt.Sprintf("%v", key)
+			result[strKey] = convertToStringKeyMap(val)
+		}
+		return result
+	case []interface{}:
+		for i, elem := range v {
+			v[i] = convertToStringKeyMap(elem)
+		}
+	}
+	return value
+}
+
 // OptionWithInputVars takes cmd line var input values and converts them to cty.Value
 // It sets these as the Parser starting inputVars which are used at the root module evaluation.
-func OptionWithInputVars(vars map[string]string) Option {
+func OptionWithInputVars(vars map[string]interface{}) Option {
 	return func(p *Parser) {
 		if p.inputVars == nil {
 			p.inputVars = make(map[string]cty.Value, len(vars))
 		}
 
-		for k, v := range vars {
-			p.inputVars[k] = cty.StringVal(v)
+		for k, val := range vars {
+			val = convertToStringKeyMap(val)
+
+			switch v := val.(type) {
+			case string:
+				p.inputVars[k] = cty.StringVal(v)
+			case int:
+				p.inputVars[k] = cty.NumberIntVal(int64(v))
+			case float64:
+				p.inputVars[k] = cty.NumberFloatVal(v)
+			case bool:
+				p.inputVars[k] = cty.BoolVal(v)
+			default:
+				b, err := json.Marshal(v)
+				if err != nil {
+					p.logger.Debug().Msgf("could not marshal input var %s: %v", k, err)
+					continue
+				}
+
+				simple := &ctyJson.SimpleJSONValue{}
+				err = simple.UnmarshalJSON(b)
+				if err != nil {
+					p.logger.Debug().Msgf("could not unmarshal input var %s: %v", k, err)
+					continue
+				}
+
+				p.inputVars[k] = simple.Value
+			}
 		}
 	}
 }

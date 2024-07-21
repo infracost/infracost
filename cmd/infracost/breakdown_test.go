@@ -1067,6 +1067,42 @@ func TestBreakdownWithOptionalVariables(t *testing.T) {
 	)
 }
 
+func TestBreakdownWithComplexConfigFileVars(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file",
+			path.Join(dir, "infracost.yml"),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithComplexVarFlags(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			dir,
+			"--terraform-var",
+			"instance_config={\"instance_type\":\"t2.micro\",\"storage\":20}",
+			"--terraform-var",
+			"lambda_configs=[{\"memory_size\":128},{\"memory_size\":256}]",
+			"--usage-file",
+			path.Join(dir, "infracost-usage.yml"),
+		},
+		nil,
+	)
+}
+
 func TestBreakdownWithDeepMergeModule(t *testing.T) {
 	GoldenFileCommandTest(
 		t,

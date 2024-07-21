@@ -387,8 +387,8 @@ func (p *TerragruntHCLProvider) initTerraformVarFiles(tfVarFiles []string, extra
 	return v
 }
 
-func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inputs map[string]interface{}) map[string]string {
-	m := make(map[string]string, len(tfVars)+len(inputs))
+func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]interface{}, inputs map[string]interface{}) map[string]interface{} {
+	m := make(map[string]interface{}, len(tfVars)+len(inputs))
 	for k, v := range tfVars {
 		m[k] = v
 	}

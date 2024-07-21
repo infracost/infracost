@@ -75,7 +75,7 @@ type Project struct {
 	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files,omitempty"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
-	TerraformVars map[string]string `yaml:"terraform_vars,omitempty"`
+	TerraformVars map[string]interface{} `yaml:"terraform_vars,omitempty"`
 	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
 	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
