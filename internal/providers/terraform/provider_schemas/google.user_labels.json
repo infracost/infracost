@@ -3,5 +3,6 @@
   "google_monitoring_custom_service": true,
   "google_monitoring_notification_channel": true,
   "google_monitoring_service": true,
-  "google_monitoring_slo": true
+  "google_monitoring_slo": true,
+  "google_monitoring_uptime_check_config": true
 }
