@@ -17,7 +17,7 @@ require (
 	github.com/awslabs/goformation/v7 v7.13.1
 	github.com/dave/dst v0.27.2
 	github.com/dustin/go-humanize v1.0.1
-	github.com/fatih/color v1.15.0
+	github.com/fatih/color v1.16.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.3.0
 	github.com/huandu/xstrings v1.3.2 // indirect
@@ -48,7 +48,7 @@ require (
 require (
 	github.com/aws/aws-sdk-go-v2/service/eks v1.27.0
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20210625153042-09f34846faab
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 )
 
 require (
@@ -102,7 +102,7 @@ require (
 	github.com/gruntwork-io/go-commons v0.17.1
 	github.com/gruntwork-io/terragrunt v0.52.4
 	github.com/hashicorp/go-cty-funcs v0.0.0-20230405223818-a090f58aa992
-	github.com/hashicorp/go-retryablehttp v0.7.5
+	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/hashicorp/go-terraform-address v0.0.0-20210506203813-2cc4f0f34da8
 	github.com/hashicorp/golang-lru/v2 v2.0.6
 	github.com/hashicorp/terraform-svchost v0.1.1
@@ -170,7 +170,7 @@ require (
 	github.com/gruntwork-io/gruntwork-cli v0.7.0 // indirect
 	github.com/gruntwork-io/terratest v0.41.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-hclog v1.5.0 // indirect
+	github.com/hashicorp/go-hclog v1.6.3 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-plugin v1.4.10 // indirect
