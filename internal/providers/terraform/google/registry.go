@@ -146,6 +146,7 @@ var FreeResources = []string{
 	"google_compute_subnetwork_iam_policy",
 	"google_compute_url_map",
 	"google_dns_policy",
+	"google_folder",
 	"google_folder_iam_binding",
 	"google_folder_iam_member",
 	"google_folder_iam_policy",
