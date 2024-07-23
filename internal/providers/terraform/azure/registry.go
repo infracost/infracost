@@ -621,6 +621,7 @@ var FreeResources = []string{
 	"azurerm_virtual_desktop_workspace",
 	"azurerm_virtual_desktop_workspace_application_group_association",
 	"azurerm_virtual_desktop_host_pool",
+	"azurerm_virtual_desktop_host_pool_registration_info",
 
 	// Azure Service Plan
 	"azurerm_windows_web_app",
