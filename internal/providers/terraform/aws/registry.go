@@ -603,9 +603,15 @@ var FreeResources = []string{
 	"aws_ssm_resource_data_sync",
 
 	// AWS SSO
-	"aws_ssoadmin_account_assignment",
-	"aws_ssoadmin_managed_policy_attachment",
-	"aws_ssoadmin_permission_set_inline_policy",
+	"aws_ssoadmin_application",
+	"aws_ssoadmin_application_access_scope",
+	"aws_ssoadmin_application_assignment",
+	"aws_ssoadmin_application_assignment_configuration",
+	"aws_ssoadmin_customer_managed_policy_attachment",
+	"aws_ssoadmin_instance_access_control_attributes",
+	"aws_ssoadmin_permission_set",
+	"aws_ssoadmin_permissions_boundary_attachment",
+	"aws_ssoadmin_trusted_token_issuer",
 
 	// AWS Transfer Family
 	"aws_transfer_access",
