@@ -183,6 +183,7 @@ var FreeResources = []string{
 	"azurerm_api_management_api_diagnostic",
 	"azurerm_api_management_api_operation",
 	"azurerm_api_management_api_operation_policy",
+	"azurerm_api_management_api_operation_tag",
 	"azurerm_api_management_api_policy",
 	"azurerm_api_management_api_schema",
 	"azurerm_api_management_api_version_set",
