@@ -448,7 +448,6 @@ var FreeResources = []string{
 	// Azure Management
 	"azurerm_management_group",
 	"azurerm_management_group_subscription_association",
-	"azurerm_management_group_policy_assignment",
 	"azurerm_management_lock",
 
 	// Azure Managed Applications
@@ -530,6 +529,12 @@ var FreeResources = []string{
 	"azurerm_subscription_policy_assignment",
 	"azurerm_subscription_policy_exemption",
 	"azurerm_subscription_policy_remediation",
+	"azurerm_resource_group_policy_assignment",
+	"azurerm_resource_group_policy_exemption",
+	"azurerm_resource_group_policy_remediation",
+	"azurerm_management_group_policy_exemption",
+	"azurerm_management_group_policy_assignment",
+	"azurerm_management_group_policy_remediation",
 
 	// Azure Portal
 	"azurerm_dashboard",
