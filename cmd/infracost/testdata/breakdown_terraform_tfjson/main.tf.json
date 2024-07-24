@@ -1,0 +1,47 @@
+{
+  "output": {
+      "aws_instance_type": {
+          "value": "${aws_instance.web_app.instance_type}"
+      }
+  },
+  "provider": {
+      "aws": {
+          "access_key": "mock_access_key",
+          "region": "us-east-1",
+          "secret_key": "mock_secret_key",
+          "skip_credentials_validation": true,
+          "skip_requesting_account_id": true
+      }
+  },
+  "resource": {
+      "aws_instance": {
+          "web_app": {
+              "ami": "ami-674cbc1e",
+              "ebs_block_device": [
+                  {
+                      "device_name": "my_data",
+                      "iops": 800,
+                      "volume_size": 1000,
+                      "volume_type": "io1"
+                  }
+              ],
+              "instance_type": "m5.4xlarge",
+              "root_block_device": [
+                  {
+                      "volume_size": 50
+                  }
+              ]
+          }
+      },
+      "aws_lambda_function": {
+          "hello_world": {
+              "filename": "function.zip",
+              "function_name": "hello_world",
+              "handler": "exports.test",
+              "memory_size": 1024,
+              "role": "arn:aws:lambda:us-east-1:aws:resource-id",
+              "runtime": "nodejs12.x"
+          }
+      }
+  }
+}
