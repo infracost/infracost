@@ -1030,7 +1030,7 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 			return nil
 		}
 		for k := range attrs {
-			if _, ok := b.UniqueAttrs[k]; !ok {
+			if _, ok := b.UniqueAttrs[k]; ok {
 				delete(attrs, k)
 			}
 

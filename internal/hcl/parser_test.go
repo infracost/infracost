@@ -1946,6 +1946,70 @@ resource "time_static" "default" {}
 	assert.Equal(t, 2021, int(i))
 }
 
+func Test_HCLAttributes(t *testing.T) {
+	path := createTestFile("main.tf", `
+resource "aws_instance" "example" {
+	ami           = "ami-0c55b159cbfafe1f0"
+	instance_type = "t2.micro"
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{DetectedPath: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+	)
+
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"ami":"ami-0c55b159cbfafe1f0", "instance_type":"t2.micro"}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
+func Test_TFJSONAttributes(t *testing.T) {
+	path := createTestFile("main.tf.json", `
+{
+	"resource": {
+		"aws_instance": {
+			"example": {
+				"ami": "ami-0c55b159cbfafe1f0",
+				"instance_type": "t2.micro"
+			}
+		}
+	}
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{DetectedPath: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+	)
+
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"ami":"ami-0c55b159cbfafe1f0", "instance_type":"t2.micro"}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
 func BenchmarkParserEvaluate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
