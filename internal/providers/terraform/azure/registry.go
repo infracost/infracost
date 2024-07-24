@@ -183,6 +183,7 @@ var FreeResources = []string{
 	"azurerm_api_management_api_diagnostic",
 	"azurerm_api_management_api_operation",
 	"azurerm_api_management_api_operation_policy",
+	"azurerm_api_management_api_operation_tag",
 	"azurerm_api_management_api_policy",
 	"azurerm_api_management_api_schema",
 	"azurerm_api_management_api_version_set",
@@ -447,7 +448,6 @@ var FreeResources = []string{
 	// Azure Management
 	"azurerm_management_group",
 	"azurerm_management_group_subscription_association",
-	"azurerm_management_group_policy_assignment",
 	"azurerm_management_lock",
 
 	// Azure Managed Applications
@@ -529,6 +529,12 @@ var FreeResources = []string{
 	"azurerm_subscription_policy_assignment",
 	"azurerm_subscription_policy_exemption",
 	"azurerm_subscription_policy_remediation",
+	"azurerm_resource_group_policy_assignment",
+	"azurerm_resource_group_policy_exemption",
+	"azurerm_resource_group_policy_remediation",
+	"azurerm_management_group_policy_exemption",
+	"azurerm_management_group_policy_assignment",
+	"azurerm_management_group_policy_remediation",
 
 	// Azure Portal
 	"azurerm_dashboard",
@@ -620,6 +626,7 @@ var FreeResources = []string{
 	"azurerm_virtual_desktop_workspace",
 	"azurerm_virtual_desktop_workspace_application_group_association",
 	"azurerm_virtual_desktop_host_pool",
+	"azurerm_virtual_desktop_host_pool_registration_info",
 
 	// Azure Service Plan
 	"azurerm_windows_web_app",
