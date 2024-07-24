@@ -4,7 +4,7 @@ terraform {
 
 inputs = {
   cluster_name    = "my-cluster"
-  cluster_version = "1.27"
+  cluster_version = "1.30"
 
   cluster_endpoint_public_access = true
 
