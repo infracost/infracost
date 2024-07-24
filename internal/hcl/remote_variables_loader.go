@@ -117,7 +117,8 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		if !config.valid() {
 			config, err = r.getBackendOrganizationWorkspace(blocks)
 			if err != nil {
-				return vars, err
+				r.logger.Warn().Err(err).Msg("could not detect Terraform Cloud organization and workspace")
+				return vars, nil
 			}
 
 			if !config.valid() {
