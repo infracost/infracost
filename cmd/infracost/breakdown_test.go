@@ -750,6 +750,10 @@ func TestBreakdownTerraformUseState_v0_14(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/terraform_v0.14_state.json", "--terraform-use-state"}, nil)
 }
 
+func TestBreakdownTerraformTFJSON(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
 func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
 	if os.Getenv("INFRACOST_TERRAFORM_CLOUD_TOKEN") == "" {
 		t.Skip("Skipping because INFRACOST_TERRAFORM_CLOUD_TOKEN is not set and external contributors won't have this.")
