@@ -1,0 +1,10 @@
+.
+└── apps
+    ├── bar
+    │   ├── backend.tf
+    │   └── terraform.tfvars
+    └── foo
+        ├── dev.tfvars
+        ├── main.tf
+        ├── prod.tfvars
+        └── terraform.tfvars

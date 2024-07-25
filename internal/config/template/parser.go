@@ -9,11 +9,12 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/infracost/infracost/internal/logging"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -35,6 +36,7 @@ type DetectedRooModule struct {
 
 // Variables hold the global variables that are passed into any template that the Parser evaluates.
 type Variables struct {
+	RepoName            string
 	Branch              string
 	BaseBranch          string
 	DetectedProjects    []DetectedProject
