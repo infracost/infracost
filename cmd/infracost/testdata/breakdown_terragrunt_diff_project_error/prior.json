@@ -17,7 +17,7 @@
       "metadata": {
         "path": "example/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "dev",
+        "terraformModulePath": "example/dev",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/dev"
       },
       "pastBreakdown": {
@@ -302,7 +302,7 @@
       "metadata": {
         "path": "example/prod",
         "type": "terragrunt_dir",
-        "terraformModulePath": "prod",
+        "terraformModulePath": "example/prod",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod"
       },
       "pastBreakdown": {

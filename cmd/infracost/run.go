@@ -378,12 +378,12 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 				var configProjects *projectOutput
 				ctx := job.ctx
 				if job.err != nil {
-					configProjects = newErroredProject(job.ctx, job.err)
+					configProjects = newErroredProject(job.provider, job.ctx, job.err)
 				} else {
 					configProjects, err = r.runProvider(job)
 					ctx = job.provider.Context()
 					if err != nil {
-						configProjects = newErroredProject(ctx, err)
+						configProjects = newErroredProject(job.provider, ctx, err)
 					}
 
 				}
@@ -952,14 +952,20 @@ func (r *parallelRunner) buildRunEnv(projectContexts []*config.ProjectContext, o
 	return env
 }
 
-func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {
+func newErroredProject(provider schema.Provider, ctx *config.ProjectContext, err error) *projectOutput {
 	metadata := schema.DetectProjectMetadata(ctx.ProjectConfig.Path)
 	metadata.Type = "error"
 	metadata.AddError(err)
+	if provider != nil {
+		metadata.TerraformModulePath = provider.RelativePath()
+	}
 
 	name := ctx.ProjectConfig.Name
 	if name == "" {
 		name = metadata.GenerateProjectName(ctx.RunContext.VCSMetadata.Remote, ctx.RunContext.IsCloudEnabled())
+		if provider != nil {
+			name = filepath.Join(name, provider.RelativePath())
+		}
 	}
 
 	return &projectOutput{projects: []*schema.Project{schema.NewProject(name, metadata)}}

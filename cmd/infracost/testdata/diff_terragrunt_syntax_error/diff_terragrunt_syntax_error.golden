@@ -1,5 +1,6 @@
 ──────────────────────────────────
 Project: dems-ag1
+Module path: testdata/diff_terragrunt_syntax_error/terragrunt/dev
 Errors:
   Error processing module at 'REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/diff_terragrunt_syntax_error/terragrunt/dev/terragrunt.hcl'. How this module was found:
     Terragrunt config file found in a subdirectory of testdata/diff_terragrunt_syntax_error/terragrunt/dev. Underlying error:

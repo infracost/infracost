@@ -1,5 +1,6 @@
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/dev
+Module path: example/dev
 Errors:
   Error processing module at 'REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/foo/terragrunt.hcl'. How this module was found:
     dependency of module at 'REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/dev'. Underlying error:
@@ -8,7 +9,8 @@ Errors:
           no such file or directory
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod
+Module path: example/prod
 Errors:
   Error processing module at 'REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/foo/terragrunt.hcl'. How this module was found:
     dependency of module at 'REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/dev'. Underlying error:
