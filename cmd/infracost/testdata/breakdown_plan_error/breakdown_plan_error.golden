@@ -1,4 +1,5 @@
 Project: infracost/infracost/examples/terraform
+Module path: .
 
 Errors:
   terraform plan failed:
