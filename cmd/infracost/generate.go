@@ -146,6 +146,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		})
 
 		variables := template.Variables{
+			RepoName:            m.Remote.Name,
 			Branch:              m.Branch.Name,
 			DetectedProjects:    detectedProjects,
 			DetectedRootModules: detectedRootModules,
