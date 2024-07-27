@@ -115,6 +115,18 @@ func TestConstraintsAllowVersionOrAbove(t *testing.T) {
 			requiredVersion: "3.38",
 			want:            false,
 		},
+		{
+			name:            "example",
+			constraints:     "~> 2.0",
+			requiredVersion: "3.38",
+			want:            false,
+		},
+		{
+			name:            "example",
+			constraints:     "~> 2",
+			requiredVersion: "3.38",
+			want:            true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
