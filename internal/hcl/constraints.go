@@ -63,8 +63,12 @@ func ConstraintsAllowVersionOrAbove(constraints version.Constraints, requiredVer
 			if segments[0] < requiredSegments[0] {
 				return false
 			}
-			if segments[0] == requiredSegments[0] && segments[1] < requiredSegments[1] {
-				return false
+			// only check the minor version if the major version is the same AND the path version is the rightmost
+			// specified component in the ~> constraint
+			if segCount := strings.Count(ver, ".") + 1; segCount > 2 {
+				if segments[0] == requiredSegments[0] && segments[1] < requiredSegments[1] {
+					return false
+				}
 			}
 		case "<":
 			if check.LessThanOrEqual(requiredVersion) {
