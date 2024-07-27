@@ -103,13 +103,37 @@ func TestConstraintsAllowVersionOrAbove(t *testing.T) {
 			requiredVersion: "3.38",
 			want:            true,
 		},
+		{
+			name:            "example",
+			constraints:     "~> 3.0",
+			requiredVersion: "3.38",
+			want:            true,
+		},
+		{
+			name:            "example",
+			constraints:     "~> 3.0.1",
+			requiredVersion: "3.38",
+			want:            false,
+		},
+		{
+			name:            "example",
+			constraints:     "~> 2.0",
+			requiredVersion: "3.38",
+			want:            false,
+		},
+		{
+			name:            "example",
+			constraints:     "~> 2",
+			requiredVersion: "3.38",
+			want:            true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c, _ := version.NewConstraint(tt.constraints)
 			v, err := version.NewVersion(tt.requiredVersion)
 			require.NoError(t, err)
-			assert.Equal(t, tt.want, ConstraintsAllowVersionOrAbove(c, v))
+			assert.Equal(t, tt.want, ConstraintsAllowVersionOrAbove(c, v), "constraint %s does not allow %s or greater", tt.constraints, tt.requiredVersion)
 		})
 	}
 }
