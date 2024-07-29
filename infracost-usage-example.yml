@@ -94,6 +94,17 @@ resource_type_default_usage:
     dns-svcs_qty_custom_resolver_locations: 1 # Number of resolver locations
     dns-svcs_qty_glb_instances: 1 # Number of GLBs
     dns-svcs_qty_pools: 1 # Number of pools
+    messagehub_CAPACITY_UNIT_HOURS: 1
+    messagehub_qty_capacity_units: 1
+    messagehub_CAPACITY_UNIT_HOURS_ADDITIONAL: 1
+    messagehub_qty_capacity_units_additional: 1 
+    messagehub_CAPACITY_UNIT_HOURS_MIRRORING: 1
+    messagehub_qty_capacity_units_mirroring: 1
+    messagehub_INSTANCE_HOURS: 1
+    messagehub_qty_instances: 1
+    messagehub_TERABYTE_HOURS: 1
+    messagehub_qty_terabytes: 1
+    messagehub_GIGABYTE_TRANSMITTED_OUTBOUNDS: 1
 
   ibm_tg_gateway: 
     connection: 3
@@ -1372,6 +1383,20 @@ resource_usage:
     dns-svcs_qty_custom_resolver_locations: 1 # Number of resolver locations
     dns-svcs_qty_glb_instances: 1 # Number of GLBs
     dns-svcs_qty_pools: 1 # Number of pools
+  
+  ibm_resource_instance.event_streams:
+    messagehub_CAPACITY_UNIT_HOURS: 1
+    messagehub_qty_capacity_units: 1
+    messagehub_CAPACITY_UNIT_HOURS_ADDITIONAL: 1
+    messagehub_qty_capacity_units_additional: 1
+    messagehub_CAPACITY_UNIT_HOURS_MIRRORING: 1
+    messagehub_qty_capacity_units_mirroring: 1
+    messagehub_INSTANCE_HOURS: 1
+    messagehub_qty_instances: 1
+    messagehub_TERABYTE_HOURS: 1
+    messagehub_qty_terabytes: 1
+    messagehub_GIGABYTE_TRANSMITTED_OUTBOUNDS: 1
+
 
   ibm_tg_gateway.tg_gateway:
     connection: 25 # Monthly number of connections to the gateway

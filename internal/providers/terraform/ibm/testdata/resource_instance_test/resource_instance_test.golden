@@ -18,6 +18,24 @@
  └─ Additional Million DNS Queries (first 999 Million Queries)                             999  Million Queries                      $645.16 
  └─ Additional Million DNS Queries (over 999 Million Queries)                                1  Million Queries                        $0.32 
                                                                                                                                              
+ ibm_resource_instance.messagehub_enterprise                                                                                                 
+ ├─ Base Capacity Unit-Hour                                                                  1  Hours                                  $7.37 
+ ├─ Additional Capacity Unit-Hour                                                            1  Hours                                  $7.37 
+ ├─ Additional Storage Terabyte per Hour                                                    10  Hours                                  $6.46 
+ ├─ Gigabyte Transmitted Outbound                                                          100  GB                                     $8.61 
+ └─ Mirroring Capacity Unit-Hour                                                             1  Hours                                  $1.47 
+                                                                                                                                             
+ ibm_resource_instance.messagehub_lite                                                                                                       
+ └─ Lite plan                                                                                1                                         $0.00 
+                                                                                                                                             
+ ibm_resource_instance.messagehub_satellite                                                                                                  
+ ├─ Base Capacity Unit-Hour                                                                  1  Hours                                  $7.37 
+ └─ Additional Capacity Unit-Hour                                                            1  Hours                                  $7.37 
+                                                                                                                                             
+ ibm_resource_instance.messagehub_standard                                                                                                   
+ ├─ Partition Hours                                                                        100  Hours                                  $1.50 
+ └─ Gigabyte Transmitted Outbound                                                          100  GB                                     $8.61 
+                                                                                                                                             
  ibm_resource_instance.resource_instance_activity_tracker_7day                                                                               
  └─ Gigabyte Months                                                                         10  Gigabyte Months                       $16.15 
                                                                                                                                              
@@ -179,7 +197,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $19,248.98 
+ OVERALL TOTAL                                                                                                                    $19,305.11 
 ──────────────────────────────────
-37 cloud resources were detected:
-∙ 37 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+41 cloud resources were detected:
+∙ 41 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

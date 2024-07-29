@@ -83,6 +83,8 @@ var FreeResources = []string{
 	"ibm_container_addons",
 	"ibm_cos_bucket_object_lock_configuration",
 	"ibm_dns_custom_resolver",
+	"ibm_event_streams_schema",
+	"ibm_event_streams_topic",
 	"ibm_iam_access_group",
 	"ibm_iam_access_group_account_settings",
 	"ibm_iam_access_group_dynamic_rule",
