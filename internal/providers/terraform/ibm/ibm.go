@@ -79,6 +79,7 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"sysdig-secure":                 {"e831e900-82d6-11ec-95c5-c12c5a5d9687", []string{}, nil, "https://cloud.ibm.com/workload-protection/catalog/security-and-compliance-center-workload-protection"},
 	"logdna":                        {"e13e1860-959c-11e8-871e-ad157af61ad7", []string{}, nil, "https://cloud.ibm.com/catalog/services/logdna"},
 	"databases-for-postgresql":      {"databases-for-postgresql", []string{}, nil, "https://cloud.ibm.com/databases/databases-for-postgresql/create"},
+	"databases-for-elasticsearch":   {"databases-for-elasticsearch", []string{}, nil, "https://cloud.ibm.com/databases/databases-for-elasticsearch/create"},
 	"secrets-manager":               {"ebc0cdb0-af2a-11ea-98c7-29e5db822649", []string{}, nil, "https://cloud.ibm.com/catalog/services/secrets-manager"},
 	"appid":                         {"AdvancedMobileAccess-d6aece47-d840-45b0-8ab9-ad15354deeea", []string{}, nil, "https://cloud.ibm.com/catalog/services/appid"},
 	"appconnect":                    {"96a0ebf2-2a02-4e32-815f-7c09a1268c78", []string{}, nil, "https://www.ibm.com/products/app-connect/pricing"},

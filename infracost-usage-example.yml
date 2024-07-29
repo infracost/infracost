@@ -111,10 +111,14 @@ resource_type_default_usage:
     data_transfer_global: 1000
     data_transfer_local: 1000
   ibm_database:
-    database_ram_mb: 12288
-    database_disk_mb: 131072
-    database_core: 3
-    database_members: 4
+    postgresql_database_ram_mb: 12288
+    postgresql_database_disk_mb: 131072
+    postgresql_database_core: 3
+    postgresql_database_members: 4
+    elasticsearch_database_ram_mb: 12288
+    elasticsearch_database_disk_mb: 131072
+    elasticsearch_database_core: 3
+    elasticsearch_database_members: 4
 
 resource_usage:
   #
@@ -1404,7 +1408,13 @@ resource_usage:
     data_transfer_global: 2500 # Monthly global traffic through the gateway in GB
 
   ibm_database.postgres:
-    database_ram_mb: 12288 # Allocated memory in MB per-member
-    database_disk_mb: 131072 # Allocated disk in MB per-member
-    database_core: 3 # Allocated dedicated CPU per-member
-    database_members: 4 # Allocated number of members in the cluster
+    postgresql_database_ram_mb: 12288 # Allocated memory in MB per-member
+    postgresql_database_disk_mb: 131072 # Allocated disk in MB per-member
+    postgresql_database_core: 3 # Allocated dedicated CPU per-member
+    postgresql_database_members: 4 # Allocated number of members in the cluster
+
+  ibm_database.elasticsearch:
+    elasticsearch_database_ram_mb: 12288 # Allocated memory in MB per-member
+    elasticsearch_database_disk_mb: 131072 # Allocated disk in MB per-member
+    elasticsearch_database_core: 3 # Allocated dedicated CPU per-member
+    elasticsearch_database_members: 4 # Allocated number of members in the cluster

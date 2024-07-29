@@ -21,10 +21,18 @@ type Database struct {
 	// Databases For PostgreSQL
 	// Catalog Link: https://cloud.ibm.com/catalog/services/databases-for-postgresql
 	// Pricing Link: https://cloud.ibm.com/docs/databases-for-postgresql?topic=databases-for-postgresql-pricing
-	RAM     *int64 `infracost_usage:"database_ram_mb"`
-	Disk    *int64 `infracost_usage:"database_disk_mb"`
-	Core    *int64 `infracost_usage:"database_core"`
-	Members *int64 `infracost_usage:"database_members"`
+	PostgreSQL_Ram     *int64 `infracost_usage:"postgresql_database_ram_mb"`
+	PostgreSQL_Disk    *int64 `infracost_usage:"postgresql_database_disk_mb"`
+	PostgreSQL_Core    *int64 `infracost_usage:"postgresql_database_core"`
+	PostgreSQL_Members *int64 `infracost_usage:"postgresql_database_members"`
+
+	// Databases For ElasticSearch
+	// Catalog Link: https://cloud.ibm.com/catalog/services/databases-for-elasticsearch
+	// Pricing Link: https://cloud.ibm.com/docs/databases-for-elasticsearch?topic=databases-for-elasticsearch-pricing
+	ElasticSearch_Ram     *int64 `infracost_usage:"elasticsearch_database_ram_mb"`
+	ElasticSearch_Disk    *int64 `infracost_usage:"elasticsearch_database_disk_mb"`
+	ElasticSearch_Core    *int64 `infracost_usage:"elasticsearch_database_core"`
+	ElasticSearch_Members *int64 `infracost_usage:"elasticsearch_database_members"`
 }
 
 type DatabaseCostComponentsFunc func(*Database) []*schema.CostComponent
@@ -37,17 +45,21 @@ func (r *Database) PopulateUsage(u *schema.UsageData) {
 
 // DatabaseUsageSchema defines a list which represents the usage schema of Database.
 var DatabaseUsageSchema = []*schema.UsageItem{
-	{Key: "database_ram_mb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "database_disk_mb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "database_core", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "database_members", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "postgresql_database_ram_mb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "postgresql_database_disk_mb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "postgresql_database_core", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "postgresql_database_members", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "elasticsearch_database_ram_mb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "elasticsearch_database_disk_mb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "elasticsearch_database_core", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "elasticsearch_database_members", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 var DatabaseCostMap map[string]DatabaseCostComponentsFunc = map[string]DatabaseCostComponentsFunc{
 	"databases-for-postgresql": GetPostgresCostComponents,
 	// "databases-for-etcd":
 	// "databases-for-redis":
-	// "databases-for-elasticsearch":
+	"databases-for-elasticsearch": GetElasticSearchCostComponents,
 	// "messages-for-rabbitmq":
 	// "databases-for-mongodb":
 	// "databases-for-mysql":
@@ -61,14 +73,14 @@ func ConvertMBtoGB(d decimal.Decimal) decimal.Decimal {
 
 func PostgresRAMCostComponent(r *Database) *schema.CostComponent {
 	var R decimal.Decimal
-	if r.RAM != nil {
-		R = ConvertMBtoGB(decimal.NewFromInt(*r.RAM))
+	if r.PostgreSQL_Ram != nil {
+		R = ConvertMBtoGB(decimal.NewFromInt(*r.PostgreSQL_Ram))
 	} else { // set the default
 		R = decimal.NewFromInt(1)
 	}
 	var m decimal.Decimal
-	if r.Members != nil {
-		m = decimal.NewFromInt(*r.Members)
+	if r.PostgreSQL_Members != nil {
+		m = decimal.NewFromInt(*r.PostgreSQL_Members)
 	} else { // set the default
 		m = decimal.NewFromInt(2)
 	}
@@ -95,14 +107,14 @@ func PostgresRAMCostComponent(r *Database) *schema.CostComponent {
 
 func PostgresDiskCostComponent(r *Database) *schema.CostComponent {
 	var d decimal.Decimal
-	if r.Disk != nil {
-		d = ConvertMBtoGB(decimal.NewFromInt(*r.Disk))
+	if r.PostgreSQL_Disk != nil {
+		d = ConvertMBtoGB(decimal.NewFromInt(*r.PostgreSQL_Disk))
 	} else { // set the default
 		d = decimal.NewFromInt(5)
 	}
 	var m decimal.Decimal
-	if r.Members != nil {
-		m = decimal.NewFromInt(*r.Members)
+	if r.PostgreSQL_Members != nil {
+		m = decimal.NewFromInt(*r.PostgreSQL_Members)
 	} else { // set the default
 		m = decimal.NewFromInt(2)
 	}
@@ -129,14 +141,14 @@ func PostgresDiskCostComponent(r *Database) *schema.CostComponent {
 
 func PostgresCoreCostComponent(r *Database) *schema.CostComponent {
 	var c decimal.Decimal
-	if r.Core != nil {
-		c = decimal.NewFromInt(*r.Core)
+	if r.PostgreSQL_Core != nil {
+		c = decimal.NewFromInt(*r.PostgreSQL_Core)
 	} else { // set the default
 		c = decimal.NewFromInt(0)
 	}
 	var m decimal.Decimal
-	if r.Members != nil {
-		m = decimal.NewFromInt(*r.Members)
+	if r.PostgreSQL_Members != nil {
+		m = decimal.NewFromInt(*r.PostgreSQL_Members)
 	} else { // set the default
 		m = decimal.NewFromInt(2)
 	}

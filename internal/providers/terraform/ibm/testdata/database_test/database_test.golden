@@ -15,7 +15,30 @@
  └─ Disk (first 1 GB-DISK)                           1  GB-DISK                        $0.61 
  └─ Disk (over 0 GB-DISK)                            1  GB-DISK                        $0.63 
                                                                                              
- OVERALL TOTAL                                                                        $87.45 
+ ibm_database.test_es_enterprise_db1                                                         
+ ├─ RAM (first 1 GB-RAM)                             1  GB-RAM                        $15.70 
+ ├─ RAM (over 0 GB-RAM)                              1  GB-RAM                        $16.17 
+ ├─ Disk (first 1 GB-DISK)                           1  GB-DISK                        $0.61 
+ ├─ Disk (over 0 GB-DISK)                            1  GB-DISK                        $0.63 
+ └─ Core (first 1 Virtual Processor Core)            1  Virtual Processor Core        $31.40 
+ └─ Core (over 0 Virtual Processor Core)             1  Virtual Processor Core        $32.34 
+                                                                                             
+ ibm_database.test_es_enterprise_db2                                                         
+ ├─ RAM (first 1 GB-RAM)                             1  GB-RAM                        $15.70 
+ ├─ RAM (over 0 GB-RAM)                              1  GB-RAM                        $16.17 
+ └─ Disk (first 1 GB-DISK)                           1  GB-DISK                        $0.61 
+ └─ Disk (over 0 GB-DISK)                            1  GB-DISK                        $0.63 
+                                                                                             
+ ibm_database.test_es_platinum_db1                                                           
+ ├─ RAM                                             36  GB-RAM                       $939.60 
+ ├─ Disk                                           384  GB-DISK                      $234.24 
+ └─ Core                                             9  Virtual Processor Core       $282.60 
+                                                                                             
+ ibm_database.test_es_platinum_db2                                                           
+ ├─ RAM                                              4  GB-RAM                       $104.40 
+ └─ Disk                                            20  GB-DISK                       $12.20 
+                                                                                            
+ OVERALL TOTAL                                                                     $1,790.45 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+4 cloud resources were detected:
+∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
