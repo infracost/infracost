@@ -85,7 +85,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getRoute53ZoneRegistryItem(),
 	getS3BucketAnalyticsConfigurationRegistryItem(),
 	getS3BucketInventoryRegistryItem(),
+	getS3BucketLifecycleConfigurationRegistryItem(),
 	getS3BucketRegistryItem(),
+	getS3BucketVersioningRegistryItem(),
 	getSecretsManagerSecret(),
 	getSSMActivationRegistryItem(),
 	getSSMParameterRegistryItem(),
@@ -537,7 +539,6 @@ var FreeResources = []string{
 	"aws_s3_bucket_public_access_block",
 	"aws_s3_bucket_replication_configuration",
 	"aws_s3_bucket_server_side_encryption_configuration",
-	"aws_s3_bucket_versioning",
 	"aws_s3_bucket_website_configuration",
 	"aws_s3_object", // Costs are shown at the bucket level
 
