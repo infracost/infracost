@@ -23,6 +23,7 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	dedicatedHost := strings.TrimSpace(d.Get("dedicated_host").String())
 	dedicatedHostGroup := strings.TrimSpace(d.Get("dedicated_host_group").String())
 	isDedicated := !((dedicatedHost == "") && (dedicatedHostGroup == ""))
+	name := d.Get("name").String()
 
 	boot_volume := make([]struct {
 		Name string
@@ -59,9 +60,10 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	r.PopulateUsage(u)
 
 	configuration := make(map[string]any)
-	configuration["region"] = region
-	configuration["profile"] = profile
+	configuration["name"] = name
 	configuration["on_dedicated_host"] = isDedicated
+	configuration["profile"] = profile
+	configuration["region"] = region
 
 	SetCatalogMetadata(d, d.Type, configuration)
 
