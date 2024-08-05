@@ -14,6 +14,10 @@ type Parser struct {
 	includePastResources bool
 }
 
+func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
+	return &Parser{ctx: ctx, includePastResources: includePastResources}
+}
+
 type parsedResource struct {
 	PartialResource *schema.PartialResource
 	ResourceData    *schema.ResourceData
