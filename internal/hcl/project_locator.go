@@ -158,11 +158,15 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 	return false
 }
 
+// clean removes the extension from the file name and converts it to lowercase.
+// This should be used to clean the file name before matching it to an env name.
 func (e *EnvFileMatcher) clean(name string) string {
 	base := filepath.Base(name)
 
 	stem, _ := splitVarFileExt(base, e.extensions)
-	return strings.ToLower(stem)
+
+	// remove the leading . from the stem as this will affect env name matching
+	return strings.TrimPrefix(strings.ToLower(stem), ".")
 }
 
 // EnvName returns the environment name for the given var file.
@@ -216,7 +220,7 @@ func (e *EnvFileMatcher) EnvName(file string) string {
 }
 
 func (e *EnvFileMatcher) hasEnvPrefix(clean string, name string) bool {
-	return strings.HasPrefix(clean, name+"-") || strings.HasPrefix(clean, name+"_") || strings.HasPrefix(clean, "."+name)
+	return strings.HasPrefix(clean, name+"-") || strings.HasPrefix(clean, name+"_") || strings.HasPrefix(clean, name+".")
 }
 
 func (e *EnvFileMatcher) hasEnvSuffix(clean string, name string) bool {
