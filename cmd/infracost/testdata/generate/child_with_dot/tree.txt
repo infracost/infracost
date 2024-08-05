@@ -1,0 +1,8 @@
+.
+└── apps
+    └── foo
+        ├── main.tf
+        └── envs
+            ├── staging.eu-west-1.tfvars
+            ├── dev.eu-west-1.tfvars
+            └── default.tfvars
