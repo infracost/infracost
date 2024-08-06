@@ -24,7 +24,10 @@
     },
     "Project": {
       "required": [
-        "path"
+        "path",
+        "spacelift_api_key_endpoint",
+        "spacelift_api_key_id",
+        "spacelift_api_key_secret"
       ],
       "properties": {
         "config_sha": {
@@ -93,6 +96,15 @@
           "type": "string"
         },
         "terraform_cloud_token": {
+          "type": "string"
+        },
+        "spacelift_api_key_endpoint": {
+          "type": "string"
+        },
+        "spacelift_api_key_id": {
+          "type": "string"
+        },
+        "spacelift_api_key_secret": {
           "type": "string"
         },
         "terragrunt_flags": {
