@@ -24,10 +24,7 @@
     },
     "Project": {
       "required": [
-        "path",
-        "spacelift_api_key_endpoint",
-        "spacelift_api_key_id",
-        "spacelift_api_key_secret"
+        "path"
       ],
       "properties": {
         "config_sha": {

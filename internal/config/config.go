@@ -97,13 +97,13 @@ type Project struct {
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
 	// SpaceliftAPIKeyEndpoint is the endpoint that the spacelift API client will communicate with.
-	SpaceliftAPIKeyEndpoint string `yaml:"spacelift_api_key_endpoint" envconfig:"SPACELIFT_API_KEY_ENDPOINT"`
+	SpaceliftAPIKeyEndpoint string `yaml:"spacelift_api_key_endpoint,omitempty" envconfig:"SPACELIFT_API_KEY_ENDPOINT"`
 	// SpaceliftAPIKeyID is the spacelift API key ID. This is used in combination
 	// with the API key secret to generate a JWT token.
-	SpaceliftAPIKeyID string `yaml:"spacelift_api_key_id" envconfig:"SPACELIFT_API_KEY_ID"`
+	SpaceliftAPIKeyID string `yaml:"spacelift_api_key_id,omitempty" envconfig:"SPACELIFT_API_KEY_ID"`
 	// SpaceliftAPIKeySecret is the spacelift API key secret.This is used in combination
 	// with the API key id to generate a JWT token.
-	SpaceliftAPIKeySecret string `yaml:"spacelift_api_key_secret" envconfig:"SPACELIFT_API_KEY_SECRET"`
+	SpaceliftAPIKeySecret string `yaml:"spacelift_api_key_secret,omitempty" envconfig:"SPACELIFT_API_KEY_SECRET"`
 	// TerragruntFlags set additional flags that should be passed to terragrunt.
 	TerragruntFlags string `yaml:"terragrunt_flags,omitempty" envconfig:"TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
