@@ -101,7 +101,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
 	}
 
-	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
+	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env), hcl.OptionWithSpaceliftRemoteVarLoader(ctx)}
 
 	if len(v.vars) > 0 {
 		withPlanFlagVars := hcl.OptionWithPlanFlagVars(v.vars)
@@ -127,7 +127,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 	})
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
 	if err == nil {
-		var loaderOpts []hcl.RemoteVariablesLoaderOption
+		var loaderOpts []hcl.TFCRemoteVariablesLoaderOption
 		if ctx.ProjectConfig.TerraformCloudWorkspace != "" && ctx.ProjectConfig.TerraformCloudOrg != "" {
 			loaderOpts = append(loaderOpts, hcl.RemoteVariablesLoaderWithRemoteConfig(hcl.TFCRemoteConfig{
 				Organization: ctx.ProjectConfig.TerraformCloudOrg,
@@ -136,7 +136,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 			}))
 		}
 
-		options = append(options, hcl.OptionWithRemoteVarLoader(
+		options = append(options, hcl.OptionWithTFCRemoteVarLoader(
 			credsSource.BaseCredentialSet.Host,
 			credsSource.BaseCredentialSet.Token,
 			localWorkspace,

@@ -95,6 +95,15 @@
         "terraform_cloud_token": {
           "type": "string"
         },
+        "spacelift_api_key_endpoint": {
+          "type": "string"
+        },
+        "spacelift_api_key_id": {
+          "type": "string"
+        },
+        "spacelift_api_key_secret": {
+          "type": "string"
+        },
         "terragrunt_flags": {
           "type": "string"
         },
