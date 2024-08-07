@@ -247,16 +247,41 @@ func OptionWithRawCtyInput(input cty.Value) (op Option) {
 	}
 }
 
-// OptionWithRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
+// OptionWithTFCRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
 // values to load remote execution variables.
-func OptionWithRemoteVarLoader(host, token, localWorkspace string, loaderOpts ...RemoteVariablesLoaderOption) Option {
+func OptionWithTFCRemoteVarLoader(host, token, localWorkspace string, loaderOpts ...TFCRemoteVariablesLoaderOption) Option {
 	return func(p *Parser) {
 		if host == "" || token == "" {
 			return
 		}
 
 		client := extclient.NewAuthedAPIClient(host, token)
-		p.remoteVariablesLoader = NewRemoteVariablesLoader(client, localWorkspace, p.logger, loaderOpts...)
+		p.remoteVariableLoaders = append(p.remoteVariableLoaders, NewTFCRemoteVariablesLoader(client, localWorkspace, p.logger, loaderOpts...))
+	}
+}
+
+// OptionWithSpaceliftRemoteVarLoader attempts to build a SpaceLift remote
+// variable loader and set this on the parser. If the required environment
+// variables are not set, the loader is skipped.
+func OptionWithSpaceliftRemoteVarLoader(ctx *config.ProjectContext) Option {
+	return func(p *Parser) {
+		if ctx.ProjectConfig.SpaceliftAPIKeyEndpoint == "" || ctx.ProjectConfig.SpaceliftAPIKeyID == "" || ctx.ProjectConfig.SpaceliftAPIKeySecret == "" {
+			p.logger.Trace().Msg("Required Spacelift API key environment variables not set, skipping Spacelift remote variable loader.")
+			return
+		}
+
+		loader, err := NewSpaceliftRemoteVariableLoader(
+			ctx.RunContext.VCSMetadata,
+			ctx.ProjectConfig.SpaceliftAPIKeyEndpoint,
+			ctx.ProjectConfig.SpaceliftAPIKeyID,
+			ctx.ProjectConfig.SpaceliftAPIKeySecret,
+		)
+		if err != nil {
+			p.logger.Debug().Err(err).Msg("could not create Spacelift remote variable loader")
+			return
+		}
+
+		p.remoteVariableLoaders = append(p.remoteVariableLoaders, loader)
 	}
 }
 
@@ -310,7 +335,7 @@ type Parser struct {
 	moduleLoader          *modules.ModuleLoader
 	hclParser             *modules.SharedHCLParser
 	blockBuilder          BlockBuilder
-	remoteVariablesLoader *RemoteVariablesLoader
+	remoteVariableLoaders []RemoteVariableLoader
 	logger                zerolog.Logger
 	isGraph               bool
 	hasChanges            bool
@@ -626,15 +651,20 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 		combinedVars = make(map[string]cty.Value)
 	}
 
-	if p.remoteVariablesLoader != nil {
-		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
-		if err != nil {
-			p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
-			return combinedVars, err
-		}
+	if p.remoteVariableLoaders != nil {
+		for _, loader := range p.remoteVariableLoaders {
+			remoteVars, err := loader.Load(RemoteVarLoaderOptions{
+				Blocks:  blocks,
+				EnvName: p.EnvName(),
+			})
+			if err != nil {
+				p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
+				return combinedVars, err
+			}
 
-		for k, v := range remoteVars {
-			combinedVars[k] = v
+			for k, v := range remoteVars {
+				combinedVars[k] = v
+			}
 		}
 	}
 
