@@ -1,0 +1,4 @@
+version: 0.1
+projects:
+ - path: ./testdata/breakdown_arm_template_config_file/standard_disk.json
+   name : standard_disk

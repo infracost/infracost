@@ -1,0 +1,24 @@
+Project: standard_disk
+
+ Name                                     Monthly Qty  Unit                      Monthly Cost   
+                                                                                                
+ Microsoft.Compute/disks/standard                                                               
+ ├─ Storage (S40, LRS)                              1  months                          $85.60   
+ └─ Disk operations                Monthly cost depends on usage: $0.0005 per 10k operations    
+                                                                                                
+ OVERALL TOTAL                                                                        $85.60 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ standard_disk                                      ┃           $86 ┃           - ┃        $86 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+
