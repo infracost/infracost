@@ -1,0 +1,73 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "metadata": {
+      "_generator": {
+        "name": "example",
+        "version": "0.26.54.24096",
+        "templateHash": "7729680081436334184"
+      }
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Compute/disks",
+        "apiVersion": "2023-10-02",
+        "name": "standard",
+        "location": "eastus",
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          }
+        },
+        "sku": {
+          "name": "Standard_LRS"
+        }
+      },
+      {
+        "type": "Microsoft.Compute/disks",
+        "apiVersion": "2023-10-02",
+        "name": "premium",
+        "location": "eastus",
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          }
+        },
+        "sku": {
+          "name": "Premium_LRS"
+        }
+      },
+      {
+        "type": "Microsoft.Compute/disks",
+        "apiVersion": "2023-10-02",
+        "name": "custom_size_ssd",
+        "location": "eastus",
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          },
+          "diskSizeGB": 1000
+        },
+        "sku": {
+          "name": "StandardSSD_LRS"
+        }
+      },
+      {
+        "type": "Microsoft.Compute/disks",
+        "apiVersion": "2023-10-02",
+        "name": "ultra",
+        "location": "eastus",
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          },
+          "diskSizeGB": 2000,
+          "diskIOPSReadWrite": 4000,
+          "diskMBpsReadWrite": 20
+        },
+        "sku": {
+          "name": "UltraSSD_LRS"
+        }
+      }
+    ]
+  }

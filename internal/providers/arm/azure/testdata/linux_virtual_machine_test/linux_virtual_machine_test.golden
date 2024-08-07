@@ -1,0 +1,63 @@
+
+ Name                                                                       Monthly Qty  Unit                      Monthly Cost    
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/standard_a2_v2_custom_disk                                                                
+ ├─ Instance usage (Linux, pay as you go, Standard_A2_v2)                           730  hours                           $65.92    
+ └─ os_disk                                                                                                                        
+    ├─ Storage (E30, LRS)                                                             1  months                          $76.80    
+    └─ Disk operations                                                                2  10k operations                   $0.00  * 
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/standard_f2_lowercase                                                                     
+ ├─ Instance usage (Linux, pay as you go, standard_f2)                              730  hours                           $72.27    
+ └─ os_disk                                                                                                                        
+    └─ Storage (P4, LRS)                                                              1  months                           $5.28    
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/standard_f2_premium_disk                                                                  
+ ├─ Instance usage (Linux, pay as you go, Standard_F2)                              730  hours                           $72.27    
+ └─ os_disk                                                                                                                        
+    └─ Storage (P4, LRS)                                                              1  months                           $5.28    
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/standard_a2_ultra_enabled                                                                 
+ ├─ Instance usage (Linux, pay as you go, Standard_A2_v2)                           730  hours                           $65.92    
+ ├─ Ultra disk reservation (if unattached)                           Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ os_disk                                                                                                                        
+    ├─ Storage (E4, LRS)                                                              1  months                           $2.40    
+    └─ Disk operations                                               Monthly cost depends on usage: $0.002 per 10k operations      
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/basic_a2                                                                                  
+ ├─ Instance usage (Linux, pay as you go, Basic_A2)                                 730  hours                           $57.67    
+ └─ os_disk                                                                                                                        
+    ├─ Storage (S4, LRS)                                                              1  months                           $1.54    
+    └─ Disk operations                                               Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/basic_b1                                                                                  
+ ├─ Instance usage (Linux, pay as you go, Standard_B1s)                             730  hours                            $7.59    
+ └─ os_disk                                                                                                                        
+    ├─ Storage (S4, LRS)                                                              1  months                           $1.54    
+    └─ Disk operations                                               Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/basic_b1_lowercase                                                                        
+ ├─ Instance usage (Linux, pay as you go, standard_b1s)                             730  hours                            $7.59    
+ └─ os_disk                                                                                                                        
+    ├─ Storage (S4, LRS)                                                              1  months                           $1.54    
+    └─ Disk operations                                               Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                   
+ Microsoft.Compute/virtualMachines/Linux/basic_b1_withMonthlyHours                                                                 
+ ├─ Instance usage (Linux, pay as you go, Standard_B1s)                             100  hours                            $1.04    
+ └─ os_disk                                                                                                                        
+    ├─ Storage (S4, LRS)                                                              1  months                           $1.54    
+    └─ Disk operations                                               Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                   
+ OVERALL TOTAL                                                                                                          $446.18 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+8 cloud resources were detected:
+∙ 8 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMLinuxVirtualMachineGoldenFile/ARM       ┃          $446 ┃       $0.00 ┃       $446 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
