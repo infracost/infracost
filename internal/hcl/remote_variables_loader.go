@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -67,6 +68,7 @@ type tfcVar struct {
 	Value     string `json:"value"`
 	Sensitive bool   `json:"sensitive"`
 	Category  string `json:"category"`
+	HCL       bool   `json:"hcl"`
 }
 
 type tfcVarsetResponse struct {
@@ -223,9 +225,11 @@ func (r *TFCRemoteVariablesLoader) Load(options RemoteVarLoaderOptions) (map[str
 		for _, v := range varset.Relationships.Vars.Data {
 			vv, ok := varsMap[v.ID]
 			if ok {
-				val := getVarValue(vv)
+				val := r.getVarValue(vv)
 				if !val.IsNull() && val.IsKnown() {
-					vars[vv.Key] = val
+					k := r.getVarKey(vv)
+					r.logger.Debug().Msgf("adding variable %s from varset %s", k, varset.Attributes.Name)
+					vars[k] = val
 				}
 			}
 		}
@@ -243,9 +247,11 @@ func (r *TFCRemoteVariablesLoader) Load(options RemoteVarLoaderOptions) (map[str
 	}
 
 	for _, v := range varsResponse.Data {
-		val := getVarValue(v.Attributes)
+		val := r.getVarValue(v.Attributes)
 		if !val.IsNull() {
-			vars[v.Attributes.Key] = val
+			k := r.getVarKey(v.Attributes)
+			r.logger.Debug().Msgf("adding variable %s from workspace", k)
+			vars[k] = val
 		}
 	}
 
@@ -317,6 +323,42 @@ func (r *TFCRemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks
 	return conf, nil
 }
 
+func (r *TFCRemoteVariablesLoader) getVarKey(variable tfcVar) string {
+	if variable.Category == "env" && strings.HasPrefix(variable.Key, "TF_VAR_") {
+		return strings.TrimPrefix(variable.Key, "TF_VAR_")
+	}
+
+	return variable.Key
+}
+
+func (r *TFCRemoteVariablesLoader) getVarValue(variable tfcVar) cty.Value {
+	if variable.Sensitive {
+		r.logger.Debug().Msgf("skipping sensitive variable %s", variable.Key)
+		return cty.DynamicVal
+	}
+
+	if variable.Value == "" {
+		r.logger.Debug().Msgf("skipping empty variable %s", variable.Key)
+		return cty.DynamicVal
+	}
+
+	if variable.Category == "env" && !strings.HasPrefix(variable.Key, "TF_VAR_") {
+		r.logger.Debug().Msgf("skipping environment variable %s", variable.Key)
+		return cty.DynamicVal
+	}
+
+	if variable.HCL {
+		val, err := ParseVariable(variable.Value)
+		if err != nil {
+			r.logger.Debug().Err(err).Msgf("could not parse variable %s with HCL value", variable.Key)
+			return cty.DynamicVal
+		}
+		return val
+	}
+
+	return cty.StringVal(variable.Value)
+}
+
 func getAttribute(block *Block, name string) string {
 	if block == nil {
 		return ""
@@ -328,14 +370,6 @@ func getAttribute(block *Block, name string) string {
 	}
 
 	return ""
-}
-
-func getVarValue(variable tfcVar) cty.Value {
-	if variable.Sensitive || variable.Category != "terraform" || variable.Value == "" {
-		return cty.DynamicVal
-	}
-
-	return cty.StringVal(variable.Value)
 }
 
 // SpaceliftRemoteVariableLoader orchestrates communicating with the Spacelift API to fetch remote variables.

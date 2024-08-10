@@ -863,7 +863,8 @@ func tfVarsToMap(vars []string) map[string]interface{} {
 
 	m := make(map[string]interface{}, len(vars))
 	for _, v := range vars {
-		pieces := strings.Split(v, "=")
+		pieces := strings.SplitN(v, "=", 2)
+
 		if len(pieces) != 2 {
 			continue
 		}

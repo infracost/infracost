@@ -1099,7 +1099,7 @@ func TestBreakdownWithComplexVarFlags(t *testing.T) {
 			"--terraform-var",
 			"instance_config={\"instance_type\":\"t2.micro\",\"storage\":20}",
 			"--terraform-var",
-			"lambda_configs=[{\"memory_size\":128},{\"memory_size\":256}]",
+			"lambda_configs=[{memory_size = 128},{ memory_size = 256}]",
 			"--usage-file",
 			path.Join(dir, "infracost-usage.yml"),
 		},
