@@ -366,7 +366,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 
 	if r.PerformanceInsightsEnabled {
 		if r.PerformanceInsightsLongTermRetention {
-			costComponents = append(costComponents, performanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
+			costComponents = append(costComponents, performanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass, databaseEngine, false, nil))
 		}
 
 		if r.MonthlyAdditionalPerformanceInsightsRequests == nil || *r.MonthlyAdditionalPerformanceInsightsRequests > 0 {
@@ -386,7 +386,37 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		UsageSchema:    DBInstanceUsageSchema,
 	}
 }
-func performanceInsightsLongTermRetentionCostComponent(region, instanceClass string) *schema.CostComponent {
+func performanceInsightsLongTermRetentionCostComponent(region, instanceClass, dbEngine string, isServerless bool, capacityUnits *float64) *schema.CostComponent {
+
+	if isServerless {
+		auroraCapacityUnits := decimal.Zero
+		if capacityUnits != nil {
+			auroraCapacityUnits = decimal.NewFromFloat(*capacityUnits)
+		}
+		return &schema.CostComponent{
+			Name:            fmt.Sprintf("Performance Insights Long Term Retention (serverless)"),
+			Unit:            "ACUs",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: &auroraCapacityUnits,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonRDS"),
+				ProductFamily: strPtr("Performance Insights"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{
+						Key:        "usagetype",
+						ValueRegex: regexPtr("PI_LTR_FMR:Serverless$"),
+					},
+					{
+						Key:   "databaseEngine",
+						Value: &dbEngine,
+					},
+				},
+			},
+		}
+	}
+
 	instanceType := strings.TrimPrefix(instanceClass, "db.")
 
 	vCPUCount := decimal.Zero
