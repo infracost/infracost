@@ -19,16 +19,18 @@ func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	return map[string]interface{}{}
 }
 
-func ParseTags(r *schema.ResourceData) *map[string]string {
+func ParseTags(externalTags map[string]string, r *schema.ResourceData) map[string]string {
 	_, supportsTags := provider_schemas.AzureTagsSupport[r.Type]
 	rTags := r.Get("tags").Map()
 	if !supportsTags && len(rTags) == 0 {
 		return nil
 	}
-
 	tags := make(map[string]string)
+	for k, v := range externalTags {
+		tags[k] = v
+	}
 	for k, v := range rTags {
 		tags[k] = v.String()
 	}
-	return &tags
+	return tags
 }

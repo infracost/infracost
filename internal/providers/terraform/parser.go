@@ -4,11 +4,14 @@ import (
 	"bytes"
 	stdJson "encoding/json"
 	"fmt"
-	"github.com/hashicorp/go-version"
+	"os"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/hashicorp/go-version"
+	"gopkg.in/yaml.v3"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
@@ -482,7 +485,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	}
 }
 
-func parseAWSDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
+func parseAWSDefaultTags(providerConf, resConf gjson.Result) map[string]string {
 	// this only works for aws, we'll need to review when other providers support default tags
 	providerKey := parseProviderKey(resConf)
 	dTagsArray := providerConf.Get(fmt.Sprintf("%s.expressions.default_tags", gjsonEscape(providerKey))).Array()
@@ -496,17 +499,16 @@ func parseAWSDefaultTags(providerConf, resConf gjson.Result) *map[string]string 
 			defaultTags[k] = v.String()
 		}
 	}
-
-	return &defaultTags
+	return defaultTags
 }
 
-func parseGoogleDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
-	defaultTags := make(map[string]string)
+func parseGoogleDefaultTags(providerConf, resConf gjson.Result) map[string]string {
 	providerKey := parseProviderKey(resConf)
+	defaultTags := make(map[string]string)
 	for k, v := range providerConf.Get(fmt.Sprintf("%s.expressions.default_labels.constant_value", gjsonEscape(providerKey))).Map() {
 		defaultTags[k] = v.String()
 	}
-	return &defaultTags
+	return defaultTags
 }
 
 func overrideRegion(d *schema.ResourceData, config *config.Config) string {
@@ -790,28 +792,97 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 	return found
 }
 
+type YorConfig struct {
+	Name  string `yaml:"name"`
+	Value struct {
+		Default string `yaml:"default"`
+	} `yaml:"value"`
+	TagGroups []struct {
+		Name string `yaml:"name"`
+		Tags []struct {
+			Name  string `yaml:"name"`
+			Value struct {
+				Default string `yaml:"default"`
+			} `yaml:"value"`
+		} `yaml:"tags"`
+	} `yaml:"tag_groups"`
+}
+
+func (p *Parser) parseYorTagsFromConfigFile(path string, tags map[string]string) {
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		logging.Logger.Debug().Msgf("failed to read yor config: %s", err)
+		return
+	}
+
+	var conf YorConfig
+	if err := yaml.Unmarshal(data, &conf); err != nil {
+		logging.Logger.Debug().Msgf("failed to unmarshal yor config: %s", err)
+		return
+	}
+
+	// single tag style config
+	if conf.Name != "" && conf.Value.Default != "" {
+		tags[conf.Name] = conf.Value.Default
+	}
+
+	// tag group style config
+	for _, tg := range conf.TagGroups {
+		for _, t := range tg.Tags {
+			if t.Name == "" || t.Value.Default == "" {
+				continue
+			}
+			tags[t.Name] = t.Value.Default
+		}
+	}
+}
+
+func (p *Parser) parseYorTagsFromJSON(rawJSON string, tags map[string]string) {
+	var simpleTags map[string]string
+	if err := stdJson.Unmarshal([]byte(rawJSON), &simpleTags); err == nil {
+		for k, v := range simpleTags {
+			if k == "" || v == "" {
+				continue
+			}
+			tags[k] = v
+		}
+	} else {
+		logging.Logger.Debug().Msgf("failed to unmarshal yor simple tags json: %s", err)
+	}
+}
+
 func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *ConfLoader, providerConf gjson.Result) {
 	awsTagParsingConfig := aws.TagParsingConfig{PropagateDefaultsToVolumeTags: hcl.ConstraintsAllowVersionOrAbove(p.providerConstraints.AWS, hcl.AWSVersionConstraintVolumeTags)}
+
+	externalTags := make(map[string]string)
+	if p.ctx.ProjectConfig.YorConfigPath != "" {
+		p.parseYorTagsFromConfigFile(p.ctx.ProjectConfig.YorConfigPath, externalTags)
+	}
+	if yorSimpleTags := os.Getenv("YOR_SIMPLE_TAGS"); yorSimpleTags != "" {
+		p.parseYorTagsFromJSON(yorSimpleTags, externalTags)
+	}
+
 	for _, resourceData := range data {
 
 		providerPrefix := getProviderPrefix(resourceData.Type)
 		defaultTagSupport := p.areDefaultTagsSupported(providerPrefix)
-		var tags *map[string]string
-		var defaultTags *map[string]string
+		var tags map[string]string
+		var defaultTags map[string]string
 		resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 		switch providerPrefix {
 		case "aws":
 			if defaultTagSupport {
 				defaultTags = parseAWSDefaultTags(providerConf, resConf)
 			}
-			tags = aws.ParseTags(defaultTags, resourceData, awsTagParsingConfig)
+			tags = aws.ParseTags(externalTags, defaultTags, resourceData, awsTagParsingConfig)
 		case "azurerm":
-			tags = azure.ParseTags(resourceData)
+			tags = azure.ParseTags(externalTags, resourceData)
 		case "google":
 			if defaultTagSupport {
 				defaultTags = parseGoogleDefaultTags(providerConf, resConf)
 			}
-			tags = google.ParseTags(resourceData, defaultTags)
+			tags = google.ParseTags(resourceData, externalTags, defaultTags)
 		default:
 			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
@@ -823,12 +894,15 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 					providerLink = fmt.Sprintf("%s:%d", providerLink, providerLine)
 				}
 				resourceData.ProviderLink = providerLink
-
 			}
 		}
 
-		resourceData.Tags = tags
-		resourceData.DefaultTags = defaultTags
+		if tags != nil {
+			resourceData.Tags = &tags
+		}
+		if defaultTags != nil {
+			resourceData.DefaultTags = &defaultTags
+		}
 		resourceData.ProviderSupportsDefaultTags = defaultTagSupport
 		resourceData.TagPropagation = p.getTagPropagationInfo(resourceData)
 	}

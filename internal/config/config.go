@@ -111,6 +111,8 @@ type Project struct {
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
 	TerraformUseState bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
 	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
+	// YorConfigPath is the path to a Yor config file, which we can extract default tags from
+	YorConfigPath string `yaml:"yor_config_path,omitempty" ignored:"true"`
 }
 
 type Config struct {

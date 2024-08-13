@@ -122,7 +122,7 @@ func (p *PriceFetcher) MissingPricesComponents() []string {
 			result = append(result, key)
 		}
 	}
-
+	sort.Strings(result)
 	return result
 }
 

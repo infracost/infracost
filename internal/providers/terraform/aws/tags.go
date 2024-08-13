@@ -93,7 +93,7 @@ var ExpectedPropagations = map[string]TagPropagationConfig{
 	},
 }
 
-func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config TagParsingConfig) *map[string]string {
+func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) map[string]string {
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
@@ -105,16 +105,27 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config Ta
 
 	tags := make(map[string]string)
 
+	// external tags (e.g. yor)
+	for k, v := range externalTags {
+		tags[k] = v
+	}
+	if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
+		for k, v := range defaultTags {
+			k = fmt.Sprintf("volume_tags.%s", k)
+			tags[k] = v
+		}
+	}
+
 	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[r.Type]
 	if supportsDefaultTags && defaultTags != nil {
-		keysAndValues := make([]string, 0, len(*defaultTags)*2)
-		for k, v := range *defaultTags {
+		keysAndValues := make([]string, 0, len(defaultTags)*2)
+		for k, v := range defaultTags {
 			tags[k] = v
 			keysAndValues = append(keysAndValues, k, v)
 		}
 
 		if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
-			for k, v := range *defaultTags {
+			for k, v := range defaultTags {
 				k = fmt.Sprintf("volume_tags.%s", k)
 				tags[k] = v
 				keysAndValues = append(keysAndValues, k, v)
@@ -161,7 +172,7 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData, config Ta
 		f(tags, r)
 	}
 
-	return &tags
+	return tags
 }
 
 func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {

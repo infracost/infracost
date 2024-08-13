@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/infracost/infracost/internal/config"
@@ -62,5 +63,20 @@ func TestCatchesRuntimeError(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform", "--terraform-workspace", "prod"}, &GoldenFileOptions{CaptureLogs: true}, func(c *config.RunContext) {
 		// this should blow up the application
 		c.Config.Projects = []*config.Project{nil, nil}
+	})
+}
+
+func TestConfigFileWithYorConfig(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-yor.yml", "--format", "json"}, &GoldenFileOptions{
+		IsJSON:      true,
+		RegexFilter: regexp.MustCompile(`"path": "[^"]*",`),
+	})
+}
+
+func TestConfigFileWithYorEnv(t *testing.T) {
+	t.Setenv("YOR_SIMPLE_TAGS", `{"Team": "Engineering"}`)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-yor.yml", "--format", "json"}, &GoldenFileOptions{
+		IsJSON:      true,
+		RegexFilter: regexp.MustCompile(`"path": "[^"]*",`),
 	})
 }
