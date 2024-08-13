@@ -394,7 +394,7 @@ func performanceInsightsLongTermRetentionCostComponent(region, instanceClass, db
 			auroraCapacityUnits = decimal.NewFromFloat(*capacityUnits)
 		}
 		return &schema.CostComponent{
-			Name:            fmt.Sprintf("Performance Insights Long Term Retention (serverless)"),
+			Name:            "Performance Insights Long Term Retention (serverless)",
 			Unit:            "ACUs",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &auroraCapacityUnits,
