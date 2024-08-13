@@ -34,7 +34,6 @@
                 "unit": "hours"
               }
             ],
-            "defaultTags": null,
             "hourlyCost": "1.017315068493150679",
             "metadata": {
               "calls": [
@@ -141,7 +140,6 @@
                 "usageBased": true
               }
             ],
-            "defaultTags": null,
             "metadata": {
               "calls": [
                 {
@@ -206,7 +204,6 @@
                 "unit": "hours"
               }
             ],
-            "defaultTags": null,
             "hourlyCost": "1.017315068493150679",
             "metadata": {
               "calls": [
@@ -313,7 +310,6 @@
                 "usageBased": true
               }
             ],
-            "defaultTags": null,
             "metadata": {
               "calls": [
                 {

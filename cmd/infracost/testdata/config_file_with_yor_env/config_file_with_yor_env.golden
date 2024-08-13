@@ -40,7 +40,6 @@
               "B": "654321",
               "Team": "Engineering"
             },
-            "defaultTags": null,
             "providerSupportsDefaultTags": true,
             "providerLink": "../../examples/terraform/main.tf:1",
             "metadata": {
@@ -128,7 +127,6 @@
               "B": "654321",
               "Team": "Engineering"
             },
-            "defaultTags": null,
             "providerSupportsDefaultTags": true,
             "providerLink": "../../examples/terraform/main.tf:1",
             "metadata": {
@@ -195,7 +193,6 @@
               "B": "654321",
               "Team": "Engineering"
             },
-            "defaultTags": null,
             "providerSupportsDefaultTags": true,
             "providerLink": "../../examples/terraform/main.tf:1",
             "metadata": {
@@ -283,7 +280,6 @@
               "B": "654321",
               "Team": "Engineering"
             },
-            "defaultTags": null,
             "providerSupportsDefaultTags": true,
             "providerLink": "../../examples/terraform/main.tf:1",
             "metadata": {
