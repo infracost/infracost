@@ -193,12 +193,11 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 func filterJSON(r gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) map[string]interface{} {
 	values := make(map[string]interface{})
 	for k, v := range r.Map() {
-		if include.MatchString(k) {
-			values[k] = v.Value()
-			continue
-		}
 		if exclude.MatchString(k) {
 			continue
+		}
+		if include.MatchString(k) {
+			values[k] = v.Value()
 		}
 
 		if v.IsObject() {
