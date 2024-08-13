@@ -897,8 +897,12 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 			}
 		}
 
-		resourceData.Tags = &tags
-		resourceData.DefaultTags = &defaultTags
+		if len(tags) > 0 {
+			resourceData.Tags = &tags
+		}
+		if len(defaultTags) > 0 {
+			resourceData.DefaultTags = &defaultTags
+		}
 		resourceData.ProviderSupportsDefaultTags = defaultTagSupport
 		resourceData.TagPropagation = p.getTagPropagationInfo(resourceData)
 	}
