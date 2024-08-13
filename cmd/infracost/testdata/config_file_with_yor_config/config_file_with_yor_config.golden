@@ -70,7 +70,6 @@
                   }
                 ],
                 "hourlyCost": "0.00684931506849315",
-                "metadata": {},
                 "monthlyCost": "5",
                 "name": "root_block_device"
               },
@@ -98,7 +97,6 @@
                   }
                 ],
                 "hourlyCost": "0.242465753424657529",
-                "metadata": {},
                 "monthlyCost": "177",
                 "name": "ebs_block_device[0]"
               }
@@ -173,7 +171,7 @@
         "totalMonthlyUsageCost": "0"
       },
       "diff": {
-        "resources": [],
+        "resources": null,
         "totalHourlyCost": "0",
         "totalMonthlyCost": "0",
         "totalMonthlyUsageCost": "0"
@@ -244,7 +242,6 @@
                   }
                 ],
                 "hourlyCost": "0.00684931506849315",
-                "metadata": {},
                 "monthlyCost": "5",
                 "name": "root_block_device"
               },
@@ -272,7 +269,6 @@
                   }
                 ],
                 "hourlyCost": "0.242465753424657529",
-                "metadata": {},
                 "monthlyCost": "177",
                 "name": "ebs_block_device[0]"
               }
@@ -347,24 +343,20 @@
         "totalMonthlyUsageCost": "0"
       },
       "summary": {
-        "noPriceResourceCounts": {},
         "totalDetectedResources": 2,
         "totalNoPriceResources": 0,
         "totalSupportedResources": 2,
         "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 2,
-        "unsupportedResourceCounts": {}
+        "totalUsageBasedResources": 2
       }
     }
   ],
   "summary": {
-    "noPriceResourceCounts": {},
     "totalDetectedResources": 2,
     "totalNoPriceResources": 0,
     "totalSupportedResources": 2,
     "totalUnsupportedResources": 0,
-    "totalUsageBasedResources": 2,
-    "unsupportedResourceCounts": {}
+    "totalUsageBasedResources": 2
   },
   "timeGenerated": "REPLACED_TIME",
   "totalHourlyCost": "1.017315068493150679",

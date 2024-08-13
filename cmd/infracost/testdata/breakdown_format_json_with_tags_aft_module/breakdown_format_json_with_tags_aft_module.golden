@@ -7,20 +7,6 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_cloudwatch_query_definition.account_id_query",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_cloudwatch_query_definition.customization_request_query",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role.aft_lambda_aft_account_provisioning_framework_create_role",
             "tags": {
               "managed_by": "AFT"
@@ -57,94 +43,10 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy.aft_invoke_aft_account_provisioning_framework_create_role",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy.aft_invoke_aft_account_provisioning_framework_persist_metadata",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy.aft_invoke_aft_account_provisioning_framework_tag_account",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy.aft_states",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy_attachment.aft_account_provisioning_framework_create_role[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy_attachment.aft_account_provisioning_framework_create_role[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy_attachment.aft_account_provisioning_framework_persist_metadata[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy_attachment.aft_account_provisioning_framework_persist_metadata[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy_attachment.aft_account_provisioning_framework_tag_account[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_provisioning_framework.aws_iam_role_policy_attachment.aft_account_provisioning_framework_tag_account[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_account_request_framework.aws_backup_plan.aft_controltower_backup_plan",
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_backup_selection.aft_controltower_backup_selection",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_permission.control_tower_management_account",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -172,34 +74,6 @@
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_account_request_processor",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_controltower_event_logger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_invoke_aft_account_provisioning_framework",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_cloudwatch_event_target.aft_management_event_bus",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -305,193 +179,11 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.aft_account_request_action_trigger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.aft_account_request_audit_trigger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.aft_account_request_processor",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.aft_cleanup_resources",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.aft_controltower_event_logger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.aft_invoke_aft_account_provisioning_framework",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy.control_tower_events",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.account_request_processor[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.account_request_processor[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_account_request_action_trigger[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_account_request_action_trigger[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_account_request_audit_trigger[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_account_request_audit_trigger[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_aws_backup_service_role",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_cleanup_resources[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_cleanup_resources[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_controltower_event_logger[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_controltower_event_logger[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_invoke_aft_account_provisioning_framework[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_iam_role_policy_attachment.aft_invoke_aft_account_provisioning_framework[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_account_request_framework.aws_internet_gateway.aft-vpc-igw[0]",
             "tags": {
               "Name": "aft-vpc-igw",
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_kms_alias.aft",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_lambda_event_source_mapping.aft_account_request_action_trigger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_lambda_event_source_mapping.aft_account_request_audit_trigger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_lambda_permission.aft_account_request_processor",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_lambda_permission.aft_controltower_event_logger",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_lambda_permission.aft_invoke_aft_account_provisioning_framework",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -522,34 +214,6 @@
               "Name": "aft-vpc-public-subnet-01",
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_route_table_association.aft_vpc_private_subnet_01[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_route_table_association.aft_vpc_private_subnet_02[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_route_table_association.aft_vpc_public_subnet_01[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_account_request_framework.aws_route_table_association.aft_vpc_public_subnet_02[0]",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -638,11 +302,6 @@
             }
           },
           {
-            "defaultTags": null,
-            "name": "module.aft.module.aft_account_request_framework.time_sleep.wait_60_seconds",
-            "tags": null
-          },
-          {
             "defaultTags": {
               "managed_by": "AFT"
             },
@@ -659,76 +318,6 @@
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_iam_role_policy_attachment.replication[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_kms_alias.encrypt-alias-primary-region",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_kms_alias.encrypt-alias-secondary-region[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_public_access_block.primary-backend-bucket",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_public_access_block.secondary-backend-bucket[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_replication_configuration.primary-backend-bucket-replication[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_server_side_encryption_configuration.primary-backend-bucket-encryption",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_server_side_encryption_configuration.secondary-backend-bucket-encryption[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_versioning.primary-backend-bucket-versioning",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_backend.aws_s3_bucket_versioning.secondary-backend-bucket-versioning[0]",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -797,53 +386,6 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_code_repositories.aws_iam_role_policy.account_provisioning_customizations_codebuild_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_code_repositories.aws_iam_role_policy.account_provisioning_customizations_codepipeline_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_code_repositories.aws_iam_role_policy.account_request_codebuild_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_code_repositories.aws_iam_role_policy.account_request_codepipeline_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_code_repositories.aws_iam_role_policy.terraform_oss_backend_account_provisioning_customizations_codebuild_policy[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_code_repositories.aws_iam_role_policy.terraform_oss_backend_account_request_codebuild_policy[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": null,
-            "name": "module.aft.module.aft_code_repositories.time_sleep.iam_eventual_consistency",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_customizations.aws_iam_role.aft_codebuild_customizations_role",
             "tags": {
               "managed_by": "AFT"
@@ -898,123 +440,6 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.aft_codebuild_customizations_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.aft_codepipeline_customizations_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.aft_execute_pipeline_lambda",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.aft_get_pipeline_executions_lambda",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.aft_identify_targets_lambda",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.aft_invoke_customizations_sfn",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy.terraform_oss_backend_codebuild_customizations_policy[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy_attachment.aft_execute_pipeline_lambda[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy_attachment.aft_execute_pipeline_lambda[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy_attachment.aft_get_pipeline_executions_lambda[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy_attachment.aft_get_pipeline_executions_lambda[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy_attachment.aft_identify_targets_lambda[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_iam_role_policy_attachment.aft_identify_targets_lambda[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_s3_bucket_public_access_block.aft-codepipeline-customizations-block-public-access",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_s3_bucket_server_side_encryption_configuration.aft-codepipeline-customizations-bucket-encryption",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_customizations.aws_s3_bucket_versioning.aft-codepipeline-customizations-bucket-versioning",
-            "tags": null
-          },
-          {
-            "defaultTags": null,
-            "name": "module.aft.module.aft_customizations.time_sleep.wait_for_iam_eventual_consistency",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_feature_options.aws_iam_role.aft_delete_default_vpc_lambda",
             "tags": {
               "managed_by": "AFT"
@@ -1051,171 +476,10 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy.aft_delete_default_vpc_lambda",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy.aft_enable_cloudtrail",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy.aft_enroll_support",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy.aft_features_sfn",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy_attachment.aft_delete_default_vpc_lambda[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy_attachment.aft_delete_default_vpc_lambda[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy_attachment.aft_enable_cloudtrail[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy_attachment.aft_enable_cloudtrail[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy_attachment.aft_enroll_support[0]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_iam_role_policy_attachment.aft_enroll_support[1]",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_kms_alias.aft_log_key_alias",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_lifecycle_configuration.aft_access_logs_lifecycle_configuration",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_lifecycle_configuration.aft_logging_bucket_lifecycle_configuration",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_logging.aft_logging_bucket_logging",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_policy.aft_access_logs",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_policy.aft_logging_bucket",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_public_access_block.aft_access_logs",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_public_access_block.aft_logging_bucket",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_server_side_encryption_configuration.aft_access_logs_encryption",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_server_side_encryption_configuration.aft_logging_bucket_encryption",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_versioning.aft_access_logs_versioning",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_versioning.aft_logging_bucket_versioning",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_iam_roles.aws_iam_role.aft_admin_role",
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_iam_roles.aws_iam_role_policy.aft_admin_role",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -1230,24 +494,10 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_iam_roles.module.aft_exec_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_iam_roles.module.aft_service_role.aws_iam_role.role",
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_iam_roles.module.aft_service_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -1262,24 +512,10 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_iam_roles.module.audit_exec_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_iam_roles.module.audit_service_role.aws_iam_role.role",
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_iam_roles.module.audit_service_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -1294,24 +530,10 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_iam_roles.module.ct_management_exec_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_iam_roles.module.ct_management_service_role.aws_iam_role.role",
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_iam_roles.module.ct_management_service_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -1326,24 +548,10 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
-            "name": "module.aft.module.aft_iam_roles.module.log_archive_exec_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
             "name": "module.aft.module.aft_iam_roles.module.log_archive_service_role.aws_iam_role.role",
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_iam_roles.module.log_archive_service_role.aws_iam_role_policy_attachment.administrator-access-attachment",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -1362,39 +570,6 @@
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_lambda_layer.aws_iam_role_policy.codebuild",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_lambda_layer.aws_iam_role_policy.codebuild_trigger_policy",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_lambda_layer.aws_iam_role_policy_attachment.codebuild_trigger_VPC_access",
-            "tags": null
-          },
-          {
-            "defaultTags": {
-              "managed_by": "AFT"
-            },
-            "name": "module.aft.module.aft_lambda_layer.aws_lambda_layer_version.layer_version",
-            "tags": null
-          },
-          {
-            "defaultTags": null,
-            "name": "module.aft.module.aft_lambda_layer.random_string.resource_suffix",
-            "tags": null
           },
           {
             "defaultTags": {
@@ -1953,11 +1128,6 @@
             "tags": {
               "managed_by": "AFT"
             }
-          },
-          {
-            "defaultTags": null,
-            "name": "module.aft.module.aft_ssm_parameters.random_uuid.metrics_reporting_uuid",
-            "tags": null
           }
         ],
         "resources": [
@@ -2121,6 +1291,15 @@
               "managed_by": "AFT"
             },
             "name": "module.aft.module.aft_account_request_framework.aws_kms_key.aft",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "defaultTags": {
+              "managed_by": "AFT"
+            },
+            "name": "module.aft.module.aft_backend.aws_kms_key.aft_access_logs_primary_backend_bucket",
             "tags": {
               "managed_by": "AFT"
             }
@@ -2436,6 +1615,20 @@
             ],
             "tags": {
               "Name": "aft-backend-REGEX_FILTER",
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "defaultTags": {
+              "managed_by": "AFT"
+            },
+            "name": "module.aft.module.aft_backend.aws_s3_bucket.aft_access_logs_primary_backend_bucket",
+            "subresources": [
+              {
+                "name": "Standard"
+              }
+            ],
+            "tags": {
               "managed_by": "AFT"
             }
           },
