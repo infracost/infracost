@@ -55,9 +55,6 @@ func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]st
 
 	tags := make(map[string]string)
 
-	for k, v := range externalTags {
-		tags[k] = v
-	}
 	for k, v := range defaultLabels {
 		tags[k] = v
 	}
@@ -69,6 +66,9 @@ func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]st
 	}
 	for k, v := range rSettingsUserLabels {
 		tags[k] = v.String()
+	}
+	for k, v := range externalTags {
+		tags[k] = v
 	}
 	return tags
 }

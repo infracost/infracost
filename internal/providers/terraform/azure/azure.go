@@ -26,11 +26,11 @@ func ParseTags(externalTags map[string]string, r *schema.ResourceData) map[strin
 		return nil
 	}
 	tags := make(map[string]string)
-	for k, v := range externalTags {
-		tags[k] = v
-	}
 	for k, v := range rTags {
 		tags[k] = v.String()
+	}
+	for k, v := range externalTags {
+		tags[k] = v
 	}
 	return tags
 }

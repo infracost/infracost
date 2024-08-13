@@ -69,14 +69,16 @@ func TestCatchesRuntimeError(t *testing.T) {
 func TestConfigFileWithYorConfig(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-yor.yml", "--format", "json"}, &GoldenFileOptions{
 		IsJSON:      true,
-		RegexFilter: regexp.MustCompile(`"path": "[^"]*",`),
+		JSONInclude: regexp.MustCompile("^(name|tags)$"),
+		JSONExclude: regexp.MustCompile("^(path)$"),
 	})
 }
 
 func TestConfigFileWithYorEnv(t *testing.T) {
-	t.Setenv("YOR_SIMPLE_TAGS", `{"Team": "Engineering"}`)
+	t.Setenv("YOR_SIMPLE_TAGS", `{"B": "another-override"}`)
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", "./testdata/infracost-config-yor.yml", "--format", "json"}, &GoldenFileOptions{
 		IsJSON:      true,
-		RegexFilter: regexp.MustCompile(`"path": "[^"]*",`),
+		JSONInclude: regexp.MustCompile("^(name|tags)$"),
+		JSONExclude: regexp.MustCompile("^(path)$"),
 	})
 }

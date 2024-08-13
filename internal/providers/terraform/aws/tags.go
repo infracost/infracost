@@ -105,10 +105,6 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 
 	tags := make(map[string]string)
 
-	// external tags (e.g. yor)
-	for k, v := range externalTags {
-		tags[k] = v
-	}
 	if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
 		for k, v := range defaultTags {
 			k = fmt.Sprintf("volume_tags.%s", k)
@@ -166,6 +162,11 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	// tags_all is only set on plan.json runs, so we can prefer them over our own calculations
 	for k, v := range rTagsAll {
 		tags[k] = v.String()
+	}
+
+	// external tags (e.g. yor)
+	for k, v := range externalTags {
+		tags[k] = v
 	}
 
 	if f, ok := tagProviders[r.Type]; ok {
