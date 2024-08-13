@@ -1,21 +1,4 @@
 {
-  "currency": "USD",
-  "diffTotalHourlyCost": "0",
-  "diffTotalMonthlyCost": "0",
-  "diffTotalMonthlyUsageCost": "0",
-  "metadata": {
-    "infracostCommand": "breakdown",
-    "vcsBranch": "stub-branch",
-    "vcsCommitAuthorEmail": "stub@stub.com",
-    "vcsCommitAuthorName": "stub-author",
-    "vcsCommitMessage": "stub-message",
-    "vcsCommitSha": "stub-sha",
-    "vcsCommitTimestamp": "REPLACED_TIME",
-    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
-  },
-  "pastTotalHourlyCost": "0",
-  "pastTotalMonthlyCost": "0",
-  "pastTotalMonthlyUsageCost": "0",
   "projects": [
     {
       "breakdown": {
@@ -25,25 +8,7 @@
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags",
-                  "endLine": 40,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 33
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 40,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-              "startLine": 33
-            },
             "name": "aws_sqs_queue.sqs_withTags",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -54,26 +19,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags_provider",
-                  "endLine": 51,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 42
-                }
-              ],
-              "checksum": "16d8d9011aaaa8856adecccbd41a8d7c2726d89fc09b664d6d10b052ef5ff3d2",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 51,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-              "startLine": 42
             },
             "name": "aws_sqs_queue.sqs_withTags_provider",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -84,32 +31,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags_mymod_aliased",
-                  "endLine": 18,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 11
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 18,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-              "startLine": 11
             },
             "name": "module.mymod_aliased.aws_sqs_queue.sqs_withTags_mymod_aliased",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -120,38 +43,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 26,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags_mysub_aliased",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_aliased/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_aliased/main.tf",
-              "startLine": 10
             },
             "name": "module.mymod_aliased.module.mysub_aliased.aws_sqs_queue.sqs_withTags_mysub_aliased",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -162,44 +55,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 26,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "module.mysubsub_aliased",
-                  "endLine": 25,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_aliased/main.tf",
-                  "startLine": 19
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_aliased",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_aliased/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_aliased/main.tf",
-              "startLine": 10
             },
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_aliased.aws_sqs_queue.sqs_withTag_mysubsub_aliased",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -210,44 +67,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 26,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "module.mysubsub_implict",
-                  "endLine": 29,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_aliased/main.tf",
-                  "startLine": 27
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_implict",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-              "startLine": 10
             },
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -258,44 +79,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 26,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "module.mysubsub_own",
-                  "endLine": 33,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_aliased/main.tf",
-                  "startLine": 31
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_own",
-                  "endLine": 23,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-                  "startLine": 16
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "5e5da66d4c9d35cc2ea7e556c54415767a6877b6f3ba852bb977cf3dd8699733",
-              "endLine": 23,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-              "startLine": 16
             },
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
@@ -306,38 +91,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 30,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysub_implicit",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_implicit/main.tf",
-              "startLine": 10
             },
             "name": "module.mymod_aliased.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -349,43 +104,7 @@
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 30,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "module.mysubsub_implict",
-                  "endLine": 34,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_implicit/main.tf",
-                  "startLine": 32
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_implict",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "35707906ad7bf7465ae0fff26bb3233b869f7cc50da7203228ee9212f48c20c7",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-              "startLine": 10
-            },
             "name": "module.mymod_aliased.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "sqs-def",
@@ -397,43 +116,7 @@
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_aliased",
-                  "endLine": 60,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 54
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 30,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "module.mysubsub_own",
-                  "endLine": 38,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_aliased/mysub_implicit/main.tf",
-                  "startLine": 36
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_own",
-                  "endLine": 23,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-                  "startLine": 16
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "5e5da66d4c9d35cc2ea7e556c54415767a6877b6f3ba852bb977cf3dd8699733",
-              "endLine": 23,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-              "startLine": 16
-            },
             "name": "module.mymod_aliased.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
@@ -444,32 +127,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_implicit",
-                  "endLine": 64,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 62
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags_mymod_implicit",
-                  "endLine": 18,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/main.tf",
-                  "startLine": 11
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 18,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/main.tf",
-              "startLine": 11
             },
             "name": "module.mymod_implicit.aws_sqs_queue.sqs_withTags_mymod_implicit",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -480,38 +139,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_implicit",
-                  "endLine": 64,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 62
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 22,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysub_implicit",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/mysub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/mysub_implicit/main.tf",
-              "startLine": 10
             },
             "name": "module.mymod_implicit.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -522,44 +151,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_implicit",
-                  "endLine": 64,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 62
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 22,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "module.mysubsub_implict",
-                  "endLine": 21,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/mysub_implicit/main.tf",
-                  "startLine": 19
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_implict",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-              "startLine": 10
             },
             "name": "module.mymod_implicit.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -570,44 +163,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_implicit",
-                  "endLine": 64,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 62
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 22,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/main.tf",
-                  "startLine": 20
-                },
-                {
-                  "blockName": "module.mysubsub_own",
-                  "endLine": 25,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_implicit/mysub_implicit/main.tf",
-                  "startLine": 23
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_own",
-                  "endLine": 23,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-                  "startLine": 16
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "5e5da66d4c9d35cc2ea7e556c54415767a6877b6f3ba852bb977cf3dd8699733",
-              "endLine": 23,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-              "startLine": 16
             },
             "name": "module.mymod_implicit.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
@@ -618,32 +175,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "defaultoverride-own-aliased-provider"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags_mymod_own_aliased",
-                  "endLine": 26,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 18
-                }
-              ],
-              "checksum": "6d2773e38f8a0a2a2b30c961b7638aa93b442305a5fa1c2b52c933a81cb51d05",
-              "defaultTagsChecksum": "27fa5c1eec5ed93ad4836b662b4ca4ecc51e47bd933d0e302ecc1fa4e7b8cdec",
-              "endLine": 26,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-              "startLine": 18
             },
             "name": "module.mymod_own_aliased.aws_sqs_queue.sqs_withTags_mymod_own_aliased",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "sqs-def",
@@ -654,38 +187,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "defaultoverride-own-aliased-provider"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 34,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTags_mysub_aliased",
-                  "endLine": 20,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_aliased/main.tf",
-                  "startLine": 11
-                }
-              ],
-              "checksum": "5ad159ca87b737ee1d3769169f6ce62258ace38284507eb6a0e563bc280cf9ef",
-              "defaultTagsChecksum": "27fa5c1eec5ed93ad4836b662b4ca4ecc51e47bd933d0e302ecc1fa4e7b8cdec",
-              "endLine": 20,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_aliased/main.tf",
-              "startLine": 11
             },
             "name": "module.mymod_own_aliased.module.mysub_aliased.aws_sqs_queue.sqs_withTags_mysub_aliased",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "sqs-def",
@@ -697,43 +200,7 @@
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "defaultoverride-own-aliased-provider"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 34,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "module.mysubsub_aliased",
-                  "endLine": 28,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_aliased/main.tf",
-                  "startLine": 22
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_aliased",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_aliased/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "27fa5c1eec5ed93ad4836b662b4ca4ecc51e47bd933d0e302ecc1fa4e7b8cdec",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_aliased/main.tf",
-              "startLine": 10
-            },
             "name": "module.mymod_own_aliased.module.mysub_aliased.module.mysubsub_aliased.aws_sqs_queue.sqs_withTag_mysubsub_aliased",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "sqs-def",
@@ -745,43 +212,7 @@
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 34,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "module.mysubsub_implict",
-                  "endLine": 32,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_aliased/main.tf",
-                  "startLine": 30
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_implict",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-              "startLine": 10
-            },
             "name": "module.mymod_own_aliased.module.mysub_aliased.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -792,44 +223,8 @@
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_aliased",
-                  "endLine": 34,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 28
-                },
-                {
-                  "blockName": "module.mysubsub_own",
-                  "endLine": 36,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_aliased/main.tf",
-                  "startLine": 34
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_own",
-                  "endLine": 23,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-                  "startLine": 16
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "5e5da66d4c9d35cc2ea7e556c54415767a6877b6f3ba852bb977cf3dd8699733",
-              "endLine": 23,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-              "startLine": 16
             },
             "name": "module.mymod_own_aliased.module.mysub_aliased.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
@@ -841,37 +236,7 @@
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 38,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 36
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysub_implicit",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_implicit/main.tf",
-              "startLine": 10
-            },
             "name": "module.mymod_own_aliased.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -883,43 +248,7 @@
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 38,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 36
-                },
-                {
-                  "blockName": "module.mysubsub_implict",
-                  "endLine": 34,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_implicit/main.tf",
-                  "startLine": 32
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_implict",
-                  "endLine": 17,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-                  "startLine": 10
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "4afc5be4b3f211d6ca990899f3ac3a14b9dde89897e8ed6b615bba389c3f87d4",
-              "endLine": 17,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_implicit/main.tf",
-              "startLine": 10
-            },
             "name": "module.mymod_own_aliased.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf:18",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
@@ -931,170 +260,78 @@
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "module.mymod_own_aliased",
-                  "endLine": 68,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-                  "startLine": 66
-                },
-                {
-                  "blockName": "module.mysub_implicit",
-                  "endLine": 38,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-                  "startLine": 36
-                },
-                {
-                  "blockName": "module.mysubsub_own",
-                  "endLine": 38,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/mysub_implicit/main.tf",
-                  "startLine": 36
-                },
-                {
-                  "blockName": "aws_sqs_queue.sqs_withTag_mysubsub_own",
-                  "endLine": 23,
-                  "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-                  "startLine": 16
-                }
-              ],
-              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
-              "defaultTagsChecksum": "5e5da66d4c9d35cc2ea7e556c54415767a6877b6f3ba852bb977cf3dd8699733",
-              "endLine": 23,
-              "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-              "startLine": 16
-            },
             "name": "module.mymod_own_aliased.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
-            "providerLink": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf:1",
-            "providerSupportsDefaultTags": true,
-            "resourceType": "aws_sqs_queue",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
           }
-        ],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0",
-        "totalMonthlyUsageCost": "0"
+        ]
       },
-      "diff": {
-        "resources": null,
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0",
-        "totalMonthlyUsageCost": "0"
-      },
-      "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_format_json_with_tags_aliased_provider/project",
         "providers": [
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "defaultoverride-aws"
             },
-            "endLine": 31,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-            "name": "aws",
-            "startLine": 18
+            "name": "aws"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
               "DefaultOverride": "defaultoverride-aws.env"
             },
-            "endLine": 16,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/project/main.tf",
-            "name": "aws.env",
-            "startLine": 1
+            "name": "aws.env"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "endLine": 14,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-            "name": "aws",
-            "startLine": 1
+            "name": "aws"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "endLine": 14,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-            "name": "aws",
-            "startLine": 1
+            "name": "aws"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "endLine": 14,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-            "name": "aws",
-            "startLine": 1
+            "name": "aws"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "endLine": 14,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-            "name": "aws",
-            "startLine": 1
+            "name": "aws"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
-            "endLine": 14,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mysubsub_own/main.tf",
-            "name": "aws",
-            "startLine": 1
+            "name": "aws"
           },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-own-aliased-provider",
               "DefaultOverride": "defaultoverride-own-aliased-provider"
             },
-            "endLine": 16,
-            "filename": "testdata/breakdown_format_json_with_tags_aliased_provider/modules/mymod_own_aliased/main.tf",
-            "name": "aws.own_aliased",
-            "startLine": 1
+            "name": "aws.own_aliased"
           }
-        ],
-        "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/project"
+        ]
       },
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/project",
-      "summary": {
-        "totalDetectedResources": 22,
-        "totalNoPriceResources": 0,
-        "totalSupportedResources": 22,
-        "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 22
-      }
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/project"
     }
-  ],
-  "summary": {
-    "totalDetectedResources": 22,
-    "totalNoPriceResources": 0,
-    "totalSupportedResources": 22,
-    "totalUnsupportedResources": 0,
-    "totalUsageBasedResources": 22
-  },
-  "timeGenerated": "REPLACED_TIME",
-  "totalHourlyCost": "0",
-  "totalMonthlyCost": "0",
-  "totalMonthlyUsageCost": "0",
-  "version": "0.2"
+  ]
 }
 Err:
 
