@@ -120,6 +120,9 @@
             }
           },
           "type": "object"
+        },
+        "yor_config_path": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
