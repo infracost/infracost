@@ -51,7 +51,8 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 	databaseEngine := r.databaseEngineValue()
 
 	costComponents := []*schema.CostComponent{}
-	if strings.EqualFold(r.InstanceClass, "db.serverless") {
+	isServerless := strings.EqualFold(r.InstanceClass, "db.serverless")
+	if isServerless {
 		costComponents = append(costComponents, r.auroraServerlessV2CostComponent(databaseEngine))
 	} else {
 		costComponents = append(costComponents, r.dbInstanceCostComponent(databaseEngine))
@@ -79,7 +80,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 	}
 	if r.PerformanceInsightsEnabled {
 		if r.PerformanceInsightsLongTermRetention {
-			costComponents = append(costComponents, performanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass))
+			costComponents = append(costComponents, performanceInsightsLongTermRetentionCostComponent(r.Region, r.InstanceClass, databaseEngine, isServerless, r.CapacityUnitsPerHr))
 		}
 
 		if r.MonthlyAdditionalPerformanceInsightsRequests == nil || *r.MonthlyAdditionalPerformanceInsightsRequests > 0 {

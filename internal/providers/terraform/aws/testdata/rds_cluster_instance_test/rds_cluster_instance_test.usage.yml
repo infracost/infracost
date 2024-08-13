@@ -23,3 +23,7 @@ resource_usage:
     reserved_instance_payment_option: all_upfront
   aws_rds_cluster_instance.aurora_serverless_v2_with_usage:
     capacity_units_per_hr: 5
+  aws_rds_cluster_instance.aurora_serverless_v2_performance_insights:
+    capacity_units_per_hr: 5
+  aws_rds_cluster_instance.aurora_serverless_v2_performance_insights_scaling:
+    capacity_units_per_hr: 5

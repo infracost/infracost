@@ -173,3 +173,23 @@ resource "aws_rds_cluster_instance" "aurora_io_optimized_instance" {
   engine             = aws_rds_cluster.aurora_io_optimized.engine
   engine_version     = aws_rds_cluster.aurora_io_optimized.engine_version
 }
+
+resource "aws_rds_cluster_instance" "aurora_serverless_v2_performance_insights" {
+  identifier                            = "aurora-cluster-demo"
+  cluster_identifier                    = aws_rds_cluster.default.id
+  instance_class                        = "db.serverless"
+  engine                                = "aurora-mysql"
+  engine_version                        = aws_rds_cluster.default.engine_version
+  performance_insights_enabled          = true
+  performance_insights_retention_period = 731
+}
+
+resource "aws_rds_cluster_instance" "aurora_serverless_v2_performance_insights_free" {
+  identifier                            = "aurora-cluster-demo"
+  cluster_identifier                    = aws_rds_cluster.default.id
+  instance_class                        = "db.serverless"
+  engine                                = "aurora-mysql"
+  engine_version                        = aws_rds_cluster.default.engine_version
+  performance_insights_enabled          = true
+  performance_insights_retention_period = 7
+}
