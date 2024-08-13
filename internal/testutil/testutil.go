@@ -156,7 +156,6 @@ func formatCost(d *decimal.Decimal) string {
 }
 
 func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
-
 	// Load the snapshot result
 	expected := []byte("")
 	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
