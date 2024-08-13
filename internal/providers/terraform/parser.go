@@ -897,10 +897,10 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 			}
 		}
 
-		if len(tags) > 0 {
+		if tags != nil {
 			resourceData.Tags = &tags
 		}
-		if len(defaultTags) > 0 {
+		if defaultTags != nil {
 			resourceData.DefaultTags = &defaultTags
 		}
 		resourceData.ProviderSupportsDefaultTags = defaultTagSupport
