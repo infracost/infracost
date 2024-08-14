@@ -60,6 +60,9 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "launch_configuration"
+              ],
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
@@ -237,6 +240,9 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "launch_configuration"
+              ],
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",

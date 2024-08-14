@@ -38,6 +38,10 @@
             },
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "location",
+                "resource_group_name"
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -72,6 +76,10 @@
             "tags": {},
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "location",
+                "resource_group_name"
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
@@ -115,6 +123,10 @@
             },
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "location",
+                "resource_group_name"
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -149,6 +161,10 @@
             "tags": {},
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "location",
+                "resource_group_name"
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
