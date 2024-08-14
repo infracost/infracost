@@ -58,7 +58,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 		priceFilter, err = resolver.PriceFilter()
 
 		if err != nil {
-			logging.Logger.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 		}
 
 		purchaseOptionLabel = "reserved"

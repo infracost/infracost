@@ -838,7 +838,7 @@ func (b *Block) Children() Blocks {
 		children = append(children, child)
 	}
 
-	return b.childBlocks
+	return children
 }
 
 // GetAttributes returns a list of Attribute for this Block. Attributes are key value specification on a given

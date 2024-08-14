@@ -80,7 +80,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 		}
 		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
-			logging.Logger.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 		} else {
 			priceFilter = reservedFilter
 		}

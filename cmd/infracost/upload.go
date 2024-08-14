@@ -71,7 +71,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				if err != nil {
 					return fmt.Errorf("failed to marshal result: %w", err)
 				}
-				cmd.Printf(string(b))
+				cmd.Print(string(b))
 			} else if result.ShareURL != "" {
 				cmd.Println("Share this cost estimate: ", ui.LinkString(result.ShareURL))
 			}

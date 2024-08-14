@@ -160,7 +160,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			if err != nil {
 				msg = fmt.Sprintf("%s: %s", msg, err)
 			}
-			logging.Logger.Debug().Msgf(msg)
+			logging.Logger.Debug().Msg(msg)
 		} else {
 			standardStorageClassUsage := u["standard"].(map[string]interface{})
 
