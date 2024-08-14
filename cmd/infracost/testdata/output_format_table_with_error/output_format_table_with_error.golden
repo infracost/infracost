@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/dev
+Project: REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/dev
 Module path: dev
 
 Errors:
@@ -8,7 +8,7 @@ Errors:
         Either a quoted string block label or an opening brace ("{") is expected here. (and 1 other messages)
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/prod
+Project: REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/prod
 Module path: prod
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   

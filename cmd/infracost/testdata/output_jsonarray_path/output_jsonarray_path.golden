@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata
+Project: REPLACED_PROJECT_PATH/testdata
 
  Name                                                   Monthly Qty  Unit         Monthly Cost   
                                                                                                  
@@ -25,7 +25,7 @@ Project: infracost/infracost/cmd/infracost/testdata
  Project total                                                                       $1,361.31   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+Project: REPLACED_PROJECT_PATH/testdata/terraform_v0.14_plan.json
 
  Name                                                              Monthly Qty  Unit   Monthly Cost   
                                                                                                       
@@ -100,7 +100,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
  Project total                                                                               $81.12   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
+Project: REPLACED_PROJECT_PATH/testdata/terraform_v0.14_nochange_plan.json
 
  Name                                                              Monthly Qty  Unit   Monthly Cost   
                                                                                                       

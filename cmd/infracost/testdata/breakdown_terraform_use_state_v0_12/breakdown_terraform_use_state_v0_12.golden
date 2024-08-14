@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_state.json
+Project: REPLACED_PROJECT_PATH/testdata/terraform_v0.12_state.json
 
  Name                                                              Monthly Qty  Unit        Monthly Cost   
                                                                                                            

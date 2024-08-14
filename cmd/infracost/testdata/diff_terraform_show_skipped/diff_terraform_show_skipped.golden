@@ -1,7 +1,7 @@
 Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
+Project: REPLACED_PROJECT_PATH/testdata/express_route_gateway_plan.json
 
 + azurerm_express_route_gateway.express_route
   +$307

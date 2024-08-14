@@ -1,5 +1,5 @@
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt
+Project: REPLACED_PROJECT_PATH/terragrunt
 Module path: ../../examples/terragrunt
 Errors:
   terragrunt run-all terragrunt-info failed:

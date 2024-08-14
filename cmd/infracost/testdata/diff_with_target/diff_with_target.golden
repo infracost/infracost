@@ -1,7 +1,7 @@
 Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/plan_with_target.json
+Project: REPLACED_PROJECT_PATH/testdata/plan_with_target.json
 
 ~ aws_instance.web_app_1
   +$8 ($9 → $16)

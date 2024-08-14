@@ -37,7 +37,7 @@
 Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+Project: REPLACED_PROJECT_PATH/testdata/terraform_v0.14_plan.json
 
 + module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
   +$13
