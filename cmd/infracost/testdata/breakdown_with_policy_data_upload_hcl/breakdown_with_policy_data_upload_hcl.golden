@@ -279,6 +279,9 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "resource_id"
+              ],
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
@@ -544,6 +547,9 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                "resource_id"
+              ],
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
