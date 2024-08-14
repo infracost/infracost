@@ -16,7 +16,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_default_tags",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_with_default_tags",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags",
         "type": "terraform_dir",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_with_default_tags",
         "providers": [
@@ -60,9 +60,6 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                "launch_configuration"
-              ],
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
@@ -240,9 +237,6 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                "launch_configuration"
-              ],
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",

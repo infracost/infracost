@@ -16,7 +16,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_format_json_with_tags_azure",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure",
         "type": "terraform_dir",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
         "providers": [
@@ -38,10 +38,6 @@
             },
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                "location",
-                "resource_group_name"
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -76,10 +72,6 @@
             "tags": {},
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                "location",
-                "resource_group_name"
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
@@ -123,10 +115,6 @@
             },
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                "location",
-                "resource_group_name"
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -161,10 +149,6 @@
             "tags": {},
             "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                "location",
-                "resource_group_name"
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",

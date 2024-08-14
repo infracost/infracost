@@ -16,7 +16,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_google",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_format_json_with_tags_google",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google",
         "type": "terraform_dir",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_google",
         "providers": [

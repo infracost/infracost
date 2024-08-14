@@ -17,7 +17,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/diff_prior_empty_project_json",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/diff_prior_empty_project_json",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_prior_empty_project_json",
         "type": "terraform_dir",
         "vcsSubPath": "cmd/infracost/testdata/diff_prior_empty_project_json",
         "providers": [

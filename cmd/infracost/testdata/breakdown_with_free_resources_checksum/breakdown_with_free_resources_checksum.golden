@@ -16,7 +16,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_free_resources_checksum",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_with_free_resources_checksum",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum",
         "type": "terraform_dir",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_with_free_resources_checksum",
         "providers": [

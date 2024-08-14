@@ -426,6 +426,14 @@ func (attr *Attribute) graphValue() (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
+		if !ctyVal.IsKnown() {
+			for _, d := range diag {
+				if d.Summary == unknownVariableDiagnostic {
+					attr.hasUnknownKeys = true
+					break
+				}
+			}
+		}
 		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
 		if attr.newMock != nil {
 			mockedVal = attr.newMock(attr)

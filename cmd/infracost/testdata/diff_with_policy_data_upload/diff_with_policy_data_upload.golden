@@ -17,7 +17,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/diff_with_policy_data_upload",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/diff_with_policy_data_upload",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",
         "type": "terraform_dir",
         "policySha": "someshastring",
         "pastPolicySha": "someoldshastring",

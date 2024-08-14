@@ -2156,34 +2156,55 @@ resource "aws_instance" "blah" {
 
 		t.Run(tt.name, func(t *testing.T) {
 
-			path := createTestFile("test.tf", tt.content)
-
-			logger := newDiscardLogger()
-			loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-			parser := NewParser(
-				RootPath{DetectedPath: filepath.Dir(path)},
-				CreateEnvFileMatcher([]string{}, nil),
-				loader,
-				logger,
-			)
-			module, err := parser.ParseDirectory()
-			require.NoError(t, err)
-
-			require.True(t, len(tt.traversal) > 0, "traversal must be non-empty")
-
-			blocks := module.Blocks.OfType(tt.traversal[0])
-
-			if len(blocks) == 0 {
-				t.Fatalf("no blocks found for traversal %v", tt.traversal)
+			variations := []struct {
+				name       string
+				parserOpts []Option
+			}{
+				{
+					name:       "default",
+					parserOpts: nil,
+				},
+				{
+					name:       "with graph evaluator",
+					parserOpts: []Option{OptionGraphEvaluator()},
+				},
 			}
 
-			block := blocks[0]
-			for _, name := range tt.traversal[1:] {
-				block = block.GetChildBlock(name)
-				require.NotNil(t, block, "block %v not found", name)
-			}
+			for _, variation := range variations {
 
-			assert.EqualValues(t, tt.expectedKeys, block.AttributesWithUnknownKeys())
+				t.Run(variation.name, func(t *testing.T) {
+
+					path := createTestFile("test.tf", tt.content)
+
+					logger := newDiscardLogger()
+					loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+					parser := NewParser(
+						RootPath{DetectedPath: filepath.Dir(path)},
+						CreateEnvFileMatcher([]string{}, nil),
+						loader,
+						logger,
+						variation.parserOpts...,
+					)
+					module, err := parser.ParseDirectory()
+					require.NoError(t, err)
+
+					require.True(t, len(tt.traversal) > 0, "traversal must be non-empty")
+
+					blocks := module.Blocks.OfType(tt.traversal[0])
+
+					if len(blocks) == 0 {
+						t.Fatalf("no blocks found for traversal %v", tt.traversal)
+					}
+
+					block := blocks[0]
+					for _, name := range tt.traversal[1:] {
+						block = block.GetChildBlock(name)
+						require.NotNil(t, block, "block %v not found", name)
+					}
+
+					assert.EqualValues(t, tt.expectedKeys, block.AttributesWithUnknownKeys())
+				})
+			}
 		})
 	}
 }
