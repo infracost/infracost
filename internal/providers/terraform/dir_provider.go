@@ -109,13 +109,13 @@ func (p *DirProvider) checks() error {
 		msg := fmt.Sprintf("Terraform binary '%s' could not be found. You have two options:\n", binary)
 		msg += "1. Set a custom Terraform binary using the environment variable INFRACOST_TERRAFORM_BINARY.\n\n"
 		msg += fmt.Sprintf("2. Set --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
-		return clierror.NewCLIError(errors.Errorf(msg), "Terraform binary could not be found")
+		return clierror.NewCLIError(errors.New(msg), "Terraform binary could not be found")
 	}
 
 	out, err := exec.Command(binary, "-version").Output()
 	if err != nil {
 		msg := fmt.Sprintf("Could not get version of Terraform binary '%s'", binary)
-		return clierror.NewCLIError(errors.Errorf(msg), "Could not get version of Terraform binary")
+		return clierror.NewCLIError(errors.New(msg), "Could not get version of Terraform binary")
 	}
 
 	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
@@ -521,11 +521,11 @@ func checkTerraformVersion(v string, fullV string) error {
 	}
 
 	if strings.HasPrefix(fullV, "Terraform ") && semver.Compare(v, minTerraformVer) < 0 {
-		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerraformVer) //nolint
+		return fmt.Errorf("Terraform %s is not supported. Please use Terraform version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerraformVer) // nolint
 	}
 
 	if strings.HasPrefix(fullV, "terragrunt") && semver.Compare(v, minTerragruntVer) < 0 {
-		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerragruntVer) //nolint
+		return fmt.Errorf("Terragrunt %s is not supported. Please use Terragrunt version >= %s. Update it or set the environment variable INFRACOST_TERRAFORM_BINARY.", v, minTerragruntVer) // nolint
 	}
 
 	// Allow any non-terraform and non-terragrunt binaries

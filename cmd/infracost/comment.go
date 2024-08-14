@@ -83,7 +83,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	combined, err := output.Combine(inputs)
 	if errors.As(err, &clierror.WarningError{}) {
-		logging.Logger.Warn().Msgf(err.Error())
+		logging.Logger.Warn().Msg(err.Error())
 	} else if err != nil {
 		return nil, err
 	}

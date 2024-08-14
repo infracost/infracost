@@ -152,7 +152,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 					if err != nil {
 						return fmt.Errorf("failed to marshal result: %w", err)
 					}
-					cmd.Printf(string(b))
+					cmd.Print(string(b))
 				} else if res.Posted {
 
 					cmd.Println("Comment posted to GitHub")

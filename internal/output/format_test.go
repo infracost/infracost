@@ -41,7 +41,7 @@ func TestFormatCost(t *testing.T) {
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
-				t.Fatalf(diff)
+				t.Fatal(diff)
 			}
 		})
 	}
@@ -78,7 +78,7 @@ func TestFormatCost2DP(t *testing.T) {
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
-				t.Fatalf(diff)
+				t.Fatal(diff)
 			}
 		})
 	}
@@ -121,7 +121,7 @@ func TestCurrencyFormatCost(t *testing.T) {
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
-				t.Fatalf(diff)
+				t.Fatal(diff)
 			}
 		})
 	}
@@ -161,7 +161,7 @@ func TestFormatPrice(t *testing.T) {
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
-				t.Fatalf(diff)
+				t.Fatal(diff)
 			}
 		})
 	}

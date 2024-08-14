@@ -177,7 +177,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 
 			err := os.WriteFile(goldenFilePath, actual, 0600)
 			assert.NoError(t, err)
-			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
+			t.Logf("Wrote golden file %s", goldenFilePath)
 		} else {
 			// Generate the diff and error message.  We don't call assert.Equal because it escapes
 			// newlines (\n) and the output looks terrible.
@@ -191,7 +191,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 				Context:  1,
 			})
 
-			t.Errorf(fmt.Sprintf("\nOutput does not match golden file (%s): \n\n%s\n", goldenFilePath, diff))
+			t.Errorf("\nOutput does not match golden file (%s): \n\n%s\n", goldenFilePath, diff)
 		}
 	}
 
