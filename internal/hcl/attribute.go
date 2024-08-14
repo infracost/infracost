@@ -18,6 +18,7 @@ var (
 	missingAttributeDiagnostic        = "Unsupported attribute"
 	valueIsNonIterableDiagnostic      = "Iteration over non-iterable value"
 	invalidFunctionArgumentDiagnostic = "Invalid function argument"
+	unknownVariableDiagnostic         = "Unknown variable"
 )
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
@@ -48,8 +49,9 @@ type Attribute struct {
 	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
 	isGraph bool
 	// newMock generates a mock value for the attribute if it's value is missing.
-	newMock       func(attr *Attribute) cty.Value
-	previousValue cty.Value
+	newMock        func(attr *Attribute) cty.Value
+	previousValue  cty.Value
+	hasUnknownKeys bool
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -139,6 +141,17 @@ func (attr *Attribute) Value() cty.Value {
 	attr.previousValue = val
 
 	return val
+}
+
+// HasUnknownKeys checks if the attribute is an object with fully known keys.
+// For example, this will return true if a value is set to the result of `merge({"x": "y"}, var.default_tags)`
+// where the value of `var.default_tags` is not known at evaluation time.
+func (attr *Attribute) HasUnknownKeys() bool {
+	if attr == nil {
+		return false
+	}
+	_ = attr.value(0)
+	return attr.hasUnknownKeys
 }
 
 // ProvidersValue retrieves the value of the attribute with special handling need for module.providers
@@ -246,10 +259,18 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		exp := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
 		val, err := exp.Value(ctx)
 		if !err.HasErrors() {
+			attr.hasUnknownKeys = true
 			return val
+		} else if len(err) < len(diag) {
+			// handle cases where there is a further error inside a function param, e.g. merge({"x": var.undefined}, var.whatever)
+			attr.hasUnknownKeys = true
 		}
 
 		for _, d := range diag {
+
+			if d.Summary == unknownVariableDiagnostic && !ctyVal.IsKnown() {
+				attr.hasUnknownKeys = true
+			}
 
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build

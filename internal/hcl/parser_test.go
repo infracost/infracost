@@ -2074,3 +2074,116 @@ terraform {
 	assert.Equal(t, ">= 5.0.0,< 5.0.4", module.ProviderConstraints.Google.String())
 
 }
+
+func Test_UnknownKeyDetection(t *testing.T) {
+
+	tests := []struct {
+		name         string
+		content      string
+		traversal    []string
+		expectedKeys []string
+	}{
+		{
+			name: "known keys, unknown value",
+			content: `
+provider "aws" {
+  default_tags {
+    tags = {
+      application = var.application
+      env         = "prod"
+    }
+  }
+}
+`,
+			traversal:    []string{"provider", "default_tags"},
+			expectedKeys: nil,
+		},
+		{
+			name: "unknown key in merge param",
+			content: `
+provider "aws" {
+  default_tags {
+    tags = merge(var.default_tags, { 
+      "Environment" = "Test"
+    })
+  }
+}
+`,
+			traversal:    []string{"provider", "default_tags"},
+			expectedKeys: []string{"tags"},
+		},
+		{
+			name: "entirely missing object",
+			content: `
+provider "aws" {
+  default_tags {
+    tags = var.default_tags
+  }
+}
+`,
+			traversal:    []string{"provider", "default_tags"},
+			expectedKeys: []string{"tags"},
+		},
+		{
+			name: "resource, known keys, unknown value",
+			content: `
+resource "aws_instance" "blah" {
+  tags = {
+    application = var.application
+    env         = "prod"
+  }
+}
+`,
+			traversal:    []string{"resource"},
+			expectedKeys: nil,
+		},
+		{
+			name: "resource, merged const w/ missing value with unknown map value",
+			content: `
+resource "aws_instance" "blah" {
+  tags = merge({
+    application = var.application
+    env         = "prod"
+  }, var.default_tags)
+}
+`,
+			traversal:    []string{"resource"},
+			expectedKeys: []string{"tags"},
+		},
+	}
+
+	for _, tt := range tests {
+
+		t.Run(tt.name, func(t *testing.T) {
+
+			path := createTestFile("test.tf", tt.content)
+
+			logger := newDiscardLogger()
+			loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+			parser := NewParser(
+				RootPath{DetectedPath: filepath.Dir(path)},
+				CreateEnvFileMatcher([]string{}, nil),
+				loader,
+				logger,
+			)
+			module, err := parser.ParseDirectory()
+			require.NoError(t, err)
+
+			require.True(t, len(tt.traversal) > 0, "traversal must be non-empty")
+
+			blocks := module.Blocks.OfType(tt.traversal[0])
+
+			if len(blocks) == 0 {
+				t.Fatalf("no blocks found for traversal %v", tt.traversal)
+			}
+
+			block := blocks[0]
+			for _, name := range tt.traversal[1:] {
+				block = block.GetChildBlock(name)
+				require.NotNil(t, block, "block %v not found", name)
+			}
+
+			assert.EqualValues(t, tt.expectedKeys, block.AttributesWithUnknownKeys())
+		})
+	}
+}

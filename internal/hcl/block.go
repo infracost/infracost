@@ -1065,6 +1065,16 @@ func (b *Block) Values() cty.Value {
 	return b.values()
 }
 
+func (b *Block) AttributesWithUnknownKeys() []string {
+	var output []string
+	for _, attr := range b.attributes {
+		if attr.HasUnknownKeys() {
+			output = append(output, attr.Name())
+		}
+	}
+	return output
+}
+
 func (b *Block) values() cty.Value {
 	values := make(map[string]cty.Value)
 

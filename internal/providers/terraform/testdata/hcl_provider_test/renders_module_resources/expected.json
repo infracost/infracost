@@ -19,6 +19,11 @@
               "type": "ipsec.1"
             },
             "infracost_metadata": {
+              "attributesWithUnknownKeys": [
+                "customer_gateway_id",
+                "transit_gateway_id",
+                "type"
+              ],
               "calls": [
                 {
                   "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
@@ -126,6 +131,11 @@
             "type": "ipsec.1"
           },
           "infracost_metadata": {
+            "attributesWithUnknownKeys": [
+              "customer_gateway_id",
+              "transit_gateway_id",
+              "type"
+            ],
             "calls": [
               {
                 "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
