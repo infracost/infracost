@@ -123,7 +123,7 @@ func (r *RDSClusterInstance) dbInstanceCostComponent(databaseEngine string) *sch
 		}
 		priceFilter, err = resolver.PriceFilter()
 		if err != nil {
-			logging.Logger.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 		}
 		purchaseOptionLabel = "reserved"
 	}

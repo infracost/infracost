@@ -78,7 +78,7 @@ func newSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 		var err error
 		config, err = parseSKU(d.Address, sku)
 		if err != nil {
-			logging.Logger.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 			return nil
 		}
 	}
