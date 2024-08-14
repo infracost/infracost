@@ -26,7 +26,7 @@ var (
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost (v|preview).*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
-	pathRegex        = regexp.MustCompile(`(/.*/)(infracost/infracost/|infracost/)cmd/infracost/(testdata/.*)`)
+	pathRegex        = regexp.MustCompile(`(/.*/)cmd/infracost/(testdata/.*)`)
 	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
 )
 
@@ -242,7 +242,7 @@ func stripDynamicValues(actual []byte) []byte {
 	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
 	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
 	actual = panicRegex.ReplaceAll(actual, []byte("runtime error: REPLACED ERROR\nEnvironment"))
-	actual = pathRegex.ReplaceAll(actual, []byte("REPLACED_PROJECT_PATH/$3"))
+	actual = pathRegex.ReplaceAll(actual, []byte("REPLACED_PROJECT_PATH/$2"))
 	actual = credsRegex.ReplaceAll(actual, []byte("REPLACED_CREDENTIALS_PATH"))
 
 	return actual
