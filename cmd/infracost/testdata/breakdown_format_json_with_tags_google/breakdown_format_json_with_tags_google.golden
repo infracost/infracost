@@ -13,7 +13,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_google",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google",
       "displayName": "main",
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google",

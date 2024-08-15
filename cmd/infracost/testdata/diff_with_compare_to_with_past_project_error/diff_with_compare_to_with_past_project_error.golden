@@ -14,7 +14,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/dev",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/dev",
       "displayName": "dev",
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/dev",
@@ -57,7 +57,7 @@
       }
     },
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/prod",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod",
       "displayName": "prod",
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod",

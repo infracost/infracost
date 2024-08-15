@@ -16,7 +16,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata",
       "displayName": "",
       "metadata": {
-        "path": "./cmd/infracost/testdata/",
+        "path": "REPLACED_PROJECT_PATH/testdata/",
         "type": "terraform_dir",
         "terraformWorkspace": "default",
         "vcsSubPath": "cmd/infracost/testdata"
@@ -574,10 +574,10 @@
       }
     },
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json",
+      "name": "REPLACED_PROJECT_PATH/testdata/azure_firewall_plan.json",
       "displayName": "",
       "metadata": {
-        "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
+        "path": "REPLACED_PROJECT_PATH/testdata/azure_firewall_plan.json",
         "type": "terraform_plan_json",
         "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json"
       },

@@ -28,7 +28,7 @@ Project: main
         - Provisioned IOPS
           -$52
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_compare_to
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_with_compare_to
 Amount:  -$743 ($2,046 → $1,303)
 Percent: -36%
 
@@ -44,7 +44,7 @@ Infracost estimate: Monthly estimate decreased by $743 ↓
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Changed project                                                 ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/diff_with_compare_to ┃         -$743 ┃           - ┃ -$743 (-36%) ┃
+┃ REPLACED_PROJECT_PATH/testdata/diff_with_compare_to ┃         -$743 ┃           - ┃ -$743 (-36%) ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

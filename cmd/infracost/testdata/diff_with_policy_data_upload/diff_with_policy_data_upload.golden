@@ -14,7 +14,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_policy_data_upload",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",
       "displayName": "main",
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",

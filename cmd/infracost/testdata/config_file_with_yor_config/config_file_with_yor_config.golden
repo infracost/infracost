@@ -38,7 +38,7 @@
           }
         ]
       },
-      "name": "infracost/infracost/cmd/infracost/testdata/yor-tag-override",
+      "name": "REPLACED_PROJECT_PATH/testdata/yor-tag-override",
       "pastBreakdown": {
         "resources": [
           {

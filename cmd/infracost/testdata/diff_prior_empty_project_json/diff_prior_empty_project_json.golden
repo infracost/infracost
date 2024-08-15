@@ -14,7 +14,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_prior_empty_project_json",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_prior_empty_project_json",
       "displayName": "main",
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/diff_prior_empty_project_json",

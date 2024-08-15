@@ -14,7 +14,7 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/example_plan.json",
+      "name": "REPLACED_PROJECT_PATH/testdata/example_plan.json",
       "displayName": "",
       "metadata": {
         "path": "./testdata/example_plan.json",

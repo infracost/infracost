@@ -2003,7 +2003,7 @@
           }
         ]
       },
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aft_module"
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_aft_module"
     }
   ]
 }
