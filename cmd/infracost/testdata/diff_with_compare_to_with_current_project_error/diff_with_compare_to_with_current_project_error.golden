@@ -20,11 +20,11 @@
         "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/dev",
         "type": "terraform_dir",
         "terraformModulePath": "dev",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_project_error/dev",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/dev",
         "errors": [
           {
             "code": 102,
-            "message": "Error loading Terraform modules: failed to parse file REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/dev/mod_with_error.tf diag: /Users/liamg/src/infracost/cmd/infracost/testdata/diff_with_compare_to_with_current_project_error/dev/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
+            "message": "Error loading Terraform modules: failed to parse file /Users/liamg/src/infracost/cmd/infracost/testdata/diff_with_compare_to_with_current_project_error/dev/mod_with_error.tf diag: /Users/liamg/src/infracost/cmd/infracost/testdata/diff_with_compare_to_with_current_project_error/dev/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
             "data": null,
             "isError": true
           }
@@ -65,11 +65,11 @@
         "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod",
         "type": "terraform_dir",
         "terraformModulePath": "prod",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_project_error/prod",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -164,19 +164,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",

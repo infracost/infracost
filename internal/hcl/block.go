@@ -1065,11 +1065,11 @@ func (b *Block) Values() cty.Value {
 	return b.values()
 }
 
-func (b *Block) AttributesWithUnknownKeys() []string {
-	var output []string
+func (b *Block) AttributesWithUnknownKeys() map[string][]string {
+	output := make(map[string][]string)
 	for _, attr := range b.attributes {
-		if attr.HasUnknownKeys() {
-			output = append(output, attr.Name())
+		if causes := attr.ReferencesCausingUnknownKeys(); len(causes) > 0 {
+			output[attr.Name()] = attr.ReferencesCausingUnknownKeys()
 		}
 	}
 	return output

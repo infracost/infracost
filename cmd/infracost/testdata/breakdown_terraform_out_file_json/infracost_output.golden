@@ -634,7 +634,7 @@
           }
         ],
         "type": "terraform_plan_json",
-        "vcsSubPath": "cmd/infracost/testdata/example_plan.json"
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/example_plan.json"
       },
       "name": "REPLACED_PROJECT_PATH/testdata/example_plan.json",
       "pastBreakdown": {

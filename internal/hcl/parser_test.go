@@ -2081,7 +2081,7 @@ func Test_UnknownKeyDetection(t *testing.T) {
 		name         string
 		content      string
 		traversal    []string
-		expectedKeys []string
+		expectedKeys map[string][]string
 	}{
 		{
 			name: "known keys, unknown value",
@@ -2110,7 +2110,7 @@ provider "aws" {
 }
 `,
 			traversal:    []string{"provider", "default_tags"},
-			expectedKeys: []string{"tags"},
+			expectedKeys: map[string][]string{"tags": {"var.default_tags"}},
 		},
 		{
 			name: "entirely missing object",
@@ -2122,7 +2122,7 @@ provider "aws" {
 }
 `,
 			traversal:    []string{"provider", "default_tags"},
-			expectedKeys: []string{"tags"},
+			expectedKeys: map[string][]string{"tags": {"var.default_tags"}},
 		},
 		{
 			name: "resource, known keys, unknown value",
@@ -2148,7 +2148,17 @@ resource "aws_instance" "blah" {
 }
 `,
 			traversal:    []string{"resource"},
-			expectedKeys: []string{"tags"},
+			expectedKeys: map[string][]string{"tags": {"var.default_tags"}},
+		},
+		{
+			name: "resource, merged two unknown vars",
+			content: `
+resource "aws_instance" "blah" {
+  tags = merge(var.default_tags, var.something_else)
+}
+`,
+			traversal:    []string{"resource"},
+			expectedKeys: map[string][]string{"tags": {"var.default_tags", "var.something_else"}},
 		},
 	}
 
@@ -2202,6 +2212,10 @@ resource "aws_instance" "blah" {
 						require.NotNil(t, block, "block %v not found", name)
 					}
 
+					if tt.expectedKeys == nil {
+						assert.Empty(t, block.AttributesWithUnknownKeys())
+						return
+					}
 					assert.EqualValues(t, tt.expectedKeys, block.AttributesWithUnknownKeys())
 				})
 			}

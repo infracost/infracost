@@ -19,11 +19,11 @@
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us1",
         "type": "terraform_dir",
         "terraformModulePath": "us1",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us1",
         "errors": [
           {
             "code": 102,
-            "message": "Error loading Terraform modules: failed to parse file REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf diag: /Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
+            "message": "Error loading Terraform modules: failed to parse file /Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf diag: /Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
             "data": null,
             "isError": true
           }
@@ -64,11 +64,11 @@
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us1",
         "type": "terraform_dir",
         "terraformModulePath": "us1",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us1",
         "errors": [
           {
             "code": 102,
-            "message": "Error loading Terraform modules: failed to parse file REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf diag: /Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
+            "message": "Error loading Terraform modules: failed to parse file /Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf diag: /Users/liamg/src/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us1/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
             "data": null,
             "isError": true
           }
@@ -109,11 +109,11 @@
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2",
         "type": "terraform_dir",
         "terraformModulePath": "us2",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us2",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -126,19 +126,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 25,
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
                   "startLine": 11
                 }
               ],
               "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",
               "endLine": 25,
-              "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
               "startLine": 11
             },
             "hourlyCost": "0.633315068493150679",
@@ -216,19 +216,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 25,
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
                   "startLine": 11
                 }
               ],
               "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",
               "endLine": 25,
-              "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
               "startLine": 11
             },
             "hourlyCost": "0.633315068493150679",
@@ -322,11 +322,11 @@
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2",
         "type": "terraform_dir",
         "terraformModulePath": "us2",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/us2",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -339,19 +339,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 25,
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
                   "startLine": 11
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 25,
-              "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
               "startLine": 11
             },
             "hourlyCost": "1.017315068493150679",
@@ -429,19 +429,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 25,
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
                   "startLine": 11
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 25,
-              "filename": "testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error_output_json/us2/main.tf",
               "startLine": 11
             },
             "hourlyCost": "1.017315068493150679",

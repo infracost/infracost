@@ -52,7 +52,7 @@ Module path: prod
         + Provisioned IOPS
           +$52
 
-Monthly cost change for REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/prod (Module path: prod)
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/prod (Module path: prod)
 Amount:  +$1,303 ($0.00 → $1,303)
 
 ──────────────────────────────────

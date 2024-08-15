@@ -22,7 +22,7 @@ Project: main
         + Provisioned IOPS
           +$52
 
-Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_prior_empty_project
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_prior_empty_project
 Amount:  +$743 ($0.00 → $743)
 
 ──────────────────────────────────

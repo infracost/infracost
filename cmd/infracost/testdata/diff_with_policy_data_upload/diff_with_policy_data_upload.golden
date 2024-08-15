@@ -21,7 +21,7 @@
         "type": "terraform_dir",
         "policySha": "someshastring",
         "pastPolicySha": "someoldshastring",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_policy_data_upload",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",
         "providers": [
           {
             "name": "aws",
@@ -29,7 +29,7 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "filename": "testdata/diff_with_policy_data_upload/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
             "startLine": 1,
             "endLine": 14
           }
@@ -51,13 +51,13 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 37,
-                  "filename": "testdata/diff_with_policy_data_upload/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
                   "startLine": 16
                 }
               ],
               "checksum": "3acb8d7106140c67676ef9dec839a0c530c96b1b14ebf4cc450e39b1a9d092cd",
               "endLine": 37,
-              "filename": "testdata/diff_with_policy_data_upload/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
               "startLine": 16
             },
             "hourlyCost": "0.33597260273972602",
@@ -136,20 +136,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/diff_with_policy_data_upload/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 37,
-                  "filename": "testdata/diff_with_policy_data_upload/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
                   "startLine": 16
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
               "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
               "endLine": 37,
-              "filename": "testdata/diff_with_policy_data_upload/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
               "startLine": 16
             },
             "hourlyCost": "0.91197260273972602",

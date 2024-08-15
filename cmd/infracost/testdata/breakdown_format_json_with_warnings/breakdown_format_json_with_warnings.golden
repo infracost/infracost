@@ -18,7 +18,7 @@
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_warnings",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings",
         "warnings": [
           {
             "code": 105,
@@ -32,7 +32,7 @@
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_format_json_with_warnings/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings/main.tf",
             "startLine": 1,
             "endLine": 7
           }

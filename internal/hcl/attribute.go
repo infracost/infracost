@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"runtime/debug"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -49,9 +50,9 @@ type Attribute struct {
 	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
 	isGraph bool
 	// newMock generates a mock value for the attribute if it's value is missing.
-	newMock        func(attr *Attribute) cty.Value
-	previousValue  cty.Value
-	hasUnknownKeys bool
+	newMock                func(attr *Attribute) cty.Value
+	previousValue          cty.Value
+	varsCausingUnknownKeys []string
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -143,15 +144,27 @@ func (attr *Attribute) Value() cty.Value {
 	return val
 }
 
-// HasUnknownKeys checks if the attribute is an object with fully known keys.
-// For example, this will return true if a value is set to the result of `merge({"x": "y"}, var.default_tags)`
+// ReferencesCausingUnknownKeys returns a list of missing references if the attribute is an object without fully known keys.
+// For example, this will return []string{"var.default_tags"} if a value is set to the result of `merge({"x": "y"}, var.default_tags)`
 // where the value of `var.default_tags` is not known at evaluation time.
-func (attr *Attribute) HasUnknownKeys() bool {
+func (attr *Attribute) ReferencesCausingUnknownKeys() []string {
 	if attr == nil {
-		return false
+		return nil
 	}
 	_ = attr.value(0)
-	return attr.hasUnknownKeys
+	if len(attr.varsCausingUnknownKeys) == 0 {
+		return nil
+	}
+	unique := make(map[string]struct{})
+	for _, v := range attr.varsCausingUnknownKeys {
+		unique[v] = struct{}{}
+	}
+	attr.varsCausingUnknownKeys = nil
+	for k := range unique {
+		attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, k)
+	}
+	sort.Strings(attr.varsCausingUnknownKeys)
+	return attr.varsCausingUnknownKeys
 }
 
 // ProvidersValue retrieves the value of the attribute with special handling need for module.providers
@@ -235,6 +248,18 @@ func (attr *Attribute) HasChanged() (change bool) {
 	return !previous.RawEquals(current)
 }
 
+// designed only to work in situations where the expression may result in an object
+func extractTraversalStringsFromExpr(expr hcl.Expression) []string {
+	switch v := expr.(type) {
+	case *hclsyntax.ScopeTraversalExpr:
+		return []string{traversalAsString(v.AsTraversal())}
+	case *hclsyntax.IndexExpr:
+		return extractTraversalStringsFromExpr(v.Collection)
+	default:
+		return nil
+	}
+}
+
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -256,20 +281,20 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		ctx := attr.Ctx.Inner()
-		exp := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
+		exp, replaced := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
 		val, err := exp.Value(ctx)
 		if !err.HasErrors() {
-			attr.hasUnknownKeys = true
+			attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, replaced...)
 			return val
 		} else if len(err) < len(diag) {
 			// handle cases where there is a further error inside a function param, e.g. merge({"x": var.undefined}, var.whatever)
-			attr.hasUnknownKeys = true
+			attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, replaced...)
 		}
 
 		for _, d := range diag {
 
 			if d.Summary == unknownVariableDiagnostic && !ctyVal.IsKnown() {
-				attr.hasUnknownKeys = true
+				attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, extractTraversalStringsFromExpr(d.Expression)...)
 			}
 
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
@@ -351,7 +376,8 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 // the bad Expressions listed in the diagnostics. This function, currently, only traverses FunctionCallExpr and ObjectCallExpr.
 // More complex Expressions could be added in the future is we deem this a better way of mocking out values/expressions
 // that cause evaluation to fail.
-func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) (hclsyntax.Expression, []string) {
+	var replaced []string
 	switch t := expr.(type) {
 	case *hclsyntax.FunctionCallExpr:
 		newArgs := make([]hclsyntax.Expression, len(t.Args))
@@ -370,14 +396,16 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 					newArgs[i] = &hclsyntax.LiteralValueExpr{
 						Val: mockedVal,
 					}
-
+					replaced = append(replaced, extractTraversalStringsFromExpr(exp)...)
 					found = true
 					break
 				}
 			}
 
 			if !found {
-				newArgs[i] = mockFunctionCallArgs(exp, diagnostics, mockedVal)
+				var moreReplaced []string
+				newArgs[i], moreReplaced = mockFunctionCallArgs(exp, diagnostics, mockedVal)
+				replaced = append(replaced, moreReplaced...)
 			}
 		}
 
@@ -388,13 +416,15 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 			NameRange:       t.NameRange,
 			OpenParenRange:  t.OpenParenRange,
 			CloseParenRange: t.CloseParenRange,
-		}
+		}, replaced
 	case *hclsyntax.ObjectConsExpr:
 		newItems := make([]hclsyntax.ObjectConsItem, len(t.Items))
 		for i, item := range t.Items {
+			// we don't care about replacements here, because an ObjectConsExpr already has fully known keys
+			vExpr, _ := mockFunctionCallArgs(item.ValueExpr, diagnostics, mockedVal)
 			newItems[i] = hclsyntax.ObjectConsItem{
 				KeyExpr:   item.KeyExpr,
-				ValueExpr: mockFunctionCallArgs(item.ValueExpr, diagnostics, mockedVal),
+				ValueExpr: vExpr,
 			}
 		}
 
@@ -402,17 +432,19 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 			Items:     newItems,
 			SrcRange:  t.SrcRange,
 			OpenRange: t.OpenRange,
-		}
+		}, replaced
 
 	}
 
 	if v, ok := expr.(hclsyntax.Expression); ok {
-		return v
+		return v, replaced
 	}
+
+	replaced = append(replaced, extractTraversalStringsFromExpr(expr)...)
 
 	return &hclsyntax.LiteralValueExpr{
 		Val: mockedVal,
-	}
+	}, replaced
 }
 
 func (attr *Attribute) graphValue() (ctyVal cty.Value) {
@@ -429,7 +461,7 @@ func (attr *Attribute) graphValue() (ctyVal cty.Value) {
 		if !ctyVal.IsKnown() {
 			for _, d := range diag {
 				if d.Summary == unknownVariableDiagnostic {
-					attr.hasUnknownKeys = true
+					attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, extractTraversalStringsFromExpr(d.Expression)...)
 					break
 				}
 			}

@@ -18,11 +18,11 @@
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_with_free_resources_checksum",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -35,19 +35,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -120,19 +120,19 @@
             "resourceType": "aws_codepipeline",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
                   "endLine": 53,
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
               "endLine": 53,
-              "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
               "startLine": 26
             }
           }
@@ -148,19 +148,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -233,19 +233,19 @@
             "resourceType": "aws_codepipeline",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_with_free_resources_checksum/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
                   "endLine": 53,
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
               "endLine": 53,
-              "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_free_resources_checksum/main.tf",
               "startLine": 26
             }
           }

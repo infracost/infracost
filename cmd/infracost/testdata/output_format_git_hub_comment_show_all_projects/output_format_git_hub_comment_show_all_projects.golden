@@ -187,7 +187,7 @@ Project: REPLACED_PROJECT_PATH/testdata/terraform_v0.14_plan.json
         + Storage (general purpose SSD, gp2)
           +$0.80
 
-Monthly cost change for REPLACED_PROJECT_PATH/testdata/terraform_v0.14_plan.json
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 Amount:  +$41 ($41 → $81)
 Percent: +100%
 

@@ -28,7 +28,7 @@ Project: REPLACED_PROJECT_PATH/testdata/diff_with_infracost_json
         - Provisioned IOPS
           -$52
 
-Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_with_infracost_json
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
 Amount:  -$743 ($2,046 → $1,303)
 Percent: -36%
 

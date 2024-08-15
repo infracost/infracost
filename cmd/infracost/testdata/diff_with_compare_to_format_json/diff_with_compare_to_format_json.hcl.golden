@@ -19,11 +19,11 @@
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -175,19 +175,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/diff_with_compare_to_format_json/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "3326e79d502305b9e1f50ad5efedb7528b9e59ded094785b1ca91c6f88812fa5",
               "endLine": 23,
-              "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.785315068493150679",

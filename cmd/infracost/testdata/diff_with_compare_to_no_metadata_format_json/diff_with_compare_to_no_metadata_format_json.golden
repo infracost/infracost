@@ -16,10 +16,10 @@
       "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_no_metadata_format_json",
       "displayName": "main",
       "metadata": {
-        "path": "testdata/diff_with_compare_to_no_metadata_format_json",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_no_metadata_format_json",
         "type": "terraform_cli",
         "terraformWorkspace": "default",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_no_metadata_format_json",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_no_metadata_format_json",
         "providers": [
           {
             "name": "aws"

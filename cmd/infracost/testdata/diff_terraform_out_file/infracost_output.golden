@@ -96,7 +96,7 @@ Project: REPLACED_PROJECT_PATH/testdata/example_plan.json
           Monthly cost depends on usage
             +$0.0007 per GB
 
-Monthly cost change for REPLACED_PROJECT_PATH/testdata/example_plan.json
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
 Amount:  +$1,485 ($0.00 → $1,485)
 
 ──────────────────────────────────
@@ -111,5 +111,5 @@ Infracost estimate: Monthly estimate increased by $1,485 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Changed project                                              ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ REPLACED_PROJECT_PATH/testdata/example_plan.json ┃       +$1,485 ┃           - ┃      +$1,485 ┃
+┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃       +$1,485 ┃           - ┃      +$1,485 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

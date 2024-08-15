@@ -18,7 +18,7 @@
       "metadata": {
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_version_less_than5point39",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39",
         "providers": [
           {
             "name": "aws",
@@ -26,7 +26,7 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
             "startLine": 1,
             "endLine": 14
           }
@@ -49,20 +49,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 98,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 76
                 }
               ],
               "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 98,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 76
             },
             "hourlyCost": "1.017315068493150679",
@@ -142,20 +142,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app_block_tags",
                   "endLine": 212,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 191
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 212,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 191
             },
             "hourlyCost": "1.017315068493150679",
@@ -233,19 +233,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.launch_template",
                   "endLine": 189,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 165
                 }
               ],
               "checksum": "683ec0c113599563ccbf834223b61ffcc2abbd9ac8d6202036fc4fc6eb56a2d0",
               "endLine": 189,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 165
             },
             "hourlyCost": "0.2303726027397260165",
@@ -336,20 +336,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.launch_instance",
                   "endLine": 112,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 100
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 112,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 100
             },
             "hourlyCost": "0.0586890410958904025",
@@ -446,19 +446,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.bar",
                   "endLine": 74,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 54
                 }
               ],
               "checksum": "78ad6fe00b08040616d8503e00877f13cab24fa8c7e6c6d1045d7d075e8b5940",
               "endLine": 74,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 54
             }
           },
@@ -470,19 +470,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
                   "endLine": 29,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 25
                 }
               ],
               "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
               "endLine": 29,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 25
             },
             "costComponents": [
@@ -511,19 +511,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
                   "endLine": 39,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 31
                 }
               ],
               "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
               "endLine": 39,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 31
             },
             "costComponents": [
@@ -552,20 +552,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_noTags",
                   "endLine": 43,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 41
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 43,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 41
             },
             "costComponents": [
@@ -595,20 +595,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_withTags",
                   "endLine": 52,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 45
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 52,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 45
             },
             "costComponents": [
@@ -642,20 +642,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_launch_template.example",
                   "endLine": 163,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 114
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 163,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 114
             }
           }
@@ -681,20 +681,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 98,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 76
                 }
               ],
               "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 98,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 76
             },
             "hourlyCost": "1.017315068493150679",
@@ -774,20 +774,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app_block_tags",
                   "endLine": 212,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 191
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 212,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 191
             },
             "hourlyCost": "1.017315068493150679",
@@ -865,19 +865,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.launch_template",
                   "endLine": 189,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 165
                 }
               ],
               "checksum": "683ec0c113599563ccbf834223b61ffcc2abbd9ac8d6202036fc4fc6eb56a2d0",
               "endLine": 189,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 165
             },
             "hourlyCost": "0.2303726027397260165",
@@ -968,20 +968,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.launch_instance",
                   "endLine": 112,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 100
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 112,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 100
             },
             "hourlyCost": "0.0586890410958904025",
@@ -1078,19 +1078,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.bar",
                   "endLine": 74,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 54
                 }
               ],
               "checksum": "78ad6fe00b08040616d8503e00877f13cab24fa8c7e6c6d1045d7d075e8b5940",
               "endLine": 74,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 54
             }
           },
@@ -1102,19 +1102,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
                   "endLine": 29,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 25
                 }
               ],
               "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
               "endLine": 29,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 25
             },
             "costComponents": [
@@ -1143,19 +1143,19 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
                   "endLine": 39,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 31
                 }
               ],
               "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
               "endLine": 39,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 31
             },
             "costComponents": [
@@ -1184,20 +1184,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_noTags",
                   "endLine": 43,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 41
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 43,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 41
             },
             "costComponents": [
@@ -1227,20 +1227,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_withTags",
                   "endLine": 52,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 45
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 52,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 45
             },
             "costComponents": [
@@ -1274,20 +1274,20 @@
               "DefaultOverride": "defaultoverride"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_launch_template.example",
                   "endLine": 163,
-                  "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
                   "startLine": 114
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 163,
-              "filename": "testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
               "startLine": 114
             }
           }

@@ -56,7 +56,7 @@ Project: REPLACED_PROJECT_PATH/testdata/example_plan.json
 + aws_s3_bucket.usage
   $0.00
 
-Monthly cost change for REPLACED_PROJECT_PATH/testdata/example_plan.json
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
 Amount:  +$1,361 ($0.00 → $1,361)
 
 ──────────────────────────────────
@@ -71,7 +71,7 @@ Infracost estimate: Monthly estimate increased by $1,361 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Changed project                                              ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ REPLACED_PROJECT_PATH/testdata/example_plan.json ┃         +$925 ┃       +$437 ┃      +$1,361 ┃
+┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃         +$925 ┃       +$437 ┃      +$1,361 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
