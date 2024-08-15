@@ -2078,10 +2078,10 @@ terraform {
 func Test_UnknownKeyDetection(t *testing.T) {
 
 	tests := []struct {
-		name         string
-		content      string
-		traversal    []string
-		expectedKeys map[string][]string
+		name      string
+		content   string
+		traversal []string
+		expected  []AttributeWithUnknownKeys
 	}{
 		{
 			name: "known keys, unknown value",
@@ -2095,8 +2095,8 @@ provider "aws" {
   }
 }
 `,
-			traversal:    []string{"provider", "default_tags"},
-			expectedKeys: nil,
+			traversal: []string{"provider", "default_tags"},
+			expected:  nil,
 		},
 		{
 			name: "unknown key in merge param",
@@ -2109,8 +2109,15 @@ provider "aws" {
   }
 }
 `,
-			traversal:    []string{"provider", "default_tags"},
-			expectedKeys: map[string][]string{"tags": {"var.default_tags"}},
+			traversal: []string{"provider", "default_tags"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+					},
+				},
+			},
 		},
 		{
 			name: "entirely missing object",
@@ -2121,8 +2128,15 @@ provider "aws" {
   }
 }
 `,
-			traversal:    []string{"provider", "default_tags"},
-			expectedKeys: map[string][]string{"tags": {"var.default_tags"}},
+			traversal: []string{"provider", "default_tags"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+					},
+				},
+			},
 		},
 		{
 			name: "resource, known keys, unknown value",
@@ -2134,8 +2148,8 @@ resource "aws_instance" "blah" {
   }
 }
 `,
-			traversal:    []string{"resource"},
-			expectedKeys: nil,
+			traversal: []string{"resource"},
+			expected:  nil,
 		},
 		{
 			name: "resource, merged const w/ missing value with unknown map value",
@@ -2147,8 +2161,15 @@ resource "aws_instance" "blah" {
   }, var.default_tags)
 }
 `,
-			traversal:    []string{"resource"},
-			expectedKeys: map[string][]string{"tags": {"var.default_tags"}},
+			traversal: []string{"resource"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+					},
+				},
+			},
 		},
 		{
 			name: "resource, merged two unknown vars",
@@ -2157,8 +2178,16 @@ resource "aws_instance" "blah" {
   tags = merge(var.default_tags, var.something_else)
 }
 `,
-			traversal:    []string{"resource"},
-			expectedKeys: map[string][]string{"tags": {"var.default_tags", "var.something_else"}},
+			traversal: []string{"resource"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+						"var.something_else",
+					},
+				},
+			},
 		},
 	}
 
@@ -2212,11 +2241,11 @@ resource "aws_instance" "blah" {
 						require.NotNil(t, block, "block %v not found", name)
 					}
 
-					if tt.expectedKeys == nil {
+					if tt.expected == nil {
 						assert.Empty(t, block.AttributesWithUnknownKeys())
 						return
 					}
-					assert.EqualValues(t, tt.expectedKeys, block.AttributesWithUnknownKeys())
+					assert.EqualValues(t, tt.expected, block.AttributesWithUnknownKeys())
 				})
 			}
 		})

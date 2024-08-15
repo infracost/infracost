@@ -327,6 +327,21 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 			EndLine:   conf.Get("infracost_metadata.end_line").Int(),
 		}
 
+		unknownKeys := conf.Get("infracost_metadata.attributes_with_unknown_keys").Array()
+		for _, unknownKey := range unknownKeys {
+			vars := unknownKey.Get("missing_variables")
+			if vars.IsArray() {
+				vals := make([]string, 0, len(vars.Array()))
+				for _, v := range vars.Array() {
+					vals = append(vals, v.String())
+				}
+				md.AttributesWithUnknownKeys = append(md.AttributesWithUnknownKeys, schema.AttributeWithUnknownKeys{
+					Attribute:        unknownKey.Get("attribute").String(),
+					MissingVariables: vals,
+				})
+			}
+		}
+
 		for _, defaultTags := range conf.Get("expressions.default_tags").Array() {
 			if md.DefaultTags == nil {
 				md.DefaultTags = make(map[string]string)

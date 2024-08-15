@@ -630,6 +630,16 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 
 	region := block.GetAttribute("region").AsString()
 
+	metadata := map[string]interface{}{
+		"filename":   block.Filename,
+		"start_line": block.StartLine,
+		"end_line":   block.EndLine,
+	}
+
+	if attrsWithMissingKeys := block.AttributesWithUnknownKeys(); len(attrsWithMissingKeys) > 0 {
+		metadata["attributes_with_unknown_keys"] = attrsWithMissingKeys
+	}
+
 	p.schema.Configuration.ProviderConfig[providerConfigKey] = ProviderConfig{
 		Name: name,
 		Expressions: map[string]interface{}{
@@ -637,15 +647,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 				"constant_value": region,
 			},
 		},
-		InfracostMetadata: map[string]interface{}{
-			"filename":   block.Filename,
-			"start_line": block.StartLine,
-			"end_line":   block.EndLine,
-		},
-	}
-
-	if attrsWithMissingKeys := block.AttributesWithUnknownKeys(); len(attrsWithMissingKeys) > 0 {
-		p.schema.Configuration.ProviderConfig[providerConfigKey].InfracostMetadata["attributesWithUnknownKeys"] = attrsWithMissingKeys
+		InfracostMetadata: metadata,
 	}
 
 	switch providerType {

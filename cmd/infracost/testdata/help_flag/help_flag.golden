@@ -36,5 +36,6 @@ FLAGS
   -h, --help               help for infracost
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
+  -v, --version            version for infracost
 
 Use "infracost [command] --help" for more information about a command.

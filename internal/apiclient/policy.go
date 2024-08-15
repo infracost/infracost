@@ -157,12 +157,18 @@ type TagPropagation struct {
 }
 
 type policy2InfracostMetadata struct {
-	Calls          []policy2InfracostMetadataCall `json:"calls"`
-	Checksum       string                         `json:"checksum"`
-	EndLine        int64                          `json:"endLine"`
-	Filename       string                         `json:"filename"`
-	StartLine      int64                          `json:"startLine"`
-	ModuleFilename string                         `json:"moduleFilename,omitempty"`
+	Calls                     []policy2InfracostMetadataCall `json:"calls"`
+	Checksum                  string                         `json:"checksum"`
+	EndLine                   int64                          `json:"endLine"`
+	Filename                  string                         `json:"filename"`
+	StartLine                 int64                          `json:"startLine"`
+	ModuleFilename            string                         `json:"moduleFilename,omitempty"`
+	AttributesWithUnknownKeys []AttributeWithUnknownKeys     `json:"attributesWithUnknownKeys,omitempty"`
+}
+
+type AttributeWithUnknownKeys struct {
+	Attribute        string   `json:"attribute"`
+	MissingVariables []string `json:"missingVariables"`
 }
 
 type policy2InfracostMetadataCall struct {
@@ -272,6 +278,30 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		}
 	}
 
+	metadata := policy2InfracostMetadata{
+		Calls:          mdCalls,
+		Checksum:       checksum,
+		EndLine:        rd.Metadata["endLine"].Int(),
+		Filename:       rd.Metadata["filename"].String(),
+		StartLine:      rd.Metadata["startLine"].Int(),
+		ModuleFilename: rd.Metadata["moduleFilename"].String(),
+	}
+
+	if attrs, ok := rd.Metadata["attributesWithUnknownKeys"]; ok {
+		for key, result := range attrs.Map() {
+			if result.IsArray() {
+				vals := make([]string, 0, len(result.Array()))
+				for _, v := range result.Array() {
+					vals = append(vals, v.String())
+				}
+				metadata.AttributesWithUnknownKeys = append(metadata.AttributesWithUnknownKeys, AttributeWithUnknownKeys{
+					Attribute:        key,
+					MissingVariables: vals,
+				})
+			}
+		}
+	}
+
 	return policy2Resource{
 		ResourceType:   rd.Type,
 		ProviderName:   rd.ProviderName,
@@ -281,15 +311,8 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		TagPropagation: tagPropagation,
 		Values:         valuesJSON,
 		References:     references,
-		Metadata: policy2InfracostMetadata{
-			Calls:          mdCalls,
-			Checksum:       checksum,
-			EndLine:        rd.Metadata["endLine"].Int(),
-			Filename:       rd.Metadata["filename"].String(),
-			StartLine:      rd.Metadata["startLine"].Int(),
-			ModuleFilename: rd.Metadata["moduleFilename"].String(),
-		},
-		Region: rd.Region,
+		Metadata:       metadata,
+		Region:         rd.Region,
 	}
 }
 

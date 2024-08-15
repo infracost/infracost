@@ -261,11 +261,17 @@ func gitToplevel(path string) (string, error) {
 }
 
 type ProviderMetadata struct {
-	Name        string            `json:"name,omitempty"`
-	DefaultTags map[string]string `json:"defaultTags,omitempty"`
-	Filename    string            `json:"filename,omitempty"`
-	StartLine   int64             `json:"startLine,omitempty"`
-	EndLine     int64             `json:"endLine,omitempty"`
+	Name                      string                     `json:"name,omitempty"`
+	DefaultTags               map[string]string          `json:"defaultTags,omitempty"`
+	Filename                  string                     `json:"filename,omitempty"`
+	StartLine                 int64                      `json:"startLine,omitempty"`
+	EndLine                   int64                      `json:"endLine,omitempty"`
+	AttributesWithUnknownKeys []AttributeWithUnknownKeys `json:"attributesWithUnknownKeys,omitempty"`
+}
+
+type AttributeWithUnknownKeys struct {
+	Attribute        string   `json:"attribute"`
+	MissingVariables []string `json:"missingVariables"`
 }
 
 // AddError pushes the provided error onto the metadata list. It does a naive
