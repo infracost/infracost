@@ -11,6 +11,7 @@ func getVPCEndpointRegistryItem() *schema.RegistryItem {
 		CoreRFunc: NewVPCEndpoint,
 		ReferenceAttributes: []string{
 			"subnet_ids",
+			"vpc_id",
 		},
 	}
 }

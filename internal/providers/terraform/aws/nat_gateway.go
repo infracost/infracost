@@ -10,6 +10,7 @@ func getNATGatewayRegistryItem() *schema.RegistryItem {
 		Name: "aws_nat_gateway",
 		ReferenceAttributes: []string{
 			"allocation_id",
+			"subnet_id",
 		},
 		CoreRFunc: NewNATGateway,
 	}
