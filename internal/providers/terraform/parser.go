@@ -858,7 +858,7 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 
 	externalTags := make(map[string]string)
 	if path := p.ctx.ProjectConfig.YorConfigPath; path != "" {
-		if root := p.ctx.RunContext.Config.RootPath; root != "" {
+		if root := p.ctx.RunContext.Config.RootPath; root != "" && !filepath.IsAbs(path) {
 			path = filepath.Join(root, path)
 		}
 		p.parseYorTagsFromConfigFile(path, externalTags)
