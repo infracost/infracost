@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
@@ -271,7 +272,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
-		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
+		mockedVal := cty.StringVal(fmt.Sprintf("%s-%s", attr.Name(), mock.Identifier))
 		if attr.newMock != nil {
 			mockedVal = attr.newMock(attr)
 		}
@@ -466,7 +467,7 @@ func (attr *Attribute) graphValue() (ctyVal cty.Value) {
 				}
 			}
 		}
-		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
+		mockedVal := cty.StringVal(fmt.Sprintf("%s-%s", attr.Name(), mock.Identifier))
 		if attr.newMock != nil {
 			mockedVal = attr.newMock(attr)
 		}

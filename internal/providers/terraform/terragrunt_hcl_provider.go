@@ -31,6 +31,7 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -458,11 +459,11 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Functions: func(baseDir string) map[string]function.Function {
 			funcs := hcl.ExpFunctions(baseDir, p.logger)
 
-			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("run_cmd-mock"))
-			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("sops_decrypt_file-mock"))
-			funcs["get_aws_account_id"] = mockSliceFuncStaticReturn(cty.StringVal("account_id-mock"))
-			funcs["get_aws_caller_identity_arn"] = mockSliceFuncStaticReturn(cty.StringVal("arn:aws:iam::123456789012:user/terragrunt-mock"))
-			funcs["get_aws_caller_identity_user_id"] = mockSliceFuncStaticReturn(cty.StringVal("caller_identity_user_id-mock"))
+			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal(fmt.Sprintf("run_cmd-%s", mock.Identifier)))
+			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal(fmt.Sprintf("sops_decrypt_file-%s", mock.Identifier)))
+			funcs["get_aws_account_id"] = mockSliceFuncStaticReturn(cty.StringVal(fmt.Sprintf("account_id-%s", mock.Identifier)))
+			funcs["get_aws_caller_identity_arn"] = mockSliceFuncStaticReturn(cty.StringVal(fmt.Sprintf("arn:aws:iam::123456789012:user/terragrunt-%s", mock.Identifier)))
+			funcs["get_aws_caller_identity_user_id"] = mockSliceFuncStaticReturn(cty.StringVal(fmt.Sprintf("caller_identity_user_id-%s", mock.Identifier)))
 
 			return funcs
 		},
@@ -809,7 +810,7 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 			return valueMap
 		}
 
-		valueMap[key] = cty.StringVal(fmt.Sprintf("%s-mock", key))
+		valueMap[key] = cty.StringVal(fmt.Sprintf("%s-%s", key, mock.Identifier))
 		return valueMap
 	}
 
@@ -857,11 +858,11 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 					continue
 				}
 
-				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-%s", key, i, mock.Identifier))
 			}
 
 			for i := len(existing); i <= index; i++ {
-				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-%s", key, i, mock.Identifier))
 			}
 
 			valueMap[key] = cty.TupleVal(vals)
@@ -870,7 +871,7 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 
 		vals := make([]cty.Value, index+1)
 		for i := 0; i <= index; i++ {
-			vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+			vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-%s", key, i, mock.Identifier))
 		}
 
 		valueMap[key] = cty.ListVal(vals)

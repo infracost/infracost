@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -174,7 +175,7 @@ locals {
 	}
 
 	v := attr.Value()
-	assert.Equal(t, cty.StringVal("transformed_tags-mock"), v)
+	assert.Equal(t, cty.StringVal(fmt.Sprintf("transformed_tags-%s", mock.Identifier)), v)
 
 	b, err := io.ReadAll(buf)
 	require.NoError(t, err)
