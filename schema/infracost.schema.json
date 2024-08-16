@@ -30,6 +30,25 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "AttributeWithUnknownKeys": {
+      "required": [
+        "attribute",
+        "missingVariables"
+      ],
+      "properties": {
+        "attribute": {
+          "type": "string"
+        },
+        "missingVariables": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Breakdown": {
       "required": [
         "resources",
@@ -387,6 +406,13 @@
         },
         "endLine": {
           "type": "integer"
+        },
+        "attributesWithUnknownKeys": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/AttributeWithUnknownKeys"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -464,6 +490,18 @@
         "subresources": {
           "items": {
             "$ref": "#/definitions/Subresource"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownDefaultTagKeys": {
+          "items": {
+            "type": "string"
           },
           "type": "array"
         }
@@ -623,6 +661,18 @@
         "subresources": {
           "items": {
             "type": "object"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownDefaultTagKeys": {
+          "items": {
+            "type": "string"
           },
           "type": "array"
         }

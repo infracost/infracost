@@ -722,11 +722,16 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		marshalledTags[tag] = tagValue
 	}
 
+	tagsVal := map[string]interface{}{
+		"constant_value": marshalledTags,
+	}
+
+	if refs := tags.ReferencesCausingUnknownKeys(); len(refs) > 0 {
+		tagsVal["missing_attributes_causing_unknown_keys"] = refs
+	}
+
 	return map[string]interface{}{
-		"tags": map[string]interface{}{
-			"constant_value": marshalledTags,
-			"missing_attributes_causing_unknown_keys": tags.ReferencesCausingUnknownKeys(),
-		},
+		"tags": tagsVal,
 	}
 }
 
@@ -783,10 +788,13 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 		marshalledTags[tag] = tagValue
 	}
 
-	return map[string]interface{}{
+	tagsVal := map[string]interface{}{
 		"constant_value": marshalledTags,
-		"missing_attributes_causing_unknown_keys": tags.ReferencesCausingUnknownKeys(),
 	}
+	if refs := tags.ReferencesCausingUnknownKeys(); len(refs) > 0 {
+		tagsVal["missing_attributes_causing_unknown_keys"] = refs
+	}
+	return tagsVal
 }
 
 func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {

@@ -516,6 +516,9 @@ func parseAWSDefaultTags(providerConf, resConf gjson.Result) (map[string]string,
 			defaultTags[k] = v.String()
 		}
 		for _, address := range dTags.Get("tags.missing_attributes_causing_unknown_keys").Array() {
+			if address.String() == "" {
+				continue
+			}
 			missingAttrsCausingUnknownKeys = append(missingAttrsCausingUnknownKeys, address.String())
 		}
 	}
@@ -535,6 +538,9 @@ func parseGoogleDefaultTags(providerConf, resConf gjson.Result) (map[string]stri
 			gjsonEscape(providerKey),
 		),
 	).Array() {
+		if address.String() == "" {
+			continue
+		}
 		missingAttrsCausingUnknownKeys = append(missingAttrsCausingUnknownKeys, address.String())
 	}
 
