@@ -1,5 +1,5 @@
 Project: testdata-breakdown_terragrunt_with_remote_source-submod-ref1
-Module path: testdata/breakdown_terragrunt_with_remote_source/submod-ref1
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/submod-ref1
 
  Name                                                            Monthly Qty  Unit                        Monthly Cost   
                                                                                                                          
@@ -20,7 +20,7 @@ Module path: testdata/breakdown_terragrunt_with_remote_source/submod-ref1
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_with_remote_source-submod-ref1-2
-Module path: testdata/breakdown_terragrunt_with_remote_source/submod-ref1-2
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/submod-ref1-2
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -41,7 +41,7 @@ Module path: testdata/breakdown_terragrunt_with_remote_source/submod-ref1-2
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_with_remote_source-submod-ref3
-Module path: testdata/breakdown_terragrunt_with_remote_source/submod-ref3
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/submod-ref3
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -62,7 +62,7 @@ Module path: testdata/breakdown_terragrunt_with_remote_source/submod-ref3
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_with_remote_source-ref1
-Module path: testdata/breakdown_terragrunt_with_remote_source/ref1
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/ref1
 
  Name                                                                         Monthly Qty  Unit                    Monthly Cost   
                                                                                                                                   
@@ -103,7 +103,7 @@ Module path: testdata/breakdown_terragrunt_with_remote_source/ref1
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_with_remote_source-ref1-submod
-Module path: testdata/breakdown_terragrunt_with_remote_source/ref1-submod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/ref1-submod
 
  Name                             Monthly Qty  Unit  Monthly Cost   
                                                                     
@@ -115,7 +115,7 @@ Module path: testdata/breakdown_terragrunt_with_remote_source/ref1-submod
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_with_remote_source-ref2
-Module path: testdata/breakdown_terragrunt_with_remote_source/ref2
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/ref2
 
  Name                                                                         Monthly Qty  Unit                    Monthly Cost   
                                                                                                                                   

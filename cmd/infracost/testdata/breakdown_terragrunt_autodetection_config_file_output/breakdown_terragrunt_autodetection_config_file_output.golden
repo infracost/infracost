@@ -1,5 +1,5 @@
 Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app1-dev
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app1/dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
                                                                                                                       
@@ -20,7 +20,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app1
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app1-prod
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app1/prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -41,7 +41,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app1
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app2-dev
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app2/dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
                                                                                                                       
@@ -62,7 +62,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app2
 
 ──────────────────────────────────
 Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app2-prod
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app2/prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -83,7 +83,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/app2
 
 ──────────────────────────────────
 Project: region1-override
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
                                                                                                                       
@@ -104,7 +104,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/regi
 
 ──────────────────────────────────
 Project: region1-override
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -125,7 +125,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/regi
 
 ──────────────────────────────────
 Project: region1-override
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
                                                                                                                       
@@ -146,7 +146,7 @@ Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/regi
 
 ──────────────────────────────────
 Project: region1-override
-Module path: testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -191,11 +191,11 @@ Err:
 
 Logs:
 INFO Autodetected 8 Terragrunt projects from 3 paths in the config file
-INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app1-dev at directory testdata/breakdown_terragrunt_autodetection_config_file_output/app1/dev
-INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app1-prod at directory testdata/breakdown_terragrunt_autodetection_config_file_output/app1/prod
-INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app2-dev at directory testdata/breakdown_terragrunt_autodetection_config_file_output/app2/dev
-INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app2-prod at directory testdata/breakdown_terragrunt_autodetection_config_file_output/app2/prod
-INFO Found Terragrunt project region1-override at directory testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/dev
-INFO Found Terragrunt project region1-override at directory testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/prod
-INFO Found Terragrunt project region1-override at directory testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/dev
-INFO Found Terragrunt project region1-override at directory testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/prod
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app1-dev at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/dev
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app1-prod at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/prod
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app2-dev at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/dev
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app2-prod at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/prod
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/dev
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/prod
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/dev
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/prod

@@ -9,7 +9,7 @@ Project: REPLACED_PROJECT_PATH/testdata/plan_with_target.json
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t3.small)
       +$8 ($8 → $15)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/plan_with_target.json
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/plan_with_target.json
 Amount:  +$8 ($9 → $16)
 Percent: +88%
 
@@ -25,7 +25,7 @@ Infracost estimate: Monthly estimate increased by $8 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/plan_with_target.json ┃           +$8 ┃           - ┃   +$8 (+88%) ┃
+┃ REPLACED_PROJECT_PATH/testdata/plan_with_target.json ┃           +$8 ┃           - ┃   +$8 (+88%) ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
