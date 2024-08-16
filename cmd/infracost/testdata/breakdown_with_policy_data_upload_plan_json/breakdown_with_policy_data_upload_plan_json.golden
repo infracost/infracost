@@ -16,7 +16,7 @@
       "name": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
       "displayName": "",
       "metadata": {
-        "path": "testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
         "type": "terraform_plan_json",
         "policySha": "someshastring",
         "pastPolicySha": "0",

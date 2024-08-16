@@ -22,7 +22,7 @@
         "providers": [
           {
             "name": "azurerm",
-            "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
             "startLine": 1,
             "endLine": 4
           }
@@ -36,19 +36,19 @@
             "tags": {
               "AzureLabel": "azure-tag"
             },
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
                   "endLine": 21,
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
                   "startLine": 11
                 }
               ],
               "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
               "endLine": 21,
-              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
               "startLine": 11
             },
             "hourlyCost": "0.45",
@@ -70,19 +70,19 @@
             "name": "azurerm_redis_cache.arc2",
             "resourceType": "azurerm_redis_cache",
             "tags": {},
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
                   "endLine": 30,
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
                   "startLine": 23
                 }
               ],
               "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
               "endLine": 30,
-              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
               "startLine": 23
             },
             "hourlyCost": "0.45",
@@ -113,19 +113,19 @@
             "tags": {
               "AzureLabel": "azure-tag"
             },
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
                   "endLine": 21,
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
                   "startLine": 11
                 }
               ],
               "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
               "endLine": 21,
-              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
               "startLine": 11
             },
             "hourlyCost": "0.45",
@@ -147,19 +147,19 @@
             "name": "azurerm_redis_cache.arc2",
             "resourceType": "azurerm_redis_cache",
             "tags": {},
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
                   "endLine": 30,
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
                   "startLine": 23
                 }
               ],
               "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
               "endLine": 30,
-              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
               "startLine": 23
             },
             "hourlyCost": "0.45",

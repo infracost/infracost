@@ -9,7 +9,7 @@
     "vcsCommitTimestamp": "REPLACED_TIME",
     "vcsCommitMessage": "stub-message",
     "vcsRepositoryUrl": "https://github.com/infracost/infracost",
-    "configFilePath": "testdata/breakdown_config_file/infracost.yml"
+    "configFilePath": "REPLACED_PROJECT_PATH/testdata/breakdown_config_file/infracost.yml"
   },
   "currency": "USD",
   "projects": [
@@ -20,12 +20,12 @@
         "path": "REPLACED_PROJECT_PATH/testdata/breakdown_config_file/dev",
         "type": "terraform_dir",
         "configSha": "1234",
-        "terraformModulePath": "testdata/breakdown_config_file/dev",
+        "terraformModulePath": "REPLACED_PROJECT_PATH/testdata/breakdown_config_file/dev",
         "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_config_file/dev",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_config_file/dev/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_config_file/dev/main.tf",
             "startLine": 1,
             "endLine": 7
           }
