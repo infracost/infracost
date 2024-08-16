@@ -135,17 +135,19 @@ type policy2Reference struct {
 }
 
 type policy2Resource struct {
-	ResourceType          string                   `json:"resourceType"`
-	ProviderName          string                   `json:"providerName"`
-	Address               string                   `json:"address"`
-	Tags                  *[]policy2Tag            `json:"tags,omitempty"`
-	DefaultTags           *[]policy2Tag            `json:"defaultTags,omitempty"`
-	SupportForDefaultTags bool                     `json:"supportForDefaultTags"`
-	TagPropagation        *TagPropagation          `json:"tagPropagation,omitempty"`
-	Values                json.RawMessage          `json:"values"`
-	References            []policy2Reference       `json:"references"`
-	Metadata              policy2InfracostMetadata `json:"infracostMetadata"`
-	Region                string                   `json:"region"`
+	ResourceType                            string                   `json:"resourceType"`
+	ProviderName                            string                   `json:"providerName"`
+	Address                                 string                   `json:"address"`
+	Tags                                    *[]policy2Tag            `json:"tags,omitempty"`
+	DefaultTags                             *[]policy2Tag            `json:"defaultTags,omitempty"`
+	SupportForDefaultTags                   bool                     `json:"supportForDefaultTags"`
+	TagPropagation                          *TagPropagation          `json:"tagPropagation,omitempty"`
+	Values                                  json.RawMessage          `json:"values"`
+	References                              []policy2Reference       `json:"references"`
+	Metadata                                policy2InfracostMetadata `json:"infracostMetadata"`
+	Region                                  string                   `json:"region"`
+	MissingVarsCausingUnknownTagKeys        []string                 `json:"missingVarsCausingUnknownTagKeys,omitempty"`
+	MissingVarsCausingUnknownDefaultTagKeys []string                 `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
 }
 
 type TagPropagation struct {
@@ -157,13 +159,12 @@ type TagPropagation struct {
 }
 
 type policy2InfracostMetadata struct {
-	Calls                     []policy2InfracostMetadataCall `json:"calls"`
-	Checksum                  string                         `json:"checksum"`
-	EndLine                   int64                          `json:"endLine"`
-	Filename                  string                         `json:"filename"`
-	StartLine                 int64                          `json:"startLine"`
-	ModuleFilename            string                         `json:"moduleFilename,omitempty"`
-	AttributesWithUnknownKeys []AttributeWithUnknownKeys     `json:"attributesWithUnknownKeys,omitempty"`
+	Calls          []policy2InfracostMetadataCall `json:"calls"`
+	Checksum       string                         `json:"checksum"`
+	EndLine        int64                          `json:"endLine"`
+	Filename       string                         `json:"filename"`
+	StartLine      int64                          `json:"startLine"`
+	ModuleFilename string                         `json:"moduleFilename,omitempty"`
 }
 
 type AttributeWithUnknownKeys struct {
@@ -287,32 +288,19 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		ModuleFilename: rd.Metadata["moduleFilename"].String(),
 	}
 
-	if attrs, ok := rd.Metadata["attributesWithUnknownKeys"]; ok {
-		for key, result := range attrs.Map() {
-			if result.IsArray() {
-				vals := make([]string, 0, len(result.Array()))
-				for _, v := range result.Array() {
-					vals = append(vals, v.String())
-				}
-				metadata.AttributesWithUnknownKeys = append(metadata.AttributesWithUnknownKeys, AttributeWithUnknownKeys{
-					Attribute:        key,
-					MissingVariables: vals,
-				})
-			}
-		}
-	}
-
 	return policy2Resource{
-		ResourceType:   rd.Type,
-		ProviderName:   rd.ProviderName,
-		Address:        rd.Address,
-		Tags:           tagsPtr,
-		DefaultTags:    defaultTagsPtr,
-		TagPropagation: tagPropagation,
-		Values:         valuesJSON,
-		References:     references,
-		Metadata:       metadata,
-		Region:         rd.Region,
+		ResourceType:                            rd.Type,
+		ProviderName:                            rd.ProviderName,
+		Address:                                 rd.Address,
+		Tags:                                    tagsPtr,
+		DefaultTags:                             defaultTagsPtr,
+		TagPropagation:                          tagPropagation,
+		Values:                                  valuesJSON,
+		References:                              references,
+		Metadata:                                metadata,
+		Region:                                  rd.Region,
+		MissingVarsCausingUnknownTagKeys:        rd.MissingVarsCausingUnknownTagKeys,
+		MissingVarsCausingUnknownDefaultTagKeys: rd.MissingVarsCausingUnknownDefaultTagKeys,
 	}
 }
 

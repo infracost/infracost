@@ -19,26 +19,28 @@ var (
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 
 type Resource struct {
-	Name                        string
-	CostComponents              []*CostComponent
-	ActualCosts                 []*ActualCosts
-	SubResources                []*Resource
-	HourlyCost                  *decimal.Decimal
-	MonthlyCost                 *decimal.Decimal
-	MonthlyUsageCost            *decimal.Decimal
-	IsSkipped                   bool
-	NoPrice                     bool
-	SkipMessage                 string
-	ResourceType                string
-	Tags                        *map[string]string
-	DefaultTags                 *map[string]string
-	TagPropagation              *TagPropagation
-	ProviderSupportsDefaultTags bool
-	ProviderLink                string
-	UsageSchema                 []*UsageItem
-	EstimateUsage               EstimateFunc
-	EstimationSummary           map[string]bool
-	Metadata                    map[string]gjson.Result
+	Name                                    string
+	CostComponents                          []*CostComponent
+	ActualCosts                             []*ActualCosts
+	SubResources                            []*Resource
+	HourlyCost                              *decimal.Decimal
+	MonthlyCost                             *decimal.Decimal
+	MonthlyUsageCost                        *decimal.Decimal
+	IsSkipped                               bool
+	NoPrice                                 bool
+	SkipMessage                             string
+	ResourceType                            string
+	Tags                                    *map[string]string
+	DefaultTags                             *map[string]string
+	TagPropagation                          *TagPropagation
+	ProviderSupportsDefaultTags             bool
+	ProviderLink                            string
+	UsageSchema                             []*UsageItem
+	EstimateUsage                           EstimateFunc
+	EstimationSummary                       map[string]bool
+	Metadata                                map[string]gjson.Result
+	MissingVarsCausingUnknownTagKeys        []string
+	MissingVarsCausingUnknownDefaultTagKeys []string
 
 	// parent is the parent resource of this resource, this is only
 	// applicable for sub resources. See FlattenedSubResources for more info

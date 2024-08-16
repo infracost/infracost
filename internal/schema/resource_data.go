@@ -9,19 +9,21 @@ import (
 )
 
 type ResourceData struct {
-	Type                        string
-	ProviderName                string
-	Address                     string
-	Tags                        *map[string]string
-	DefaultTags                 *map[string]string
-	ProviderSupportsDefaultTags bool
-	ProviderLink                string
-	TagPropagation              *TagPropagation
-	RawValues                   gjson.Result
-	ReferencesMap               map[string][]*ResourceData
-	CFResource                  cloudformation.Resource
-	UsageData                   *UsageData
-	Metadata                    map[string]gjson.Result
+	Type                                    string
+	ProviderName                            string
+	Address                                 string
+	Tags                                    *map[string]string
+	DefaultTags                             *map[string]string
+	ProviderSupportsDefaultTags             bool
+	ProviderLink                            string
+	TagPropagation                          *TagPropagation
+	RawValues                               gjson.Result
+	ReferencesMap                           map[string][]*ResourceData
+	CFResource                              cloudformation.Resource
+	UsageData                               *UsageData
+	Metadata                                map[string]gjson.Result
+	MissingVarsCausingUnknownTagKeys        []string
+	MissingVarsCausingUnknownDefaultTagKeys []string
 	// Region is the region of the resource. When building a resource callers should
 	// use this value instead of the deprecated d.Get("region").String() or
 	// lookupRegion method.

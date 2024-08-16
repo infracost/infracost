@@ -501,30 +501,44 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	}
 }
 
-func parseAWSDefaultTags(providerConf, resConf gjson.Result) map[string]string {
+func parseAWSDefaultTags(providerConf, resConf gjson.Result) (map[string]string, []string) {
 	// this only works for aws, we'll need to review when other providers support default tags
 	providerKey := parseProviderKey(resConf)
 	dTagsArray := providerConf.Get(fmt.Sprintf("%s.expressions.default_tags", gjsonEscape(providerKey))).Array()
 	if len(dTagsArray) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	defaultTags := make(map[string]string)
+	var missingAttrsCausingUnknownKeys []string
 	for _, dTags := range dTagsArray {
 		for k, v := range dTags.Get("tags.constant_value").Map() {
 			defaultTags[k] = v.String()
 		}
+		for _, address := range dTags.Get("tags.missing_attributes_causing_unknown_keys").Array() {
+			missingAttrsCausingUnknownKeys = append(missingAttrsCausingUnknownKeys, address.String())
+		}
 	}
-	return defaultTags
+	return defaultTags, missingAttrsCausingUnknownKeys
 }
 
-func parseGoogleDefaultTags(providerConf, resConf gjson.Result) map[string]string {
+func parseGoogleDefaultTags(providerConf, resConf gjson.Result) (map[string]string, []string) {
 	providerKey := parseProviderKey(resConf)
 	defaultTags := make(map[string]string)
 	for k, v := range providerConf.Get(fmt.Sprintf("%s.expressions.default_labels.constant_value", gjsonEscape(providerKey))).Map() {
 		defaultTags[k] = v.String()
 	}
-	return defaultTags
+	var missingAttrsCausingUnknownKeys []string
+	for _, address := range providerConf.Get(
+		fmt.Sprintf(
+			"%s.expressions.default_labels.missing_attributes_causing_unknown_keys",
+			gjsonEscape(providerKey),
+		),
+	).Array() {
+		missingAttrsCausingUnknownKeys = append(missingAttrsCausingUnknownKeys, address.String())
+	}
+
+	return defaultTags, missingAttrsCausingUnknownKeys
 }
 
 func overrideRegion(d *schema.ResourceData, config *config.Config) string {
@@ -884,6 +898,8 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 
 	for _, resourceData := range data {
 
+		var missingVarsCausingUnknownTagKeys []string
+		var missingVarsCausingUnknownDefaultTagKeys []string
 		providerPrefix := getProviderPrefix(resourceData.Type)
 		defaultTagSupport := p.areDefaultTagsSupported(providerPrefix)
 		var tags map[string]string
@@ -892,16 +908,16 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		switch providerPrefix {
 		case "aws":
 			if defaultTagSupport {
-				defaultTags = parseAWSDefaultTags(providerConf, resConf)
+				defaultTags, missingVarsCausingUnknownDefaultTagKeys = parseAWSDefaultTags(providerConf, resConf)
 			}
-			tags = aws.ParseTags(externalTags, defaultTags, resourceData, awsTagParsingConfig)
+			tags, missingVarsCausingUnknownTagKeys = aws.ParseTags(externalTags, defaultTags, resourceData, awsTagParsingConfig)
 		case "azurerm":
-			tags = azure.ParseTags(externalTags, resourceData)
+			tags, missingVarsCausingUnknownTagKeys = azure.ParseTags(externalTags, resourceData)
 		case "google":
 			if defaultTagSupport {
-				defaultTags = parseGoogleDefaultTags(providerConf, resConf)
+				defaultTags, missingVarsCausingUnknownDefaultTagKeys = parseGoogleDefaultTags(providerConf, resConf)
 			}
-			tags = google.ParseTags(resourceData, externalTags, defaultTags)
+			tags, missingVarsCausingUnknownTagKeys = google.ParseTags(resourceData, externalTags, defaultTags)
 		default:
 			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
@@ -924,6 +940,8 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		}
 		resourceData.ProviderSupportsDefaultTags = defaultTagSupport
 		resourceData.TagPropagation = p.getTagPropagationInfo(resourceData)
+		resourceData.MissingVarsCausingUnknownTagKeys = missingVarsCausingUnknownTagKeys
+		resourceData.MissingVarsCausingUnknownDefaultTagKeys = missingVarsCausingUnknownDefaultTagKeys
 	}
 }
 

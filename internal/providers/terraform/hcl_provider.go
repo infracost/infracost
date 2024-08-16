@@ -725,6 +725,7 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 	return map[string]interface{}{
 		"tags": map[string]interface{}{
 			"constant_value": marshalledTags,
+			"missing_attributes_causing_unknown_keys": tags.ReferencesCausingUnknownKeys(),
 		},
 	}
 }
@@ -784,6 +785,7 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 
 	return map[string]interface{}{
 		"constant_value": marshalledTags,
+		"missing_attributes_causing_unknown_keys": tags.ReferencesCausingUnknownKeys(),
 	}
 }
 
