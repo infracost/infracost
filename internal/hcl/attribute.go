@@ -152,7 +152,7 @@ func (attr *Attribute) ReferencesCausingUnknownKeys() []string {
 	if attr == nil {
 		return nil
 	}
-	_ = attr.value(0)
+	_ = attr.Value()
 	if len(attr.varsCausingUnknownKeys) == 0 {
 		return nil
 	}
@@ -295,7 +295,12 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		for _, d := range diag {
 
 			if d.Summary == unknownVariableDiagnostic && !ctyVal.IsKnown() {
-				attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, extractTraversalStringsFromExpr(d.Expression)...)
+				missing := extractTraversalStringsFromExpr(d.Expression)
+				for _, m := range missing {
+					if !strings.HasSuffix(m, ".id") && !strings.HasSuffix(m, ".arn") {
+						attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, m)
+					}
+				}
 			}
 
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
