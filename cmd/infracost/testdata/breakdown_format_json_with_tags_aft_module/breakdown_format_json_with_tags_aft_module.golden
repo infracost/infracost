@@ -1299,6 +1299,15 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
+            "name": "module.aft.module.aft_backend.aws_kms_key.aft_access_logs_primary_backend_bucket",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "defaultTags": {
+              "managed_by": "AFT"
+            },
             "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-primary-region",
             "tags": {
               "Name": "aft-backend-REGEX_FILTER-primary-region-kms-key",
@@ -1606,6 +1615,20 @@
             ],
             "tags": {
               "Name": "aft-backend-REGEX_FILTER",
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "defaultTags": {
+              "managed_by": "AFT"
+            },
+            "name": "module.aft.module.aft_backend.aws_s3_bucket.aft_access_logs_primary_backend_bucket",
+            "subresources": [
+              {
+                "name": "Standard"
+              }
+            ],
+            "tags": {
               "managed_by": "AFT"
             }
           },
@@ -2003,7 +2026,7 @@
           }
         ]
       },
-      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_aft_module"
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aft_module"
     }
   ]
 }
