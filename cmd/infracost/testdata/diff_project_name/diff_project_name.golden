@@ -2,7 +2,7 @@ Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
 Project: my first project
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform
+Module path: testdata/diff_project_name/terraform
 
 ~ aws_instance.web_app
   -$420 ($743 → $322)
@@ -10,13 +10,13 @@ Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.xlarge)
       -$420 ($561 → $140)
 
-Monthly cost change for my first project (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform)
+Monthly cost change for my first project (Module path: testdata/diff_project_name/terraform)
 Amount:  -$420 ($743 → $322)
 Percent: -57%
 
 ──────────────────────────────────
 Project: my first project again
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform
+Module path: testdata/diff_project_name/terraform
 
 ~ aws_instance.web_app
   -$420 ($743 → $322)
@@ -24,13 +24,13 @@ Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.xlarge)
       -$420 ($561 → $140)
 
-Monthly cost change for my first project again (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform)
+Monthly cost change for my first project again (Module path: testdata/diff_project_name/terraform)
 Amount:  -$420 ($743 → $322)
 Percent: -57%
 
 ──────────────────────────────────
 Project: my terragrunt dev project
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt/dev
+Module path: testdata/diff_project_name/terragrunt/dev
 
 ~ aws_instance.web_app
   -$8 ($60 → $52)
@@ -38,13 +38,13 @@ Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt/dev
     ~ Instance usage (Linux/UNIX, on-demand, t2.small → t2.micro)
       -$8 ($17 → $8)
 
-Monthly cost change for my terragrunt dev project (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt/dev)
+Monthly cost change for my terragrunt dev project (Module path: testdata/diff_project_name/terragrunt/dev)
 Amount:  -$8 ($60 → $52)
 Percent: -14%
 
 ──────────────────────────────────
 Project: my terragrunt multi project
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/dev
+Module path: testdata/diff_project_name/terragrunt-multi/dev
 
 + aws_instance.web_app
   +$52
@@ -80,12 +80,12 @@ Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/d
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt multi project (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/dev)
+Monthly cost change for my terragrunt multi project (Module path: testdata/diff_project_name/terragrunt-multi/dev)
 Amount:  +$52 ($0.00 → $52)
 
 ──────────────────────────────────
 Project: my terragrunt multi project
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/prod
+Module path: testdata/diff_project_name/terragrunt-multi/prod
 
 ~ aws_instance.web_app
   +$280 ($467 → $748)
@@ -93,13 +93,13 @@ Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/p
     ~ Instance usage (Linux/UNIX, on-demand, m5.2xlarge → m5.4xlarge)
       +$280 ($280 → $561)
 
-Monthly cost change for my terragrunt multi project (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/prod)
+Monthly cost change for my terragrunt multi project (Module path: testdata/diff_project_name/terragrunt-multi/prod)
 Amount:  +$280 ($467 → $748)
 Percent: +60%
 
 ──────────────────────────────────
 Project: my terragrunt prod project
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt/prod
+Module path: testdata/diff_project_name/terragrunt/prod
 
 ~ aws_instance.web_app
   -$561 ($1,308 → $748)
@@ -107,13 +107,13 @@ Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt/prod
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my terragrunt prod project (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt/prod)
+Monthly cost change for my terragrunt prod project (Module path: testdata/diff_project_name/terragrunt/prod)
 Amount:  -$561 ($1,308 → $748)
 Percent: -43%
 
 ──────────────────────────────────
 Project: my terragrunt workspace
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/dev
+Module path: testdata/diff_project_name/terragrunt-multi/dev
 Workspace: ws2
 
 ~ aws_instance.web_app
@@ -122,13 +122,13 @@ Workspace: ws2
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
       +$0.88 ($8 → $8)
 
-Monthly cost change for my terragrunt workspace (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/dev, Workspace: ws2)
+Monthly cost change for my terragrunt workspace (Module path: testdata/diff_project_name/terragrunt-multi/dev, Workspace: ws2)
 Amount:  +$0.88 ($51 → $52)
 Percent: +2%
 
 ──────────────────────────────────
 Project: my terragrunt workspace
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/prod
+Module path: testdata/diff_project_name/terragrunt-multi/prod
 Workspace: ws2
 
 + aws_instance.web_app
@@ -165,12 +165,12 @@ Workspace: ws2
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt workspace (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terragrunt-multi/prod, Workspace: ws2)
+Monthly cost change for my terragrunt workspace (Module path: testdata/diff_project_name/terragrunt-multi/prod, Workspace: ws2)
 Amount:  +$748 ($0.00 → $748)
 
 ──────────────────────────────────
 Project: my workspace project
-Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform
+Module path: testdata/diff_project_name/terraform
 Workspace: ws1
 
 ~ aws_instance.web_app
@@ -179,7 +179,7 @@ Workspace: ws1
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.xlarge)
       -$420 ($561 → $140)
 
-Monthly cost change for my workspace project (Module path: REPLACED_PROJECT_PATH/testdata/diff_project_name/terraform, Workspace: ws1)
+Monthly cost change for my workspace project (Module path: testdata/diff_project_name/terraform, Workspace: ws1)
 Amount:  -$420 ($743 → $322)
 Percent: -57%
 

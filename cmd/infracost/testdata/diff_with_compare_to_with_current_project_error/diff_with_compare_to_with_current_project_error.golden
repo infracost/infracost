@@ -69,7 +69,7 @@
         "providers": [
           {
             "name": "aws",
-            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
+            "filename": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -164,19 +164,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf:1",
+            "providerLink": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
+                  "filename": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
+              "filename": "testdata/diff_with_compare_to_with_current_project_error/prod/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",

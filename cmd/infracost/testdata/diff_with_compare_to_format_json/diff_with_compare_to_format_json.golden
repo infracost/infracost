@@ -17,7 +17,7 @@
       "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
       "displayName": "main",
       "metadata": {
-        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
+        "path": "testdata/diff_with_compare_to_format_json",
         "type": "terraform_cli",
         "terraformWorkspace": "default",
         "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",

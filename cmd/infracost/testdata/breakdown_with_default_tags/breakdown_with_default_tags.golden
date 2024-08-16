@@ -30,7 +30,7 @@
               "SomeFloat": "1.1",
               "SomeNumber": "1"
             },
-            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+            "filename": "testdata/breakdown_with_default_tags/main.tf",
             "startLine": 1,
             "endLine": 18
           }
@@ -58,19 +58,19 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
                   "endLine": 100,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 75
                 }
               ],
               "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
               "endLine": 100,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+              "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 75
             },
             "hourlyCost": "0.04557260273972602",
@@ -157,20 +157,20 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 32,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 22
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
               "defaultTagsChecksum": "554cb5bc144f8c4690b6f71b48b5f746dc3141e609f7ab49fabb549fd5fee449",
               "endLine": 32,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+              "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
             },
             "costComponents": [
@@ -235,19 +235,19 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
                   "endLine": 100,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 75
                 }
               ],
               "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
               "endLine": 100,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+              "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 75
             },
             "hourlyCost": "0.04557260273972602",
@@ -334,20 +334,20 @@
               "SomeNumber": "1"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
+            "providerLink": "testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 32,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 22
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
               "defaultTagsChecksum": "554cb5bc144f8c4690b6f71b48b5f746dc3141e609f7ab49fabb549fd5fee449",
               "endLine": 32,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
+              "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
             },
             "costComponents": [

@@ -1,5 +1,5 @@
 Project: testdata-hclmulti_project_infra-dev
-Module path: REPLACED_PROJECT_PATH/testdata/hclmulti_project_infra/dev
+Module path: testdata/hclmulti_project_infra/dev
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost   
                                                                                                                      
@@ -53,7 +53,7 @@ Module path: REPLACED_PROJECT_PATH/testdata/hclmulti_project_infra/dev
 
 ──────────────────────────────────
 Project: testdata-hclmulti_project_infra-prod
-Module path: REPLACED_PROJECT_PATH/testdata/hclmulti_project_infra/prod
+Module path: testdata/hclmulti_project_infra/prod
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost   
                                                                                                                      

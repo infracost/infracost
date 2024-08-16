@@ -22,7 +22,7 @@
         "providers": [
           {
             "name": "google",
-            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+            "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
             "startLine": 1,
             "endLine": 8
           }
@@ -41,19 +41,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
                   "endLine": 17,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 10
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
               "endLine": 17,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 10
             },
             "hourlyCost": "0.027397260273972604",
@@ -81,19 +81,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
                   "endLine": 22,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 19
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
               "endLine": 22,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 19
             },
             "hourlyCost": "0.02328767123287671",
@@ -122,19 +122,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_sql_database_instance.gsdi",
                   "endLine": 42,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 32
                 }
               ],
               "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
               "endLine": 42,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 32
             },
             "hourlyCost": "0.022828767123287671",
@@ -196,19 +196,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_monitoring_custom_service.gmcs",
                   "endLine": 30,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 24
                 }
               ],
               "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
               "endLine": 30,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 24
             }
           }
@@ -230,19 +230,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
                   "endLine": 17,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 10
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
               "endLine": 17,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 10
             },
             "hourlyCost": "0.027397260273972604",
@@ -270,19 +270,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
                   "endLine": 22,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 19
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
               "endLine": 22,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 19
             },
             "hourlyCost": "0.02328767123287671",
@@ -311,19 +311,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_sql_database_instance.gsdi",
                   "endLine": 42,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 32
                 }
               ],
               "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
               "endLine": 42,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 32
             },
             "hourlyCost": "0.022828767123287671",
@@ -385,19 +385,19 @@
               "DefaultLabel": "this is a default label"
             },
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
+            "providerLink": "testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_monitoring_custom_service.gmcs",
                   "endLine": 30,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
                   "startLine": 24
                 }
               ],
               "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
               "endLine": 30,
-              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
               "startLine": 24
             }
           }

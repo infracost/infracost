@@ -23,7 +23,7 @@
         "providers": [
           {
             "name": "aws",
-            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+            "filename": "testdata/diff_with_free_resources_checksum/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -39,12 +39,12 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf"
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -120,12 +120,12 @@
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
-                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf"
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
                 }
               ],
               "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
               "endLine": 53,
-              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 26
             }
           }
@@ -141,19 +141,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf:1",
+            "providerLink": "testdata/diff_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -226,19 +226,19 @@
             "resourceType": "aws_codepipeline",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf:1",
+            "providerLink": "testdata/diff_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
                   "endLine": 53,
-                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "3f6fdddc5327be5b4c588323e2ddf30e5d6928af61d8893034acfc3bf3cc2a4d",
               "endLine": 53,
-              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 26
             }
           }
