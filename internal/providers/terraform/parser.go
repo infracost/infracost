@@ -5,6 +5,7 @@ import (
 	stdJson "encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -856,8 +857,11 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 	awsTagParsingConfig := aws.TagParsingConfig{PropagateDefaultsToVolumeTags: hcl.ConstraintsAllowVersionOrAbove(p.providerConstraints.AWS, hcl.AWSVersionConstraintVolumeTags)}
 
 	externalTags := make(map[string]string)
-	if p.ctx.ProjectConfig.YorConfigPath != "" {
-		p.parseYorTagsFromConfigFile(p.ctx.ProjectConfig.YorConfigPath, externalTags)
+	if path := p.ctx.ProjectConfig.YorConfigPath; path != "" {
+		if root := p.ctx.RunContext.Config.RootPath; root != "" {
+			path = filepath.Join(root, path)
+		}
+		p.parseYorTagsFromConfigFile(path, externalTags)
 	}
 	if yorSimpleTags := os.Getenv("YOR_SIMPLE_TAGS"); yorSimpleTags != "" {
 		p.parseYorTagsFromJSON(yorSimpleTags, externalTags)
