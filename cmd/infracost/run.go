@@ -512,6 +512,7 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 	out = &projectOutput{}
 
 	t1 := time.Now()
+	logging.Logger.Debug().Msg("Loading resources")
 	projects, err := job.provider.LoadResources(usageData)
 	if err != nil {
 		r.cmd.PrintErrln()
@@ -520,6 +521,7 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 
 	_ = r.uploadCloudResourceIDs(projects)
 
+	logging.Logger.Debug().Msg("Building resources")
 	r.buildResources(projects)
 
 	logging.Logger.Debug().Msg("Retrieving cloud prices to calculate costs")
