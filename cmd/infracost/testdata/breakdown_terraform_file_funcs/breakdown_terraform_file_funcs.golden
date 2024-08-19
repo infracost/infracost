@@ -8,144 +8,144 @@ Project: main
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
  aws_instance.file["abs"]
- ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.file["cd"]
- ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  module.mod_files.aws_instance.file["rootcd"]
- ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.template_file["abs"]
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                                           730  hours         $8.47
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                                           730  hours         $8.47   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.template_file["cd"]
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                                           730  hours         $8.47
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                                           730  hours         $8.47   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.file["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.file["pdabs"]
- ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.file["sym"]
- ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileexists["abs"]
- ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileexists["cd"]
- ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileexists["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileexists["pdabs"]
- ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileexists["sym"]
- ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.filemd5["abs"]
- ├─ Instance usage (Linux/UNIX, on-demand, f6ccad7be10c3d1fbedee0c976c942b9)                   730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, f6ccad7be10c3d1fbedee0c976c942b9)                   730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.filemd5["cd"]
- ├─ Instance usage (Linux/UNIX, on-demand, f6ccad7be10c3d1fbedee0c976c942b9)                   730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, f6ccad7be10c3d1fbedee0c976c942b9)                   730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.filemd5["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, d41d8cd98f00b204e9800998ecf8427e)                   730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, d41d8cd98f00b204e9800998ecf8427e)                   730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.filemd5["pdabs"]
- ├─ Instance usage (Linux/UNIX, on-demand, d41d8cd98f00b204e9800998ecf8427e)                   730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, d41d8cd98f00b204e9800998ecf8427e)                   730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.filemd5["sym"]
- ├─ Instance usage (Linux/UNIX, on-demand, d41d8cd98f00b204e9800998ecf8427e)                   730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, d41d8cd98f00b204e9800998ecf8427e)                   730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileset["abs"]
- ├─ Instance usage (Linux/UNIX, on-demand, 1)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, 1)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileset["cd"]
- ├─ Instance usage (Linux/UNIX, on-demand, 1)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, 1)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileset["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, 0)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, 0)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.fileset["pdabs"]
- ├─ Instance usage (Linux/UNIX, on-demand, 0)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, 0)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.template_file["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  aws_instance.template_file["pdabs"]
- ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  module.mod_files.aws_instance.file["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, )                                                   730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, )                                                   730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  module.mod_files.aws_instance.fileexists["cd"]
- ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  module.mod_files.aws_instance.fileexists["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  module.mod_files.aws_instance.fileexists["rootcd"]
- ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found
+ ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found   
  └─ root_block_device
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
 
  OVERALL TOTAL                                                                                                 $530.70
 
