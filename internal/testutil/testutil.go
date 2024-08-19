@@ -194,7 +194,15 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 			})
 
 			b64 := base64.RawStdEncoding.EncodeToString(actual)
-			t.Errorf("\nOutput does not match golden file (%s):\n%s\n \n\n%s\n", goldenFilePath, b64, diff)
+			for i := 0; i < len(b64); i += 80 {
+				if i+80 < len(b64) {
+					t.Logf("%s", b64[i:i+80])
+				} else {
+					t.Logf("%s", b64[i:])
+				}
+			}
+
+			t.Errorf("\nOutput does not match golden file (%s):\n\n%s\n", goldenFilePath, diff)
 		}
 	}
 
