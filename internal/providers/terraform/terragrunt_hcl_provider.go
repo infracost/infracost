@@ -640,8 +640,24 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	return info
 }
 
+func splitModuleSubDir(moduleSource string) (string, string, error) {
+	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleSource)
+	if strings.HasPrefix(submodulePath, "../") {
+		return "", "", fmt.Errorf("invalid submodule path '%s'", submodulePath)
+	}
+
+	return moduleAddr, submodulePath, nil
+}
+
 // downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
 func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (string, error) {
+	_, modAddr, err := splitModuleSubDir(sourceURL)
+	if err != nil {
+		return "", err
+	}
+
+	sourceURL = sourceURL + "&subdir=" + url.QueryEscape(modAddr)
+
 	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
 	if err != nil {
 		return "", err
