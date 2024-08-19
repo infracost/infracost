@@ -137,6 +137,8 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	retryReq, _ := retryablehttp.FromRequest(req)
 	resp, err := d.httpClient.Do(retryReq)
 
+	d.logger.Debug().Msgf("Download URL response status code: %d", resp.StatusCode)
+
 	if err != nil {
 		return "", fmt.Errorf("error fetching download URL '%s': %w", downloadURL.String(), err)
 	}
