@@ -195,10 +195,12 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
 			for moduleCall := range jobs {
+				m.logger.Debug().Msgf("loading module %s", moduleCall.Name)
 				metadata, err := m.loadModule(moduleCall, path, prefix)
 				if err != nil {
 					return err
 				}
+				m.logger.Debug().Msgf("loaded module %s", metadata.Key)
 
 				// only include non-local modules in the manifest since we don't want to cache local ones.
 				if !IsLocalModule(metadata.Source) {
@@ -207,11 +209,13 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 					manifestMu.Unlock()
 				}
 
+				m.logger.Debug().Msgf("loading nested modules for %s", metadata.Key)
 				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
 				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
 				if err != nil {
 					return err
 				}
+				m.logger.Debug().Msgf("loaded nested modules for %s", metadata.Key)
 
 				manifestMu.Lock()
 				manifestModules = append(manifestModules, nestedManifestModules...)

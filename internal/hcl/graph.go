@@ -445,10 +445,12 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 		blocks = append(blocks, block)
 
 		if block.Type() == "module" {
+			g.logger.Debug().Msgf("loading module %q", block.FullName())
 			modCall, err := evaluator.loadModule(block)
 			if err != nil {
 				return nil, fmt.Errorf("could not load module %q", block.FullName())
 			}
+			g.logger.Debug().Msgf("loaded module %q", block.FullName())
 
 			moduleEvaluator := NewEvaluator(
 				*modCall.Module,
