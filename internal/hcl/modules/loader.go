@@ -399,10 +399,12 @@ func (m *ModuleLoader) loadRegistryModule(key string, source string, version str
 			return manifestModule, nil
 		}
 
+		m.logger.Debug().Msgf("downloading module %s to %s", lookupResult.ModuleURL.Location, dest)
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
 			return nil, schema.NewPrivateRegistryDiag(source, strPtr(lookupResult.ModuleURL.Location), err)
 		}
+		m.logger.Debug().Msgf("downloaded module %s to %s", lookupResult.ModuleURL.Location, dest)
 
 		return manifestModule, nil
 	}
