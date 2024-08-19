@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"bytes"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
@@ -192,7 +193,8 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 				Context:  1,
 			})
 
-			t.Errorf("\nOutput does not match golden file (%s): \n\n%s\n", goldenFilePath, diff)
+			b64 := base64.RawStdEncoding.EncodeToString(actual)
+			t.Errorf("\nOutput does not match golden file (%s):\n%s\n \n\n%s\n", goldenFilePath, b64, diff)
 		}
 	}
 
