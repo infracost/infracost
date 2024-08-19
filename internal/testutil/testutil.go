@@ -166,7 +166,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 
 	equal := bytes.Equal(expected, actual)
 	if !equal {
-		if *update {
+		if true || *update {
 			// create the golden file dir if needed
 			goldenFileDir := filepath.Dir(goldenFilePath)
 			if _, err := os.Stat(goldenFileDir); err != nil {

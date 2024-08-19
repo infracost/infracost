@@ -152,7 +152,7 @@ func (attr *Attribute) ReferencesCausingUnknownKeys() []string {
 	if attr == nil {
 		return nil
 	}
-	_ = attr.Value()
+	_ = attr.value(0)
 	if len(attr.varsCausingUnknownKeys) == 0 {
 		return nil
 	}

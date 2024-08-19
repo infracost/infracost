@@ -13,16 +13,16 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure",
       "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_format_json_with_tags_azure",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure",
         "providers": [
           {
             "name": "azurerm",
-            "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
             "startLine": 1,
             "endLine": 4
           }
@@ -36,13 +36,27 @@
             "tags": {
               "AzureLabel": "azure-tag"
             },
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+             "attributesWithUnknownKeys": [
+               {
+                 "attribute": "location",
+                 "missingVariables": [
+                   "azurerm_resource_group.example.location"
+                 ]
+               },
+               {
+                 "attribute": "resource_group_name",
+                 "missingVariables": [
+                   "azurerm_resource_group.example.name"
+                 ]
+               }
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
                   "endLine": 21,
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf",
                   "startLine": 11
                 }
               ],
@@ -70,8 +84,22 @@
             "name": "azurerm_redis_cache.arc2",
             "resourceType": "azurerm_redis_cache",
             "tags": {},
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                {
+                  "attribute": "location",
+                  "missingVariables": [
+                    "azurerm_resource_group.example.location"
+                  ]
+                },
+                {
+                  "attribute": "resource_group_name",
+                  "missingVariables": [
+                    "azurerm_resource_group.example.name"
+                  ]
+                }
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
@@ -113,8 +141,22 @@
             "tags": {
               "AzureLabel": "azure-tag"
             },
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                {
+                  "attribute": "location",
+                  "missingVariables": [
+                    "azurerm_resource_group.example.location"
+                  ]
+                },
+                {
+                  "attribute": "resource_group_name",
+                  "missingVariables": [
+                    "azurerm_resource_group.example.name"
+                  ]
+                }
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -147,8 +189,22 @@
             "name": "azurerm_redis_cache.arc2",
             "resourceType": "azurerm_redis_cache",
             "tags": {},
-            "providerLink": "testdata/breakdown_format_json_with_tags_azure/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
+              "attributesWithUnknownKeys": [
+                {
+                  "attribute": "location",
+                  "missingVariables": [
+                    "azurerm_resource_group.example.location"
+                  ]
+                },
+                {
+                  "attribute": "resource_group_name",
+                  "missingVariables": [
+                    "azurerm_resource_group.example.name"
+                  ]
+                }
+              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
