@@ -196,7 +196,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	errGroup := &errgroup.Group{}
 	manifestMu := sync.Mutex{}
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
 			for moduleCall := range jobs {
 				m.logger.Debug().Msgf("loading module %s", moduleCall.Name)
