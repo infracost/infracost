@@ -156,19 +156,23 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 	}
 	m.cache.loadFromManifest(manifest)
 
+	m.logger.Debug().Msg("loading modules")
 	metadatas, err := m.loadModules(path, "")
 	if err != nil {
 		return nil, err
 	}
+	m.logger.Debug().Msg("loaded modules")
 
 	manifest.Modules = metadatas
 	manifest.Path = path
 	manifest.Version = supportedManifestVersion
 
+	m.logger.Debug().Msg("writing module manifest")
 	err = writeManifest(manifest, manifestFilePath)
 	if err != nil {
 		m.logger.Debug().Err(err).Msg("error writing module manifest")
 	}
+	m.logger.Debug().Msg("written module manifest")
 
 	return manifest, nil
 }
@@ -220,8 +224,11 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 				manifestMu.Lock()
 				manifestModules = append(manifestModules, nestedManifestModules...)
 				manifestMu.Unlock()
+
+				m.logger.Debug().Msgf("loaded all modules for %s", metadata.Key)
 			}
 
+			m.logger.Debug().Msg("finished loading modules")
 			return nil
 		})
 	}
@@ -230,6 +237,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	if err != nil {
 		return manifestModules, fmt.Errorf("could not load modules for path %s %w", path, err)
 	}
+
+	m.logger.Debug().Msg("finished loading all modules")
 
 	return manifestModules, nil
 }
