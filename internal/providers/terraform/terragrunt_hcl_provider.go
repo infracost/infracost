@@ -506,7 +506,12 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 //     these for further runTerragrunt calls that use the dependency outputs.
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
+
+	p.logger.Debug().Msgf("fetching dependency outputs for %s", opts.TerragruntConfigPath)
+
 	outputs := p.fetchDependencyOutputs(opts)
+
+	p.logger.Debug().Msgf("parsing terragrunt config file %s", opts.TerragruntConfigPath)
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
 		info.error = err
@@ -556,6 +561,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		opts.RetrySleepIntervalSec = time.Duration(*terragruntConfig.RetrySleepIntervalSec) * time.Second
 	}
 
+	p.logger.Debug().Msgf("downloading source for %s", opts.TerragruntConfigPath)
 	sourceURL, err := tgconfig.GetTerraformSourceUrl(opts, terragruntConfig)
 	if err != nil {
 		info.error = err
@@ -582,6 +588,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	pconfig := *p.ctx.ProjectConfig // clone the projectConfig
 	pconfig.Path = info.workingDir
 
+	p.logger.Debug().Msgf("initializing terraform var files for %s", opts.TerragruntConfigPath)
 	if terragruntConfig.Terraform != nil {
 		pconfig.TerraformVarFiles = p.initTerraformVarFiles(pconfig.TerraformVarFiles, terragruntConfig.Terraform.ExtraArgs, pconfig.Path, opts)
 	}
@@ -617,6 +624,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 
+	p.logger.Debug().Msgf("evaluating terragrunt config file %s", opts.TerragruntConfigPath)
 	mod := h.Module()
 	if mod.Error != nil {
 		path := ""
