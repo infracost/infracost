@@ -145,6 +145,13 @@ func (attr *Attribute) Value() cty.Value {
 	return val
 }
 
+var missingVarPrefixes = []string{
+	"data",
+	"var",
+	"module",
+	"local",
+}
+
 // ReferencesCausingUnknownKeys returns a list of missing references if the attribute is an object without fully known keys.
 // For example, this will return []string{"var.default_tags"} if a value is set to the result of `merge({"x": "y"}, var.default_tags)`
 // where the value of `var.default_tags` is not known at evaluation time.
@@ -158,6 +165,16 @@ func (attr *Attribute) ReferencesCausingUnknownKeys() []string {
 	}
 	unique := make(map[string]struct{})
 	for _, v := range attr.varsCausingUnknownKeys {
+		var valid bool
+		for _, prefix := range missingVarPrefixes {
+			if strings.HasPrefix(v, prefix+".") {
+				valid = true
+				break
+			}
+		}
+		if !valid {
+			continue
+		}
 		unique[v] = struct{}{}
 	}
 	attr.varsCausingUnknownKeys = nil

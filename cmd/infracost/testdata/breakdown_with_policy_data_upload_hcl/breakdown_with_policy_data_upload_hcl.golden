@@ -279,14 +279,6 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                {
-                  "attribute": "resource_id",
-                  "missingVariables": [
-                    "aws_dynamodb_table.autoscale_dynamodb_table.name"
-                  ]
-                }
-              ],
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
@@ -552,14 +544,6 @@
             "providerSupportsDefaultTags": true,
             "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                {
-                  "attribute": "resource_id",
-                  "missingVariables": [
-                    "aws_dynamodb_table.autoscale_dynamodb_table.name"
-                  ]
-                }
-              ],
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",

@@ -38,20 +38,6 @@
             },
             "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                {
-                  "attribute": "location",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.location"
-                  ]
-                },
-                {
-                  "attribute": "resource_group_name",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.name"
-                  ]
-                }
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -86,20 +72,6 @@
             "tags": {},
             "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                {
-                  "attribute": "location",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.location"
-                  ]
-                },
-                {
-                  "attribute": "resource_group_name",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.name"
-                  ]
-                }
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
@@ -143,20 +115,6 @@
             },
             "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                {
-                  "attribute": "location",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.location"
-                  ]
-                },
-                {
-                  "attribute": "resource_group_name",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.name"
-                  ]
-                }
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
@@ -191,20 +149,6 @@
             "tags": {},
             "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_azure/main.tf:1",
             "metadata": {
-              "attributesWithUnknownKeys": [
-                {
-                  "attribute": "location",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.location"
-                  ]
-                },
-                {
-                  "attribute": "resource_group_name",
-                  "missingVariables": [
-                    "azurerm_resource_group.example.name"
-                  ]
-                }
-              ],
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
