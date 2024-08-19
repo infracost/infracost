@@ -215,6 +215,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 				m.logger.Debug().Msgf("loading nested modules for %s", metadata.Key)
 				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
+				fmt.Println("moduleDir", moduleDir)
+				fmt.Println("metadata.Key", metadata.Key)
 				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
 				if err != nil {
 					return err
@@ -439,6 +441,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 	if err != nil {
 		return nil, err
 	}
+	moduleAddr = moduleAddr + "&subdir=" + url.QueryEscape(submodulePath)
 
 	dest := m.downloadDest(moduleAddr, "")
 	moduleDownloadDir, err := m.cachePathRel(dest)
