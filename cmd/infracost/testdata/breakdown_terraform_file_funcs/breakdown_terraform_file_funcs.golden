@@ -7,22 +7,22 @@ Project: main
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
- aws_instance.file["abs"]
+ aws_instance.file["abs"]                                                                                                 
  ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08   
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
- aws_instance.file["cd"]
+ aws_instance.file["cd"]                                                                                                  
  ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08   
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
- module.mod_files.aws_instance.file["rootcd"]
+ module.mod_files.aws_instance.file["rootcd"]                                                                             
  ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                                           730  hours        $70.08   
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
- aws_instance.template_file["abs"]
+ aws_instance.template_file["abs"]                                                                                        
  ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                                           730  hours         $8.47   
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   

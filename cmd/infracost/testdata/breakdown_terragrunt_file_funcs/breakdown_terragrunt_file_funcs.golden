@@ -57,10 +57,10 @@ Project: main
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
- aws_instance.fileexists["pd"]
- ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found
+ aws_instance.fileexists["pd"]                                                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found   
  └─ root_block_device                                                                                                     
-    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80
+    └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
  aws_instance.fileexists["pdabs"]                                                                                         
  ├─ Instance usage (Linux/UNIX, on-demand, ne)                                                 730  hours     not found   
@@ -142,7 +142,7 @@ Project: main
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
- module.mod_files.aws_instance.fileexists["rootcd"]
+ module.mod_files.aws_instance.fileexists["rootcd"]                                                                       
  ├─ Instance usage (Linux/UNIX, on-demand, e)                                                  730  hours     not found   
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
