@@ -32,14 +32,14 @@ Module path: prod
     ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
     └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
                                                                                                                         
- aws_lambda_function.hello_world
+ aws_lambda_function.hello_world                                                                                        
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
  ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
  └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
                                                                                                                         
  Project total                                                                                                $747.64   
 
- OVERALL TOTAL                                                                                               $799.61
+ OVERALL TOTAL                                                                                               $799.61 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
