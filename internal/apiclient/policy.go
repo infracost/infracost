@@ -167,11 +167,6 @@ type policy2InfracostMetadata struct {
 	ModuleFilename string                         `json:"moduleFilename,omitempty"`
 }
 
-type AttributeWithUnknownKeys struct {
-	Attribute        string   `json:"attribute"`
-	MissingVariables []string `json:"missingVariables"`
-}
-
 type policy2InfracostMetadataCall struct {
 	Filename  string `json:"filename"`
 	BlockName string `json:"blockName"`
