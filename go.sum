@@ -282,8 +282,8 @@ github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRF
 github.com/alecthomas/units v0.0.0-20190717042225-c3de453c63f4/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94 h1:GRH/2nycl5JYrn248Hy/I4h9JrsogYHB02pKqs+ERiQ=
 github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94/go.mod h1:OCh6ghKmU0hPjtwMqWBoNxPmtRioKd1xSu7Zs4sbIqM=
-github.com/aliscott/go-getter v0.0.0-20240820100545-eb34e6ba5f8e h1:9/+MjI/1FiVPDr5fKTiMlxHqXQqwY0EickczWMv7juU=
-github.com/aliscott/go-getter v0.0.0-20240820100545-eb34e6ba5f8e/go.mod h1:W7TalhMmbPmsSMdNjD0ZskARur/9GJ17cfHTRtXV744=
+github.com/aliscott/go-getter v0.0.0-20240820101520-6f433670e4f4 h1:OKUU4gijS1+jNbvBWadaWMDp8JsnOlDWSxZuvNvzSqk=
+github.com/aliscott/go-getter v0.0.0-20240820101520-6f433670e4f4/go.mod h1:W7TalhMmbPmsSMdNjD0ZskARur/9GJ17cfHTRtXV744=
 github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e h1:D+6DwJEaRT97rBY5Vamed9SzXtm5zXUB28kGVv3nhLM=
 github.com/aliscott/go-pretty/v6 v6.1.1-0.20210226104003-408905a61c8e/go.mod h1:+nE9fyyHGil+PuISTCrp7avEdo6bqoMwqZnuiK2r2a0=
 github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190329064014-6e358769c32a/go.mod h1:T9M45xf79ahXVelWoOBmH0y4aC1t5kXO5BxwyakgIGA=

@@ -280,4 +280,4 @@ replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.202311151145
 
 replace github.com/shurcooL/graphql => github.com/spacelift-io/graphql v1.2.0
 
-replace github.com/hashicorp/go-getter => github.com/aliscott/go-getter v0.0.0-20240820100545-eb34e6ba5f8e
+replace github.com/hashicorp/go-getter => github.com/aliscott/go-getter v0.0.0-20240820101520-6f433670e4f4
