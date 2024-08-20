@@ -470,6 +470,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		GetOutputs:  p.terragruntPathToValue,
 	}
 
+	p.logger.Debug().Msgf("creating stack for Terragrunt config paths in %s", terragruntOptions.WorkingDir)
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
 	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, []string{
 		terragruntConfigPath,
@@ -479,6 +480,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	}
 	p.stack = s
 
+	p.logger.Debug().Msgf("running Terragrunt in %s", terragruntOptions.WorkingDir)
 	err = s.Run(terragruntOptions)
 	if err != nil {
 		return nil, clierror.NewCLIError(
