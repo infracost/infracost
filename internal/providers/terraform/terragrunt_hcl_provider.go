@@ -656,7 +656,15 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return "", err
 	}
 
-	sourceURL = sourceURL + "&subdir=" + url.QueryEscape(modAddr)
+	// Parse the URL, add the subdir as a param
+	u, err := url.Parse(sourceURL)
+	if err != nil {
+		return "", err
+	}
+	q := u.Query()
+	q.Set("subdir", modAddr)
+	u.RawQuery = q.Encode()
+	sourceURL = u.String()
 
 	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
 	if err != nil {
