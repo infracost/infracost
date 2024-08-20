@@ -1065,6 +1065,24 @@ func (b *Block) Values() cty.Value {
 	return b.values()
 }
 
+type AttributeWithUnknownKeys struct {
+	Attribute        string   `json:"attribute"`
+	MissingVariables []string `json:"missingVariables"`
+}
+
+func (b *Block) AttributesWithUnknownKeys() []AttributeWithUnknownKeys {
+	var output []AttributeWithUnknownKeys
+	for _, attr := range b.attributes {
+		if causes := attr.ReferencesCausingUnknownKeys(); len(causes) > 0 {
+			output = append(output, AttributeWithUnknownKeys{
+				Attribute:        attr.Name(),
+				MissingVariables: causes,
+			})
+		}
+	}
+	return output
+}
+
 func (b *Block) values() cty.Value {
 	values := make(map[string]cty.Value)
 

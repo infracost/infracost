@@ -93,14 +93,20 @@ var ExpectedPropagations = map[string]TagPropagationConfig{
 	},
 }
 
-func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) map[string]string {
+func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) (map[string]string, []string) {
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
+
+	var missing []string
+	tagsMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags")
+	missing = append(missing, tagsMissing...)
+	tagsAllMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags_all")
+	missing = append(missing, tagsAllMissing...)
 
 	rTags := r.Get("tags").Map()
 	rTagsAll := r.Get("tags_all").Map()
 	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
-		return nil
+		return nil, missing
 	}
 
 	tags := make(map[string]string)
@@ -140,6 +146,8 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	}
 
 	if supportsTagBlock {
+		tagBlockMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tag")
+		missing = append(missing, tagBlockMissing...)
 		for _, el := range r.Get("tag").Array() {
 			k := el.Get("key").String()
 			if k == "" {
@@ -173,7 +181,7 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 		f(tags, r)
 	}
 
-	return tags
+	return tags, missing
 }
 
 func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {

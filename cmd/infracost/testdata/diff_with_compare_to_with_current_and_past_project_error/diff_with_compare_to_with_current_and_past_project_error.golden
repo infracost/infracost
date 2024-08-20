@@ -14,17 +14,17 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
       "displayName": "dev",
       "metadata": {
-        "path": "testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
         "type": "terraform_dir",
         "terraformModulePath": "dev",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
         "errors": [
           {
             "code": 102,
-            "message": "Error loading Terraform modules: failed to parse file testdata/diff_with_compare_to_with_current_and_past_project_error/dev/mod_with_error.tf diag: testdata/diff_with_compare_to_with_current_and_past_project_error/dev/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
+            "message": "Error loading Terraform modules: failed to parse file REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/dev/mod_with_error.tf diag: REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/dev/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
             "data": null,
             "isError": true
           },
@@ -65,17 +65,17 @@
       }
     },
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
       "displayName": "prod",
       "metadata": {
-        "path": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
         "type": "terraform_dir",
         "terraformModulePath": "prod",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -170,19 +170,19 @@
             "resourceType": "aws_instance",
             "tags": {},
             "providerSupportsDefaultTags": true,
-            "providerLink": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf:1",
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",
               "endLine": 23,
-              "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
               "startLine": 9
             },
             "hourlyCost": "0.633315068493150679",

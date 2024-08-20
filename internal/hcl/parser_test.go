@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -161,11 +163,11 @@ output "loadbalancer"  {
 	require.NotNil(t, label)
 	mockedVal := label.GetAttribute("value").Value()
 	require.Equal(t, cty.String, mockedVal.Type())
-	assert.Equal(t, "value-mock", mockedVal.AsString())
+	assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), mockedVal.AsString())
 
 	mockedVarObj := label.GetAttribute("value_nested").Value()
 	require.Equal(t, cty.String, mockedVarObj.Type())
-	assert.Equal(t, "value_nested-mock", mockedVarObj.AsString())
+	assert.Equal(t, fmt.Sprintf("value_nested-%s", mock.Identifier), mockedVarObj.AsString())
 
 	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
 	require.NotNil(t, output)
@@ -186,9 +188,9 @@ output "loadbalancer"  {
 		pieces := strings.Split(k, ":")
 		require.Len(t, pieces, 2)
 
-		assert.Equal(t, "value-mock", pieces[0])
-		assert.Equal(t, "value-mock", pieces[1])
-		assert.Equal(t, "value-mock", v.AsString())
+		assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), pieces[0])
+		assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), pieces[1])
+		assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), v.AsString())
 	}
 
 	require.Len(t, keys, 1)
@@ -237,7 +239,7 @@ output "exp2" {
 	require.True(t, mockedObj.Type().IsObjectType())
 	asMap := mockedObj.AsValueMap()
 	assert.Len(t, asMap, 1)
-	assert.Equal(t, "value-mock", asMap["astring"].AsString())
+	assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), asMap["astring"].AsString())
 
 	output = blocks.Matching(BlockMatcher{Label: "exp2", Type: "output"})
 	require.NotNil(t, output)
@@ -247,8 +249,8 @@ output "exp2" {
 	asMap = mockedObj.AsValueMap()
 	assert.Len(t, asMap, 1)
 	for k, v := range asMap {
-		assert.Equal(t, "value-mock", k)
-		assert.Equal(t, "value-mock", v.AsString())
+		assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), k)
+		assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), v.AsString())
 	}
 }
 
@@ -285,7 +287,7 @@ output "instances" {
 
 	asMap := mockedObj.AsValueMap()
 	assert.Len(t, asMap, 1)
-	assert.Equal(t, "value-mock", asMap["primary-application-server"].AsString())
+	assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), asMap["primary-application-server"].AsString())
 }
 
 func Test_UnsupportedAttributesSplatOperator(t *testing.T) {
@@ -326,7 +328,7 @@ resource "other_resource" "test" {
 	assert.Len(t, pieces, 8)
 
 	for _, piece := range pieces {
-		assert.Equal(t, "task_definition-mock", piece)
+		assert.Equal(t, fmt.Sprintf("task_definition-%s", mock.Identifier), piece)
 	}
 }
 
@@ -406,7 +408,7 @@ resource "other_resource" "test" {
 	attr := output.GetAttribute("task_definition")
 	mockedVal := attr.Value()
 	for _, v := range strings.Split(mockedVal.AsString(), ":") {
-		assert.Equal(t, "task_definition-mock", v)
+		assert.Equal(t, fmt.Sprintf("task_definition-%s", mock.Identifier), v)
 	}
 }
 
@@ -466,8 +468,8 @@ output "serviceendpoint_principals" {
 	_, ok = asMap["prod"]
 	assert.True(t, ok)
 
-	assert.Equal(t, "value-mock", asMap["dev"].AsString())
-	assert.Equal(t, "value-mock", asMap["prod"].AsString())
+	assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), asMap["dev"].AsString())
+	assert.Equal(t, fmt.Sprintf("value-%s", mock.Identifier), asMap["prod"].AsString())
 }
 
 func Test_UnsupportedAttributesLocalIndex(t *testing.T) {
@@ -496,7 +498,7 @@ output "val" {
 	attr := output.GetAttribute("value")
 	value := attr.Value()
 	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
-	assert.Equal(t, "val-mock", value.AsString())
+	assert.Equal(t, fmt.Sprintf("val-%s", mock.Identifier), value.AsString())
 }
 
 func Test_SetsHasChangesOnMod(t *testing.T) {
@@ -536,7 +538,7 @@ output "val" {
 	attr := output.GetAttribute("value")
 	value := attr.Value()
 	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
-	assert.Equal(t, "val-mock", value.AsString())
+	assert.Equal(t, fmt.Sprintf("val-%s", mock.Identifier), value.AsString())
 }
 
 func Test_Modules(t *testing.T) {
@@ -703,7 +705,7 @@ resource "aws_instance" "my_instance" {
 
 	amiAttr := resource.GetAttribute("ami")
 	require.NotNil(t, amiAttr)
-	assert.Equal(t, "defaults-mock", amiAttr.Value().AsString())
+	assert.Equal(t, fmt.Sprintf("defaults-%s", mock.Identifier), amiAttr.Value().AsString())
 }
 
 func TestOptionWithRawCtyInput(t *testing.T) {
@@ -1220,8 +1222,8 @@ resource "dynamic" "resource" {
 		t,
 		`[
 			{"foo":"10.0.2.0", "bar":"existing_child_block_should_be_kept"},
-			{"foo":"10.0.0.0","bar":"input-mock"},
-			{"foo":"10.0.1.0","bar":"input-mock"}
+			{"foo":"10.0.0.0","bar":"input-infracost-mock-44956be29f34"},
+			{"foo":"10.0.1.0","bar":"input-infracost-mock-44956be29f34"}
 		]`,
 		values,
 	)
@@ -1679,7 +1681,7 @@ resource "aws_instance" "example" {
 	moduleBlock := module.Blocks.Matching(BlockMatcher{Label: "module.mod1"})
 	assertBlockEqualsJSON(
 		t,
-		`{"config":{"instance_type":"m5.4xlarge", "tags": "config-mock"}}`,
+		`{"config":{"instance_type":"m5.4xlarge", "tags": "config-infracost-mock-44956be29f34"}}`,
 		moduleBlock.Values(),
 		"id", "arn", "self_link", "name", "source",
 	)
@@ -1690,7 +1692,7 @@ resource "aws_instance" "example" {
 	resource := mod1.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
 	assertBlockEqualsJSON(
 		t,
-		`{"instance_type":"m5.4xlarge", "tags": "config-mock"}`,
+		`{"instance_type":"m5.4xlarge", "tags": "config-infracost-mock-44956be29f34"}`,
 		resource.Values(),
 		"id", "arn", "self_link", "name",
 	)
@@ -1771,7 +1773,7 @@ resource "aws_instance" "example" {
 	resource := module.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
 	assertBlockEqualsJSON(
 		t,
-		`{"foo":0, "tags":"tags-mock"}`,
+		`{"foo":0, "tags":"tags-infracost-mock-44956be29f34"}`,
 		resource.Values(),
 		"id", "arn", "self_link", "name",
 	)
@@ -2073,4 +2075,181 @@ terraform {
 	assert.Equal(t, "~> 5.52.0", module.ProviderConstraints.AWS.String())
 	assert.Equal(t, ">= 5.0.0,< 5.0.4", module.ProviderConstraints.Google.String())
 
+}
+
+func Test_UnknownKeyDetection(t *testing.T) {
+
+	tests := []struct {
+		name      string
+		content   string
+		traversal []string
+		expected  []AttributeWithUnknownKeys
+	}{
+		{
+			name: "known keys, unknown value",
+			content: `
+provider "aws" {
+  default_tags {
+    tags = {
+      application = var.application
+      env         = "prod"
+    }
+  }
+}
+`,
+			traversal: []string{"provider", "default_tags"},
+			expected:  nil,
+		},
+		{
+			name: "unknown key in merge param",
+			content: `
+provider "aws" {
+  default_tags {
+    tags = merge(var.default_tags, { 
+      "Environment" = "Test"
+    })
+  }
+}
+`,
+			traversal: []string{"provider", "default_tags"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+					},
+				},
+			},
+		},
+		{
+			name: "entirely missing object",
+			content: `
+provider "aws" {
+  default_tags {
+    tags = var.default_tags
+  }
+}
+`,
+			traversal: []string{"provider", "default_tags"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+					},
+				},
+			},
+		},
+		{
+			name: "resource, known keys, unknown value",
+			content: `
+resource "aws_instance" "blah" {
+  tags = {
+    application = var.application
+    env         = "prod"
+  }
+}
+`,
+			traversal: []string{"resource"},
+			expected:  nil,
+		},
+		{
+			name: "resource, merged const w/ missing value with unknown map value",
+			content: `
+resource "aws_instance" "blah" {
+  tags = merge({
+    application = var.application
+    env         = "prod"
+  }, var.default_tags)
+}
+`,
+			traversal: []string{"resource"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+					},
+				},
+			},
+		},
+		{
+			name: "resource, merged two unknown vars",
+			content: `
+resource "aws_instance" "blah" {
+  tags = merge(var.default_tags, var.something_else)
+}
+`,
+			traversal: []string{"resource"},
+			expected: []AttributeWithUnknownKeys{
+				{
+					Attribute: "tags",
+					MissingVariables: []string{
+						"var.default_tags",
+						"var.something_else",
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+
+		t.Run(tt.name, func(t *testing.T) {
+
+			variations := []struct {
+				name       string
+				parserOpts []Option
+			}{
+				{
+					name:       "default",
+					parserOpts: nil,
+				},
+				{
+					name:       "with graph evaluator",
+					parserOpts: []Option{OptionGraphEvaluator()},
+				},
+			}
+
+			for _, variation := range variations {
+
+				t.Run(variation.name, func(t *testing.T) {
+
+					path := createTestFile("test.tf", tt.content)
+
+					logger := newDiscardLogger()
+					loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+					parser := NewParser(
+						RootPath{DetectedPath: filepath.Dir(path)},
+						CreateEnvFileMatcher([]string{}, nil),
+						loader,
+						logger,
+						variation.parserOpts...,
+					)
+					module, err := parser.ParseDirectory()
+					require.NoError(t, err)
+
+					require.True(t, len(tt.traversal) > 0, "traversal must be non-empty")
+
+					blocks := module.Blocks.OfType(tt.traversal[0])
+
+					if len(blocks) == 0 {
+						t.Fatalf("no blocks found for traversal %v", tt.traversal)
+					}
+
+					block := blocks[0]
+					for _, name := range tt.traversal[1:] {
+						block = block.GetChildBlock(name)
+						require.NotNil(t, block, "block %v not found", name)
+					}
+
+					if tt.expected == nil {
+						assert.Empty(t, block.AttributesWithUnknownKeys())
+						return
+					}
+					assert.EqualValues(t, tt.expected, block.AttributesWithUnknownKeys())
+				})
+			}
+		})
+	}
 }

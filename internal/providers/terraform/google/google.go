@@ -36,7 +36,7 @@ func GetResourceRegion(d *schema.ResourceData) string {
 	return ""
 }
 
-func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]string) map[string]string {
+func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]string) (map[string]string, []string) {
 
 	_, supportsLabels := provider_schemas.GoogleLabelsSupport[r.Type]
 	rLabels := r.Get("labels").Map()
@@ -47,10 +47,15 @@ func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]st
 	_, supportsSettingsUserLabels := provider_schemas.GoogleSettingsUserLabelsSupport[r.Type]
 	rSettingsUserLabels := r.Get("settings.0.user_labels").Map()
 
+	missingForLabels := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "labels")
+	missingForUserLabels := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "user_labels")
+	missingForSettingsUserLabels := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "settings.0.user_labels")
+	missing := append(append(missingForLabels, missingForUserLabels...), missingForSettingsUserLabels...)
+
 	if !supportsLabels && len(rLabels) == 0 &&
 		!supportsUserLabels && len(rUserLabels) == 0 &&
 		!supportsSettingsUserLabels && len(rSettingsUserLabels) == 0 {
-		return nil
+		return nil, missing
 	}
 
 	tags := make(map[string]string)
@@ -70,5 +75,6 @@ func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]st
 	for k, v := range externalTags {
 		tags[k] = v
 	}
-	return tags
+
+	return tags, missing
 }

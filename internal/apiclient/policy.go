@@ -135,17 +135,19 @@ type policy2Reference struct {
 }
 
 type policy2Resource struct {
-	ResourceType          string                   `json:"resourceType"`
-	ProviderName          string                   `json:"providerName"`
-	Address               string                   `json:"address"`
-	Tags                  *[]policy2Tag            `json:"tags,omitempty"`
-	DefaultTags           *[]policy2Tag            `json:"defaultTags,omitempty"`
-	SupportForDefaultTags bool                     `json:"supportForDefaultTags"`
-	TagPropagation        *TagPropagation          `json:"tagPropagation,omitempty"`
-	Values                json.RawMessage          `json:"values"`
-	References            []policy2Reference       `json:"references"`
-	Metadata              policy2InfracostMetadata `json:"infracostMetadata"`
-	Region                string                   `json:"region"`
+	ResourceType                            string                   `json:"resourceType"`
+	ProviderName                            string                   `json:"providerName"`
+	Address                                 string                   `json:"address"`
+	Tags                                    *[]policy2Tag            `json:"tags,omitempty"`
+	DefaultTags                             *[]policy2Tag            `json:"defaultTags,omitempty"`
+	SupportForDefaultTags                   bool                     `json:"supportForDefaultTags"`
+	TagPropagation                          *TagPropagation          `json:"tagPropagation,omitempty"`
+	Values                                  json.RawMessage          `json:"values"`
+	References                              []policy2Reference       `json:"references"`
+	Metadata                                policy2InfracostMetadata `json:"infracostMetadata"`
+	Region                                  string                   `json:"region"`
+	MissingVarsCausingUnknownTagKeys        []string                 `json:"missingVarsCausingUnknownTagKeys,omitempty"`
+	MissingVarsCausingUnknownDefaultTagKeys []string                 `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
 }
 
 type TagPropagation struct {
@@ -272,24 +274,28 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		}
 	}
 
+	metadata := policy2InfracostMetadata{
+		Calls:          mdCalls,
+		Checksum:       checksum,
+		EndLine:        rd.Metadata["endLine"].Int(),
+		Filename:       rd.Metadata["filename"].String(),
+		StartLine:      rd.Metadata["startLine"].Int(),
+		ModuleFilename: rd.Metadata["moduleFilename"].String(),
+	}
+
 	return policy2Resource{
-		ResourceType:   rd.Type,
-		ProviderName:   rd.ProviderName,
-		Address:        rd.Address,
-		Tags:           tagsPtr,
-		DefaultTags:    defaultTagsPtr,
-		TagPropagation: tagPropagation,
-		Values:         valuesJSON,
-		References:     references,
-		Metadata: policy2InfracostMetadata{
-			Calls:          mdCalls,
-			Checksum:       checksum,
-			EndLine:        rd.Metadata["endLine"].Int(),
-			Filename:       rd.Metadata["filename"].String(),
-			StartLine:      rd.Metadata["startLine"].Int(),
-			ModuleFilename: rd.Metadata["moduleFilename"].String(),
-		},
-		Region: rd.Region,
+		ResourceType:                            rd.Type,
+		ProviderName:                            rd.ProviderName,
+		Address:                                 rd.Address,
+		Tags:                                    tagsPtr,
+		DefaultTags:                             defaultTagsPtr,
+		TagPropagation:                          tagPropagation,
+		Values:                                  valuesJSON,
+		References:                              references,
+		Metadata:                                metadata,
+		Region:                                  rd.Region,
+		MissingVarsCausingUnknownTagKeys:        rd.MissingVarsCausingUnknownTagKeys,
+		MissingVarsCausingUnknownDefaultTagKeys: rd.MissingVarsCausingUnknownDefaultTagKeys,
 	}
 }
 

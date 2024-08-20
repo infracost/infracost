@@ -1,7 +1,7 @@
 Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt/dev
+Project: REPLACED_PROJECT_PATH/terragrunt/dev
 Module path: terragrunt/dev
 
 + aws_instance.web_app
@@ -42,7 +42,7 @@ Monthly cost change for infracost/infracost/examples/terragrunt/dev (Module path
 Amount:  +$52 ($0.00 → $52)
 
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt/prod
+Project: REPLACED_PROJECT_PATH/terragrunt/prod
 Module path: terragrunt/prod
 
 + aws_instance.web_app

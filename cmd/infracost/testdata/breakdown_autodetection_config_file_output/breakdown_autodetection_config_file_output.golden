@@ -1,5 +1,5 @@
 Project: testdata-breakdown_autodetection_config_file_output-dev
-Module path: testdata/breakdown_autodetection_config_file_output/dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/dev
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
                                                                                            
@@ -15,7 +15,7 @@ Module path: testdata/breakdown_autodetection_config_file_output/dev
 
 ──────────────────────────────────
 Project: testdata-breakdown_autodetection_config_file_output-prod-bar
-Module path: testdata/breakdown_autodetection_config_file_output/prod/bar
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/bar
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
                                                                                            
@@ -31,7 +31,7 @@ Module path: testdata/breakdown_autodetection_config_file_output/prod/bar
 
 ──────────────────────────────────
 Project: testdata-breakdown_autodetection_config_file_output-prod-foo
-Module path: testdata/breakdown_autodetection_config_file_output/prod/foo
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/foo
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
                                                                                            
@@ -66,6 +66,6 @@ Err:
 
 Logs:
 INFO Autodetected 3 Terraform projects from 2 paths in the config file
-INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-dev at directory testdata/breakdown_autodetection_config_file_output/dev
-INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-prod-bar at directory testdata/breakdown_autodetection_config_file_output/prod/bar
-INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-prod-foo at directory testdata/breakdown_autodetection_config_file_output/prod/foo
+INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-dev at directory REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/dev
+INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-prod-bar at directory REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/bar
+INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-prod-foo at directory REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/foo

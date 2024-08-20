@@ -329,7 +329,7 @@
           }
         ]
       },
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/project"
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_aliased_provider/project"
     }
   ]
 }

@@ -15,6 +15,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/infracost/infracost/internal/schema"
+
 	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
@@ -27,7 +29,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/schema"
 )
 
 var (
@@ -244,6 +245,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
+
 	j := p.LoadPlanJSON()
 	if j.Error != nil {
 		return []*schema.Project{p.newProject(j)}, nil
@@ -497,6 +499,9 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block, moduleSourceURL string
 		"calls":     calls,
 		"checksum":  generateChecksum(jsonValues),
 	}
+	if attrsWithMissingKeys := block.AttributesWithUnknownKeys(); len(attrsWithMissingKeys) > 0 {
+		metadata["attributesWithUnknownKeys"] = attrsWithMissingKeys
+	}
 
 	// if there is a non-empty module source url, this means that resource comes from a remote module
 	// in this case we should add the module source url to the metadata.
@@ -625,6 +630,16 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 
 	region := block.GetAttribute("region").AsString()
 
+	metadata := map[string]interface{}{
+		"filename":   block.Filename,
+		"start_line": block.StartLine,
+		"end_line":   block.EndLine,
+	}
+
+	if attrsWithMissingKeys := block.AttributesWithUnknownKeys(); len(attrsWithMissingKeys) > 0 {
+		metadata["attributes_with_unknown_keys"] = attrsWithMissingKeys
+	}
+
 	p.schema.Configuration.ProviderConfig[providerConfigKey] = ProviderConfig{
 		Name: name,
 		Expressions: map[string]interface{}{
@@ -632,11 +647,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 				"constant_value": region,
 			},
 		},
-		InfracostMetadata: map[string]interface{}{
-			"filename":   block.Filename,
-			"start_line": block.StartLine,
-			"end_line":   block.EndLine,
-		},
+		InfracostMetadata: metadata,
 	}
 
 	switch providerType {
@@ -711,10 +722,16 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		marshalledTags[tag] = tagValue
 	}
 
+	tagsVal := map[string]interface{}{
+		"constant_value": marshalledTags,
+	}
+
+	if refs := tags.ReferencesCausingUnknownKeys(); len(refs) > 0 {
+		tagsVal["missing_attributes_causing_unknown_keys"] = refs
+	}
+
 	return map[string]interface{}{
-		"tags": map[string]interface{}{
-			"constant_value": marshalledTags,
-		},
+		"tags": tagsVal,
 	}
 }
 
@@ -771,9 +788,13 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 		marshalledTags[tag] = tagValue
 	}
 
-	return map[string]interface{}{
+	tagsVal := map[string]interface{}{
 		"constant_value": marshalledTags,
 	}
+	if refs := tags.ReferencesCausingUnknownKeys(); len(refs) > 0 {
+		tagsVal["missing_attributes_causing_unknown_keys"] = refs
+	}
+	return tagsVal
 }
 
 func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {

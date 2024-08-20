@@ -122,7 +122,7 @@ func TestBreakdownFormatJsonWithTagsAftModule(t *testing.T) {
 			IsJSON:      true,
 			JSONInclude: regexp.MustCompile("^(defaultTags|tags|name)$"),
 			JSONExclude: regexp.MustCompile("^(costComponents|pastBreakdown)$"),
-			RegexFilter: regexp.MustCompile("(tags-mock|bucket-mock)"),
+			RegexFilter: regexp.MustCompile("(tags-infracost-mock-44956be29f34|bucket-infracost-mock-44956be29f34|name-infracost-mock-44956be29f34)"),
 		}, func(ctx *config.RunContext) {
 			ctx.Config.TagPoliciesEnabled = true
 		},

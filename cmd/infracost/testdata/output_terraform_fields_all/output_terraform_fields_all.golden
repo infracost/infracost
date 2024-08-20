@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata
+Project: REPLACED_PROJECT_PATH/testdata
 
  Name                                                           Price  Monthly Qty  Unit         Hourly Cost  Monthly Cost   
                                                                                                                              
@@ -25,7 +25,7 @@ Project: infracost/infracost/cmd/infracost/testdata
  Project total                                                                                                   $1,361.31   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
+Project: REPLACED_PROJECT_PATH/testdata/azure_firewall_plan.json
 
  Name                                                  Price     Monthly Qty  Unit            Hourly Cost  Monthly Cost   
                                                                                                                           

@@ -118,21 +118,23 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 		}
 
 		resources[i] = &schema.Resource{
-			Name:                        resource.Name,
-			IsSkipped:                   skip,
-			Metadata:                    convertMetadata(resource.Metadata),
-			CostComponents:              convertCostComponents(resource.CostComponents),
-			ActualCosts:                 convertActualCosts(resource.ActualCosts),
-			SubResources:                convertOutputResources(resource.SubResources, skip),
-			Tags:                        resource.Tags,
-			DefaultTags:                 resource.DefaultTags,
-			TagPropagation:              tagProp,
-			ProviderSupportsDefaultTags: resource.ProviderSupportsDefaultTags,
-			ProviderLink:                resource.ProviderLink,
-			HourlyCost:                  resource.HourlyCost,
-			MonthlyCost:                 resource.MonthlyCost,
-			MonthlyUsageCost:            resource.MonthlyUsageCost,
-			ResourceType:                resource.ResourceType,
+			Name:                                    resource.Name,
+			IsSkipped:                               skip,
+			Metadata:                                convertMetadata(resource.Metadata),
+			CostComponents:                          convertCostComponents(resource.CostComponents),
+			ActualCosts:                             convertActualCosts(resource.ActualCosts),
+			SubResources:                            convertOutputResources(resource.SubResources, skip),
+			Tags:                                    resource.Tags,
+			DefaultTags:                             resource.DefaultTags,
+			TagPropagation:                          tagProp,
+			ProviderSupportsDefaultTags:             resource.ProviderSupportsDefaultTags,
+			ProviderLink:                            resource.ProviderLink,
+			HourlyCost:                              resource.HourlyCost,
+			MonthlyCost:                             resource.MonthlyCost,
+			MonthlyUsageCost:                        resource.MonthlyUsageCost,
+			ResourceType:                            resource.ResourceType,
+			MissingVarsCausingUnknownTagKeys:        resource.MissingVarsCausingUnknownTagKeys,
+			MissingVarsCausingUnknownDefaultTagKeys: resource.MissingVarsCausingUnknownDefaultTagKeys,
 		}
 	}
 
@@ -306,20 +308,22 @@ type ActualCosts struct {
 }
 
 type Resource struct {
-	Name                        string                 `json:"name"`
-	ResourceType                string                 `json:"resourceType,omitempty"`
-	Tags                        *map[string]string     `json:"tags,omitempty"`
-	DefaultTags                 *map[string]string     `json:"defaultTags,omitempty"`
-	TagPropagation              *TagPropagation        `json:"tagPropagation,omitempty"`
-	ProviderSupportsDefaultTags bool                   `json:"providerSupportsDefaultTags,omitempty"`
-	ProviderLink                string                 `json:"providerLink,omitempty"`
-	Metadata                    map[string]interface{} `json:"metadata"`
-	HourlyCost                  *decimal.Decimal       `json:"hourlyCost,omitempty"`
-	MonthlyCost                 *decimal.Decimal       `json:"monthlyCost,omitempty"`
-	MonthlyUsageCost            *decimal.Decimal       `json:"monthlyUsageCost,omitempty"`
-	CostComponents              []CostComponent        `json:"costComponents,omitempty"`
-	ActualCosts                 []ActualCosts          `json:"actualCosts,omitempty"`
-	SubResources                []Resource             `json:"subresources,omitempty"`
+	Name                                    string                 `json:"name"`
+	ResourceType                            string                 `json:"resourceType,omitempty"`
+	Tags                                    *map[string]string     `json:"tags,omitempty"`
+	DefaultTags                             *map[string]string     `json:"defaultTags,omitempty"`
+	TagPropagation                          *TagPropagation        `json:"tagPropagation,omitempty"`
+	ProviderSupportsDefaultTags             bool                   `json:"providerSupportsDefaultTags,omitempty"`
+	ProviderLink                            string                 `json:"providerLink,omitempty"`
+	Metadata                                map[string]interface{} `json:"metadata"`
+	HourlyCost                              *decimal.Decimal       `json:"hourlyCost,omitempty"`
+	MonthlyCost                             *decimal.Decimal       `json:"monthlyCost,omitempty"`
+	MonthlyUsageCost                        *decimal.Decimal       `json:"monthlyUsageCost,omitempty"`
+	CostComponents                          []CostComponent        `json:"costComponents,omitempty"`
+	ActualCosts                             []ActualCosts          `json:"actualCosts,omitempty"`
+	SubResources                            []Resource             `json:"subresources,omitempty"`
+	MissingVarsCausingUnknownTagKeys        []string               `json:"missingVarsCausingUnknownTagKeys,omitempty"`
+	MissingVarsCausingUnknownDefaultTagKeys []string               `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
 }
 
 type TagPropagation struct {
@@ -556,20 +560,22 @@ func newResource(r *schema.Resource, comps []CostComponent, actualCosts []Actual
 	}
 
 	return Resource{
-		Name:                        r.Name,
-		ResourceType:                r.ResourceType,
-		Metadata:                    metadata,
-		Tags:                        r.Tags,
-		DefaultTags:                 r.DefaultTags,
-		TagPropagation:              tagProp,
-		ProviderSupportsDefaultTags: r.ProviderSupportsDefaultTags,
-		ProviderLink:                r.ProviderLink,
-		HourlyCost:                  r.HourlyCost,
-		MonthlyCost:                 r.MonthlyCost,
-		MonthlyUsageCost:            r.MonthlyUsageCost,
-		CostComponents:              comps,
-		ActualCosts:                 actualCosts,
-		SubResources:                subresources,
+		Name:                                    r.Name,
+		ResourceType:                            r.ResourceType,
+		Metadata:                                metadata,
+		Tags:                                    r.Tags,
+		DefaultTags:                             r.DefaultTags,
+		TagPropagation:                          tagProp,
+		ProviderSupportsDefaultTags:             r.ProviderSupportsDefaultTags,
+		ProviderLink:                            r.ProviderLink,
+		HourlyCost:                              r.HourlyCost,
+		MonthlyCost:                             r.MonthlyCost,
+		MonthlyUsageCost:                        r.MonthlyUsageCost,
+		CostComponents:                          comps,
+		ActualCosts:                             actualCosts,
+		SubResources:                            subresources,
+		MissingVarsCausingUnknownTagKeys:        r.MissingVarsCausingUnknownTagKeys,
+		MissingVarsCausingUnknownDefaultTagKeys: r.MissingVarsCausingUnknownDefaultTagKeys,
 	}
 }
 

@@ -19,6 +19,20 @@
               "type": "ipsec.1"
             },
             "infracost_metadata": {
+              "attributesWithUnknownKeys": [
+                {
+                  "attribute": "customer_gateway_id",
+                  "missingVariables": ["module.gateway.aws_customer_gateway_id"]
+                },
+                {
+                  "attribute": "transit_gateway_id",
+                  "missingVariables": ["module.gateway.aws_ec2_transit_gateway_id"]
+                },
+                {
+                  "attribute": "type",
+                  "missingVariables": ["module.gateway.aws_customer_gateway_type"]
+                }
+              ],
               "calls": [
                 {
                   "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
@@ -126,6 +140,20 @@
             "type": "ipsec.1"
           },
           "infracost_metadata": {
+            "attributesWithUnknownKeys": [
+              {
+                "attribute": "customer_gateway_id",
+                "missingVariables": ["module.gateway.aws_customer_gateway_id"]
+              },
+              {
+                "attribute": "transit_gateway_id",
+                "missingVariables": ["module.gateway.aws_ec2_transit_gateway_id"]
+              },
+              {
+                "attribute": "type",
+                "missingVariables": ["module.gateway.aws_customer_gateway_type"]
+              }
+            ],
             "calls": [
               {
                 "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",

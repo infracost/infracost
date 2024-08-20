@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
+Project: REPLACED_PROJECT_PATH/testdata/example_plan.json
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -47,5 +47,5 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                                      ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃        $1,485 ┃           - ┃     $1,485 ┃
+┃ REPLACED_PROJECT_PATH/testdata/example_plan.json ┃        $1,485 ┃           - ┃     $1,485 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

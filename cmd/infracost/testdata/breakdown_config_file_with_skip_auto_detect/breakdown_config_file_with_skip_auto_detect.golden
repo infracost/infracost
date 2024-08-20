@@ -1,5 +1,5 @@
 Project: testdata-breakdown_config_file_with_skip_auto_detect-infra
-Module path: testdata/breakdown_config_file_with_skip_auto_detect/infra
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_config_file_with_skip_auto_detect/infra
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
                                                                                            
@@ -15,7 +15,7 @@ Module path: testdata/breakdown_config_file_with_skip_auto_detect/infra
 
 ──────────────────────────────────
 Project: testdata-breakdown_config_file_with_skip_auto_detect-infra-dev
-Module path: testdata/breakdown_config_file_with_skip_auto_detect/infra/dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_config_file_with_skip_auto_detect/infra/dev
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
                                                                                            

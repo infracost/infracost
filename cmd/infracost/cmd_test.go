@@ -23,10 +23,10 @@ import (
 var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
-	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
+	projectPathRegex = regexp.MustCompile(`(Project:) .*/(examples|cmd/infracost)/(.*)`)
 	versionRegex     = regexp.MustCompile(`Infracost (v|preview).*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
-	pathRegex        = regexp.MustCompile(`(/.*/)(infracost/infracost/cmd/infracost/testdata/.*)`)
+	pathRegex        = regexp.MustCompile(`(:\s*"|^|\s|')([a-zA-Z0-9-_/]+/)*(testdata/[^\s"']*)`)
 	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
 )
 
@@ -239,10 +239,10 @@ func filterJSONArray(rArray []gjson.Result, include *regexp.Regexp, exclude *reg
 func stripDynamicValues(actual []byte) []byte {
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
 	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
-	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
+	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH/$3"))
 	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
 	actual = panicRegex.ReplaceAll(actual, []byte("runtime error: REPLACED ERROR\nEnvironment"))
-	actual = pathRegex.ReplaceAll(actual, []byte("REPLACED_PROJECT_PATH/$2"))
+	actual = pathRegex.ReplaceAll(actual, []byte("${1}REPLACED_PROJECT_PATH/$3"))
 	actual = credsRegex.ReplaceAll(actual, []byte("REPLACED_CREDENTIALS_PATH"))
 
 	return actual

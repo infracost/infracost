@@ -3,8 +3,8 @@ Module path: us1
 
 Errors:
   Error loading Terraform modules:
-    failed to parse file testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf diag:
-      testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf:1,9-10:
+    failed to parse file REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf diag:
+      REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf:1,9-10:
         Invalid block definition; Either a quoted string block label or an opening brace ("{") is expected here., and 1 other diagnostic(s)
 
 ──────────────────────────────────
@@ -13,8 +13,8 @@ Module path: us1
 
 Errors:
   Error loading Terraform modules:
-    failed to parse file testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf diag:
-      testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf:1,9-10:
+    failed to parse file REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf diag:
+      REPLACED_PROJECT_PATH/testdata/breakdown_multi_project_with_error/us1/mod_with_error.tf:1,9-10:
         Invalid block definition; Either a quoted string block label or an opening brace ("{") is expected here., and 1 other diagnostic(s)
 
 ──────────────────────────────────

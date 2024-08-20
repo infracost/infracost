@@ -179,6 +179,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 			assert.NoError(t, err)
 			t.Logf("Wrote golden file %s", goldenFilePath)
 		} else {
+
 			// Generate the diff and error message.  We don't call assert.Equal because it escapes
 			// newlines (\n) and the output looks terrible.
 			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
@@ -191,7 +192,7 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 				Context:  1,
 			})
 
-			t.Errorf("\nOutput does not match golden file (%s): \n\n%s\n", goldenFilePath, diff)
+			t.Errorf("\nOutput does not match golden file (%s):\n\n%s\n", goldenFilePath, diff)
 		}
 	}
 

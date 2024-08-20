@@ -3,6 +3,7 @@ package funcs
 import (
 	"strings"
 
+	"github.com/infracost/infracost/internal/hcl/mock"
 	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
@@ -29,7 +30,7 @@ var YAMLDecodeFunc = function.New(&function.Spec{
 			return cty.NilType, function.NewArgErrorf(0, "YAML source code cannot be null")
 		}
 		val := args[0].AsString()
-		if strings.HasSuffix(val, "-mock") {
+		if strings.HasSuffix(val, "-mock") || strings.Contains(val, mock.Identifier) {
 			return cty.Object(map[string]cty.Type{
 				"foo": cty.String,
 			}), nil
@@ -39,7 +40,7 @@ var YAMLDecodeFunc = function.New(&function.Spec{
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
 		val := args[0].AsString()
-		if strings.HasSuffix(val, "-mock") {
+		if strings.HasSuffix(val, "-mock") || strings.Contains(val, mock.Identifier) {
 			return cty.ObjectVal(map[string]cty.Value{
 				"foo": cty.StringVal("bar"),
 			}), nil
