@@ -254,66 +254,6 @@ resource_type_default_usage:
     monthly_monitored_objects: 100000000 # Monthly number of monitored objects by S3 Analytics Storage Class Analysis.
   aws_s3_bucket_inventory:
     monthly_listed_objects: 4000000000 # Monthly number of listed objects.
-  aws_s3_bucket_lifecycle_configuration:
-    object_tags: 10000000 # Total object tags.
-    standard: # Usages of S3 Standard:
-      storage_gb: 450 # Total storage in GB.
-      monthly_tier_1_requests: 2000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 25000000 # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_select_data_scanned_gb: 5000 # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 14500 # Monthly data returned by S3 Select in GB.
-    intelligent_tiering: # Usages of S3 Intelligent - Tiering:
-      frequent_access_storage_gb: 0 # Total storage for Frequent Access Tier in GB.
-      infrequent_access_storage_gb: 0 # Total storage for Infrequent Access Tier in GB.
-      monitored_objects: 0 # Total objects monitored by the Intelligent Tiering.
-      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
-      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.
-      early_delete_gb: 0 # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
-    standard_infrequent_access: # Usages of S3 Standard - Infrequent Access:
-      storage_gb: 0 # Total storage in GB.
-      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
-      monthly_data_retrieval_gb: 0 # Monthly data retrievals in GB
-      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.
-    one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
-      storage_gb: 0 # Total storage in GB.
-      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
-      monthly_data_retrieval_gb: 0 # Monthly data retrievals in GB
-      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.
-    glacier_flexible_retrieval: # Usages of S3 Glacier Flexible Retrieval:
-      storage_gb: 0 # Total storage in GB.
-      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
-      monthly_standard_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB (for standard level of S3 Glacier).
-      monthly_standard_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB (for standard level of S3 Glacier).
-      monthly_bulk_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB (for bulk level of S3 Glacier)
-      monthly_bulk_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB (for bulk level of S3 Glacier)
-      monthly_expedited_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
-      monthly_expedited_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
-      monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
-      monthly_expedited_data_retrieval_requests: 0 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
-      monthly_standard_data_retrieval_gb: 0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
-      monthly_expedited_data_retrieval_gb: 0 # Monthly data retrievals in GB (for expedited level of S3 Glacier).
-      early_delete_gb: 0 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
-    glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
-      storage_gb: 0 # Total storage in GB.
-      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
-      monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
-      monthly_bulk_data_retrieval_requests: 0 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
-      monthly_standard_data_retrieval_gb: 0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
-      monthly_bulk_data_retrieval_gb: 0 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
-      early_delete_gb: 0 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
   aws_s3_bucket:
     object_tags: 10000000 # Total object tags. Only for AWS provider V3.
     standard: # Usages of S3 Standard:

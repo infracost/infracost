@@ -19,7 +19,7 @@ func NewS3BucketLifecycleConfiguration(d *schema.ResourceData, u *schema.UsageDa
 		Tags:         d.Tags,
 		DefaultTags:  d.DefaultTags,
 		IsSkipped:    true,
-		NoPrice:      false,
-		//SkipMessage:  "Free resource.",
+		NoPrice:      true,
+		SkipMessage:  "Free resource.",
 	}
 }
