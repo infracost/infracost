@@ -88,7 +88,7 @@ type scaledInt64 struct {
 // length of the fraction.
 func decimalToScaledInt(d decimal.Decimal, minFracLen, maxFracLen int) *scaledInt64 {
 	// round excess fraction part
-	d = d.Round(int32(maxFracLen))
+	d = d.Round(int32(maxFracLen)) // nolint:gosec
 
 	co := d.Coefficient().Int64()
 	ex := int(d.Exponent())
