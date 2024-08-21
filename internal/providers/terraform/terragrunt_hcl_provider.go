@@ -441,7 +441,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 			fmt.Println("(1) Running terragrunt in", opts.WorkingDir)
 			workingDirInfo := p.runTerragrunt(opts)
-			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
+			_, _ = terragruntOutputCache.Set(opts.WorkingDir, func() (cty.Value, error) {
 				if workingDirInfo == nil {
 					return cty.EmptyObjectVal, errors.New("nil outputs")
 				}
