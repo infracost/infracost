@@ -440,9 +440,9 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 				}
 			}()
 
-			fmt.Println("(1) Running terragrunt in", opts.WorkingDir)
+			// fmt.Println("(1) Running terragrunt in", opts.WorkingDir)
 			workingDirInfo := p.runTerragrunt(opts)
-			fmt.Println("(1) Fetching terragrunt outputs for", opts.TerragruntConfigPath)
+			// fmt.Println("(1) Fetching terragrunt outputs for", opts.TerragruntConfigPath)
 			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
 				if workingDirInfo == nil {
 					return cty.EmptyObjectVal, errors.New("nil outputs")
@@ -983,9 +983,9 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 }
 
 func (p *TerragruntHCLProvider) terragruntPathToValue(targetConfig string, opts *tgoptions.TerragruntOptions) (*cty.Value, bool, error) {
-	fmt.Println("(2) Fetching terragrunt outputs for", targetConfig)
+	// fmt.Println("(2) Fetching terragrunt outputs for", targetConfig)
 	value, err := terragruntOutputCache.Set(targetConfig, func() (cty.Value, error) {
-		fmt.Println("(2) Running terragrunt for", targetConfig)
+		// fmt.Println("(2) Running terragrunt for", targetConfig)
 		info := p.runTerragrunt(opts.Clone(targetConfig))
 		if info != nil && info.error != nil {
 			return cty.EmptyObjectVal, fmt.Errorf("could not run teragrunt path %s err: %w", targetConfig, info.error)
