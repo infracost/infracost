@@ -208,8 +208,8 @@ func (h *githubPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 	variables := map[string]interface{}{
 		"owner":    githubv4.String(h.owner),
 		"repo":     githubv4.String(h.repo),
-		"prNumber": githubv4.Int(h.prNumber),
-		"after":    (*githubv4.String)(nil), // Null after argument to get first page.
+		"prNumber": githubv4.Int(h.prNumber), // nolint:gosec // ignore G115: integer overflow conversion int -> int32
+		"after":    (*githubv4.String)(nil),  // Null after argument to get first page.
 	}
 
 	// Get comments from all pages.

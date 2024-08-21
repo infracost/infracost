@@ -450,7 +450,7 @@ type stackConfig struct {
 }
 
 type getStackOptions struct {
-	count int
+	count int32
 
 	repositoryName string
 	name           string
