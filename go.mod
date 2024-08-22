@@ -270,3 +270,5 @@ replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0
 replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94
 
 replace github.com/shurcooL/graphql => github.com/spacelift-io/graphql v1.2.0
+
+replace github.com/hashicorp/go-getter => github.com/infracost/go-getter v0.0.0-20240822113104-39b0696ac026
