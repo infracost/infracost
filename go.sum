@@ -853,8 +853,8 @@ github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/infracost/go-getter v0.0.0-20240822113104-39b0696ac026 h1:5pKP8qiQhcKrvf61knWyCuTHxgwxQYV9XYYIKFRclyw=
 github.com/infracost/go-getter v0.0.0-20240822113104-39b0696ac026/go.mod h1:W7TalhMmbPmsSMdNjD0ZskARur/9GJ17cfHTRtXV744=
-github.com/infracost/terragrunt v0.47.1-0.20240501143558-4c01e72103df h1:aGlX6621I8AM6Rza0QorcAzABpYtMP9KV8yfgBX08VU=
-github.com/infracost/terragrunt v0.47.1-0.20240501143558-4c01e72103df/go.mod h1:xmRpWI+M4KlZbMQp1pj20CdXlZf5eIkRND5ybNkdnus=
+github.com/infracost/terragrunt v0.47.1-0.20240822112109-d682e6df916e h1:WJ8yg67fGSoao3LMkIzXcASsjdk2xm4yo9Qg376SNXo=
+github.com/infracost/terragrunt v0.47.1-0.20240822112109-d682e6df916e/go.mod h1:xmRpWI+M4KlZbMQp1pj20CdXlZf5eIkRND5ybNkdnus=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
