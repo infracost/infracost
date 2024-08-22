@@ -22,6 +22,7 @@ import (
 	tgcliinfo "github.com/gruntwork-io/terragrunt/cli/commands/terragrunt-info"
 	"github.com/gruntwork-io/terragrunt/codegen"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
+	tghclparse "github.com/gruntwork-io/terragrunt/config/hclparse"
 	tgconfigstack "github.com/gruntwork-io/terragrunt/configstack"
 	"github.com/gruntwork-io/terragrunt/options"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
@@ -30,7 +31,6 @@ import (
 	"github.com/hashicorp/go-getter"
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
-	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
@@ -427,7 +427,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		IgnoreExternalDependencies: true,
 		SourceMap:                  p.ctx.RunContext.Config.TerraformSourceMap,
 		UsePartialParseConfigCache: true,
-		RunTerragrunt: func(opts *tgoptions.TerragruntOptions) (err error) {
+		RunTerragrunt: func(ctx context.Context, opts *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
 				unexpectedErr := recover()
 				if unexpectedErr != nil {
@@ -442,7 +442,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			}()
 
 			workingDirInfo := p.runTerragrunt(opts)
-			fmt.Println("1", opts.TerragruntConfigPath)
 			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
 				if workingDirInfo == nil {
 					return cty.EmptyObjectVal, errors.New("nil outputs")
@@ -482,7 +481,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	}
 	p.stack = s
 
-	err = s.Run(terragruntOptions)
+	err = s.Run(context.Background(), terragruntOptions)
 	if err != nil {
 		return nil, clierror.NewCLIError(
 			fmt.Errorf(
@@ -510,7 +509,11 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
-	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
+
+	parsingCtx := tgconfig.NewParsingContext(context.Background(), opts)
+	parsingCtx.DecodedDependencies = &outputs
+
+	terragruntConfig, err := tgconfig.ParseConfigFile(parsingCtx, opts.TerragruntConfigPath, nil)
 	if err != nil {
 		info.error = err
 		return
@@ -684,7 +687,7 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 	// host machine, rather than requiring an SSH key is added.
 	failedHttpsDownload := !forceHttpsDownload(sourceURL, opts, terragruntConfig)
 	if failedHttpsDownload {
-		_, err = tgcliterraform.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
+		_, err = tgcliterraform.DownloadTerraformSource(context.Background(), sourceURL, opts, terragruntConfig)
 		if err != nil {
 			return "", err
 		}
@@ -714,7 +717,7 @@ func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return false
 	}
 
-	_, err = tgcliterraform.DownloadTerraformSource(newUrl.String(), opts, terragruntConfig)
+	_, err = tgcliterraform.DownloadTerraformSource(context.Background(), newUrl.String(), opts, terragruntConfig)
 	return err == nil
 }
 
@@ -973,7 +976,6 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 }
 
 func (p *TerragruntHCLProvider) terragruntPathToValue(targetConfig string, opts *tgoptions.TerragruntOptions) (*cty.Value, bool, error) {
-	fmt.Println("2",targetConfig)
 	value, err := terragruntOutputCache.Set(targetConfig, func() (cty.Value, error) {
 		info := p.runTerragrunt(opts.Clone(targetConfig))
 		if info != nil && info.error != nil {
@@ -1064,13 +1066,14 @@ func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []st
 		return nil, tgerrors.WithStackTrace(tgconfigstack.NoTerraformModulesFound)
 	}
 
-	modules, err := tgconfigstack.ResolveTerraformModules(terragruntConfigPaths, terragruntOptions, nil, howThesePathsWereFound)
+	stack := tgconfigstack.NewStack(terragruntOptions)
+	modules, err := stack.ResolveTerraformModules(context.Background(), terragruntConfigPaths)
 	if err != nil {
 		return nil, err
 	}
+	stack.Modules = modules
 
-	stack := &tgconfigstack.Stack{Path: path, Modules: modules}
-	if err := stack.CheckForCycles(); err != nil {
+	if err := modules.CheckForCycles(); err != nil {
 		return nil, err
 	}
 
@@ -1080,19 +1083,18 @@ func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []st
 // decodeDependencyBlocks parses the file at filename and returns a map containing all the hcl blocks with the "dependency" label.
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
 func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value, include *tgconfig.IncludeConfig) (map[string]tgconfig.Dependency, error) {
-	parser := hclparse.NewParser()
+	parserOpts := tgconfig.DefaultParserOptions(terragruntOptions)
 
-	parseFunc := parser.ParseHCLFile
-	if strings.HasSuffix(filename, ".json") {
-		parseFunc = parser.ParseJSONFile
+	parser := tghclparse.NewParser().WithOptions(parserOpts...)
+
+	file, err := parser.ParseFromFile(filename)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, err)
 	}
 
-	file, diags := parseFunc(filename)
-	if diags != nil && diags.HasErrors() {
-		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, diags)
-	}
+	parsingCtx := tgconfig.NewParsingContext(context.Background(), terragruntOptions)
 
-	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, include, nil)
+	trackInclude, locals, err := tgconfig.DecodeBaseBlocks(parsingCtx, file, include)
 	var withStack *goerrors.Error
 	if errors.As(err, &withStack) {
 		stack := withStack.ErrorStack()
@@ -1102,13 +1104,10 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 		return nil, fmt.Errorf("could not parse base hcl blocks %w", err)
 	}
 
-	contextExtensions := tgconfig.EvalContextExtensions{
-		Locals:              localsAsCty,
-		TrackInclude:        trackInclude,
-		DecodedDependencies: dependencyOutputs,
-	}
+	parsingCtx = parsingCtx.WithTrackInclude(trackInclude)
+	parsingCtx = parsingCtx.WithLocals(locals)
 
-	evalContext, err := tgconfig.CreateTerragruntEvalContext(filename, terragruntOptions, contextExtensions)
+	evalContext, err := tgconfig.CreateTerragruntEvalContext(parsingCtx, filename)
 	if err != nil {
 		return nil, err
 	}
@@ -1122,7 +1121,7 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 	depmap := make(map[string]tgconfig.Dependency)
 	keymap := make(map[string]struct{})
 	for _, dep := range deps.Dependencies {
-		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+		depmap[getCleanedTargetConfigPath(dep.ConfigPath.AsString(), filename)] = dep
 		keymap[dep.Name] = struct{}{}
 	}
 
@@ -1142,7 +1141,7 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 						continue
 					}
 
-					depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+					depmap[getCleanedTargetConfigPath(dep.ConfigPath.AsString(), filename)] = dep
 				}
 			}
 		}
