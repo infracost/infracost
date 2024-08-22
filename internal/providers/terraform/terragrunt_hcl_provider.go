@@ -442,6 +442,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			}()
 
 			workingDirInfo := p.runTerragrunt(opts)
+			fmt.Println("1", opts.TerragruntConfigPath)
 			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
 				if workingDirInfo == nil {
 					return cty.EmptyObjectVal, errors.New("nil outputs")
@@ -972,6 +973,7 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 }
 
 func (p *TerragruntHCLProvider) terragruntPathToValue(targetConfig string, opts *tgoptions.TerragruntOptions) (*cty.Value, bool, error) {
+	fmt.Println("2",targetConfig)
 	value, err := terragruntOutputCache.Set(targetConfig, func() (cty.Value, error) {
 		info := p.runTerragrunt(opts.Clone(targetConfig))
 		if info != nil && info.error != nil {
