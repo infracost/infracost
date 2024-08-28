@@ -18,68 +18,113 @@ var defaultProviderRegions = map[string]string{
 
 // Parser ...
 type Parser struct {
-	ctx *config.ProjectContext
+	ctx                  *config.ProjectContext
+	includePastResources bool
 }
 
 // NewParser ...
-func NewParser(ctx *config.ProjectContext) *Parser {
-	return &Parser{ctx}
+func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
+	return &Parser{
+		ctx:                  ctx,
+		includePastResources: includePastResources,
+	}
 }
 
-func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+// parsedResource is used to collect a PartialResource with its corresponding ResourceData
+// so the ResourceData may be used internally by the parsing job, while the PartialResource
+// can be passed back up to top level functions.
+type parsedResource struct {
+	PartialResource *schema.PartialResource
+	ResourceData    *schema.ResourceData
+}
+
+func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) parsedResource {
 	registryMap := GetResourceRegistryMap()
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
-			return &schema.Resource{
-				Name:         d.Address,
-				ResourceType: d.Type,
-				Tags:         d.Tags,
+			resource := &schema.Resource{
+				Name:         d.Type + "." + d.Address,
 				IsSkipped:    true,
 				NoPrice:      true,
 				SkipMessage:  "Free resource.",
+				ResourceType: d.Type,
+			}
+			return parsedResource{
+				PartialResource: schema.NewPartialResource(d, resource, nil, nil),
+				ResourceData:    d,
 			}
 		}
-		res := registryItem.RFunc(d, u)
-		if res != nil {
-			res.ResourceType = d.Type
-			res.Tags = d.Tags
-			return res
+
+		// Use CoreRFunc to generate a CoreResource if possible.
+		if registryItem.CoreRFunc != nil {
+			coreRes := registryItem.CoreRFunc(d)
+			if coreRes != nil {
+				return parsedResource{
+					PartialResource: schema.NewPartialResource(d, nil, coreRes, nil),
+					ResourceData:    d,
+				}
+			}
+		} else {
+			res := registryItem.RFunc(d, u)
+			if res != nil {
+				res.Name = d.Type + "." + d.Address
+				if u != nil {
+					res.EstimationSummary = u.CalcEstimationSummary()
+				}
+
+				return parsedResource{
+					PartialResource: schema.NewPartialResource(d, res, nil, nil),
+					ResourceData:    d,
+				}
+			}
 		}
 	}
-	return &schema.Resource{
-		Name:         d.Address,
-		ResourceType: d.Type,
-		Tags:         d.Tags,
-		IsSkipped:    true,
-		SkipMessage:  "This resource is not currently supported",
+
+	return parsedResource{
+		PartialResource: schema.NewPartialResource(
+			d,
+			&schema.Resource{
+				Name:        d.Type + "." + d.Address,
+				IsSkipped:   true,
+				SkipMessage: "This resource is not currently supported",
+				Metadata:    d.Metadata,
+			},
+			nil,
+			[]string{},
+		),
+		ResourceData: d,
 	}
 }
 
-func (p *Parser) parseTemplates(data [][]byte, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
-	var resources []*schema.Resource
+func (p *Parser) parseTemplates(data [][]byte, usage map[string]*schema.UsageData) ([]parsedResource, error) {
+	var resources []parsedResource
+
 	baseResources := p.loadUsageFileResources(usage)
-	// Process each Crossplane template
+
 	for _, bytes := range data {
 		if !gjson.ValidBytes(bytes) {
-			return baseResources, baseResources, errors.New("invalid JSON")
+			return nil, errors.New("invalid JSON")
 		}
 		resources = append(resources, p.parseTemplate(usage, gjson.ParseBytes(bytes))...)
 	}
+
 	resources = append(resources, baseResources...)
-	return nil, resources, nil
+
+	return resources, nil
 }
 
-func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.Result) []*schema.Resource {
-	var resources []*schema.Resource
-	parseFunc := p.parseSimpleResourse
+func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.Result) []parsedResource {
+	var resources []parsedResource
+	var parseFunc func(gjson.Result) map[string]*schema.ResourceData
+
 	if parsed.Get("kind").String() == "Composition" {
 		parseFunc = p.parseCompositeResource
+	} else {
+		parseFunc = p.parseSimpleResource
 	}
-	resData := parseFunc(parsed)
 
-	// p.parseReferences(resData, conf)
-	// p.stripDataResources(resData)
+	resData := parseFunc(parsed)
 
 	for _, d := range resData {
 		var usageData *schema.UsageData
@@ -87,12 +132,12 @@ func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.
 			usageData = ud
 		} else if strings.HasSuffix(d.Address, "]") {
 			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
-
 			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
 				usageData = arrayUsageData
 			}
 		}
-		if r := p.createResource(d, usageData); r != nil {
+
+		if r := p.createResource(d, usageData); r.PartialResource != nil {
 			resources = append(resources, r)
 		}
 	}
@@ -100,7 +145,7 @@ func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.
 	return resources
 }
 
-func (p *Parser) parseSimpleResourse(parsed gjson.Result) map[string]*schema.ResourceData {
+func (p *Parser) parseSimpleResource(parsed gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
 	name, resourceType, provider, address, labels := p.getMetaData(parsed)
 	spec := parsed.Get("spec")
@@ -112,28 +157,21 @@ func (p *Parser) parseSimpleResourse(parsed gjson.Result) map[string]*schema.Res
 func (p *Parser) getMetaData(parsed gjson.Result) (string, string, string, string, map[string]string) {
 	apiVersion := parsed.Get("apiVersion").String()
 	kind := parsed.Get("kind").String()
-	name := parsed.Get("name").String()
-	if name == "" {
-		name = parsed.Get("metadata.name").String()
-	}
+	name := parsed.Get("metadata.name").String()
 	provider := getProvider(apiVersion)
 	labels := getLabels(parsed)
-	address := provider + "." + kind
-	if name != "" {
-		address += "." + name
-	}
-	resourceType := provider + "/" + kind
+	address := fmt.Sprintf("%s.%s.%s", provider, kind, name)
+	resourceType := fmt.Sprintf("%s/%s", provider, kind)
 	return name, resourceType, provider, address, labels
 }
 
 func (p *Parser) parseCompositeResource(parsed gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
 	if parsed.Get("spec").Get("resources").IsArray() {
-		for _, r := range parsed.Get("spec").Get("resources").Array() {
+		for _, r := range parsed.Get("spec.resources").Array() {
 			base := r.Get("base")
 			base = schema.AddRawValue(base, "name", r.Get("name").String())
-			//TODO: Process r.Get("patches") then update base before calling parseSimpleResourse
-			resource := p.parseSimpleResourse(base)
+			resource := p.parseSimpleResource(base)
 			for key, value := range resource {
 				resources[key] = value
 			}
@@ -142,15 +180,13 @@ func (p *Parser) parseCompositeResource(parsed gjson.Result) map[string]*schema.
 	return resources
 }
 
-func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
-	resources := make([]*schema.Resource, 0)
+func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []parsedResource {
+	var resources []parsedResource
 	for k, v := range u {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
-				if r := p.createResource(d, v); r != nil {
-					resources = append(resources, r)
-				}
+				resources = append(resources, p.createResource(d, v))
 			}
 		}
 	}

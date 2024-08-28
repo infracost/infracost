@@ -14,6 +14,7 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
+	"github.com/infracost/infracost/internal/providers/crossplane"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -51,6 +52,8 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		return &DetectionOutput{Providers: []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	case ProjectTypeCloudFormation:
 		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeCrossPlaneTemplate:
+		return &DetectionOutput{Providers: []schema.Provider{crossplane.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	}
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
@@ -106,7 +109,6 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 			} else {
 				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, nil, detectedProjectContext, pl))
 			}
-
 		}
 	}
 
@@ -201,6 +203,7 @@ var (
 	ProjectTypeTerragruntCLI       ProjectType = "terragrunt_cli"
 	ProjectTypeTerraformStateJSON  ProjectType = "terraform_state_json"
 	ProjectTypeCloudFormation      ProjectType = "cloudformation"
+	ProjectTypeCrossPlaneTemplate  ProjectType = "crossplane_template_file"
 	ProjectTypeAutodetect          ProjectType = "autodetect"
 )
 
@@ -219,6 +222,10 @@ func DetectProjectType(path string, forceCLI bool) ProjectType {
 
 	if isTerraformPlan(path) {
 		return ProjectTypeTerraformPlanBinary
+	}
+
+	if isCrossPlaneTemplateProvider(path) {
+		return ProjectTypeCrossPlaneTemplate
 	}
 
 	if forceCLI {
@@ -348,4 +355,8 @@ func isCloudFormationTemplate(path string) bool {
 	}
 
 	return false
+}
+
+func isCrossPlaneTemplateProvider(path string) bool {
+	return crossplane.IsCrossPlaneTemplateProvider(path)
 }

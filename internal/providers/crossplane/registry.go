@@ -1,7 +1,6 @@
 package crossplane
 
 import (
-	"strings"
 	"sync"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -40,9 +39,9 @@ func GetUsageOnlyResources() []string {
 	return r
 }
 
-func HasSupportedProvider(rType string) bool {
-	return strings.Contains(rType, ".azure.crossplane.io")
-}
+// func HasSupportedProvider(rType string) bool {
+// 	return strings.Contains(rType, ".azure.crossplane.io")
+// }
 
 func createFreeResources(l []string) []*schema.RegistryItem {
 	freeResources := make([]*schema.RegistryItem, 0)

@@ -1,0 +1,44 @@
+apiVersion: containerservice.azure.upbound.io/v1beta1
+kind: KubernetesCluster
+metadata:
+  name: example-akscluster
+  labels:
+    testing.upbound.io/example-name: example
+spec:
+  forProvider:
+    skuTier: Standard
+    autoScalerProfile:
+      - maxGracefulTerminationSec: "200"
+        maxUnreadyNodes: 2
+        scaleDownDelayAfterAdd: 5m
+    defaultNodePool:
+      - name: default
+        enableNodePublicIp: false
+        nodeCount: 3
+        minCount: 3
+        maxCount: 6
+        maxPods: 30
+        vmSize: Standard_D8as_v5
+        enableAutoScaling: true
+        osDiskSizeGb: 30
+        osDiskType: managed
+        osSku: Ubuntu
+        temporaryNameForRotation: rotation
+        tags:
+          crossplane: test
+        zones:
+          - "1"
+          - "2"
+          - "3"
+    dnsPrefix: crossplane-aks
+    oidcIssuerEnabled: true
+    identity:
+      - type: SystemAssigned
+    location: us-east
+    resourceGroupName: example-rg
+    vnetSubnetIDRef:
+      name: example-sub
+    tags:
+      environment: example-test
+    workloadIdentityEnabled: true
+    # kubernetesVersion: 1.29.7
