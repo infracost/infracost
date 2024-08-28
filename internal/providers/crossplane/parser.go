@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
@@ -41,8 +42,11 @@ type parsedResource struct {
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) parsedResource {
 	registryMap := GetResourceRegistryMap()
 
+	logging.Logger.Debug().Msgf("Creating resource for: %s, Type: %s", d.Address, d.Type)
+
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
+			logging.Logger.Debug().Msgf("Skipping resource: %s, Type: %s (No price)", d.Address, d.Type)
 			resource := &schema.Resource{
 				Name:         d.Type + "." + d.Address,
 				IsSkipped:    true,
@@ -56,14 +60,19 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) par
 			}
 		}
 
+		logging.Logger.Debug().Msgf("Resource found in registry map: %s, Type: %s", d.Address, d.Type)
+
 		// Use CoreRFunc to generate a CoreResource if possible.
 		if registryItem.CoreRFunc != nil {
 			coreRes := registryItem.CoreRFunc(d)
 			if coreRes != nil {
+				logging.Logger.Debug().Msgf("Core resource created: %s, Type: %s", d.Address, d.Type)
 				return parsedResource{
 					PartialResource: schema.NewPartialResource(d, nil, coreRes, nil),
 					ResourceData:    d,
 				}
+			} else {
+				logging.Logger.Debug().Msgf("CoreRFunc returned nil for: %s, Type: %s", d.Address, d.Type)
 			}
 		} else {
 			res := registryItem.RFunc(d, u)
@@ -72,13 +81,17 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) par
 				if u != nil {
 					res.EstimationSummary = u.CalcEstimationSummary()
 				}
-
+				logging.Logger.Debug().Msgf("Resource created: %s, Type: %s", res.Name, res.ResourceType)
 				return parsedResource{
 					PartialResource: schema.NewPartialResource(d, res, nil, nil),
 					ResourceData:    d,
 				}
+			} else {
+				logging.Logger.Debug().Msgf("RFunc returned nil for: %s, Type: %s", d.Address, d.Type)
 			}
 		}
+	} else {
+		logging.Logger.Debug().Msgf("Resource type not supported: %s", d.Type)
 	}
 
 	return parsedResource{
@@ -127,6 +140,7 @@ func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.
 	resData := parseFunc(parsed)
 
 	for _, d := range resData {
+		logging.Logger.Debug().Msgf("Parsing resource: %s, Type: %s, Address: %s", d.Get("metadata.name").String(), d.Type, d.Address)
 		var usageData *schema.UsageData
 		if ud := usage[d.Address]; ud != nil {
 			usageData = ud
@@ -139,6 +153,8 @@ func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.
 
 		if r := p.createResource(d, usageData); r.PartialResource != nil {
 			resources = append(resources, r)
+		} else {
+			logging.Logger.Debug().Msgf("No resource created for: %s", d.Address)
 		}
 	}
 
@@ -161,7 +177,7 @@ func (p *Parser) getMetaData(parsed gjson.Result) (string, string, string, strin
 	provider := getProvider(apiVersion)
 	labels := getLabels(parsed)
 	address := fmt.Sprintf("%s.%s.%s", provider, kind, name)
-	resourceType := fmt.Sprintf("%s/%s", provider, kind)
+	resourceType := apiVersion
 	return name, resourceType, provider, address, labels
 }
 

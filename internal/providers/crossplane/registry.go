@@ -3,9 +3,9 @@ package crossplane
 import (
 	"sync"
 
-	"github.com/infracost/infracost/internal/schema"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/crossplane/azure"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type ResourceRegistryMap map[string]*schema.RegistryItem
@@ -22,9 +22,11 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 		// Merge all resource registries
 
 		for _, registryItem := range azure.ResourceRegistry {
+			logging.Logger.Debug().Msgf("Registering resource: %s", registryItem.Name)
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 		for _, registryItem := range createFreeResources(azure.FreeResources) {
+			logging.Logger.Debug().Msgf("Registering free resource: %s", registryItem.Name)
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 
@@ -51,6 +53,7 @@ func createFreeResources(l []string) []*schema.RegistryItem {
 			NoPrice: true,
 			Notes:   []string{"Free resource."},
 		})
+		logging.Logger.Debug().Msgf("Creating free resource entry: %s", resourceName)
 	}
 	return freeResources
 }

@@ -1,0 +1,26 @@
+apiVersion: compute.azure.upbound.io/v1beta1
+kind: LinuxVirtualMachine
+metadata:
+  name: example-linux-vm
+spec:
+  providerConfigRef:
+    name: default
+  writeConnectionSecretToRef:
+    name: example-linux-vm-creds
+    namespace: crossplane
+  forProvider:
+    computerName: example-linux-vm
+    resourceGroupName: example-rg
+    location: us-east
+    adminUsername: admin
+    networkInterfaceIdsRefs:
+      name: example-nic
+    osDisk:
+      - diskSizeGb: 30
+        storageAccountType: Standard_LRS
+    size: Standard_D8as_v5
+    sourceImageReference:
+      - offer: UbuntuServer
+        publisher: Canonical
+        sku: 16.04-LTS
+        version: latest
