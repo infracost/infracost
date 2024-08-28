@@ -150,7 +150,7 @@ func (p *Parser) parseSimpleResource(parsed gjson.Result) map[string]*schema.Res
 	name, resourceType, provider, address, labels := p.getMetaData(parsed)
 	spec := parsed.Get("spec")
 	spec = schema.AddRawValue(spec, "name", name)
-	resources[address] = schema.NewResourceData(resourceType, provider, address, labels, spec)
+	resources[address] = schema.NewResourceData(resourceType, provider, address, &labels, spec)
 	return resources
 }
 
@@ -185,7 +185,7 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []parsed
 	for k, v := range u {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
-				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
+				d := schema.NewResourceData(t, "global", k, &map[string]string{}, gjson.Result{})
 				resources = append(resources, p.createResource(d, v))
 			}
 		}

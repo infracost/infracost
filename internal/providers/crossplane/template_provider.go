@@ -81,12 +81,26 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
-	pastResources, resources, err := parser.parseTemplates(data, usage)
+
+	// Convert usage to the expected map[string]*schema.UsageData
+	usageData := make(map[string]*schema.UsageData)
+	for k, v := range usage.Data() {
+		usageData[k] = v
+	}
+
+	parsedResources, err := parser.parseTemplates(data, usageData)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing CrossPlane template file")
 	}
 
-	project.PastResources = pastResources
+	// Convert parsedResources to []*schema.Resource
+	var resources []*schema.Resource
+	for _, pr := range parsedResources {
+		if pr.PartialResource != nil {
+			resources = append(resources, pr.PartialResource.Resource)
+		}
+	}
+
 	project.Resources = resources
 
 	return []*schema.Project{project}, nil
