@@ -12,5 +12,9 @@ func TestAzureRMAIntegrationServiceEnvironment(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "integration_service_environment_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	// Ignore the CLI because the resource has been removed from the provider
+	opts.IgnoreCLI = true
+
+	tftest.GoldenFileResourceTestsWithOpts(t, "integration_service_environment_test", opts)
 }
