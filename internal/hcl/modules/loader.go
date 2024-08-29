@@ -1,11 +1,13 @@
 package modules
 
 import (
+	"bytes"
 	"crypto/md5" //nolint
 	"errors"
 	"fmt"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -33,6 +35,12 @@ var (
 	tfManifestPath = ".terraform/modules/modules.json"
 
 	supportedManifestVersion = "2.0"
+
+	// maxSparseCheckoutDepth is the maximum depth to which we will follow symlinks when adding directories
+	// to the sparse-checkout file list. This is currently set to a low value, since increasing it is likely
+	// to cause performance issues. If we need to increase it in the future, we should consider adding an
+	// option to allow users to set this value.
+	maxSparseCheckoutDepth = 1
 )
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
@@ -279,6 +287,29 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		}
 
 		m.logger.Debug().Msgf("loading local module %s from %s", key, dir)
+
+		// If the module is a in a git repo we need to check that it has been checked out.
+		// If it hasn't been checked out then we need to add it to the sparse-checkout file list.
+		m.logger.Debug().Msgf("finding git repo root for path %s", parentPath)
+		repoRoot, err := findGitRepoRoot(parentPath)
+		if err == nil {
+			// Get the dir relative to the repoRoot
+			absDir, err := filepath.Abs(dir)
+			if err != nil {
+				return nil, err
+			}
+
+			relDir, err := filepath.Rel(repoRoot, absDir)
+			if err != nil {
+				return nil, err
+			}
+
+			err = m.checkoutPathIfRequired(repoRoot, relDir)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		return &ManifestModule{
 			Key:    key,
 			Source: source,
@@ -313,6 +344,197 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	return manifestModule, nil
+}
+
+// checkoutPathIfRequired checks if the given directories are in the sparse-checkout file list and adds them if not.
+func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) error {
+	// Lock the git repo root so we don't have multiple calls trying to read and update the sparse-checkout file list.
+	unlock := m.sync.Lock(repoRoot)
+	defer unlock()
+
+	// Get the list of sparse checkout directories (and assume sparse checkout is enabled if this succeeds)
+	m.logger.Debug().Msgf("getting sparse checkout directories for path %s", repoRoot)
+	existingDirs, err := getSparseCheckoutDirs(repoRoot)
+	if err != nil {
+		// If the error indicates that sparse checkout is not enabled, just return nil
+		if err.Error() == "sparse-checkout not enabled" {
+			m.logger.Debug().Msgf("sparse-checkout not enabled for path %s", repoRoot)
+			return nil
+		}
+		return err
+	}
+
+	mu := &sync.Mutex{}
+
+	return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, []string{dirs}, mu, m.logger, 0)
+}
+
+func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
+	var newDirs []string
+
+	// Sort the existing directories and dirs to be added by length
+	sort.Slice(existingDirs, func(i, j int) bool {
+		return len(existingDirs[i]) < len(existingDirs[j])
+	})
+	sort.Slice(dirs, func(i, j int) bool {
+		return len(dirs[i]) < len(dirs[j])
+	})
+
+	for _, dir := range dirs {
+		if isCoveredByExistingDirs(existingDirs, dir) {
+			continue
+		}
+
+		existingDirs = append(existingDirs, dir)
+		newDirs = append(newDirs, dir)
+	}
+	if len(newDirs) == 0 {
+		return nil
+	}
+
+	logger.Debug().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
+	mu.Lock()
+	err := setSparseCheckoutDirs(repoRoot, existingDirs)
+	mu.Unlock()
+	if err != nil {
+		return err
+	}
+
+	if depth >= maxSparseCheckoutDepth {
+		return nil
+	}
+
+	var additionalDirs []string
+	for _, dir := range newDirs {
+		symlinkedDirs, err := ResolveSymLinkedDirs(repoRoot, dir)
+		if err != nil {
+			return err
+		}
+
+		for _, symlinkedDir := range symlinkedDirs {
+			if !isCoveredByExistingDirs(existingDirs, symlinkedDir) {
+				additionalDirs = append(additionalDirs, symlinkedDir)
+			}
+		}
+	}
+
+	if len(additionalDirs) > 0 {
+		logger.Debug().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", repoRoot, additionalDirs)
+		return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, additionalDirs, mu, logger, depth+1)
+	}
+
+	return nil
+}
+
+func isCoveredByExistingDirs(existingDirs []string, dir string) bool {
+	for _, existingDir := range existingDirs {
+		if dir == existingDir || strings.HasPrefix(dir, existingDir+string(filepath.Separator)) {
+			return true
+		}
+	}
+	return false
+}
+
+// findGitRepoRoot finds the root of the Git repository given a starting path
+func findGitRepoRoot(startPath string) (string, error) {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	cmd.Dir = startPath
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("not a git repository")
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// getSparseCheckoutDirs gets the list of directories currently in sparse-checkout
+func getSparseCheckoutDirs(repoRoot string) ([]string, error) {
+	cmd := exec.Command("git", "sparse-checkout", "list")
+	cmd.Dir = repoRoot
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		stderrStr := strings.TrimSpace(stderr.String())
+		if strings.Contains(stderrStr, "this worktree is not sparse") {
+			return nil, errors.New("sparse-checkout not enabled")
+		}
+
+		return nil, fmt.Errorf("error getting sparse-checkout list: %w", err)
+	}
+
+	output := strings.TrimSpace(stdout.String())
+	if output == "" {
+		return nil, nil
+	}
+
+	return strings.Split(output, "\n"), nil
+}
+
+// setSparseCheckoutDirs sets the sparse-checkout list to include the given directories
+func setSparseCheckoutDirs(repoRoot string, dirs []string) error {
+	cmd := exec.Command("git", "sparse-checkout", "set")
+	cmd.Dir = repoRoot
+	cmd.Args = append(cmd.Args, dirs...)
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error setting sparse-checkout list: %w", err)
+	}
+
+	return nil
+}
+
+// ResolveSymLinkedDirs traverses the directory to find symlinks and resolve their destinations
+func ResolveSymLinkedDirs(repoRoot, dir string) ([]string, error) {
+	dirsToInclude := make(map[string]struct{})
+	basePath := path.Join(repoRoot, dir)
+
+	err := filepath.Walk(basePath, func(currentPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("error walking the path: %w", err)
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			resolvedPath, err := resolveSymlink(currentPath)
+			if err != nil {
+				return fmt.Errorf("error resolving symlink: %w", err)
+			}
+
+			// Ensure the resolved path is within the repoRoot
+			if !strings.HasPrefix(resolvedPath, repoRoot) {
+				return nil
+			}
+
+			resolvedDir := filepath.Dir(resolvedPath)
+
+			resolvedRelDir, err := filepath.Rel(repoRoot, resolvedDir)
+			if err != nil {
+				return fmt.Errorf("error getting relative path: %w", err)
+			}
+
+			// Skip if it's already included or within the original directory
+			if _, alreadyIncluded := dirsToInclude[resolvedRelDir]; alreadyIncluded || strings.HasPrefix(resolvedRelDir, dir) {
+				return nil
+			}
+
+			dirsToInclude[resolvedRelDir] = struct{}{}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	dirs := make([]string, 0, len(dirsToInclude))
+	for d := range dirsToInclude {
+		dirs = append(dirs, d)
+	}
+
+	return dirs, nil
 }
 
 func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, error) {
@@ -609,6 +831,20 @@ func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapRes
 	}
 
 	return result, nil
+}
+
+// resolveSymlink resolves symlinks even if the target does not exist
+func resolveSymlink(path string) (string, error) {
+	link, err := os.Readlink(path)
+	if err != nil {
+		return "", err
+	}
+
+	if filepath.IsAbs(link) {
+		return link, nil
+	}
+
+	return filepath.Join(filepath.Dir(path), link), nil
 }
 
 func getProcessCount() int {

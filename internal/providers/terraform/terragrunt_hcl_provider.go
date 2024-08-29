@@ -564,7 +564,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
-		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig)
+		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig, p.logger)
 
 		if err != nil {
 			info.error = err
@@ -644,7 +644,7 @@ func splitModuleSubDir(moduleSource string) (string, string, error) {
 }
 
 // downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
-func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (string, error) {
+func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig, logger zerolog.Logger) (string, error) {
 	_, modAddr, err := splitModuleSubDir(sourceURL)
 	if err != nil {
 		return "", err
@@ -689,9 +689,33 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		}
 	}
 
+	if modAddr != "" && isGitDir(dir) {
+		symlinkedDirs, err := modules.ResolveSymLinkedDirs(dir, modAddr)
+		if err != nil {
+			return "", err
+		}
+
+		if len(symlinkedDirs) > 0 {
+			mu := &sync.Mutex{}
+			logger.Debug().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", dir, symlinkedDirs)
+			// Using a depth of 1 here since the submodule directory is already downloaded, so only need
+			// to add the symlinked directories to the sparse-checkout.
+			err := modules.RecursivelyAddDirsToSparseCheckout(dir, []string{modAddr}, symlinkedDirs, mu, logger, 1)
+			if err != nil {
+				return "", err
+			}
+		}
+	}
+
 	terragruntDownloadedDirs.Store(dir, true)
 
 	return source.WorkingDir, nil
+}
+
+// isGitDir checks if the directory is a git directory
+func isGitDir(dir string) bool {
+	_, err := os.Stat(filepath.Join(dir, ".git"))
+	return err == nil
 }
 
 func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) bool {
