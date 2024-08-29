@@ -34,7 +34,7 @@ spec:
     oidcIssuerEnabled: true
     identity:
       - type: SystemAssigned
-    location: us-east
+    location: eastus
     resourceGroupName: example-rg
     vnetSubnetIDRef:
       name: example-sub

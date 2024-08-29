@@ -48,7 +48,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) par
 		if registryItem.NoPrice {
 			logging.Logger.Debug().Msgf("Skipping resource: %s, Type: %s (No price)", d.Address, d.Type)
 			resource := &schema.Resource{
-				Name:         d.Type + "." + d.Address,
+				Name: 	      d.Address,
 				IsSkipped:    true,
 				NoPrice:      true,
 				SkipMessage:  "Free resource.",
@@ -140,7 +140,7 @@ func (p *Parser) parseTemplate(usage map[string]*schema.UsageData, parsed gjson.
 	resData := parseFunc(parsed)
 
 	for _, d := range resData {
-		logging.Logger.Debug().Msgf("Parsing resource: %s, Type: %s, Address: %s", d.Get("metadata.name").String(), d.Type, d.Address)
+		logging.Logger.Debug().Msgf("Parsing resource: %s, Type: %s, Address: %s", d.Get("kind").String(), d.Type, d.Address)
 		var usageData *schema.UsageData
 		if ud := usage[d.Address]; ud != nil {
 			usageData = ud
@@ -176,8 +176,11 @@ func (p *Parser) getMetaData(parsed gjson.Result) (string, string, string, strin
 	name := parsed.Get("metadata.name").String()
 	provider := getProvider(apiVersion)
 	labels := getLabels(parsed)
-	address := fmt.Sprintf("%s.%s.%s", provider, kind, name)
-	resourceType := apiVersion
+	address := provider + "." + kind
+	if name != "" {
+		address += "." + name
+	}
+	resourceType := provider + "/" + kind
 	return name, resourceType, provider, address, labels
 }
 

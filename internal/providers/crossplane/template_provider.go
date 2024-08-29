@@ -66,44 +66,42 @@ func (p *TemplateProvider) RelativePath() string {
 
 // LoadResources loads and parses the resources from the Crossplane template.
 func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-	data, err := readCrossPlaneTemplate(p.Path)
-	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading CrossPlane template file")
-	}
+    data, err := readCrossPlaneTemplate(p.Path)
+    if (err != nil) {
+        return []*schema.Project{}, errors.Wrap(err, "Error reading CrossPlane template file")
+    }
 
-	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
-	metadata.Type = p.Type()
-	p.AddMetadata(metadata)
-	name := p.ctx.ProjectConfig.Name
-	if name == "" {
-		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
-	}
+    metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+    metadata.Type = p.Type()
+    p.AddMetadata(metadata)
+    name := p.ctx.ProjectConfig.Name
+    if name == "" {
+        name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+    }
 
-	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx, p.includePastResources)
+    project := schema.NewProject(name, metadata)
+    parser := NewParser(p.ctx, p.includePastResources)
 
-	// Convert usage to the expected map[string]*schema.UsageData
-	usageData := make(map[string]*schema.UsageData)
-	for k, v := range usage.Data() {
-		usageData[k] = v
-	}
+    // Convert usage to the expected map[string]*schema.UsageData
+    usageData := make(map[string]*schema.UsageData)
+    for k, v := range usage.Data() {
+        usageData[k] = v
+    }
 
-	parsedResources, err := parser.parseTemplates(data, usageData)
-	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing CrossPlane template file")
-	}
+    parsedResources, err := parser.parseTemplates(data, usageData)
+    if err != nil {
+        return []*schema.Project{project}, errors.Wrap(err, "Error parsing CrossPlane template file")
+    }
 
-	// Convert parsedResources to []*schema.Resource
-	var resources []*schema.Resource
-	for _, pr := range parsedResources {
-		if pr.PartialResource != nil {
-			resources = append(resources, pr.PartialResource.Resource)
-		}
-	}
+    // Instead of converting parsedResources to []*schema.Resource,
+    // directly append them as PartialResources to the project.
+    for _, pr := range parsedResources {
+        if pr.PartialResource != nil {
+            project.PartialResources = append(project.PartialResources, pr.PartialResource)
+        }
+    }
 
-	project.Resources = resources
-
-	return []*schema.Project{project}, nil
+    return []*schema.Project{project}, nil
 }
 
 // IsCrossPlaneTemplateProvider checks if the provided file is a Crossplane template.

@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/logging"
@@ -9,17 +10,16 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// GetAzureRMKubernetesClusterRegistryItem ...
-func GetAzureRMKubernetesClusterRegistryItem() *schema.RegistryItem {
+// getKubernetesClusterRegistryItem ...
+func getKubernetesClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "containerservice.azure.upbound.io/v1beta1",
-		CoreRFunc: NewAzureRMKubernetesCluster,
+		Name:  "containerservice.azure.upbound.io/KubernetesCluster",
+		CoreRFunc: NewKubernetesCluster,
 	}
 }
 
-// NewAzureRMKubernetesCluster ...
 // Reference: https://marketplace.upbound.io/providers/upbound/provider-azure-containerservice/v1.5.0
-func NewAzureRMKubernetesCluster(d *schema.ResourceData) schema.CoreResource {
+func NewKubernetesCluster(d *schema.ResourceData) schema.CoreResource {
 	forProvider := d.Get("forProvider")
 	logging.Logger.Debug().Msgf("Parsing forProvider: %s", forProvider.Raw)
 
@@ -64,7 +64,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData) schema.CoreResource {
 		HttpApplicationRoutingEnabled: forProvider.Get("httpApplicationRoutingEnabled").Bool(),
 	}
 
-	// Additional parsing for specific fields (if needed)
+	logging.Logger.Debug().Msgf("Created KubernetesCluster: %s", fmt.Sprintf("%v", r))
 
 	return r
 }

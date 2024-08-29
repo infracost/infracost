@@ -8,11 +8,11 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// GetAzureRMKubernetesClusterNodePoolRegistryItem ...
-func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
+// getKubernetesClusterNodePoolRegistryItem ...
+func getKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:      "containerservice.azure.upbound.io/v1beta1",
-		CoreRFunc: NewAzureRMKubernetesClusterNodePool,
+		Name:      "containerservice.azure.upbound.io/KubernetesClusterNodePool",
+		CoreRFunc: NewKubernetesClusterNodePool,
 		ReferenceAttributes: []string{
 			"kubernetesClusterId",
 		},
@@ -22,8 +22,8 @@ func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-// NewAzureRMKubernetesClusterNodePool ...
-func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
+// NewKubernetesClusterNodePool ...
+func NewKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
 	nodeCount := int64(1)
 	if d.Get("forProvider.nodeCount").Type != gjson.Null {
 		nodeCount = d.Get("forProvider.nodeCount").Int()
