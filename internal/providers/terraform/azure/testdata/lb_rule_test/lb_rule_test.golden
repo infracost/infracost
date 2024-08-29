@@ -1,9 +1,6 @@
 
  Name                                          Monthly Qty  Unit              Monthly Cost   
                                                                                              
- azurerm_lb_rule.rules_withDefaultSku                                                        
- └─ Rule usage                                         730  hours                    $7.30   
-                                                                                             
  azurerm_lb_rule.rules_withStandardSku                                                       
  └─ Rule usage                                         730  hours                    $7.30   
                                                                                              
@@ -16,23 +13,20 @@
  azurerm_public_ip.example_withStandardSku                                                   
  └─ IP address (static, regional)                      730  hours                    $3.65   
                                                                                              
- azurerm_lb.example_withDefaultSku                                                           
- └─ Data processed                          Monthly cost depends on usage: $0.005 per GB     
-                                                                                             
  azurerm_lb.example_withStandardSku                                                          
  └─ Data processed                          Monthly cost depends on usage: $0.005 per GB     
                                                                                              
- OVERALL TOTAL                                                                     $25.55 
+ OVERALL TOTAL                                                                     $18.25 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
 10 cloud resources were detected:
-∙ 7 were estimated
-∙ 3 were free
+∙ 5 were estimated
+∙ 5 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃           $26 ┃           - ┃        $26 ┃
+┃ main                                               ┃           $18 ┃           - ┃        $18 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
