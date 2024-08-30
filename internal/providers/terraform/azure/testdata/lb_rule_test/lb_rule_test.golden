@@ -5,18 +5,18 @@
  └─ Rule usage                                         730  hours                    $7.30   
                                                                                              
  azurerm_public_ip.example_withBasicSku                                                      
- └─ IP address (static, regional)                      730  hours                    $2.63   
+ └─ IP address (static, regional)                      730  hours                    $3.65   
                                                                                              
  azurerm_public_ip.example_withDefaultSku                                                    
- └─ IP address (static, regional)                      730  hours                    $2.63   
+ └─ IP address (static, regional)                      730  hours                    $3.65   
                                                                                              
  azurerm_public_ip.example_withStandardSku                                                   
- └─ IP address (static, regional)                      730  hours                    $2.63   
+ └─ IP address (static, regional)                      730  hours                    $3.65   
                                                                                              
  azurerm_lb.example_withStandardSku                                                          
  └─ Data processed                          Monthly cost depends on usage: $0.005 per GB     
                                                                                              
- OVERALL TOTAL                                                                     $15.18 
+ OVERALL TOTAL                                                                     $18.25 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -28,5 +28,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃           $15 ┃           - ┃        $15 ┃
+┃ main                                               ┃           $18 ┃           - ┃        $18 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

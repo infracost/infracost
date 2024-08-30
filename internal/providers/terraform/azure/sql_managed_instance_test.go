@@ -12,5 +12,9 @@ func TestSQLManagedInstance(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "sql_managed_instance_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	// This resource is removed from the latest provider
+	opts.IgnoreCLI = true
+
+	tftest.GoldenFileResourceTestsWithOpts(t, "sql_managed_instance_test", opts)
 }

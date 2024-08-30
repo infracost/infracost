@@ -13,5 +13,7 @@ func TestMySQLServer_usage(t *testing.T) {
 
 	opts := tftest.DefaultGoldenFileOptions()
 	opts.CaptureLogs = true
+	// ignore CLI - this has been removed from the latest provider
+	opts.IgnoreCLI = true
 	tftest.GoldenFileResourceTestsWithOpts(t, "mysql_server_test", opts)
 }
