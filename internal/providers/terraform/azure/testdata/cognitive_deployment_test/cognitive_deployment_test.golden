@@ -315,6 +315,11 @@
  azurerm_cognitive_deployment.eastus_without_usage["whisper"]                                                                                  
  └─ Text to speech (whisper)                                                         Monthly cost depends on usage: $0.36 per hours            
                                                                                                                                                
+ azurerm_cognitive_deployment.free_tier                                                                                                        
+ ├─ Language input (gpt-4)                                                           Monthly cost depends on usage: $0.03 per 1K tokens        
+ ├─ Language output (gpt-4)                                                          Monthly cost depends on usage: $0.06 per 1K tokens        
+ └─ Code interpreter sessions (gpt-4)                                                Monthly cost depends on usage: $0.03 per sessions         
+                                                                                                                                               
  azurerm_cognitive_deployment.swedencentral_without_usage["dall-e-3"]                                                                          
  ├─ Standard 1024x1024 images (dall-e-3)                                             Monthly cost depends on usage: $4.00 per 100 images       
  ├─ Standard 1024x1792 images (dall-e-3)                                             Monthly cost depends on usage: $8.00 per 100 images       
@@ -377,8 +382,8 @@
 
 ──────────────────────────────────
 116 cloud resources were detected:
-∙ 108 were estimated
-∙ 7 were free
+∙ 109 were estimated
+∙ 6 were free
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_cognitive_deployment
 

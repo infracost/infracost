@@ -56,7 +56,6 @@ resource "azurerm_machine_learning_compute_instance" "example" {
   for_each = toset(local.vm_sizes)
 
   name                          = "example-instance"
-  location                      = azurerm_resource_group.example.location
   machine_learning_workspace_id = azurerm_machine_learning_workspace.example.id
   virtual_machine_size          = each.value
 
@@ -64,7 +63,6 @@ resource "azurerm_machine_learning_compute_instance" "example" {
 
 resource "azurerm_machine_learning_compute_instance" "with_monthly_hrs" {
   name                          = "with-monthly-hrs"
-  location                      = azurerm_resource_group.example.location
   machine_learning_workspace_id = azurerm_machine_learning_workspace.example.id
   virtual_machine_size          = "Standard_D2s_v3"
 }

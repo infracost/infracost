@@ -33,12 +33,6 @@ resource "azurerm_synapse_workspace" "example" {
   sql_administrator_login_password     = "H@Sh1CoR3!"
   managed_virtual_network_enabled      = false
 
-  aad_admin {
-    login     = "AzureAD Admin"
-    object_id = "00000000-0000-0000-0000-000000000000"
-    tenant_id = "00000000-0000-0000-0000-000000000000"
-  }
-
   identity {
     type = "SystemAssigned"
   }
@@ -53,6 +47,7 @@ resource "azurerm_synapse_sql_pool" "default" {
   synapse_workspace_id = azurerm_synapse_workspace.example.id
   sku_name             = "DW200c"
   create_mode          = "Default"
+  storage_account_type = "GRS"
 }
 
 resource "azurerm_synapse_sql_pool" "storage" {
@@ -60,6 +55,7 @@ resource "azurerm_synapse_sql_pool" "storage" {
   synapse_workspace_id = azurerm_synapse_workspace.example.id
   sku_name             = "DW200c"
   create_mode          = "Default"
+  storage_account_type = "GRS"
 }
 
 resource "azurerm_synapse_sql_pool" "no_backup" {
@@ -67,4 +63,5 @@ resource "azurerm_synapse_sql_pool" "no_backup" {
   synapse_workspace_id = azurerm_synapse_workspace.example.id
   sku_name             = "DW200c"
   create_mode          = "Default"
+  storage_account_type = "GRS"
 }

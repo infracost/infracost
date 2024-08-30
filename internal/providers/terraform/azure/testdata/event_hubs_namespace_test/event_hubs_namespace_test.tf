@@ -43,8 +43,8 @@ resource "azurerm_eventhub_namespace" "premium" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "Premium"
-  zone_redundant      = true
-  capacity            = 8
+
+  capacity = 8
 }
 
 resource "azurerm_eventhub_namespace" "premiumWithoutUsage" {
@@ -52,7 +52,7 @@ resource "azurerm_eventhub_namespace" "premiumWithoutUsage" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   sku                 = "Premium"
-  zone_redundant      = true
+
 }
 
 resource "azurerm_eventhub_namespace" "dedicated" {

@@ -25,6 +25,7 @@ resource "azurerm_public_ip" "example_withDefaultSku" {
   location            = "West US"
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_lb" "example_withDefaultSku" {
@@ -53,6 +54,7 @@ resource "azurerm_public_ip" "example_withBasicSku" {
   location            = "West US"
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
+  sku                 = "Basic"
 }
 
 resource "azurerm_lb" "example_withBasicSku" {
@@ -82,6 +84,7 @@ resource "azurerm_public_ip" "example_withStandardSku" {
   location            = "West US"
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
 resource "azurerm_lb" "example_withStandardSku" {
