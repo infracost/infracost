@@ -57,11 +57,11 @@ resource "azurerm_cosmosdb_account" "continuous_backup" {
 }
 
 resource "azurerm_cosmosdb_account" "multi-master_backup2copies" {
-  name                            = "tfex-cosmosdb-account"
-  resource_group_name             = azurerm_resource_group.example.name
-  location                        = azurerm_resource_group.example.location
-  offer_type                      = "Standard"
-  enable_multiple_write_locations = true
+  name                = "tfex-cosmosdb-account"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  offer_type          = "Standard"
+
 
   consistency_policy {
     consistency_level = "Strong"
@@ -95,7 +95,7 @@ resource "azurerm_cosmosdb_sql_container" "non-usage_autoscale" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
   database_name       = azurerm_cosmosdb_sql_database.example.name
-  partition_key_path  = "/definition/id"
+  partition_key_paths = ["/definition/id"]
   autoscale_settings {
     max_throughput = 4000
   }
@@ -106,7 +106,7 @@ resource "azurerm_cosmosdb_sql_container" "autoscale" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   database_name       = azurerm_cosmosdb_sql_database.example.name
-  partition_key_path  = "/definition/id"
+  partition_key_paths = ["/definition/id"]
   autoscale_settings {
     max_throughput = 6000
   }
@@ -117,7 +117,7 @@ resource "azurerm_cosmosdb_sql_container" "provisioned" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.continuous_backup.name
   database_name       = azurerm_cosmosdb_sql_database.example.name
-  partition_key_path  = "/definition/id"
+  partition_key_paths = ["/definition/id"]
   throughput          = 500
 }
 
@@ -126,7 +126,7 @@ resource "azurerm_cosmosdb_sql_container" "mutli-master_backup2copies" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
   database_name       = azurerm_cosmosdb_sql_database.example.name
-  partition_key_path  = "/definition/id"
+  partition_key_paths = ["/definition/id"]
   throughput          = 1000
 }
 
@@ -135,5 +135,5 @@ resource "azurerm_cosmosdb_sql_container" "serverless" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
   database_name       = azurerm_cosmosdb_sql_database.example.name
-  partition_key_path  = "/definition/id"
+  partition_key_paths = ["/definition/id"]
 }

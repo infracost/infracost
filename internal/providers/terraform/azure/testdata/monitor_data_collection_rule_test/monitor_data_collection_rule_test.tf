@@ -38,6 +38,7 @@ resource "azurerm_monitor_data_collection_rule" "example" {
 
   data_sources {
     syslog {
+      streams        = ["Microsoft-Syslog"]
       facility_names = ["*"]
       log_levels     = ["*"]
       name           = "test-datasource-syslog"

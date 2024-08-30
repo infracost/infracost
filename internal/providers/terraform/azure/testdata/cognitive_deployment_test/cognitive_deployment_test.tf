@@ -96,8 +96,8 @@ resource "azurerm_cognitive_deployment" "eastus_without_usage" {
     version = each.value.version
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -113,8 +113,8 @@ resource "azurerm_cognitive_deployment" "eastus2_without_usage" {
     version = each.value.version
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -130,8 +130,8 @@ resource "azurerm_cognitive_deployment" "swedencentral_without_usage" {
     version = each.value.version
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -147,8 +147,8 @@ resource "azurerm_cognitive_deployment" "eastus_with_usage" {
     version = each.value.version
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -164,8 +164,8 @@ resource "azurerm_cognitive_deployment" "eastus2_with_usage" {
     version = each.value.version
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -181,8 +181,8 @@ resource "azurerm_cognitive_deployment" "swedencentral_with_usage" {
     version = each.value.version
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -195,9 +195,8 @@ resource "azurerm_cognitive_deployment" "free_tier" {
     name   = "gpt-4"
   }
 
-  scale {
-    type = "Standard"
-    tier = "Free"
+  sku {
+    name = "Standard"
   }
 }
 
@@ -210,7 +209,7 @@ resource "azurerm_cognitive_deployment" "unsupported" {
     name   = "ada"
   }
 
-  scale {
-    type = "Standard"
+  sku {
+    name = "Standard"
   }
 }

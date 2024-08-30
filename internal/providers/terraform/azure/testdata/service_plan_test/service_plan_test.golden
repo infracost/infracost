@@ -466,9 +466,6 @@
  azurerm_service_plan.example["Windows.I2.1"]                                                  
  └─ Instance usage (I2)                                             730  hours       $438.00   
                                                                                                
- azurerm_service_plan.example["Windows.P0v3.3"]                                                
- └─ Instance usage (P0v3)                                         2,190  hours       $438.00   
-                                                                                               
  azurerm_service_plan.example["Windows.P1v2.3"]                                                
  └─ Instance usage (P1v2)                                         2,190  hours       $438.00   
                                                                                                
@@ -483,9 +480,6 @@
                                                                                                
  azurerm_service_plan.example["WindowsContainer.I2.1"]                                         
  └─ Instance usage (I2)                                             730  hours       $438.00   
-                                                                                               
- azurerm_service_plan.example["WindowsContainer.P0v3.3"]                                       
- └─ Instance usage (P0v3)                                         2,190  hours       $438.00   
                                                                                                
  azurerm_service_plan.example["WindowsContainer.P1v2.3"]                                       
  └─ Instance usage (P1v2)                                         2,190  hours       $438.00   
@@ -505,6 +499,12 @@
  azurerm_service_plan.example["WindowsContainer.I1v2.1"]                                       
  └─ Instance usage (I1v2)                                           730  hours       $399.31   
                                                                                                
+ azurerm_service_plan.example["Windows.P0v3.3"]                                                
+ └─ Instance usage (P0v3)                                         2,190  hours       $344.93   
+                                                                                               
+ azurerm_service_plan.example["WindowsContainer.P0v3.3"]                                       
+ └─ Instance usage (P0v3)                                         2,190  hours       $344.93   
+                                                                                               
  azurerm_service_plan.example["Linux.P1v3.3"]                                                  
  └─ Instance usage (P1v3)                                         2,190  hours       $339.45   
                                                                                                
@@ -520,9 +520,6 @@
  azurerm_service_plan.example["Linux.P3v2.1"]                                                  
  └─ Instance usage (P3v2)                                           730  hours       $294.19   
                                                                                                
- azurerm_service_plan.example["Windows.P0v3.2"]                                                
- └─ Instance usage (P0v3)                                         1,460  hours       $292.00   
-                                                                                               
  azurerm_service_plan.example["Windows.P1v2.2"]                                                
  └─ Instance usage (P1v2)                                         1,460  hours       $292.00   
                                                                                                
@@ -534,9 +531,6 @@
                                                                                                
  azurerm_service_plan.example["Windows.S3.1"]                                                  
  └─ Instance usage (S3)                                             730  hours       $292.00   
-                                                                                               
- azurerm_service_plan.example["WindowsContainer.P0v3.2"]                                       
- └─ Instance usage (P0v3)                                         1,460  hours       $292.00   
                                                                                                
  azurerm_service_plan.example["WindowsContainer.P1v2.2"]                                       
  └─ Instance usage (P1v2)                                         1,460  hours       $292.00   
@@ -571,8 +565,14 @@
  azurerm_service_plan.example["WindowsContainer.P1mv3.1"]                                      
  └─ Instance usage (P1mv3)                                          730  hours       $252.58   
                                                                                                
+ azurerm_service_plan.example["Windows.P0v3.2"]                                                
+ └─ Instance usage (P0v3)                                         1,460  hours       $229.95   
+                                                                                               
  azurerm_service_plan.example["Windows.P1v3.1"]                                                
  └─ Instance usage (P1v3)                                           730  hours       $229.95   
+                                                                                               
+ azurerm_service_plan.example["WindowsContainer.P0v3.2"]                                       
+ └─ Instance usage (P0v3)                                         1,460  hours       $229.95   
                                                                                                
  azurerm_service_plan.example["WindowsContainer.P1v3.1"]                                       
  └─ Instance usage (P1v3)                                           730  hours       $229.95   
@@ -582,9 +582,6 @@
                                                                                                
  azurerm_service_plan.example["Linux.P2v3.1"]                                                  
  └─ Instance usage (P2v3)                                           730  hours       $226.30   
-                                                                                               
- azurerm_service_plan.example["Linux.P0v3.3"]                                                  
- └─ Instance usage (P0v3)                                         2,190  hours       $221.19   
                                                                                                
  azurerm_service_plan.example["Linux.P1v2.3"]                                                  
  └─ Instance usage (P1v2)                                         2,190  hours       $221.19   
@@ -619,14 +616,14 @@
  azurerm_service_plan.example["Linux.S1.3"]                                                    
  └─ Instance usage (S1)                                           2,190  hours       $208.05   
                                                                                                
+ azurerm_service_plan.example["Linux.P0v3.3"]                                                  
+ └─ Instance usage (P0v3)                                         2,190  hours       $169.73   
+                                                                                               
  azurerm_service_plan.example["Windows.B1.3"]                                                  
  └─ Instance usage (B1)                                           2,190  hours       $164.25   
                                                                                                
  azurerm_service_plan.example["WindowsContainer.B1.3"]                                         
  └─ Instance usage (B1)                                           2,190  hours       $164.25   
-                                                                                               
- azurerm_service_plan.example["Linux.P0v3.2"]                                                  
- └─ Instance usage (P0v3)                                         1,460  hours       $147.46   
                                                                                                
  azurerm_service_plan.example["Linux.P1v2.2"]                                                  
  └─ Instance usage (P1v2)                                         1,460  hours       $147.46   
@@ -637,9 +634,6 @@
  azurerm_service_plan.example["Linux.B3.3"]                                                    
  └─ Instance usage (B3)                                           2,190  hours       $146.73   
                                                                                                
- azurerm_service_plan.example["Windows.P0v3.1"]                                                
- └─ Instance usage (P0v3)                                           730  hours       $146.00   
-                                                                                               
  azurerm_service_plan.example["Windows.P1v2.1"]                                                
  └─ Instance usage (P1v2)                                           730  hours       $146.00   
                                                                                                
@@ -648,9 +642,6 @@
                                                                                                
  azurerm_service_plan.example["Windows.S2.1"]                                                  
  └─ Instance usage (S2)                                             730  hours       $146.00   
-                                                                                               
- azurerm_service_plan.example["WindowsContainer.P0v3.1"]                                       
- └─ Instance usage (P0v3)                                           730  hours       $146.00   
                                                                                                
  azurerm_service_plan.example["WindowsContainer.P1v2.1"]                                       
  └─ Instance usage (P1v2)                                           730  hours       $146.00   
@@ -669,6 +660,15 @@
                                                                                                
  azurerm_service_plan.example["Linux.P1mv3.1"]                                                 
  └─ Instance usage (P1mv3)                                          730  hours       $135.78   
+                                                                                               
+ azurerm_service_plan.example["Windows.P0v3.1"]                                                
+ └─ Instance usage (P0v3)                                           730  hours       $114.98   
+                                                                                               
+ azurerm_service_plan.example["WindowsContainer.P0v3.1"]                                       
+ └─ Instance usage (P0v3)                                           730  hours       $114.98   
+                                                                                               
+ azurerm_service_plan.example["Linux.P0v3.2"]                                                  
+ └─ Instance usage (P0v3)                                         1,460  hours       $113.15   
                                                                                                
  azurerm_service_plan.example["Linux.P1v3.1"]                                                  
  └─ Instance usage (P1v3)                                           730  hours       $113.15   
@@ -691,9 +691,6 @@
  azurerm_service_plan.example["Linux.B2.3"]                                                    
  └─ Instance usage (B2)                                           2,190  hours        $74.46   
                                                                                                
- azurerm_service_plan.example["Linux.P0v3.1"]                                                  
- └─ Instance usage (P0v3)                                           730  hours        $73.73   
-                                                                                               
  azurerm_service_plan.example["Linux.P1v2.1"]                                                  
  └─ Instance usage (P1v2)                                           730  hours        $73.73   
                                                                                                
@@ -705,6 +702,9 @@
                                                                                                
  azurerm_service_plan.example["Linux.S1.1"]                                                    
  └─ Instance usage (S1)                                             730  hours        $69.35   
+                                                                                               
+ azurerm_service_plan.example["Linux.P0v3.1"]                                                  
+ └─ Instance usage (P0v3)                                           730  hours        $56.58   
                                                                                                
  azurerm_service_plan.example["Windows.B1.1"]                                                  
  └─ Instance usage (B1)                                             730  hours        $54.75   
@@ -811,7 +811,7 @@
  azurerm_service_plan.example["WindowsContainer.F1.3"]                                         
  └─ Instance usage (F1)                                           2,190  hours         $0.00   
                                                                                                
- OVERALL TOTAL                                                                  $611,320.98 
+ OVERALL TOTAL                                                                  $610,845.75 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -823,5 +823,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃      $611,321 ┃           - ┃   $611,321 ┃
+┃ main                                               ┃      $610,846 ┃           - ┃   $610,846 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -118,9 +118,9 @@
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-22 cloud resources were detected:
+21 cloud resources were detected:
 ∙ 12 were estimated
-∙ 6 were free
+∙ 5 were free
 ∙ 4 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 4 x azurerm_log_analytics_workspace
 

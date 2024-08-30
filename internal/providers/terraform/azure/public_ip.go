@@ -21,14 +21,13 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	region := d.Region
 
 	var meterName string
-	sku := "Basic"
+	sku := "Standard" // default sku is Standard
+	skuTier := "Regional"
 	allocationMethod := d.Get("allocation_method").String()
 
 	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()
 	}
-
-	skuTier := "regional"
 
 	switch sku {
 	case "Basic":
@@ -38,8 +37,8 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		if skuTierVal != "" {
 			skuTier = skuTierVal
 		}
-		if skuTier == "global" {
-			sku = "Global"
+		if skuTier == "Global" {
+			sku = "Standard" // When sku_tier is Global, sku is Standard
 			meterName = "Global IPv4 " + allocationMethod + " Public IP"
 		} else {
 			meterName = "Standard IPv4 " + allocationMethod + " Public IP"
