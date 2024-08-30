@@ -71,7 +71,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetAzureRMLoadBalancerRuleRegistryItem(),
 	// GetAzureRMLoadBalancerOutboundRuleRegistryItem(),
 	// getLinuxFunctionAppRegistryItem(),
-	// getLinuxVirtualMachineRegistryItem(),
+	getLinuxVirtualMachineRegistryItem(),
 	// getLinuxVirtualMachineScaleSetRegistryItem(),
 	// getLogAnalyticsWorkspaceRegistryItem(),
 	// getManagedDiskRegistryItem(),

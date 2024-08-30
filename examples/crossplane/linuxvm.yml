@@ -11,7 +11,7 @@ spec:
   forProvider:
     computerName: example-linux-vm
     resourceGroupName: example-rg
-    location: us-east
+    location: eastus
     adminUsername: admin
     networkInterfaceIdsRefs:
       name: example-nic

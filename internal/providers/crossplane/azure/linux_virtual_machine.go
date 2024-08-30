@@ -1,42 +1,41 @@
 package azure
 
 import (
-	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/shopspring/decimal"
 )
 
-func linuxVirtualMachineCostComponent(region string, instanceType string) *schema.CostComponent {
-	purchaseOption := "Consumption"
-	purchaseOptionLabel := "pay as you go"
-
-	productNameRe := "/Virtual Machines .* Series$/"
-	if strings.HasPrefix(instanceType, "Basic_") {
-		productNameRe = "/Virtual Machines .* Series Basic$/"
-	}
-
-	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
-			Service:       strPtr("Virtual Machines"),
-			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr("/^(?!.*(Low Priority|Spot)$).*$/i")},
-				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
-				{Key: "productName", ValueRegex: strPtr(productNameRe)},
-			},
-		},
-		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(purchaseOption),
-			Unit:           strPtr("1 Hour"),
+func getLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
+	return &schema.RegistryItem{
+		Name:      "compute.azure.upbound.io/LinuxVirtualMachine",
+		CoreRFunc: NewAzureLinuxVirtualMachine,
+		Notes: []string{
+			"Non-standard images such as RHEL are not supported.",
+			"Low priority, Spot and Reserved instances are not supported.",
 		},
 	}
+}
+func NewAzureLinuxVirtualMachine(d *schema.ResourceData) schema.CoreResource {
+	forProvider := d.Get("forProvider")
+
+	region := lookupRegion(d, []string{})
+
+	r := &azure.LinuxVirtualMachine{
+		Address:         d.Address,
+		Region:          region,
+		Size:            strings.ToLower(forProvider.Get("size").String()),
+		UltraSSDEnabled: forProvider.Get("additionalCapabilities.0.ultraSsdEnabled").Bool(),
+	}
+
+	if len(d.Get("osDisk").Array()) > 0 {
+		storageData := forProvider.Get("osDisk").Array()[0]
+		r.OSDiskData = &azure.ManagedDiskData{
+			DiskType:   storageData.Get("storageAccountType").String(),
+			DiskSizeGB: storageData.Get("diskSizeGb").Int(),
+		}
+	}
+
+	return r
 }
