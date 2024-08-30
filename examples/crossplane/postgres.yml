@@ -1,0 +1,32 @@
+apiVersion: dbforpostgresql.azure.upbound.io/v1beta1
+kind: FlexibleServer
+metadata:
+  name: example-postgres
+spec:
+  forProvider:
+    administratorLogin: admin
+    administratorPasswordSecretRef:
+      key: password
+      name: postgres-secret
+      namespace: crossplane
+    autoGeneratePassword: true
+    backupRetentionDays: 7
+    identity:
+    - type: SystemAssigned
+    location: eastus
+    resourceGroupName: example-rg
+    skuName: GP_Standard_D2s_v3
+    storageTier: "P30"
+    storageMb: 32768
+    version: "16"
+    zone: "1"
+---
+apiVersion: dbforpostgresql.azure.upbound.io/v1beta1
+kind: FlexibleServerDatabase
+metadata:
+  name: cpdatabase
+spec:
+  forProvider:
+    charset: utf8
+    collation: en_US.utf8
+    serverId: example-postgres
