@@ -106,7 +106,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// getVirtualMachineRegistryItem(),
 	// GetAzureRMVirtualNetworkGatewayConnectionRegistryItem(),
 	// GetAzureRMVirtualNetworkGatewayRegistryItem(),
-	// getWindowsVirtualMachineRegistryItem(),
+	getWindowsVirtualMachineRegistryItem(),
 	// getWindowsVirtualMachineScaleSetRegistryItem(),
 	// getVPNGatewayRegistryItem(),
 	// getVPNGatewayConnectionRegistryItem(),

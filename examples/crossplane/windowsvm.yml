@@ -1,0 +1,32 @@
+apiVersion: compute.azure.upbound.io/v1beta1
+kind: WindowsVirtualMachine
+metadata:
+  name: example-windows-vm
+spec:
+  providerConfigRef:
+    name: default
+  forProvider:
+    computerName: example-windows-vm
+    resourceGroupName: example-rg
+    location: eastus
+    licenseType: None
+    adminPasswordSecretRef:
+      key: password
+      name: vm-secret
+      namespace: crossplane
+    adminUsername: admin
+    networkInterfaceIdsRefs:
+      name: example-nic
+    osDisk:
+    - diskSizeGb: 150
+      caching: ReadWrite
+      storageAccountType: Standard_LRS
+    size: Standard_B1s
+    enableAutomaticUpdates: true
+    identity:
+    - type: SystemAssigned
+    sourceImageReference:
+      - offer: WindowsServer
+        publisher: MicrosoftWindowsServer
+        sku: 2016-Datacenter
+        version: latest
