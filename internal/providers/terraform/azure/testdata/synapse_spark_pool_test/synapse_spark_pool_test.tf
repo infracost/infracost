@@ -33,12 +33,6 @@ resource "azurerm_synapse_workspace" "example" {
   sql_administrator_login_password     = "H@Sh1CoR3!"
   managed_virtual_network_enabled      = false
 
-  aad_admin {
-    login     = "AzureAD Admin"
-    object_id = "00000000-0000-0000-0000-000000000000"
-    tenant_id = "00000000-0000-0000-0000-000000000000"
-  }
-
   identity {
     type = "SystemAssigned"
   }
@@ -53,6 +47,7 @@ resource "azurerm_synapse_spark_pool" "default" {
   synapse_workspace_id = azurerm_synapse_workspace.example.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
+  spark_version        = "3.4"
 
   node_count = 3
   auto_pause {
@@ -65,6 +60,7 @@ resource "azurerm_synapse_spark_pool" "autoscale" {
   synapse_workspace_id = azurerm_synapse_workspace.example.id
   node_size_family     = "MemoryOptimized"
   node_size            = "Small"
+  spark_version        = "3.4"
 
   auto_scale {
     min_node_count = 4

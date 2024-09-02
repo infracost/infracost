@@ -12,5 +12,9 @@ func TestMariaDBServer(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "mariadb_server_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	// Ignore the CLI because the resource has been removed from the provider in favour of azurerm_mysql_flexible_server
+	opts.IgnoreCLI = true
+
+	tftest.GoldenFileResourceTestsWithOpts(t, "mariadb_server_test", opts)
 }

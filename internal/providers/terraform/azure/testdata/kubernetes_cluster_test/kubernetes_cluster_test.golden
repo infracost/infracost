@@ -4,7 +4,7 @@
  azurerm_kubernetes_cluster.windows                                                                  
  ├─ Uptime SLA                                                          730  hours         $73.00    
  └─ default_node_pool                                                                                
-    ├─ Instance usage (Windows, pay as you go, Standard_D2_v2)        3,650  hours        $919.80    
+    ├─ Instance usage (Windows, pay as you go, Standard_D2_v2)        3,650  hours        $868.70    
     └─ os_disk                                                                                       
        └─ Storage (S4, LRS)                                               5  months         $7.68    
                                                                                                      
@@ -44,7 +44,7 @@
     └─ os_disk                                                                                       
        └─ Storage (S10, LRS)                                              1  months         $5.89    
                                                                                                      
- OVERALL TOTAL                                                                          $2,835.67 
+ OVERALL TOTAL                                                                          $2,784.57 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -56,5 +56,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $2,835 ┃       $0.50 ┃     $2,836 ┃
+┃ main                                               ┃        $2,784 ┃       $0.50 ┃     $2,785 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

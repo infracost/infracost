@@ -584,6 +584,19 @@ func (t *TreeNode) ParentNode() *TreeNode {
 	return nil
 }
 
+// Parents returns the list of parent nodes of the current node.
+func (t *TreeNode) Parents() []*TreeNode {
+	var parents []*TreeNode
+	parent := t.ParentNode()
+
+	for parent != nil {
+		parents = append(parents, parent)
+		parent = parent.ParentNode()
+	}
+
+	return parents
+}
+
 // UnusedParentVarFiles returns a list of any parent directories that contain var
 // files that have not been used by a project.
 func (t *TreeNode) UnusedParentVarFiles() []*VarFiles {
@@ -962,9 +975,10 @@ type RootPath struct {
 	// TerraformVarFiles are a list of any .tfvars or .tfvars.json files found at the root level.
 	TerraformVarFiles RootPathVarFiles
 
-	HasChildVarFiles bool
-	IsTerragrunt     bool
-	ModuleCalls      []string
+	HasChildVarFiles         bool
+	IsTerragrunt             bool
+	IsParentTerragruntConfig bool
+	ModuleCalls              []string
 }
 
 func (r *RootPath) RelPath() string {
@@ -1146,6 +1160,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 
 	p.findTerragruntDirs(startingPath)
 	p.walkPaths(startingPath, 0, p.maxSearchDepth())
+
 	for _, project := range p.discoveredProjects {
 		if _, ok := p.projectDuplicates[project.path]; ok {
 			p.projectDuplicates[project.path] = true
@@ -1661,6 +1676,7 @@ func (p *ProjectLocator) findTerragruntDirs(fullPath string) {
 	terragruntConfigFiles, err := tgconfig.FindConfigFilesInPath(fullPath, &options.TerragruntOptions{
 		DownloadDir: terragruntDownloadDir,
 	})
+
 	if err != nil {
 		p.logger.Debug().Err(err).Msgf("failed to find terragrunt files in path %s", fullPath)
 	}
@@ -1669,14 +1685,105 @@ func (p *ProjectLocator) findTerragruntDirs(fullPath string) {
 		p.wdContainsTerragrunt = true
 	}
 
-	for _, configFile := range terragruntConfigFiles {
-		if !p.shouldSkipDir(filepath.Dir(configFile)) && !IsParentTerragruntConfig(configFile, terragruntConfigFiles) {
+	for _, project := range p.removeParentTerragruntFiles(fullPath, terragruntConfigFiles) {
+		if !p.shouldSkipDir(filepath.Dir(project)) {
 			p.discoveredProjects = append(p.discoveredProjects, discoveredProject{
-				path:         filepath.Dir(configFile),
+				path:         project,
 				isTerragrunt: true,
 			})
 		}
 	}
+}
+
+// removeParentTerragruntFiles removes any parent Terragrunt config files from
+// the list of discovered Terragrunt configuration files.
+func (p *ProjectLocator) removeParentTerragruntFiles(startingPath string, files []string) []string {
+	var paths []RootPath
+	nameMap := make(map[string]string)
+	for _, file := range files {
+		dir := filepath.Dir(file)
+		nameMap[dir] = filepath.Base(file)
+
+		paths = append(paths, RootPath{
+			DetectedPath: dir,
+			StartingPath: startingPath,
+		})
+	}
+
+	var projects []string
+	root := CreateTreeNode(startingPath, paths, nil, nil)
+
+	// We need to slightly modify the TreeNode behaviour so that it works for this Terragrunt
+	// use case. For this case if there is a detected Terragrunt config file in the root of the
+	// directory we need to set it on the Root node so that we can traverse the tree and mark
+	// all parent nodes as parent Terragrunt config files.
+	var rootChildren []*TreeNode
+	for _, child := range root.Children {
+		if child.Name == "." && child.RootPath != nil {
+			root.RootPath = child.RootPath
+		} else {
+			rootChildren = append(rootChildren, child)
+		}
+	}
+	root.Children = rootChildren
+
+	root.PostOrder(func(t *TreeNode) {
+		if p.shouldSkipDir(filepath.Dir(t.RootPath.DetectedPath)) {
+			return
+		}
+
+		if t.RootPath.IsParentTerragruntConfig {
+			// If the current node is a parent terragrunt config, we can skip processing it.
+			return
+		}
+
+		parent := t.ParentNode()
+		if parent == nil {
+			// no valid parent node so no need to process this child node.
+			return
+		}
+
+		if parent.RootPath != nil && parent.RootPath.IsParentTerragruntConfig {
+			// no need to process this child node as the parent has already been marked as a parent terragrunt config.
+			return
+		}
+
+		filename := nameMap[t.RootPath.DetectedPath]
+		if p.processFile(filepath.Join(t.RootPath.DetectedPath, filename)) {
+			// Mark all parent nodes as parent terragrunt config of the current node.
+			parents := t.Parents()
+			for _, v := range parents {
+				if v != nil && v.RootPath != nil {
+					v.RootPath.IsParentTerragruntConfig = true
+				}
+			}
+		}
+	})
+
+	root.Visit(func(t *TreeNode) {
+		if t.RootPath != nil && !t.RootPath.IsParentTerragruntConfig {
+			projects = append(projects, t.RootPath.DetectedPath)
+		}
+	})
+
+	return projects
+}
+
+func (p *ProjectLocator) processFile(name string) bool {
+	file, err := os.Open(name)
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), "find_in_parent_folders()") {
+			return true
+		}
+	}
+
+	return false
 }
 
 func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
@@ -1717,54 +1824,4 @@ func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
 
 		return false
 	}
-}
-
-// IsParentTerragruntConfig checks if a terragrunt config entry is a parent file that is referenced by another config
-// with a find_in_parent_folders call. The find_in_parent_folders function searches up the directory tree
-// from the file and returns the absolute path to the first terragrunt.hcl. This means if it is found
-// we can treat this file as a child terragrunt.hcl.
-func IsParentTerragruntConfig(parent string, configFiles []string) bool {
-	for _, name := range configFiles {
-		if !isChildDirectory(parent, name) {
-			continue
-		}
-
-		file, err := os.Open(name)
-		if err != nil {
-			continue
-		}
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			// skip any commented out lines
-			if strings.HasPrefix(line, "#") {
-				continue
-			}
-
-			if strings.Contains(line, "find_in_parent_folders()") {
-				file.Close()
-				return true
-			}
-		}
-
-		file.Close()
-	}
-
-	return false
-}
-
-func isChildDirectory(parent, child string) bool {
-	if parent == child {
-		return false
-	}
-
-	parentDir := filepath.Dir(parent)
-	childDir := filepath.Dir(child)
-	p, err := filepath.Rel(parentDir, childDir)
-	if err != nil || strings.Contains(p, "..") {
-		return false
-	}
-
-	return true
 }

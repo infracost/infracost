@@ -29,8 +29,8 @@
  └─ Restored data                                                         3,000  GB                             $450.00   
                                                                                                                           
  azurerm_cosmosdb_mongo_database.mutli-master_backup2copies                                                               
- ├─ Provisioned throughput (provisioned, West US)                            10  RU/s x 100                     $116.80   
- ├─ Provisioned throughput (provisioned, Central US)                         10  RU/s x 100                     $116.80   
+ ├─ Provisioned throughput (provisioned, West US)                            10  RU/s x 100                      $58.40   
+ ├─ Provisioned throughput (provisioned, Central US)                         10  RU/s x 100                      $58.40   
  ├─ Transactional storage (West US)                                       1,000  GB                             $250.00   
  ├─ Transactional storage (Central US)                                    1,000  GB                             $250.00   
  └─ Restored data                                            Monthly cost depends on usage: $0.15 per GB                  
@@ -44,7 +44,7 @@
  ├─ Periodic backup (West US)                                Monthly cost depends on usage: $0.15 per GB                  
  └─ Restored data                                            Monthly cost depends on usage: $0.15 per GB                  
                                                                                                                           
- OVERALL TOTAL                                                                                               $5,155.73 
+ OVERALL TOTAL                                                                                               $5,038.93 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -56,5 +56,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $5,156 ┃           - ┃     $5,156 ┃
+┃ main                                               ┃        $5,039 ┃           - ┃     $5,039 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
