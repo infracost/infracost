@@ -650,15 +650,18 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return "", err
 	}
 
-	// Parse the URL, add the subdir as a param
-	u, err := url.Parse(sourceURL)
-	if err != nil {
-		return "", err
+	// If sparse checkout is enabled add the subdir to the Source URL as a query param
+	// so go-getter only downloads the required directory.
+	if os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true" {
+		u, err := url.Parse(sourceURL)
+		if err != nil {
+			return "", err
+		}
+		q := u.Query()
+		q.Set("subdir", modAddr)
+		u.RawQuery = q.Encode()
+		sourceURL = u.String()
 	}
-	q := u.Query()
-	q.Set("subdir", modAddr)
-	u.RawQuery = q.Encode()
-	sourceURL = u.String()
 
 	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
 	if err != nil {

@@ -647,15 +647,18 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 		return nil, err
 	}
 
-	// Parse the URL, add the subdir as a param
-	u, err := url.Parse(moduleAddr)
-	if err != nil {
-		return nil, err
+	// If sparse checkout is enabled add the subdir to the module URL as a query param
+	// so go-getter only downloads the required directory.
+	if os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true" {
+		u, err := url.Parse(moduleAddr)
+		if err != nil {
+			return nil, err
+		}
+		q := u.Query()
+		q.Set("subdir", submodulePath)
+		u.RawQuery = q.Encode()
+		moduleAddr = u.String()
 	}
-	q := u.Query()
-	q.Set("subdir", submodulePath)
-	u.RawQuery = q.Encode()
-	moduleAddr = u.String()
 
 	dest := m.downloadDest(moduleAddr, "")
 	moduleDownloadDir, err := m.cachePathRel(dest)
