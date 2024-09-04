@@ -271,4 +271,4 @@ replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.202311151145
 
 replace github.com/shurcooL/graphql => github.com/spacelift-io/graphql v1.2.0
 
-replace github.com/hashicorp/go-getter => github.com/infracost/go-getter v0.0.0-20240822113104-39b0696ac026
+replace github.com/hashicorp/go-getter => github.com/infracost/go-getter v0.0.0-20240904124147-19d7e5faed63

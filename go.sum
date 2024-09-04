@@ -813,8 +813,8 @@ github.com/imdario/mergo v0.3.13/go.mod h1:4lJ1jqUDcsbIECGy0RUJAXNIhg+6ocWgb1ALK
 github.com/inconshreveable/mousetrap v1.0.0/go.mod h1:PxqpIevigyE2G7u3NXJIT2ANytuPF1OarO4DADm73n8=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/infracost/go-getter v0.0.0-20240822113104-39b0696ac026 h1:5pKP8qiQhcKrvf61knWyCuTHxgwxQYV9XYYIKFRclyw=
-github.com/infracost/go-getter v0.0.0-20240822113104-39b0696ac026/go.mod h1:W7TalhMmbPmsSMdNjD0ZskARur/9GJ17cfHTRtXV744=
+github.com/infracost/go-getter v0.0.0-20240904124147-19d7e5faed63 h1:EJaOxMKTC3yg+m7rS8OezKPKKP6hbIJIjW/PF6/dDA4=
+github.com/infracost/go-getter v0.0.0-20240904124147-19d7e5faed63/go.mod h1:W7TalhMmbPmsSMdNjD0ZskARur/9GJ17cfHTRtXV744=
 github.com/infracost/terragrunt v0.47.1-0.20240823104233-816ab8a80d32 h1:OUzb9sYmVDj1T/81naN4c1EevgkJHAJVFIbeJUPkFLI=
 github.com/infracost/terragrunt v0.47.1-0.20240823104233-816ab8a80d32/go.mod h1:504J5iD5AjGgP5IwHkUWAcfoqvZIhrR1aEvyxDxX1VA=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
