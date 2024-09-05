@@ -369,10 +369,14 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) erro
 	return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, []string{dirs}, mu, m.logger, 0)
 }
 
+// RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
+// It then checks any symlinks within the directories and adds them to the sparse-checkout file list as well.
 func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
 	var newDirs []string
 
 	// Sort the existing directories and dirs to be added by length
+	// This ensures that parent directories are added before child directories
+	// since they cover the child directories anyway.
 	sort.Slice(existingDirs, func(i, j int) bool {
 		return len(existingDirs[i]) < len(existingDirs[j])
 	})
@@ -426,6 +430,8 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 	return nil
 }
 
+// isCoveredByExistingDirs checks if the given directory is covered by any of the existing directories
+// i.e. if it is a subdirectory of any of the existing directories.
 func isCoveredByExistingDirs(existingDirs []string, dir string) bool {
 	for _, existingDir := range existingDirs {
 		if dir == existingDir || strings.HasPrefix(dir, existingDir+string(filepath.Separator)) {
@@ -477,10 +483,6 @@ func setSparseCheckoutDirs(repoRoot string, dirs []string) error {
 	cmd := exec.Command("git", "sparse-checkout", "set")
 	cmd.Dir = repoRoot
 	cmd.Args = append(cmd.Args, dirs...)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error setting sparse-checkout list: %w", err)
 	}
