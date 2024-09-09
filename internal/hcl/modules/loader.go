@@ -290,7 +290,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 		// If the module is a in a git repo we need to check that it has been checked out.
 		// If it hasn't been checked out then we need to add it to the sparse-checkout file list.
-		m.logger.Debug().Msgf("finding git repo root for path %s", parentPath)
+		m.logger.Trace().Msgf("finding git repo root for path %s", parentPath)
 		repoRoot, err := findGitRepoRoot(parentPath)
 		if err == nil {
 			// Get the dir relative to the repoRoot
@@ -353,12 +353,12 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) erro
 	defer unlock()
 
 	// Get the list of sparse checkout directories (and assume sparse checkout is enabled if this succeeds)
-	m.logger.Debug().Msgf("getting sparse checkout directories for path %s", repoRoot)
+	m.logger.Trace().Msgf("getting sparse checkout directories for path %s", repoRoot)
 	existingDirs, err := getSparseCheckoutDirs(repoRoot)
 	if err != nil {
 		// If the error indicates that sparse checkout is not enabled, just return nil
 		if err.Error() == "sparse-checkout not enabled" {
-			m.logger.Debug().Msgf("sparse-checkout not enabled for path %s", repoRoot)
+			m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
 			return nil
 		}
 		return err
@@ -396,7 +396,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 		return nil
 	}
 
-	logger.Debug().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
+	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
 	mu.Lock()
 	err := setSparseCheckoutDirs(repoRoot, existingDirs)
 	mu.Unlock()
@@ -423,7 +423,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 	}
 
 	if len(additionalDirs) > 0 {
-		logger.Debug().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", repoRoot, additionalDirs)
+		logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", repoRoot, additionalDirs)
 		return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, additionalDirs, mu, logger, depth+1)
 	}
 

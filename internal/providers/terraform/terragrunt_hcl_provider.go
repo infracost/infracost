@@ -700,7 +700,7 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 
 		if len(symlinkedDirs) > 0 {
 			mu := &sync.Mutex{}
-			logger.Debug().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", dir, symlinkedDirs)
+			logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", dir, symlinkedDirs)
 			// Using a depth of 1 here since the submodule directory is already downloaded, so only need
 			// to add the symlinked directories to the sparse-checkout.
 			err := modules.RecursivelyAddDirsToSparseCheckout(dir, []string{modAddr}, symlinkedDirs, mu, logger, 1)
