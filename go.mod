@@ -181,6 +181,7 @@ require (
 	github.com/hashicorp/vault/api v1.14.0 // indirect
 	github.com/hashicorp/yamux v0.0.0-20211028200310-0bc27b27de87 // indirect
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef // indirect
+	github.com/huandu/go-clone v1.7.2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jessevdk/go-flags v1.5.0 // indirect
 	github.com/jstemmer/go-junit-report v1.0.0 // indirect
@@ -264,9 +265,10 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
-//replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231211141424-6a52de9a284a
-replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20240501143558-4c01e72103df
+replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20240909111416-82d45309175e
 
 replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94
 
 replace github.com/shurcooL/graphql => github.com/spacelift-io/graphql v1.2.0
+
+replace github.com/hashicorp/go-getter => github.com/infracost/go-getter v0.0.0-20240909111353-c0d2eebadfd5

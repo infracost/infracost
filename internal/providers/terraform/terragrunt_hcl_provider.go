@@ -426,6 +426,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
 		SourceMap:                  p.ctx.RunContext.Config.TerraformSourceMap,
+		UsePartialParseConfigCache: true,
 		RunTerragrunt: func(opts *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
 				unexpectedErr := recover()
@@ -563,7 +564,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
-		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig)
+		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig, p.logger)
 
 		if err != nil {
 			info.error = err
@@ -633,8 +634,35 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	return info
 }
 
+func splitModuleSubDir(moduleSource string) (string, string, error) {
+	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleSource)
+	if strings.HasPrefix(submodulePath, "../") {
+		return "", "", fmt.Errorf("invalid submodule path '%s'", submodulePath)
+	}
+
+	return moduleAddr, submodulePath, nil
+}
+
 // downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
-func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (string, error) {
+func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig, logger zerolog.Logger) (string, error) {
+	_, modAddr, err := splitModuleSubDir(sourceURL)
+	if err != nil {
+		return "", err
+	}
+
+	// If sparse checkout is enabled add the subdir to the Source URL as a query param
+	// so go-getter only downloads the required directory.
+	if os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true" {
+		u, err := url.Parse(sourceURL)
+		if err != nil {
+			return "", err
+		}
+		q := u.Query()
+		q.Set("subdir", modAddr)
+		u.RawQuery = q.Encode()
+		sourceURL = u.String()
+	}
+
 	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
 	if err != nil {
 		return "", err
@@ -664,9 +692,33 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		}
 	}
 
+	if modAddr != "" && isGitDir(dir) {
+		symlinkedDirs, err := modules.ResolveSymLinkedDirs(dir, modAddr)
+		if err != nil {
+			return "", err
+		}
+
+		if len(symlinkedDirs) > 0 {
+			mu := &sync.Mutex{}
+			logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", dir, symlinkedDirs)
+			// Using a depth of 1 here since the submodule directory is already downloaded, so only need
+			// to add the symlinked directories to the sparse-checkout.
+			err := modules.RecursivelyAddDirsToSparseCheckout(dir, []string{modAddr}, symlinkedDirs, mu, logger, 1)
+			if err != nil {
+				return "", err
+			}
+		}
+	}
+
 	terragruntDownloadedDirs.Store(dir, true)
 
 	return source.WorkingDir, nil
+}
+
+// isGitDir checks if the directory is a git directory
+func isGitDir(dir string) bool {
+	_, err := os.Stat(filepath.Join(dir, ".git"))
+	return err == nil
 }
 
 func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) bool {
