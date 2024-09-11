@@ -119,6 +119,9 @@ resource_type_default_usage:
     elasticsearch_database_disk_mb: 131072
     elasticsearch_database_core: 3
     elasticsearch_database_members: 4
+  ibm_is_vpc_server:
+    is.vpn-server_CONNECTION_HOURS: 730
+    is.vpn-server_INSTANCE_HOURS: 730
 
 resource_usage:
   #
@@ -1392,3 +1395,7 @@ resource_usage:
     elasticsearch_database_disk_mb: 131072 # Allocated disk in MB per-member
     elasticsearch_database_core: 3 # Allocated dedicated CPU per-member
     elasticsearch_database_members: 4 # Allocated number of members in the cluster
+
+  ibm_is_vpc_server:
+    is.vpn-server_CONNECTION_HOURS: 730
+    is.vpn-server_INSTANCE_HOURS: 730

@@ -1,0 +1,25 @@
+
+ Name                                            Monthly Qty  Unit                Monthly Cost 
+                                                                                               
+ ibm_is_vpc.vpc                                                                                
+ ├─ VPC instance                                           1  Instance                   $0.00 
+ ├─ VPC egress free allowance (first 5GB)    Monthly cost depends on usage: $0.00 per GB       
+ └─ VPC egress us-south (first 9995 GB)      Monthly cost depends on usage: $0.090915 per GB   
+ └─ VPC egress us-south (next 40000 GB)      Monthly cost depends on usage: $0.086735 per GB   
+ └─ VPC egress us-south (next 100000 GB)     Monthly cost depends on usage: $0.07315 per GB    
+ └─ VPC egress us-south (over 149995 GB)     Monthly cost depends on usage: $0.05225 per GB    
+                                                                                               
+ ibm_is_vpn_server.vpn_server                                                                  
+ ├─ VPN connection hours us-south                        730  Hours                      $7.63 
+ └─ VPN instance hours us-south                          730  Hours                     $91.54 
+                                                                                               
+ ibm_is_vpn_server.vpn_server_without_usage                                                    
+ ├─ VPN connection hours us-south            Monthly cost depends on usage: $0.01045 per Hours 
+ └─ VPN instance hours us-south              Monthly cost depends on usage: $0.13 per Hours    
+                                                                                               
+ OVERALL TOTAL                                                                          $99.17 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 3 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 2 x ibm_is_subnet

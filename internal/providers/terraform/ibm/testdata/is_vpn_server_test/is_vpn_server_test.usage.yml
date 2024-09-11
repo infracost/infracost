@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  ibm_is_vpn_server.vpn_server:
+    is.vpn-server_CONNECTION_HOURS: 730
+    is.vpn-server_INSTANCE_HOURS: 730

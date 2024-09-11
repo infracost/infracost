@@ -20,6 +20,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsPublicGatewayRegistryItem(),
 	getIbmPiVolumeRegistryItem(),
 	getDatabaseRegistryItem(),
+	getIsVpnServerRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -172,6 +173,8 @@ var FreeResources = []string{
 	"ibm_sm_service_credentials_secret",
 	"ibm_sm_username_password_secret",
 	"ibm_tg_connection",
+	"ibm_is_vpn_server_client",
+	"ibm_is_vpn_server_route",
 }
 
 var UsageOnlyResources = []string{
