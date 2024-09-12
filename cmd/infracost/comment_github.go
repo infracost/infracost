@@ -134,7 +134,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 					return err
 				}
 
-				if res.Posted && ctx.IsCloudUploadExplicitlyEnabled() {
+				if res.Posted && ctx.IsCloudUploadEnabled() {
 					dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 					if err := dashboardClient.SavePostedPrComment(ctx, commentOut.AddRunResponse.RunID, commentOut.Body); err != nil {
 						logging.Logger.Err(err).Msg("could not save posted PR comment")
