@@ -65,7 +65,6 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_pi_volume":                 {"Power Systems Storage Volume", []string{}, nil, "https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-pricing-virtual-server#storage-type"},
 	"ibm_cos_bucket":                {"Object Storage Bucket", []string{}, nil, "https://cloud.ibm.com/objectstorage/create#pricing"},
 	"ibm_is_lb":                     {"is.load-balancer", []string{}, nil, "https://cloud.ibm.com/vpc-ext/provision/loadBalancer"},
-	"ibm_is_public_gateway":         {"is.public-gateway", []string{"ibm_is_floating_ip"}, nil, "https://cloud.ibm.com/vpc-ext/provision/vpc"},
 	"kms":                           {"ee41347f-b18e-4ca6-bf80-b5467c63f9a6", []string{}, nil, "https://cloud.ibm.com/catalog/services/key-protect"},
 	"cloud-object-storage":          {"dff97f5c-bc5e-4455-b470-411c3edbe49c", []string{}, nil, "https://cloud.ibm.com/objectstorage/create#pricing"},
 	"roks":                          {"containers.kubernetes.cluster.roks", []string{}, nil, "https://cloud.ibm.com/kubernetes/catalog/about?platformType=openshift"},
