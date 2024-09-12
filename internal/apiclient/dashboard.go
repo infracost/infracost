@@ -124,9 +124,14 @@ func (c *DashboardAPIClient) SavePostedPrComment(ctx *config.RunContext, runId, 
 	q := `mutation SavePostedPrComment($runId: String!, $comment: String!) {
 			savePostedPrComment(runId: $runId, comment: $comment) 
 }`
-	_, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{"runId": runId, "comment": comment}}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{"runId": runId, "comment": comment}}})
 	if err != nil {
 		return err
+	}
+	if len(results) > 0 {
+		if results[0].Get("errors").Exists() {
+			return errors.New(results[0].Get("errors").String())
+		}
 	}
 	return nil
 }

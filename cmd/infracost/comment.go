@@ -119,9 +119,10 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		// the full comment markdown has been received from the API addRun or loaded from the comment-path file,
 		// so use that instead of building the output using the output.ToMarkdown templates.
 		out = &CommentOutput{
-			Body:    commentData,
-			HasDiff: combined.HasDiff(),
-			ValidAt: &combined.TimeGenerated,
+			Body:           commentData,
+			HasDiff:        combined.HasDiff(),
+			ValidAt:        &combined.TimeGenerated,
+			AddRunResponse: result,
 		}
 	}
 
