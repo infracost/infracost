@@ -51,7 +51,7 @@ type catalogMetadata struct {
 // Map between terraform type and global catalog id. For ibm_resource_instance, the service
 // field already matches the global catalog id, so they do not need to be mapped. eg: "kms"
 var globalCatalogServiceId = map[string]catalogMetadata{
-	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log"}, nil, "https://cloud.ibm.com/vpc-ext/provision/vpc"},
+	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log", "ibm_is_share"}, nil, "https://cloud.ibm.com/vpc-ext/provision/vpc"},
 	"ibm_container_vpc_cluster":     {"containers-kubernetes", []string{}, nil, "https://cloud.ibm.com/kubernetes/catalog/about#pricing"},
 	"ibm_container_vpc_worker_pool": {"containers-kubernetes", []string{}, nil, "https://cloud.ibm.com/kubernetes/catalog/about#pricing"},
 	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key", "ibm_is_floating_ip"}, nil, "https://cloud.ibm.com/vpc-ext/provision/vs"},
@@ -88,6 +88,7 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"compliance":                    {"compliance", []string{}, nil, "https://cloud.ibm.com/catalog/services/security-and-compliance-center"},
 	"dns-svcs":                      {"b4ed8a30-936f-11e9-b289-1d079699cbe5", []string{}, nil, "https://cloud.ibm.com/catalog/services/dns-services"},
 	"messagehub":                    {"6a7f4e38-f218-48ef-9dd2-df408747568e", []string{}, nil, "https://cloud.ibm.com/eventstreams-provisioning/6a7f4e38-f218-48ef-9dd2-df408747568e/create"},
+	"ibm_is_share":                  {"is.share", []string{}, nil, "https://cloud.ibm.com/docs/vpc?topic=vpc-file-storage-vpc-faqs&interface=ui#faq-fs-billing"},
 	"ibm_is_vpn_server":             {"is.vpn-server", []string{}, nil, "https://cloud.ibm.com/vpc-ext/provision/vpnserver"},
 }
 

@@ -1,0 +1,45 @@
+
+ Name                                                              Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                       
+ ibm_is_share.testNFS                                                                                                  
+ ├─ 100 GB file storage share for VPC - us-south-2                      73,000  GB Hours                        $15.00 
+ └─ 100 Max IOPS (first 5000 IOPS Hours)                                 5,000  IOPS Hours                       $0.69 
+ └─ 100 Max IOPS (next 15000 IOPS Hours)                                15,000  IOPS Hours                       $1.03 
+ └─ 100 Max IOPS (next 20000 IOPS Hours)                                20,000  IOPS Hours                       $0.55 
+ └─ 100 Max IOPS (over 40000 IOPS Hours)                                33,000  IOPS Hours                       $0.45 
+                                                                                                                       
+ ibm_is_share.testNFS2withInlineReplica                                                                                
+ ├─ 200 GB file storage share for VPC - us-south-2                     146,000  GB Hours                        $30.00 
+ ├─ 100 Max IOPS (first 5000 IOPS Hours)                                 5,000  IOPS Hours                       $0.69 
+ ├─ 100 Max IOPS (next 15000 IOPS Hours)                                15,000  IOPS Hours                       $1.03 
+ ├─ 100 Max IOPS (next 20000 IOPS Hours)                                20,000  IOPS Hours                       $0.55 
+ ├─ 100 Max IOPS (over 40000 IOPS Hours)                                33,000  IOPS Hours                       $0.45 
+ ├─ 200 GB Replica file storage share for VPC - us-south-3             146,000  GB Hours                        $30.00 
+ ├─ 100 Max IOPS (first 5000 IOPS Hours)                                 5,000  IOPS Hours                       $0.69 
+ ├─ 100 Max IOPS (next 15000 IOPS Hours)                                15,000  IOPS Hours                       $1.03 
+ ├─ 100 Max IOPS (next 20000 IOPS Hours)                                20,000  IOPS Hours                       $0.55 
+ ├─ 100 Max IOPS (over 40000 IOPS Hours)                                33,000  IOPS Hours                       $0.45 
+ └─ Transmitted data                                                         1  GB                               $0.02 
+                                                                                                                       
+ ibm_is_share.testReplica                                                                                              
+ ├─ 100 GB Replica file storage share for VPC - us-south-3  Monthly cost depends on usage: $0.0002055 per GB Hours     
+ ├─ 100 Max IOPS (first 5000 IOPS Hours)                    Monthly cost depends on usage: $0.000137 per IOPS Hours    
+ ├─ 100 Max IOPS (next 15000 IOPS Hours)                    Monthly cost depends on usage: $0.0000685 per IOPS Hours   
+ ├─ 100 Max IOPS (next 20000 IOPS Hours)                    Monthly cost depends on usage: $0.0000274 per IOPS Hours   
+ ├─ 100 Max IOPS (over 40000 IOPS Hours)                    Monthly cost depends on usage: $0.0000137 per IOPS Hours   
+ └─ Transmitted data                                        Monthly cost depends on usage: $0.02 per GB                
+                                                                                                                       
+ ibm_is_vpc.testVpc                                                                                                    
+ ├─ VPC instance                                                             1  Instance                         $0.00 
+ ├─ VPC egress free allowance (first 5GB)                   Monthly cost depends on usage: $0.00 per GB                
+ └─ VPC egress us-south (first 9995 GB)                     Monthly cost depends on usage: $0.090915 per GB            
+ └─ VPC egress us-south (next 40000 GB)                     Monthly cost depends on usage: $0.086735 per GB            
+ └─ VPC egress us-south (next 100000 GB)                    Monthly cost depends on usage: $0.07315 per GB             
+ └─ VPC egress us-south (over 149995 GB)                    Monthly cost depends on usage: $0.05225 per GB             
+                                                                                                                       
+ OVERALL TOTAL                                                                                                  $83.17 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x ibm_is_share_mount_target

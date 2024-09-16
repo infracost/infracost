@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  ibm_is_share.testNFS:
+    is-share_monthly_instance_hours: 730 # Monthly number of instance hours
+
+  ibm_is_share.testNFS2withInlineReplica:
+    is-share_monthly_instance_hours: 730 # Monthly number of instance hours
+    is-share_monthly_transmitted_gb: 1   # Data transmitted to the instance

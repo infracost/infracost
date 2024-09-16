@@ -19,6 +19,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsLbRegistryItem(),
 	getIbmPiVolumeRegistryItem(),
 	getDatabaseRegistryItem(),
+	getIsShareRegistryItem(),
 	getIsVpnServerRegistryItem(),
 }
 
@@ -109,6 +110,9 @@ var FreeResources = []string{
 	"ibm_is_security_group",
 	"ibm_is_security_group_rule",
 	"ibm_is_security_group_target",
+	"ibm_is_share_delete_accessor_binding",
+	"ibm_is_share_mount_target",
+	"ibm_is_share_replica_operations",
 	"ibm_is_ssh_key",
 	"ibm_is_subnet",
 	"ibm_is_subnet_public_gateway_attachment",
