@@ -92,6 +92,12 @@ pipeline {
     }
 }
 `
+	case "blank.tf":
+		content = `
+			variable "region" {
+				type = string
+			}
+		`
 	default:
 		content = ""
 	}
