@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/IBM/go-sdk-core/v5/core"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -18,10 +19,11 @@ import (
 )
 
 type APIClient struct {
-	endpoint  string
-	apiKey    string
-	tlsConfig *tls.Config
-	uuid      uuid.UUID
+	endpoint         string
+	apiKey           string
+	ibmAuthenticator *core.IamAuthenticator
+	tlsConfig        *tls.Config
+	uuid             uuid.UUID
 }
 
 type GraphQLQuery struct {
@@ -67,7 +69,10 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 		return []byte{}, errors.Wrap(err, "Error generating request")
 	}
 
-	c.AddAuthHeaders(req)
+	err = c.AddAuthHeaders(req)
+	if err != nil {
+		return []byte{}, errors.Wrap(err, "Error sending API request")
+	}
 
 	// Use the DefaultTransport since this handles the HTTP/HTTPS proxy and other defaults
 	// and add the TLS config that was passed into the client
@@ -108,12 +113,21 @@ func (c *APIClient) AddDefaultHeaders(req *http.Request) {
 	req.Header.Set("User-Agent", userAgent())
 }
 
-func (c *APIClient) AddAuthHeaders(req *http.Request) {
+func (c *APIClient) AddAuthHeaders(req *http.Request) error {
 	c.AddDefaultHeaders(req)
 	req.Header.Set("X-Api-Key", c.apiKey)
 	if c.uuid != uuid.Nil {
 		req.Header.Set("X-Infracost-Trace-Id", fmt.Sprintf("cli=%s", c.uuid.String()))
 	}
+	if c.ibmAuthenticator != nil {
+		token, err := c.ibmAuthenticator.GetToken()
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	}
+	return nil
 }
 
 func userAgent() string {

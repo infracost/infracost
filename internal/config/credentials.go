@@ -15,6 +15,8 @@ var credentialsVersion = "0.1"
 type Credentials struct {
 	Version            string `yaml:"version"`
 	APIKey             string `yaml:"api_key,omitempty"`
+	IBMCloudApiKey     string `yaml:"ibm_cloud_api_key,omitempty"`
+	IBMCloudIAMUrl     string `yaml:"ibm_cloud_iam_url,omitempty"`
 	PricingAPIEndpoint string `yaml:"pricing_api_endpoint,omitempty"`
 }
 
@@ -41,6 +43,14 @@ func loadCredentials(cfg *Config) error {
 
 	if cfg.APIKey == "" {
 		cfg.APIKey = cfg.Credentials.APIKey
+	}
+
+	if cfg.IBMCloudApiKey == "" {
+		cfg.IBMCloudApiKey = cfg.Credentials.IBMCloudApiKey
+	}
+
+	if cfg.IBMCloudIAMUrl == "" {
+		cfg.IBMCloudIAMUrl = cfg.Credentials.IBMCloudIAMUrl
 	}
 
 	return nil

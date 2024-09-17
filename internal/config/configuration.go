@@ -20,6 +20,7 @@ type Configuration struct {
 	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify,omitempty"`
 	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
 	EnableCloud           *bool  `yaml:"enable_cloud"`
+	IBMUsage              string `yaml:"ibm_usage"`
 	EnableCloudUpload     *bool  `yaml:"enable_cloud_upload"`
 }
 
@@ -66,6 +67,14 @@ func loadConfiguration(cfg *Config) error {
 
 	if cfg.TLSCACertFile == "" {
 		cfg.TLSCACertFile = cfg.Configuration.TLSCACertFile
+	}
+
+	if cfg.IBMUsage == "" {
+		cfg.IBMUsage = cfg.Configuration.IBMUsage
+	}
+
+	if cfg.IBMUsage == "" {
+		cfg.IBMUsage = cfg.IBMUsageDefault
 	}
 
 	return nil

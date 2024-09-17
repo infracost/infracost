@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/IBM/go-sdk-core/v5/core"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -41,7 +42,9 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		currency = "USD"
 	}
 
-	tlsConfig := tls.Config{} // nolint: gosec
+	tlsConfig := tls.Config{
+		MinVersion: tls.VersionTLS12,
+	} // nolint: gosec
 
 	if ctx.Config.TLSCACertFile != "" {
 		rootCAs, _ := x509.SystemCertPool()
@@ -65,16 +68,44 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		tlsConfig.RootCAs = rootCAs
 	}
 
-	if ctx.Config.TLSInsecureSkipVerify != nil {
-		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
+	// disallow this setting
+	// if ctx.Config.TLSInsecureSkipVerify != nil {
+	//	tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
+	//}
+
+	var iamAuthenticator *core.IamAuthenticator = nil
+	authenticatorBuilder := core.NewIamAuthenticatorBuilder()
+	if ctx.Config.IBMCloudIAMUrl != "" {
+		fmt.Println("Configured IAM URL", ctx.Config.IBMCloudIAMUrl)
+		authenticatorBuilder.SetURL(ctx.Config.IBMCloudIAMUrl)
+	} else {
+		fmt.Println("No IBM_CLOUD_IAM_URL credential set, defaults to production.")
+	}
+	if ctx.Config.IBMCloudApiKey != "" {
+		if len(ctx.Config.IBMCloudApiKey) != 44 {
+			fmt.Println("IBM_CLOUD_API_KEY's length is not 44... Is this a proper IAM api key?")
+		}
+		authenticatorBuilder.SetApiKey(ctx.Config.IBMCloudApiKey)
+		authenticator, err := authenticatorBuilder.Build()
+		if err != nil {
+			log.Error("Unable to init authenticator", err)
+		}
+		iamAuthenticator = authenticator
+	} else {
+		fmt.Println("No IBM_CLOUD_API_KEY credential set")
+	}
+
+	if ctx.Config.APIKey == "" && iamAuthenticator == nil {
+		fmt.Println("No authentication method specified")
 	}
 
 	return &PricingAPIClient{
 		APIClient: APIClient{
-			endpoint:  ctx.Config.PricingAPIEndpoint,
-			apiKey:    ctx.Config.APIKey,
-			tlsConfig: &tlsConfig,
-			uuid:      ctx.UUID(),
+			endpoint:         ctx.Config.PricingAPIEndpoint,
+			apiKey:           ctx.Config.APIKey,
+			ibmAuthenticator: iamAuthenticator,
+			tlsConfig:        &tlsConfig,
+			uuid:             ctx.UUID(),
 		},
 		Currency:       currency,
 		EventsDisabled: ctx.Config.EventsDisabled,
