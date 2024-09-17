@@ -1,6 +1,7 @@
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 name: Upload post-release assets
 
@@ -28,3 +29,15 @@ jobs:
             -H 'authorization: Bearer ${{ secrets.POST_RELEASE_TRIGGERS_TOKEN }}' \
             https://api.github.com/repos/infracost/infracost-atlantis/dispatches \
             -d '{"event_type":"infracost_atlantis"}'
+
+  update-infracost-docs:
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
+    name: Update Infracost Docs to reference latest CLI version
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H 'authorization: Bearer ${{ secrets.POST_RELEASE_TRIGGERS_TOKEN }}' \
+            https://api.github.com/repos/infracost/docs/dispatches \
+            -d '{"event_type":"bump_cli_version"}'

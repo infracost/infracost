@@ -1,9 +1,9 @@
 terraform {
   required_providers {
-			ibm = {
-				source = "IBM-Cloud/ibm"
-				version = "1.63.0"
-			}    
+    ibm = {
+      source  = "IBM-Cloud/ibm"
+      version = "1.63.0"
+    }
   }
 }
 
@@ -81,7 +81,7 @@ resource "ibm_cos_bucket" "standard-ams03" {
   bucket_name          = "standard-bucket-at-ams03"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   storage_class        = "standard"
-  single_site_location      = "ams03"
+  single_site_location = "ams03"
 }
 
 resource "ibm_resource_instance" "cos-lite-instance" {

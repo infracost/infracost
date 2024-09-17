@@ -239,4 +239,5 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
-replace github.com/zclconf/go-cty-yaml => github.ibm.com/dataops/go-cty-yaml v1.0.0
+// go-cty-yaml repo has some CVE's that have been addressed in a private fork within GHE
+// replace github.com/zclconf/go-cty-yaml => github.ibm.com/dataops/go-cty-yaml v1.0.0

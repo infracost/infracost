@@ -59,10 +59,10 @@ resource "ibm_database" "test_db2" {
 }
 
 resource "ibm_database" "test_es_enterprise_db1" {
-  name                         = "demo-es-enterprise"
-  service                      = "databases-for-elasticsearch"
-  plan                         = "enterprise"
-  location                     = "eu-gb"
+  name     = "demo-es-enterprise"
+  service  = "databases-for-elasticsearch"
+  plan     = "enterprise"
+  location = "eu-gb"
 
   group {
     group_id = "member"
@@ -79,10 +79,10 @@ resource "ibm_database" "test_es_enterprise_db1" {
 }
 
 resource "ibm_database" "test_es_enterprise_db2" {
-  name                         = "demo-es-enterprise2"
-  service                      = "databases-for-elasticsearch"
-  plan                         = "enterprise"
-  location                     = "eu-gb"
+  name     = "demo-es-enterprise2"
+  service  = "databases-for-elasticsearch"
+  plan     = "enterprise"
+  location = "eu-gb"
 
   group {
     group_id = "member"
@@ -96,10 +96,10 @@ resource "ibm_database" "test_es_enterprise_db2" {
 }
 
 resource "ibm_database" "test_es_platinum_db1" {
-  name                         = "demo-es-platinum"
-  service                      = "databases-for-elasticsearch"
-  plan                         = "platinum"
-  location                     = "eu-gb"
+  name     = "demo-es-platinum"
+  service  = "databases-for-elasticsearch"
+  plan     = "platinum"
+  location = "eu-gb"
 
   group {
     group_id = "member"
@@ -116,10 +116,10 @@ resource "ibm_database" "test_es_platinum_db1" {
 }
 
 resource "ibm_database" "test_es_platinum_db2" {
-  name                         = "demo-es-platinum2"
-  service                      = "databases-for-elasticsearch"
-  plan                         = "platinum"
-  location                     = "eu-gb"
+  name     = "demo-es-platinum2"
+  service  = "databases-for-elasticsearch"
+  plan     = "platinum"
+  location = "eu-gb"
 
   group {
     group_id = "member"

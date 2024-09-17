@@ -1,14 +1,14 @@
 terraform {
   required_providers {
     ibm = {
-      source = "IBM-Cloud/ibm"
+      source  = "IBM-Cloud/ibm"
       version = "1.64.0"
     }
   }
 }
 
 provider "ibm" {
-    region = "us-south"
+  region = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_kms" {
@@ -44,93 +44,93 @@ resource "ibm_resource_instance" "resource_instance_power_iaas" {
 }
 
 resource "ibm_resource_instance" "resource_instance_logdna_lite" {
-  name              = "logdna-lite"
-  service           = "logdna"
-  plan              = "lite"
-  location          = "us-south"
+  name     = "logdna-lite"
+  service  = "logdna"
+  plan     = "lite"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_logdna_7day" {
-  name              = "logdna-7day"
-  service           = "logdna"
-  plan              = "7-day"
-  location          = "us-south"
+  name     = "logdna-7day"
+  service  = "logdna"
+  plan     = "7-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_logdna_7day_no_usage" {
-  name              = "logdna-7day-no-usage"
-  service           = "logdna"
-  plan              = "7-day"
-  location          = "us-south"
+  name     = "logdna-7day-no-usage"
+  service  = "logdna"
+  plan     = "7-day"
+  location = "us-south"
 }
 resource "ibm_resource_instance" "resource_instance_logdna_14day" {
-  name              = "logdna-14day"
-  service           = "logdna"
-  plan              = "14-day"
-  location          = "us-south"
+  name     = "logdna-14day"
+  service  = "logdna"
+  plan     = "14-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_logdna_30day" {
-  name              = "logdna-30day"
-  service           = "logdna"
-  plan              = "30-day"
-  location          = "us-south"
+  name     = "logdna-30day"
+  service  = "logdna"
+  plan     = "30-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_logdna_hipaa30day" {
-  name              = "logdna-hipaa30day"
-  service           = "logdna"
-  plan              = "hipaa-30-day"
-  location          = "us-south"
+  name     = "logdna-hipaa30day"
+  service  = "logdna"
+  plan     = "hipaa-30-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_activity_tracker_lite" {
-  name              = "activity-tracker-lite"
-  service           = "logdnaat"
-  plan              = "lite"
-  location          = "us-south"
+  name     = "activity-tracker-lite"
+  service  = "logdnaat"
+  plan     = "lite"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_activity_tracker_7day" {
-  name              = "activity-tracker-7day"
-  service           = "logdnaat"
-  plan              = "7-day"
-  location          = "us-south"
+  name     = "activity-tracker-7day"
+  service  = "logdnaat"
+  plan     = "7-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_activity_tracker_7day_no_usage" {
-  name              = "activity-tracker-7day-no-usage"
-  service           = "logdnaat"
-  plan              = "7-day"
-  location          = "us-south"
+  name     = "activity-tracker-7day-no-usage"
+  service  = "logdnaat"
+  plan     = "7-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_monitoring_lite" {
-  name              = "sysdig-lite"
-  service           = "sysdig-monitor"
-  plan              = "lite"
-  location          = "us-south"
+  name     = "sysdig-lite"
+  service  = "sysdig-monitor"
+  plan     = "lite"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_monitoring_graduated" {
-  name              = "sysdig-graduated"
-  service           = "sysdig-monitor"
-  plan              = "graduated-tier"
-  location          = "us-south"
+  name     = "sysdig-graduated"
+  service  = "sysdig-monitor"
+  plan     = "graduated-tier"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_monitoring_graduated_no_usage" {
-  name              = "sysdig-graduated-no-usage"
-  service           = "sysdig-monitor"
-  plan              = "graduated-tier"
-  location          = "us-south"
+  name     = "sysdig-graduated-no-usage"
+  service  = "sysdig-monitor"
+  plan     = "graduated-tier"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_monitoring_graduated_secure" {
-  name              = "sysdig-graduated-secure"
-  service           = "graduated-tier-sysdig-secure-plus-monitor"
-  plan              = "7-day"
-  location          = "us-south"
+  name     = "sysdig-graduated-secure"
+  service  = "graduated-tier-sysdig-secure-plus-monitor"
+  plan     = "7-day"
+  location = "us-south"
 }
 
 resource "ibm_resource_instance" "cd_instance_professional" {

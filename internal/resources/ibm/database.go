@@ -86,7 +86,7 @@ func PostgresRAMCostComponent(r *Database) *schema.CostComponent {
 	}
 
 	cost := R.Mul(m)
-	
+
 	costComponent := schema.CostComponent{
 		Name:            "RAM",
 		Unit:            "GB-RAM",

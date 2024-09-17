@@ -120,7 +120,20 @@ test_update_ibm:
 
 fmt:
 	go fmt ./...
-	find . -name '*.tf' -exec terraform fmt {} \;
+	@find . -path '*/.*' -prune -o -name '*_with_error.tf' -prune -o -name '*.tf' -type f -print0 | xargs -0 -L1 bash -c '! test "$$(tail -c 1 "$$0")" || (echo >> "$$0" && echo "Terminating newline added to $$0")'
+	find . -path '*/.*' -prune -o -name '*_with_error.tf' -prune -o -name '*.tf' -exec terraform fmt {} +;
+
+tf_fmt_check:
+	@echo "Checking Terraform formatting..."
+	@if ! find . -path '*/.*' -prune -o -name '*_with_error.tf' -prune -o -name '*.tf' -exec terraform fmt -check=true -write=false {} +; then \
+		echo "Terraform files not formatted. Run 'make fmt' to fix, or rename the file to '..._with_error.tf' to ignore."; \
+		exit 1; \
+	fi
+	@echo "Checking that .tf files end with newline..."
+	@if ! find . -path '*/.*' -prune -o -name '*_with_error.tf' -prune -o -name '*.tf' -type f -print0 | xargs -0 -L1 bash -c '! test "$$(tail -c 1 "$$0")" || (echo "$$0" && false)'; then \
+		echo "Terraform files missing terminating newline. Run 'make fmt' to fix, or rename the file to '..._with_error.tf' to ignore."; \
+        exit 1; \
+    fi
 
 lint:
 	golangci-lint run

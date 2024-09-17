@@ -15,36 +15,34 @@ jobs:
           - target: darwin
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.19
+          go-version-file: go.mod
       - name: Build project
         run: make ${{ matrix.target }}
       - name: Upload amd64 build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.target != 'windows' }}
         with:
           name: ${{ matrix.target }}-amd64
           path: "build/infracost-${{ matrix.target }}-amd64"
       - name: Upload windows amd64 build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.target == 'windows' }}
         with:
           name: ${{ matrix.target }}-amd64
           path: "build/infracost.exe"
       - name: Upload arm64 build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.target != 'windows' }}
         with:
           name: ${{ matrix.target }}-arm64
           path: "build/infracost-${{ matrix.target }}-arm64"
       - name: Upload windows arm64 build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ matrix.target == 'windows' }}
         with:
           name: ${{ matrix.target }}-arm64
           path: "build/infracost-arm64.exe"
-
