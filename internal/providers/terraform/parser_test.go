@@ -985,6 +985,79 @@ func TestAddressModulePart(t *testing.T) {
 	}
 }
 
+func TestRemoveAddressCountIndex(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected int
+	}{
+		{"aws_instance.my_instance", -1},
+		{"data.aws_instance.my_instance", -1},
+		{"aws_instance.my_instance[3]", 3},
+		{"data.aws_instance.my_instance[3]", 3},
+		{"aws_instance.my_instance[3]", 3},
+		{"data.aws_instance.my_instance[3]", 3},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", -1},
+		{"module.my_module.data.aws_instance.my_instance", -1},
+		{"module.my_module.aws_instance.my_instance[3]", 3},
+		{"module.my_module.data.aws_instance.my_instance[3]", 3},
+		{"module.my_module.aws_instance.my_instance[3]", 3},
+		{"module.my_module.data.aws_instance.my_instance[3]", 3},
+		// Count modules
+		{"module.my_module[2].aws_instance.my_instance", -1},
+		{"module.my_module[2].data.aws_instance.my_instance", -1},
+		{"module.my_module[2].aws_instance.my_instance[3]", 3},
+		{"module.my_module[2].data.aws_instance.my_instance[3]", 3},
+		{"module.my_module[2].aws_instance.my_instance[3]", 3},
+		{"module.my_module[2].data.aws_instance.my_instance[3]", 3},
+		// Each resources
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance", -1},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance", -1},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index.1\"]", -1},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index.1\"]", -1},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index[1]\"]", -1},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index[1]\"]", -1},
+	}
+
+	for _, test := range tests {
+		actual := addressCountIndex(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestAddressKey(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected string
+	}{
+		{"aws_instance.my_instance", ""},
+		{"data.aws_instance.my_instance", ""},
+		{"aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"data.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		{"data.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", ""},
+		{"module.my_module.data.aws_instance.my_instance", ""},
+		{"module.my_module.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		{"module.my_module.data.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		// Each modules
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance", ""},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance", ""},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+	}
+
+	for _, test := range tests {
+		actual := addressKey(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
 func TestRemoveAddressArrayPart(t *testing.T) {
 	tests := []struct {
 		address  string
@@ -1003,6 +1076,13 @@ func TestRemoveAddressArrayPart(t *testing.T) {
 		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance"},
 		{"module.my_module.aws_instance.my_instance[\"index[1]\"]", "aws_instance.my_instance"},
 		{"module.my_module.data.aws_instance.my_instance[\"index[1]\"]", "data.aws_instance.my_instance"},
+		// Each modules
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance", "aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index[1]\"]", "aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index[1]\"]", "data.aws_instance.my_instance"},
 	}
 
 	for _, test := range tests {
