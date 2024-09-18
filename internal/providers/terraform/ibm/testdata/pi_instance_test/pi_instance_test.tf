@@ -1,8 +1,7 @@
 terraform {
   required_providers {
     ibm = {
-      source  = "IBM-Cloud/ibm"
-      version = "1.58.0"
+      source = "IBM-Cloud/ibm"
     }
   }
 }
@@ -81,7 +80,7 @@ resource "ibm_pi_instance" "aix-shared-s922-instance" {
   pi_instance_name     = "aix-shared-s922"
   pi_proc_type         = "shared"
   pi_image_id          = ibm_pi_image.aix_image.id
-  pi_key_pair_name     = ibm_pi_key.key.key_id
+  pi_key_pair_name     = ibm_pi_key.key.id
   pi_sys_type          = "s922"
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_pin_policy        = "none"
@@ -98,7 +97,7 @@ resource "ibm_pi_instance" "ibmi-dedicated-e980-instance" {
   pi_instance_name     = "ibmi-dedicated-e980"
   pi_proc_type         = "dedicated"
   pi_image_id          = ibm_pi_image.ibmi_image.id
-  pi_key_pair_name     = ibm_pi_key.key.key_id
+  pi_key_pair_name     = ibm_pi_key.key.id
   pi_sys_type          = "e980"
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_pin_policy        = "none"
@@ -112,7 +111,7 @@ resource "ibm_pi_instance" "ibmi-dedicated-e980-instance" {
 resource "ibm_pi_instance" "hana-dedicated-e980-instance" {
   pi_instance_name     = "hana-dedicated-e980"
   pi_image_id          = ibm_pi_image.hana_image.id
-  pi_key_pair_name     = ibm_pi_key.key.key_id
+  pi_key_pair_name     = ibm_pi_key.key.id
   pi_sys_type          = "e980"
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_pin_policy        = "none"
@@ -130,7 +129,7 @@ resource "ibm_pi_instance" "netweaver-shared-s922-instance" {
   pi_instance_name     = "netweaver-shared-s922"
   pi_proc_type         = "shared"
   pi_image_id          = ibm_pi_image.netweaver_image.id
-  pi_key_pair_name     = ibm_pi_key.key.key_id
+  pi_key_pair_name     = ibm_pi_key.key.id
   pi_sys_type          = "s922"
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_pin_policy        = "none"
@@ -147,7 +146,7 @@ resource "ibm_pi_instance" "netweaver-shared-s922-no-usage-specified-instance" {
   pi_instance_name     = "netweaver-shared-s922"
   pi_proc_type         = "shared"
   pi_image_id          = ibm_pi_image.netweaver_image.id
-  pi_key_pair_name     = ibm_pi_key.key.key_id
+  pi_key_pair_name     = ibm_pi_key.key.id
   pi_sys_type          = "s922"
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_pin_policy        = "none"

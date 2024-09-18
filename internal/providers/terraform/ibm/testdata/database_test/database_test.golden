@@ -30,15 +30,15 @@
  └─ Disk (over 0 GB-DISK)                            1  GB-DISK                        $0.63 
                                                                                              
  ibm_database.test_es_platinum_db1                                                           
- ├─ RAM                                             36  GB-RAM                       $939.60 
- ├─ Disk                                           384  GB-DISK                      $234.24 
- └─ Core                                             9  Virtual Processor Core       $282.60 
+ ├─ RAM                                             36  GB-RAM                       $967.79 
+ ├─ Disk                                           384  GB-DISK                      $241.27 
+ └─ Core                                             9  Virtual Processor Core       $291.08 
                                                                                              
  ibm_database.test_es_platinum_db2                                                           
- ├─ RAM                                              4  GB-RAM                       $104.40 
- └─ Disk                                            20  GB-DISK                       $12.20 
-                                                                                            
- OVERALL TOTAL                                                                     $1,790.45 
+ ├─ RAM                                              4  GB-RAM                       $107.53 
+ └─ Disk                                            20  GB-DISK                       $12.57 
+                                                                                             
+ OVERALL TOTAL                                                                     $1,837.64 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

@@ -1,8 +1,7 @@
 terraform {
   required_providers {
     ibm = {
-      source  = "IBM-Cloud/ibm"
-      version = "1.63.0"
+      source = "IBM-Cloud/ibm"
     }
   }
 }
@@ -127,7 +126,7 @@ resource "ibm_database" "test_es_platinum_db2" {
       allocation_count = 4
     }
     memory {
-      allocation_mb = 1024
+      allocation_mb = 2048
     }
   }
 }

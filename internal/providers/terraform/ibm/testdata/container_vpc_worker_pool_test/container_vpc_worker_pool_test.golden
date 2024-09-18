@@ -16,9 +16,9 @@
  └─ VPC egress eu-de (over 149995 GB)                                                                  0  GB               $0.00 
                                                                                                                                  
  mycluster                                                                                                                       
- └─ VPC Container Work Zone flavor: (bx2.4x16) region: (eu-de) name: (eu-de-1) x(3) workers        2,190  hours          $682.31 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (eu-de) name: (eu-de-1) x(3) workers        2,190  hours          $665.19 
                                                                                                                                  
- OVERALL TOTAL                                                                                                         $5,816.13 
+ OVERALL TOTAL                                                                                                         $5,799.01 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 4 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
