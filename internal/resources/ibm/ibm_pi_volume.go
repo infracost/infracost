@@ -38,9 +38,11 @@ var IbmPiVolumeUsageSchema = []*schema.UsageItem{
 }
 
 var tierMapping = map[string]string{
+	"tier0":    "TIER_ZERO_STORAGE_GIGABYTE_HOURS",
 	"tier1":    "TIER_ONE_STORAGE_GIGABYTE_HOURS",
 	"ssd":      "TIER_ONE_STORAGE_GIGABYTE_HOURS",
 	"tier3":    "TIER_THREE_STORAGE_GIGABYTE_HOURS",
+	"tier5k":   "FIXED_5K_OPS_GIGABYTE_HOURS",
 	"standard": "TIER_THREE_STORAGE_GIGABYTE_HOURS",
 }
 
@@ -103,7 +105,7 @@ func (r *IbmPiVolume) BuildResource() *schema.Resource {
 		}
 		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0.0)))
 		costComponents = append(costComponents, costComponent)
-	} else if r.Type == "tier1" || r.Type == "tier3" || r.Type == "standard" || r.Type == "ssd" {
+	} else if r.Type == "tier1" || r.Type == "tier3" || r.Type == "standard" || r.Type == "ssd" || r.Type == "tier0" || r.Type == "tier5k" {
 
 		costComponent := &schema.CostComponent{
 			Name:            fmt.Sprintf("Volume (%d GB, %s, %s)", r.Size, r.Type, r.Name),
