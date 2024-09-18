@@ -65,6 +65,14 @@ var (
 		".tfvars.json",
 		".auto.tfvars.json",
 	}
+	defaultExcludedDirs = []string{
+		".infracost",
+		".git",
+		".terraform",
+		".terragrunt-cache",
+		"example",
+		"examples",
+	}
 )
 
 // EnvFileMatcher is used to match environment specific var files.
@@ -119,6 +127,30 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 		extensions: extensions,
 		wildcards:  wildcards,
 	}
+}
+
+func createWildcardGlobPaths(dirs []string) []string {
+	var paths []string
+	for _, dir := range dirs {
+		paths = append(paths, path.Join(dir, "**"))
+	}
+
+	for _, dir := range dirs {
+		paths = append(paths, path.Join("**", path.Join(dir, "**")))
+	}
+
+	return paths
+}
+
+func isDefaultExcluded(name string) bool {
+	for _, dir := range defaultExcludedDirs {
+		if dir == name {
+			return true
+		}
+	}
+
+	return false
+
 }
 
 // IsAutoVarFile checks if the var file is an auto.tfvars or terraform.tfvars.
@@ -345,7 +377,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			modules:            make(map[string]struct{}),
 			moduleCalls:        make(map[string][]string),
 			discoveredVarFiles: make(map[string][]RootPathVarFile),
-			excludedDirs:       config.ExcludedDirs,
+			excludedDirs:       append(createWildcardGlobPaths(defaultExcludedDirs), config.ExcludedDirs...),
 			changedObjects:     config.ChangedObjects,
 			includedDirs:       config.IncludedDirs,
 			pathOverrides:      overrides,
@@ -1295,8 +1327,10 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 }
 
 func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) bool {
-	if p.shouldSkipDir(dir.path) {
-		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
+	// if the directory is marked as excluded and not included we skip it.
+	// The include_dirs setting takes precedence over exclude_dirs.
+	if p.shouldSkipDir(dir.path) && !p.shouldIncludeDir(dir.path) {
+		p.logger.Trace().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
 
 		return false
 	}
@@ -1484,7 +1518,8 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 		if info.IsDir() {
 			fullPath := filepath.Join(fullPath, info.Name())
 
-			if strings.HasPrefix(info.Name(), ".") && !p.shouldIncludeDir(fullPath) {
+			// if the directory is one of the known excluded directories we skip it.
+			if isDefaultExcluded(info.Name()) && !p.shouldIncludeDir(fullPath) {
 				continue
 			}
 
