@@ -1059,7 +1059,7 @@ func getModuleNames(addr string) []string {
 }
 
 func addressCountIndex(addr string) int {
-	r := regexp.MustCompile(`\[(\d+)\]`)
+	r := regexp.MustCompile(`\[(\d+)\]$`)
 	m := r.FindStringSubmatch(addr)
 
 	if len(m) > 0 {
@@ -1072,7 +1072,7 @@ func addressCountIndex(addr string) int {
 }
 
 func addressKey(addr string) string {
-	r := regexp.MustCompile(`\["([^"]+)"\]`)
+	r := regexp.MustCompile(`\["([^"]+)"\]$`)
 	m := r.FindStringSubmatch(addr)
 
 	if len(m) > 0 {
