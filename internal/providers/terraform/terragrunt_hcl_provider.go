@@ -1084,7 +1084,13 @@ type terragruntDependency struct {
 
 // Find all the Terraform modules in the folders that contain the given Terragrunt config files and assemble those
 // modules into a Stack object
-func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []string, terragruntOptions *options.TerragruntOptions, howThesePathsWereFound string) (*tgconfigstack.Stack, error) {
+func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []string, terragruntOptions *options.TerragruntOptions, howThesePathsWereFound string) (stack *tgconfigstack.Stack, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("createStackForTerragruntConfigPaths panic: %v", r)
+		}
+	}()
+
 	if len(terragruntConfigPaths) == 0 {
 		return nil, tgerrors.WithStackTrace(tgconfigstack.NoTerraformModulesFound)
 	}
@@ -1094,7 +1100,7 @@ func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []st
 		return nil, err
 	}
 
-	stack := &tgconfigstack.Stack{Path: path, Modules: modules}
+	stack = &tgconfigstack.Stack{Path: path, Modules: modules}
 	if err := stack.CheckForCycles(); err != nil {
 		return nil, err
 	}
