@@ -128,7 +128,7 @@ func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostCom
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -165,7 +165,7 @@ func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.Co
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -202,7 +202,7 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -237,7 +237,7 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -279,7 +279,7 @@ func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComp
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -321,7 +321,7 @@ func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostCompo
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -357,7 +357,7 @@ func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostC
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -391,7 +391,7 @@ func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostCompo
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -424,7 +424,7 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -457,7 +457,7 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -530,7 +530,7 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -565,7 +565,7 @@ func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
@@ -592,11 +592,8 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 		unit = "TIER_ONE_STORAGE_GIGABYTE_HOURS"
 	} else if r.StorageType == "tier3" {
 		unit = "TIER_THREE_STORAGE_GIGABYTE_HOURS"
-	} else if r.StorageType == "tier0" {
-		unit = "TIER_ZERO_STORAGE_GIGABYTE_HOURS"
-	} else if r.StorageType == "tier5k" {
-		unit = "FIXED_5K_OPS_GIGABYTE_HOURS"
 	}
+
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage - %s", r.StorageType),
 		Unit:            "GB hours",
@@ -605,7 +602,7 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("composite"),
+			ProductFamily: strPtr("service"),
 			Service:       strPtr("power-iaas"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
