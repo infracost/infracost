@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -696,6 +697,9 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 				if _, ok := idMap[defaultID]; !ok {
 					idMap[defaultID] = []*schema.ResourceData{}
 				}
+				if slices.Contains(idMap[defaultID], d) {
+					continue
+				}
 				idMap[defaultID] = append(idMap[defaultID], d)
 			}
 		}
@@ -705,6 +709,9 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 			for _, customID := range f(d) {
 				if _, ok := idMap[customID]; !ok {
 					idMap[customID] = []*schema.ResourceData{}
+				}
+				if slices.Contains(idMap[customID], d) {
+					continue
 				}
 				idMap[customID] = append(idMap[customID], d)
 			}
