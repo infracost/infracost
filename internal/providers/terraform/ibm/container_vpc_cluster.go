@@ -27,6 +27,9 @@ func newContainerVpcCluster(d *schema.ResourceData, u *schema.UsageData) *schema
 
 	region := d.Get("region").String()
 	kubeVersion := d.Get("kube_version").String()
+	if kubeVersion == "" {
+		kubeVersion = "4.15.25_openshift"
+	}
 	flavor := d.Get("flavor").String()
 	workerCount := d.Get("worker_count").Int()
 
