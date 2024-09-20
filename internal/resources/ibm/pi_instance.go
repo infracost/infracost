@@ -592,6 +592,10 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 		unit = "TIER_ONE_STORAGE_GIGABYTE_HOURS"
 	} else if r.StorageType == "tier3" {
 		unit = "TIER_THREE_STORAGE_GIGABYTE_HOURS"
+	} else if r.StorageType == "tier0" {
+		unit = "TIER_ZERO_STORAGE_GIGABYTE_HOURS"
+	} else if r.StorageType == "tier5k" {
+		unit = "FIXED_5K_OPS_GIGABYTE_HOURS"
 	}
 
 	return &schema.CostComponent{
