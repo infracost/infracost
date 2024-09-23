@@ -8,23 +8,23 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func GetElasticSearchCostComponents(r *Database) []*schema.CostComponent {
+func GetPostgresCostComponents(r *Database) []*schema.CostComponent {
 
 	if r.Flavor != "" {
 		return []*schema.CostComponent{
-			ElasticSearchHostFlavorComponent(r),
-			ElasticSearchDiskCostComponent(r),
+			PostgresHostFlavorComponent(r),
+			PostgresDiskCostComponent(r),
 		}
 	} else {
 		return []*schema.CostComponent{
-			ElasticSearchRAMCostComponent(r),
-			ElasticSearchDiskCostComponent(r),
-			ElasticSearchVirtualProcessorCoreCostComponent(r),
+			PostgresRAMCostComponent(r),
+			PostgresDiskCostComponent(r),
+			PostgresVirtualProcessorCoreCostComponent(r),
 		}
 	}
 }
 
-func ElasticSearchVirtualProcessorCoreCostComponent(r *Database) *schema.CostComponent {
+func PostgresVirtualProcessorCoreCostComponent(r *Database) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Virtual Processor Cores (%s members)", strconv.FormatInt(r.Members, 10)),
 		Unit:            "CPU",
@@ -33,7 +33,7 @@ func ElasticSearchVirtualProcessorCoreCostComponent(r *Database) *schema.CostCom
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Location),
-			Service:       strPtr("databases-for-elasticsearch"),
+			Service:       strPtr("databases-for-postgresql"),
 			ProductFamily: strPtr("service"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{
@@ -47,12 +47,7 @@ func ElasticSearchVirtualProcessorCoreCostComponent(r *Database) *schema.CostCom
 	}
 }
 
-func ElasticSearchRAMCostComponent(r *Database) *schema.CostComponent {
-
-	unit := "GIGABYTE_MONTHS_RAM"
-	if r.Plan == "enterprise" {
-		unit = "GIGABYTE_MONTHS_RAM_NEW"
-	}
+func PostgresRAMCostComponent(r *Database) *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("RAM (%s members)", strconv.FormatInt(r.Members, 10)),
@@ -62,7 +57,7 @@ func ElasticSearchRAMCostComponent(r *Database) *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Location),
-			Service:       strPtr("databases-for-elasticsearch"),
+			Service:       strPtr("databases-for-postgresql"),
 			ProductFamily: strPtr("service"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{
@@ -71,12 +66,12 @@ func ElasticSearchRAMCostComponent(r *Database) *schema.CostComponent {
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			Unit: strPtr(unit),
+			Unit: strPtr("GIGABYTE_MONTHS_RAM_NEW"),
 		},
 	}
 }
 
-func ElasticSearchDiskCostComponent(r *Database) *schema.CostComponent {
+func PostgresDiskCostComponent(r *Database) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Disk (%s members)", strconv.FormatInt(r.Members, 10)),
 		Unit:            "GB",
@@ -85,7 +80,7 @@ func ElasticSearchDiskCostComponent(r *Database) *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Location),
-			Service:       strPtr("databases-for-elasticsearch"),
+			Service:       strPtr("databases-for-postgresql"),
 			ProductFamily: strPtr("service"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{
@@ -99,7 +94,7 @@ func ElasticSearchDiskCostComponent(r *Database) *schema.CostComponent {
 	}
 }
 
-func ElasticSearchHostFlavorComponent(r *Database) *schema.CostComponent {
+func PostgresHostFlavorComponent(r *Database) *schema.CostComponent {
 
 	CostUnit := map[string]string{
 		"b3c.4x16.encrypted":   "HOST_FOUR_SIXTEEN",
@@ -118,7 +113,7 @@ func ElasticSearchHostFlavorComponent(r *Database) *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Location),
-			Service:       strPtr("databases-for-elasticsearch"),
+			Service:       strPtr("databases-for-postgresql"),
 			ProductFamily: strPtr("service"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{

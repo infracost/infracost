@@ -10,22 +10,22 @@ provider "ibm" {
   region = "us-south"
 }
 
-resource "ibm_database" "test_db1" {
-  name     = "demo-postgres"
+# -------------------------------------------
+# POSTGRES
+# -------------------------------------------
+
+resource "ibm_database" "postgresql_standard_flavor" {
+  name     = "postgres-standard-flavour"
   service  = "databases-for-postgresql"
   plan     = "standard"
-  location = "eu-gb"
-
-  group {
+  location = "us-south"
+  group { # Note: "memory" not allowed when host_flavor is set
     group_id = "member"
-    memory {
-      allocation_mb = 12288
+    host_flavor {
+      id = "m3c.30x240.encrypted"
     }
     disk {
-      allocation_mb = 131072
-    }
-    cpu {
-      allocation_count = 3
+      allocation_mb = 4194304
     }
   }
   configuration = <<CONFIGURATION
@@ -35,19 +35,21 @@ resource "ibm_database" "test_db1" {
   CONFIGURATION
 }
 
-resource "ibm_database" "test_db2" {
-  name     = "demo-postgres2"
+resource "ibm_database" "postgresql_standard" {
+  name     = "postgres-standard"
   service  = "databases-for-postgresql"
   plan     = "standard"
-  location = "eu-gb"
-
+  location = "us-south"
   group {
     group_id = "member"
     memory {
-      allocation_mb = 15360
+      allocation_mb = 114688
     }
-    members {
-      allocation_count = 4
+    disk {
+      allocation_mb = 4194304
+    }
+    cpu {
+      allocation_count = 28
     }
   }
   configuration = <<CONFIGURATION
@@ -57,76 +59,77 @@ resource "ibm_database" "test_db2" {
   CONFIGURATION
 }
 
-resource "ibm_database" "test_es_enterprise_db1" {
-  name     = "demo-es-enterprise"
-  service  = "databases-for-elasticsearch"
-  plan     = "enterprise"
-  location = "eu-gb"
+# -------------------------------------------
+# ELASTICSEARCH
+# -------------------------------------------
 
-  group {
-    group_id = "member"
-    memory {
-      allocation_mb = 12288
-    }
-    disk {
-      allocation_mb = 131072
-    }
-    cpu {
-      allocation_count = 3
-    }
-  }
-}
-
-resource "ibm_database" "test_es_enterprise_db2" {
-  name     = "demo-es-enterprise2"
-  service  = "databases-for-elasticsearch"
-  plan     = "enterprise"
-  location = "eu-gb"
-
-  group {
-    group_id = "member"
-    members {
-      allocation_count = 4
-    }
-    memory {
-      allocation_mb = 15360
-    }
-  }
-}
-
-resource "ibm_database" "test_es_platinum_db1" {
-  name     = "demo-es-platinum"
+resource "ibm_database" "elasticsearch_platinum" {
+  name     = "elasticsearch-platinum"
   service  = "databases-for-elasticsearch"
   plan     = "platinum"
-  location = "eu-gb"
-
+  location = "us-south"
   group {
     group_id = "member"
     memory {
-      allocation_mb = 12288
+      allocation_mb = 114688
     }
     disk {
-      allocation_mb = 131072
+      allocation_mb = 4194304
     }
     cpu {
-      allocation_count = 3
+      allocation_count = 28
     }
   }
 }
 
-resource "ibm_database" "test_es_platinum_db2" {
-  name     = "demo-es-platinum2"
+resource "ibm_database" "elasticsearch_platinum_flavor" {
+  name     = "elasticsearch-platinum-flavor"
   service  = "databases-for-elasticsearch"
   plan     = "platinum"
-  location = "eu-gb"
+  location = "us-south"
+  group { # Note: "memory" not allowed when host_flavor is set
+    group_id = "member"
+    host_flavor {
+      id = "m3c.30x240.encrypted"
+    }
+    disk {
+      allocation_mb = 4194304
+    }
+  }
+}
 
+resource "ibm_database" "elasticsearch_enterprise" {
+  name     = "elasticsearch-enterprise"
+  service  = "databases-for-elasticsearch"
+  plan     = "enterprise"
+  location = "us-south"
   group {
     group_id = "member"
-    members {
-      allocation_count = 4
-    }
+
     memory {
-      allocation_mb = 2048
+      allocation_mb = 114688
+    }
+    disk {
+      allocation_mb = 4194304
+    }
+    cpu {
+      allocation_count = 28
+    }
+  }
+}
+
+resource "ibm_database" "elasticsearch_enterprise_flavor" {
+  name     = "elasticsearch-enterprise-flavor"
+  service  = "databases-for-elasticsearch"
+  plan     = "enterprise"
+  location = "us-south"
+  group { # Note: "memory" not allowed when host_flavor is set
+    group_id = "member"
+    host_flavor {
+      id = "m3c.30x240.encrypted"
+    }
+    disk {
+      allocation_mb = 4194304
     }
   }
 }
