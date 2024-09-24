@@ -113,13 +113,13 @@
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $187.00  * 
  └─ Outbound data transfer to other regions                  750  GB          $60.00  * 
                                                                                         
- aws_data_transfer.ap-southeast-5                                                    
- ├─ Intra-region data transfer                             2,000  GB          $20.00 
- ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,126.40 
- ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
- ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,884.80 
- ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $187.00 
- └─ Outbound data transfer to other regions                  750  GB          $60.00 
+ aws_data_transfer.ap-southeast-5                                                       
+ ├─ Intra-region data transfer                             2,000  GB          $20.00  * 
+ ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,105.92  * 
+ ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,133.44  * 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,557.12  * 
+ ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $244.80  * 
+ └─ Outbound data transfer to other regions                  750  GB          $60.00  * 
                                                                                      
  aws_data_transfer.us-east-2                                                            
  ├─ Intra-region data transfer                             2,000  GB          $20.00  * 
