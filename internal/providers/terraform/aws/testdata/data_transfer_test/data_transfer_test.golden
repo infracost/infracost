@@ -226,7 +226,7 @@
  ├─ Outbound data transfer to US East regions                500  GB           $5.00  * 
  └─ Outbound data transfer to other regions                  750  GB          $15.00  * 
                                                                                         
- OVERALL TOTAL                                                           $375,774.31 
+ OVERALL TOTAL                                                           $375,135.79 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -237,5 +237,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃         $0.00 ┃    $375,774 ┃   $375,774 ┃
+┃ main                                               ┃         $0.00 ┃    $375,136 ┃   $375,136 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
