@@ -179,3 +179,9 @@ resource_usage:
         monthly_intra_region_gb: 1000
         monthly_outbound_other_regions_gb: 750
         monthly_outbound_internet_gb: 157000
+
+    aws_data_transfer.ap-southeast-5:
+        region: ap-southeast-5
+        monthly_intra_region_gb: 1000
+        monthly_outbound_other_regions_gb: 750
+        monthly_outbound_internet_gb: 157000
