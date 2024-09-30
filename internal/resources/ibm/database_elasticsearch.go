@@ -2,6 +2,7 @@ package ibm
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -10,7 +11,7 @@ import (
 
 func GetElasticSearchCostComponents(r *Database) []*schema.CostComponent {
 
-	if r.Flavor != "" {
+	if r.Flavor != "" && r.Flavor != "multitenant" {
 		return []*schema.CostComponent{
 			ElasticSearchHostFlavorComponent(r),
 			ElasticSearchDiskCostComponent(r),
@@ -25,11 +26,18 @@ func GetElasticSearchCostComponents(r *Database) []*schema.CostComponent {
 }
 
 func ElasticSearchVirtualProcessorCoreCostComponent(r *Database) *schema.CostComponent {
+
+	var q float64 = float64(r.CPU)
+	if r.Flavor == "multitenant" && q == 0 {
+		// Calculate CPU as 1:8 ratio with RAM, with a max of 2 CPU https://cloud.ibm.com/docs/databases-for-elasticsearch?topic=databases-for-elasticsearch-resources-scaling&interface=terraform
+		q = math.Min(float64(r.Memory/1024)/8, 2)
+	}
+
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Virtual Processor Cores (%s members)", strconv.FormatInt(r.Members, 10)),
 		Unit:            "CPU",
 		UnitMultiplier:  decimal.NewFromInt(1), // Final quantity for this cost component will be divided by this amount
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.CPU * r.Members)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(float64(q) * float64(r.Members))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Location),
@@ -114,7 +122,7 @@ func ElasticSearchHostFlavorComponent(r *Database) *schema.CostComponent {
 		Name:            fmt.Sprintf("Host Flavor (%s members, %s)", strconv.FormatInt(r.Members, 10), r.Flavor),
 		Unit:            "Flavor",
 		UnitMultiplier:  decimal.NewFromInt(1), // Final quantity for this cost component will be divided by this amount
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.Members)),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(float64(r.Members))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Location),

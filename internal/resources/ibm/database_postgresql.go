@@ -10,7 +10,7 @@ import (
 
 func GetPostgresCostComponents(r *Database) []*schema.CostComponent {
 
-	if r.Flavor != "" {
+	if r.Flavor != "" && r.Flavor != "multitenant" {
 		return []*schema.CostComponent{
 			PostgresHostFlavorComponent(r),
 			PostgresDiskCostComponent(r),
