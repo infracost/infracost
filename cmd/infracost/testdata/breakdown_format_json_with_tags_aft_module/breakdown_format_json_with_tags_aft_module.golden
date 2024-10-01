@@ -2032,6 +2032,7 @@
 }
 Err:
 
+
 Logs:
 WARN 2 aws_sns_topic prices missing across 2 resources
 
