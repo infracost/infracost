@@ -288,7 +288,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 		m.logger.Debug().Msgf("loading local module %s from %s", key, dir)
 
-		// If the module is a in a git repo we need to check that it has been checked out.
+		// If the module is in a git repo we need to check that it has been checked out.
 		// If it hasn't been checked out then we need to add it to the sparse-checkout file list.
 		m.logger.Trace().Msgf("finding git repo root for path %s", parentPath)
 		repoRoot, err := findGitRepoRoot(parentPath)
@@ -351,6 +351,17 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) erro
 	// Lock the git repo root so we don't have multiple calls trying to read and update the sparse-checkout file list.
 	unlock := m.sync.Lock(repoRoot)
 	defer unlock()
+
+	// Check if sparse-checkout is enabled for the repo
+	enabled, err := isSparseCheckoutEnabled(repoRoot)
+	if err != nil {
+		return err
+	}
+
+	if !enabled {
+		m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
+		return nil
+	}
 
 	// Get the list of sparse checkout directories (and assume sparse checkout is enabled if this succeeds)
 	m.logger.Trace().Msgf("getting sparse checkout directories for path %s", repoRoot)
@@ -450,6 +461,23 @@ func findGitRepoRoot(startPath string) (string, error) {
 		return "", fmt.Errorf("not a git repository")
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+// isSparseCheckoutEnabled checks if sparse-checkout is enabled in the repository
+func isSparseCheckoutEnabled(repoRoot string) (bool, error) {
+	cmd := exec.Command("git", "config", "--get", "core.sparseCheckout")
+	cmd.Dir = repoRoot
+	output, err := cmd.Output()
+	if err != nil {
+		// if exit status is 1, then the config is not set
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("error checking if sparse-checkout is enabled: %w", err)
+	}
+	return string(output) == "true\n", nil
 }
 
 // getSparseCheckoutDirs gets the list of directories currently in sparse-checkout
