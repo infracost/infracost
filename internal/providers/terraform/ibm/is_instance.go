@@ -17,6 +17,7 @@ func getIsInstanceRegistryItem() *schema.RegistryItem {
 // valid profile values https://cloud.ibm.com/docs/vpc?topic=vpc-profiles&interface=ui
 // profile names in Global Catalog contain dots instead of dashes
 func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+
 	region := d.Get("region").String()
 	profile := d.Get("profile").String()
 	zone := d.Get("zone").String()
@@ -25,26 +26,17 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	isDedicated := !((dedicatedHost == "") && (dedicatedHostGroup == ""))
 	name := d.Get("name").String()
 
-	boot_volume := make([]struct {
-		Name string
-		Size int64
-	}, 0)
+	// Defaults
+	bootVolumeName := "Unnamed boot volume"
+	var bootVolumeSize int64 = 100
 
-	boot_volume_parse := d.Get("boot_volume").Array()
-	if len(boot_volume_parse) > 0 {
-		for _, volume := range boot_volume_parse {
-			name := volume.Get("name").String()
-			if name == "" {
-				name = "Unnamed boot volume"
-			}
-			size := volume.Get("size").Int()
-			if size == 0 {
-				size = 100
-			}
-			boot_volume = append(boot_volume, struct {
-				Name string
-				Size int64
-			}{Name: name, Size: size})
+	bv := d.Get("boot_volume").Array()
+	if len(bv) > 0 {
+		if bv[0].Get("name").String() != "" {
+			bootVolumeName = bv[0].Get("name").String()
+		}
+		if bv[0].Get("size").Int() != 0 {
+			bootVolumeSize = bv[0].Get("size").Int()
 		}
 	}
 
@@ -54,7 +46,10 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		Profile:     profile,
 		Zone:        zone,
 		IsDedicated: isDedicated,
-		BootVolume:  boot_volume,
+		BootVolume: struct {
+			Name string
+			Size int64
+		}{Name: bootVolumeName, Size: bootVolumeSize},
 	}
 
 	r.PopulateUsage(u)
