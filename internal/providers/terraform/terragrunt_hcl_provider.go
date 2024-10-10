@@ -954,18 +954,18 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 	mockValue := cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
 
 	if v, ok := valueMap[key]; ok && isList(v) {
-		// if we have the index already in the dependency output, and it is known use the existing value.
-		// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
-		// try and marshal the cty values to JSON.
-		if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
-			return valueMap
-		}
-
 		existing := v.AsValueSlice()
 		vals := make([]cty.Value, index+1)
 		for i, value := range existing {
-			if value.IsKnown() {
+			if i != index && value.IsKnown() {
 				vals[i] = value
+				continue
+			}
+
+			// if we are at the index and the value is known, and it is an object we need to merge the object
+			// with mock values for the rest of the pieces.
+			if i == index && value.IsKnown() && value.CanIterateElements() && !isList(value) {
+				vals[i] = cty.ObjectVal(mergeObjectWithDependencyMap(value.AsValueMap(), pieces[1:]))
 				continue
 			}
 
