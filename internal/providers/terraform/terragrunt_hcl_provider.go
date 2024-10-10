@@ -770,7 +770,20 @@ func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 }
 
 var (
-	depRegexp   = regexp.MustCompile(`dependency\.[\w\-.\[\]"]+`)
+	// depRegexp is used to find dependency references in Terragrunt files, e.g. dependency.foo.bar
+	// so that we can mock the outputs of these dependencies into a "shape" that is expected by any
+	// inputs that reference it.
+	// The following regex supports formats like:
+	// - dependency.foo.bar
+	// - dependency.foo.bar[0]
+	// - dependency.foo.bar["baz"]
+	// - dependency.foo.bar[0]["baz"]
+	// - tolist(dependency.foo.bar)
+	// - tolist(dependency.foo.bar)[0]
+	// - tomap(dependency.foo.bar)["baz"]
+	// - tolist(dependency.foo.bar["baz")[0]
+	// - tomap(dependency.foo.bar[0])["baz"]
+	depRegexp   = regexp.MustCompile(`(?:\w+\()?dependency\.[\w\-.\[\]"]+(?:\)[\w\-.\[\]"]+)?(?:\))?`)
 	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
 	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
 )
@@ -820,11 +833,19 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 	valueMap := moduleOutputs.AsValueMap()
 
 	for _, match := range matches {
-		pieces := strings.Split(match, ".")
+		stripped := stripFunctionCalls(match)
+		pieces := strings.Split(stripped, ".")
 		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
 	}
 
 	return cty.ObjectVal(valueMap)
+}
+
+func stripFunctionCalls(input string) string {
+	re := regexp.MustCompile(`\w+\(([^)]+)\)`)
+	stripped := re.ReplaceAllString(input, "$1")
+
+	return stripped
 }
 
 func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
@@ -933,18 +954,18 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 	mockValue := cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
 
 	if v, ok := valueMap[key]; ok && isList(v) {
-		// if we have the index already in the dependency output, and it is known use the existing value.
-		// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
-		// try and marshal the cty values to JSON.
-		if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
-			return valueMap
-		}
-
 		existing := v.AsValueSlice()
 		vals := make([]cty.Value, index+1)
 		for i, value := range existing {
-			if value.IsKnown() {
+			if i != index && value.IsKnown() {
 				vals[i] = value
+				continue
+			}
+
+			// if we are at the index and the value is known, and it is an object we need to merge the object
+			// with mock values for the rest of the pieces.
+			if i == index && value.IsKnown() && value.CanIterateElements() && !isList(value) {
+				vals[i] = cty.ObjectVal(mergeObjectWithDependencyMap(value.AsValueMap(), pieces[1:]))
 				continue
 			}
 
