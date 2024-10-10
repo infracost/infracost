@@ -22,15 +22,21 @@
               "attributesWithUnknownKeys": [
                 {
                   "attribute": "customer_gateway_id",
-                  "missingVariables": ["module.gateway.aws_customer_gateway_id"]
+                  "missingVariables": [
+                    "module.gateway.aws_customer_gateway_id"
+                  ]
                 },
                 {
                   "attribute": "transit_gateway_id",
-                  "missingVariables": ["module.gateway.aws_ec2_transit_gateway_id"]
+                  "missingVariables": [
+                    "module.gateway.aws_ec2_transit_gateway_id"
+                  ]
                 },
                 {
                   "attribute": "type",
-                  "missingVariables": ["module.gateway.aws_customer_gateway_type"]
+                  "missingVariables": [
+                    "module.gateway.aws_customer_gateway_type"
+                  ]
                 }
               ],
               "calls": [
@@ -143,15 +149,21 @@
             "attributesWithUnknownKeys": [
               {
                 "attribute": "customer_gateway_id",
-                "missingVariables": ["module.gateway.aws_customer_gateway_id"]
+                "missingVariables": [
+                  "module.gateway.aws_customer_gateway_id"
+                ]
               },
               {
                 "attribute": "transit_gateway_id",
-                "missingVariables": ["module.gateway.aws_ec2_transit_gateway_id"]
+                "missingVariables": [
+                  "module.gateway.aws_ec2_transit_gateway_id"
+                ]
               },
               {
                 "attribute": "type",
-                "missingVariables": ["module.gateway.aws_customer_gateway_type"]
+                "missingVariables": [
+                  "module.gateway.aws_customer_gateway_type"
+                ]
               }
             ],
             "calls": [
