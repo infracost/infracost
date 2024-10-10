@@ -770,7 +770,20 @@ func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 }
 
 var (
-	depRegexp   = regexp.MustCompile(`dependency\.[\w\-.\[\]"]+`)
+	// depRegexp is used to find dependency references in Terragrunt files, e.g. dependency.foo.bar
+	// so that we can mock the outputs of these dependencies into a "shape" that is expected by any
+	// inputs that reference it.
+	// The following regex supports formats like:
+	// - dependency.foo.bar
+	// - dependency.foo.bar[0]
+	// - dependency.foo.bar["baz"]
+	// - dependency.foo.bar[0]["baz"]
+	// - tolist(dependency.foo.bar)
+	// - tolist(dependency.foo.bar)[0]
+	// - tomap(dependency.foo.bar)["baz"]
+	// - tolist(dependency.foo.bar["baz")[0]
+	// - tomap(dependency.foo.bar[0])["baz"]
+	depRegexp   = regexp.MustCompile(`(?:\w+\()?dependency\.[\w\-.\[\]"]+(?:\)[\w\-.\[\]"]+)?(?:\))?`)
 	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
 	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
 )
@@ -820,11 +833,19 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 	valueMap := moduleOutputs.AsValueMap()
 
 	for _, match := range matches {
-		pieces := strings.Split(match, ".")
+		stripped := stripFunctionCalls(match)
+		pieces := strings.Split(stripped, ".")
 		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
 	}
 
 	return cty.ObjectVal(valueMap)
+}
+
+func stripFunctionCalls(input string) string {
+	re := regexp.MustCompile(`\w+\(([^)]+)\)`)
+	stripped := re.ReplaceAllString(input, "$1")
+
+	return stripped
 }
 
 func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
