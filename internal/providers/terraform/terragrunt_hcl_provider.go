@@ -955,17 +955,24 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 
 	if v, ok := valueMap[key]; ok && isList(v) {
 		existing := v.AsValueSlice()
-		vals := make([]cty.Value, index+1)
-		for i, value := range existing {
-			if i != index && value.IsKnown() {
-				vals[i] = value
+
+		s := index + 1
+		if len(existing) > s {
+			s = len(existing)
+		}
+		vals := make([]cty.Value, s)
+
+		for i := 0; i < len(existing); i++ {
+			existingVal := existing[i]
+			if i != index && existingVal.IsKnown() {
+				vals[i] = existingVal
 				continue
 			}
 
 			// if we are at the index and the value is known, and it is an object we need to merge the object
 			// with mock values for the rest of the pieces.
-			if i == index && value.IsKnown() && value.CanIterateElements() && !isList(value) {
-				vals[i] = cty.ObjectVal(mergeObjectWithDependencyMap(value.AsValueMap(), pieces[1:]))
+			if i == index && existingVal.IsKnown() && existingVal.CanIterateElements() && !isList(existingVal) {
+				vals[i] = cty.ObjectVal(mergeObjectWithDependencyMap(existingVal.AsValueMap(), pieces[1:]))
 				continue
 			}
 
