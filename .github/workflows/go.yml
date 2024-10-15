@@ -18,6 +18,9 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Check Terraform format
         run: make tf_fmt_check
 
@@ -76,6 +79,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -93,6 +98,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -110,6 +117,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
