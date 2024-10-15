@@ -783,7 +783,18 @@ var (
 	// - tomap(dependency.foo.bar)["baz"]
 	// - tolist(dependency.foo.bar["baz")[0]
 	// - tomap(dependency.foo.bar[0])["baz"]
-	depRegexp   = regexp.MustCompile(`(?:\w+\()?dependency\.[\w\-.\[\]"]+(?:\)[\w\-.\[\]"]+)?(?:\))?`)
+	// - values(dependency.foo.bar).*
+	// - values(dependency.foo.bar).*.baz
+	// - values(dependency.foo.bar).baz[0]
+	// - values(dependency.foo.bar).baz["qux"]
+	// - values(dependency.foo.bar).*[0]
+	// - values(dependency.foo.bar).*[0]["qux"]
+	// - values(dependency.foo.bar).*.baz[0]
+	// - values(dependency.foo.bar).*.baz["qux"]
+	//
+	// The regex will also match any trailing braces so we have to strip them later on.
+	// There's no easy way to avoid this since golang regex doesn't support lookbehinds.
+	depRegexp   = regexp.MustCompile(`(?:\w+\()?dependency\.[\w\-.\[\]"]+(?:\)[\w\*\-.\[\]"]+)?(?:\))?`)
 	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
 	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
 )
@@ -833,7 +844,7 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 	valueMap := moduleOutputs.AsValueMap()
 
 	for _, match := range matches {
-		stripped := stripFunctionCalls(match)
+		stripped := stripTrailingBraces(stripFunctionCalls(match))
 		pieces := strings.Split(stripped, ".")
 		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
 	}
@@ -846,6 +857,10 @@ func stripFunctionCalls(input string) string {
 	stripped := re.ReplaceAllString(input, "$1")
 
 	return stripped
+}
+
+func stripTrailingBraces(input string) string {
+	return strings.TrimSuffix(input, ")")
 }
 
 func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
