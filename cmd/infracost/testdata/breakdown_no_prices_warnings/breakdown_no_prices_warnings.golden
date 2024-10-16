@@ -15,7 +15,7 @@ Project: main
  ├─ root_block_device                                                                                    
  │  └─ Storage (general purpose SSD, gp2)                                      50  GB            $5.00   
  └─ ebs_block_device[0]                                                                                  
-    └─ Storage (general purpose SSD, gp2)                                   1,000  GB        not found   
+    └─ Storage (unknown)                                                    1,000  GB        not found   
                                                                                                          
  aws_instance.instance_invalid                                                                           
  ├─ Instance usage (Linux/UNIX, on-demand, invalid_instance_type)             730  hours     not found   
