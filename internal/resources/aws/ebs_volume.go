@@ -95,8 +95,10 @@ func (a *EBSVolume) storageCostComponent() *schema.CostComponent {
 		name = "Storage (cold HDD, sc1)"
 	case "gp3":
 		name = "Storage (general purpose SSD, gp3)"
-	default:
+	case "gp2":
 		name = "Storage (general purpose SSD, gp2)"
+	default:
+		name = "Storage (unknown)"
 	}
 
 	return &schema.CostComponent{
