@@ -67,7 +67,7 @@ func (r *VPCEndpoint) BuildResource() *schema.Resource {
 		endpointHours = "VpcEndpoint-Hours"
 		endpointBytes = "VpcEndpoint-Bytes"
 		if dataProcessedGB != nil {
-			gbLimits := []int{1000, 4000}
+			gbLimits := []int{1000000, 4000000}
 			tiers := usage.CalculateTierBuckets(*dataProcessedGB, gbLimits)
 
 			if tiers[0].GreaterThan(decimal.NewFromInt(0)) {
