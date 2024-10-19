@@ -19,6 +19,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
@@ -1381,6 +1382,7 @@ var (
 		"data.google_compute_zones":    googleComputeZonesValues,
 		"data.aws_region":              awsCurrentRegion,
 		"data.aws_default_tags":        awsDefaultTagValues,
+		"data.aws_subnets":             awsSubnetsValues,
 		"resource.random_shuffle":      randomShuffleValues,
 		"resource.time_static":         timeStaticValues,
 		"resource.aws_launch_template": launchTemplateValues,
@@ -1461,6 +1463,23 @@ func awsDefaultTagValues(b *Block) cty.Value {
 
 	return cty.ObjectVal(map[string]cty.Value{
 		"tags": cty.ObjectVal(map[string]cty.Value{}),
+	})
+}
+
+// awsSubnetsValues mocks the values returned from data.aws_subnets. This data
+// source returns a list of subnet IDs.
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets
+//
+// We return a list of 3 fake subnet IDs. Although the actual number of subnets
+// returned is based on the region and availability zones, we return a fixed
+// "sensible" number.
+func awsSubnetsValues(b *Block) cty.Value {
+	return cty.ObjectVal(map[string]cty.Value{
+		"ids": cty.ListVal([]cty.Value{
+			cty.StringVal(fmt.Sprintf("subnet-1-%s", mock.Identifier)),
+			cty.StringVal(fmt.Sprintf("subnet-2-%s", mock.Identifier)),
+			cty.StringVal(fmt.Sprintf("subnet-3-%s", mock.Identifier)),
+		}),
 	})
 }
 
