@@ -4,4 +4,4 @@ resource_usage:
     monthly_data_processed_gb: 1000
 
   aws_vpc_endpoint.interface_withBigUsage:
-    monthly_data_processed_gb: 7000
+    monthly_data_processed_gb: 7000000

@@ -18,6 +18,9 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Check Terraform format
         run: make tf_fmt_check
 
@@ -56,7 +59,7 @@ jobs:
         run: |
           make run --silent ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
           [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
-          jq '' infracost-output.json
+          jq '.' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
@@ -65,7 +68,7 @@ jobs:
         run: |
           make run --silent ARGS="breakdown --config-file=infracost-example.yml"
           [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
-          jq '' infracost-output.json
+          jq '.' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
@@ -76,6 +79,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -93,6 +98,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -110,6 +117,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:

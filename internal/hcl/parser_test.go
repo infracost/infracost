@@ -1520,6 +1520,39 @@ resource "random_shuffle" "bad" {
 	)
 }
 
+func Test_MocksForAWSSubnets(t *testing.T) {
+	path := createTestFile("test.tf", `
+provider "aws" {
+	region = "us-east-1"
+}
+
+data "aws_subnets" "example" {
+	filter {
+		name   = "vpc-id"
+		values = ["vpc-12345678"]
+	}
+}`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{DetectedPath: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+	)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	assertBlockEqualsJSON(
+		t,
+		`{"ids":["subnet-1-infracost-mock-44956be29f34", "subnet-2-infracost-mock-44956be29f34", "subnet-3-infracost-mock-44956be29f34"]}`,
+		blocks.Matching(BlockMatcher{Label: "aws_subnets.example", Type: "data"}).Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
 func Test_LocalsMergeWithDataTags(t *testing.T) {
 	path := createTestFile("test.tf", `
 provider "aws" {
@@ -2105,7 +2138,7 @@ provider "aws" {
 			content: `
 provider "aws" {
   default_tags {
-    tags = merge(var.default_tags, { 
+    tags = merge(var.default_tags, {
       "Environment" = "Test"
     })
   }
