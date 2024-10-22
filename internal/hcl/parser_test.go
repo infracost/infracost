@@ -194,7 +194,6 @@ output "loadbalancer"  {
 	}
 
 	require.Len(t, keys, 1)
-
 }
 
 func Test_UnsupportedAttributesList(t *testing.T) {
@@ -542,7 +541,6 @@ output "val" {
 }
 
 func Test_Modules(t *testing.T) {
-
 	path := createTestFileWithModule(`
 module "my-mod" {
 	source = "../module"
@@ -604,11 +602,9 @@ output "mod_result" {
 	require.NotNil(t, childValAttr)
 	require.Equal(t, cty.String, childValAttr.Value().Type())
 	assert.Equal(t, "ok", childValAttr.Value().AsString())
-
 }
 
 func Test_NestedParentModule(t *testing.T) {
-
 	path := createTestFileWithModule(`
 module "my-mod" {
 	source = "../."
@@ -917,7 +913,6 @@ resource "test_resource_two" "test" {
 }
 
 func Test_ModuleForEaches(t *testing.T) {
-
 	path := createTestFileWithModule(`
 locals {
   az = {
@@ -1227,7 +1222,6 @@ resource "dynamic" "resource" {
 		]`,
 		values,
 	)
-
 }
 
 func Test_ForEachReferencesAnotherForEachDependentAttribute(t *testing.T) {
@@ -2107,11 +2101,9 @@ terraform {
 
 	assert.Equal(t, "~> 5.52.0", module.ProviderConstraints.AWS.String())
 	assert.Equal(t, ">= 5.0.0,< 5.0.4", module.ProviderConstraints.Google.String())
-
 }
 
 func Test_UnknownKeyDetection(t *testing.T) {
-
 	tests := []struct {
 		name      string
 		content   string
@@ -2227,9 +2219,7 @@ resource "aws_instance" "blah" {
 	}
 
 	for _, tt := range tests {
-
 		t.Run(tt.name, func(t *testing.T) {
-
 			variations := []struct {
 				name       string
 				parserOpts []Option
@@ -2245,9 +2235,7 @@ resource "aws_instance" "blah" {
 			}
 
 			for _, variation := range variations {
-
 				t.Run(variation.name, func(t *testing.T) {
-
 					path := createTestFile("test.tf", tt.content)
 
 					logger := newDiscardLogger()
@@ -2283,6 +2271,54 @@ resource "aws_instance" "blah" {
 					assert.EqualValues(t, tt.expected, block.AttributesWithUnknownKeys())
 				})
 			}
+		})
+	}
+}
+
+func Test_uniqueDependencyPaths(t *testing.T) {
+	tests := []struct {
+		name     string
+		paths    []string
+		expected []string
+	}{
+		{
+			name: "no duplicates",
+			paths: []string{
+				"module.foo",
+				"module.bar",
+				"module.baz",
+			},
+			expected: []string{
+				"\"**\"",
+				"module.bar/**",
+				"module.baz/**",
+				"module.foo/**",
+			},
+		},
+		{
+			name: "duplicates",
+			paths: []string{
+				"module.foo",
+				"module.bar",
+				"module.foo",
+				"module.baz",
+				"module.bar",
+			},
+			expected: []string{
+				"\"**\"",
+				"module.bar/**",
+				"module.baz/**",
+				"module.foo/**",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := Parser{
+				moduleCalls: tt.paths,
+			}
+			result := p.DependencyPaths()
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }
