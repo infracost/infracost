@@ -141,6 +141,13 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
+ azurerm_virtual_machine.windows_vms["Standard_E96ds_v6"]                                                                             
+ ├─ Instance usage (Windows, pay as you go, Standard_E96ds_v6)                         730  hours                        $8,953.45    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_ND40s_v2"]                                                                               
  ├─ Instance usage (Linux, pay as you go, Standard_ND40s_v2)                           730  hours                        $8,935.20    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -150,6 +157,13 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_E96bs_v5"]                                                                             
  ├─ Instance usage (Windows, pay as you go, Standard_E96bs_v5)                         730  hours                        $8,444.64    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.windows_vms["Standard_E96ads_v6"]                                                                            
+ ├─ Instance usage (Windows, pay as you go, Standard_E96ads_v6)                        730  hours                        $8,311.78    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -185,13 +199,6 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_E96s_v6"]                                                                              
  ├─ Instance usage (Windows, pay as you go, Standard_E96s_v6)                          730  hours                        $7,859.18    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.windows_vms["Standard_E96ads_v6"]                                                                            
- ├─ Instance usage (Windows, pay as you go, Standard_E96ads_v6)                        730  hours                        $7,848.96    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -260,6 +267,20 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
+ azurerm_virtual_machine.windows_vms["Standard_E96as_v6"]                                                                             
+ ├─ Instance usage (Windows, pay as you go, Standard_E96as_v6)                         730  hours                        $7,400.74    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.windows_vms["Standard_D96ads_v6"]                                                                            
+ ├─ Instance usage (Windows, pay as you go, Standard_D96ads_v6)                        730  hours                        $7,218.24    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
  azurerm_virtual_machine.windows_vms["Standard_D96d_v5"]                                                                              
  ├─ Instance usage (Windows, pay as you go, Standard_D96d_v5)                          730  hours                        $7,183.20    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -302,13 +323,6 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_E96as_v6"]                                                                             
- ├─ Instance usage (Windows, pay as you go, Standard_E96as_v6)                         730  hours                        $7,021.87    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
  azurerm_virtual_machine.windows_vms["Standard_M64ds_v2"]                                                                             
  ├─ Instance usage (Windows, pay as you go, Standard_M64ds_v2)                         730  hours                        $7,017.49    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -318,13 +332,6 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_M64s_v2"]                                                                              
  ├─ Instance usage (Windows, pay as you go, Standard_M64s_v2)                          730  hours                        $6,864.19    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.windows_vms["Standard_D96ads_v6"]                                                                            
- ├─ Instance usage (Windows, pay as you go, Standard_D96ads_v6)                        730  hours                        $6,860.54    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -407,6 +414,20 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
+ azurerm_virtual_machine.windows_vms["Standard_D96alds_v6"]                                                                           
+ ├─ Instance usage (Windows, pay as you go, Standard_D96alds_v6)                       730  hours                        $6,559.78    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.windows_vms["Standard_D96as_v6"]                                                                             
+ ├─ Instance usage (Windows, pay as you go, Standard_D96as_v6)                         730  hours                        $6,405.02    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
  azurerm_virtual_machine.windows_vms["Standard_D96ls_v6"]                                                                             
  ├─ Instance usage (Windows, pay as you go, Standard_D96ls_v6)                         730  hours                        $6,351.00    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -416,13 +437,6 @@
                                                                                                                                       
  azurerm_virtual_machine.linux_vms["Standard_HX176rs"]                                                                                
  ├─ Instance usage (Linux, pay as you go, Standard_HX176rs)                            730  hours                        $6,307.20    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.windows_vms["Standard_D96alds_v6"]                                                                           
- ├─ Instance usage (Windows, pay as you go, Standard_D96alds_v6)                       730  hours                        $6,258.29    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -463,8 +477,8 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_D96as_v6"]                                                                             
- ├─ Instance usage (Windows, pay as you go, Standard_D96as_v6)                         730  hours                        $6,118.13    
+ azurerm_virtual_machine.windows_vms["Standard_D96als_v6"]                                                                            
+ ├─ Instance usage (Windows, pay as you go, Standard_D96als_v6)                        730  hours                        $6,040.75    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -477,8 +491,8 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_D96als_v6"]                                                                            
- ├─ Instance usage (Windows, pay as you go, Standard_D96als_v6)                        730  hours                        $5,781.60    
+ azurerm_virtual_machine.linux_vms["Standard_E96ds_v6"]                                                                               
+ ├─ Instance usage (Linux, pay as you go, Standard_E96ds_v6)                           730  hours                        $5,729.77    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -493,6 +507,13 @@
                                                                                                                                       
  azurerm_virtual_machine.linux_vms["Standard_E96bs_v5"]                                                                               
  ├─ Instance usage (Linux, pay as you go, Standard_E96bs_v5)                           730  hours                        $5,220.96    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.linux_vms["Standard_E96ads_v6"]                                                                              
+ ├─ Instance usage (Linux, pay as you go, Standard_E96ads_v6)                          730  hours                        $5,088.10    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -568,13 +589,6 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_E96ads_v6"]                                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_E96ads_v6)                          730  hours                        $4,625.28    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_E96ads_v5"]                                                                              
  ├─ Instance usage (Linux, pay as you go, Standard_E96ads_v5)                          730  hours                        $4,590.24    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -638,6 +652,20 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
+ azurerm_virtual_machine.linux_vms["Standard_E96as_v6"]                                                                               
+ ├─ Instance usage (Linux, pay as you go, Standard_E96as_v6)                           730  hours                        $4,177.06    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.linux_vms["Standard_D96ads_v6"]                                                                              
+ ├─ Instance usage (Linux, pay as you go, Standard_D96ads_v6)                          730  hours                        $3,994.56    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_D96d_v5"]                                                                                
  ├─ Instance usage (Linux, pay as you go, Standard_D96d_v5)                            730  hours                        $3,959.52    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -666,22 +694,8 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_E96ds_v6"]                                                                             
- ├─ Instance usage (Windows, pay as you go, Standard_E96ds_v6)                         730  hours                        $3,924.48    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_D96lds_v6"]                                                                              
  ├─ Instance usage (Linux, pay as you go, Standard_D96lds_v6)                          730  hours                        $3,865.35    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.linux_vms["Standard_E96as_v6"]                                                                               
- ├─ Instance usage (Linux, pay as you go, Standard_E96as_v6)                           730  hours                        $3,798.19    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -696,13 +710,6 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_HB60rs"]                                                                               
  ├─ Instance usage (Windows, pay as you go, Standard_HB60rs)                           730  hours                        $3,679.20    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.linux_vms["Standard_D96ads_v6"]                                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_D96ads_v6)                          730  hours                        $3,636.86    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -771,6 +778,13 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
+ azurerm_virtual_machine.linux_vms["Standard_D96alds_v6"]                                                                             
+ ├─ Instance usage (Linux, pay as you go, Standard_D96alds_v6)                         730  hours                        $3,336.10    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_NV48s_v3"]                                                                               
  ├─ Instance usage (Linux, pay as you go, Standard_NV48s_v3)                           730  hours                        $3,328.80    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -778,15 +792,15 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_D96ls_v6"]                                                                               
- ├─ Instance usage (Linux, pay as you go, Standard_D96ls_v6)                           730  hours                        $3,127.32    
+ azurerm_virtual_machine.linux_vms["Standard_D96as_v6"]                                                                               
+ ├─ Instance usage (Linux, pay as you go, Standard_D96as_v6)                           730  hours                        $3,181.34    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_D96alds_v6"]                                                                             
- ├─ Instance usage (Linux, pay as you go, Standard_D96alds_v6)                         730  hours                        $3,034.61    
+ azurerm_virtual_machine.linux_vms["Standard_D96ls_v6"]                                                                               
+ ├─ Instance usage (Linux, pay as you go, Standard_D96ls_v6)                           730  hours                        $3,127.32    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -820,8 +834,8 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_D96as_v6"]                                                                               
- ├─ Instance usage (Linux, pay as you go, Standard_D96as_v6)                           730  hours                        $2,894.45    
+ azurerm_virtual_machine.linux_vms["Standard_D96als_v6"]                                                                              
+ ├─ Instance usage (Linux, pay as you go, Standard_D96als_v6)                          730  hours                        $2,817.07    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -836,13 +850,6 @@
                                                                                                                                       
  azurerm_virtual_machine.linux_vms["Standard_HB120rs_v3"]                                                                             
  ├─ Instance usage (Linux, pay as you go, Standard_HB120rs_v3)                         730  hours                        $2,628.00    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.linux_vms["Standard_D96als_v6"]                                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_D96als_v6)                          730  hours                        $2,557.92    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1037,15 +1044,15 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_F8ams_v6"]                                                                             
- ├─ Instance usage (Windows, pay as you go, Standard_F8ams_v6)                         730  hours                          $811.03    
+ azurerm_virtual_machine.windows_vms["Standard_PB6s"]                                                                                 
+ ├─ Instance usage (Windows, pay as you go, Standard_PB6s)                             730  hours                          $807.38    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_PB6s"]                                                                                 
- ├─ Instance usage (Windows, pay as you go, Standard_PB6s)                             730  hours                          $807.38    
+ azurerm_virtual_machine.windows_vms["Standard_F8ams_v6"]                                                                             
+ ├─ Instance usage (Windows, pay as you go, Standard_F8ams_v6)                         730  hours                          $791.32    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1086,13 +1093,6 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_E96ds_v6"]                                                                               
- ├─ Instance usage (Linux, pay as you go, Standard_E96ds_v6)                           730  hours                          $700.80    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
  azurerm_virtual_machine.windows_vms["Standard_E8d_v4"]                                                                               
  ├─ Instance usage (Windows, pay as you go, Standard_E8d_v4)                           730  hours                          $689.12    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -1107,15 +1107,15 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_F8as_v6"]                                                                              
- ├─ Instance usage (Windows, pay as you go, Standard_F8as_v6)                          730  hours                          $683.28    
+ azurerm_virtual_machine.windows_vms["Standard_F8alds_v6"]                                                                            
+ ├─ Instance usage (Windows, pay as you go, Standard_F8alds_v6)                        730  hours                          $682.55    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_F8alds_v6"]                                                                            
- ├─ Instance usage (Windows, pay as you go, Standard_F8alds_v6)                        730  hours                          $682.55    
+ azurerm_virtual_machine.windows_vms["Standard_F8as_v6"]                                                                              
+ ├─ Instance usage (Windows, pay as you go, Standard_F8as_v6)                          730  hours                          $667.22    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1163,15 +1163,15 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_F8als_v6"]                                                                             
- ├─ Instance usage (Windows, pay as you go, Standard_F8als_v6)                         730  hours                          $635.10    
+ azurerm_virtual_machine.linux_vms["Standard_F8amds_v6"]                                                                              
+ ├─ Instance usage (Linux, pay as you go, Standard_F8amds_v6)                          730  hours                          $629.26    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_F8amds_v6"]                                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_F8amds_v6)                          730  hours                          $629.26    
+ azurerm_virtual_machine.windows_vms["Standard_F8als_v6"]                                                                             
+ ├─ Instance usage (Windows, pay as you go, Standard_F8als_v6)                         730  hours                          $621.96    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1282,13 +1282,6 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_F8ams_v6"]                                                                               
- ├─ Instance usage (Linux, pay as you go, Standard_F8ams_v6)                           730  hours                          $542.39    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
  azurerm_virtual_machine.windows_vms["Standard_D8pds_v5"]                                                                             
  ├─ Instance usage (Windows, pay as you go, Standard_D8pds_v5)                         730  hours                          $532.90    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -1298,6 +1291,13 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_A8m_v2"]                                                                               
  ├─ Instance usage (Windows, pay as you go, Standard_A8m_v2)                           730  hours                          $525.60    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.linux_vms["Standard_F8ams_v6"]                                                                               
+ ├─ Instance usage (Linux, pay as you go, Standard_F8ams_v6)                           730  hours                          $522.68    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1394,13 +1394,6 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_F8as_v6"]                                                                                
- ├─ Instance usage (Linux, pay as you go, Standard_F8as_v6)                            730  hours                          $414.64    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_F8alds_v6"]                                                                              
  ├─ Instance usage (Linux, pay as you go, Standard_F8alds_v6)                          730  hours                          $413.91    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -1410,6 +1403,13 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_FX4mds"]                                                                               
  ├─ Instance usage (Windows, pay as you go, Standard_FX4mds)                           730  hours                          $405.88    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
+ azurerm_virtual_machine.linux_vms["Standard_F8as_v6"]                                                                                
+ ├─ Instance usage (Linux, pay as you go, Standard_F8as_v6)                            730  hours                          $398.58    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1443,15 +1443,15 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.linux_vms["Standard_F8als_v6"]                                                                               
- ├─ Instance usage (Linux, pay as you go, Standard_F8als_v6)                           730  hours                          $366.46    
+ azurerm_virtual_machine.windows_vms["Standard_DC4s"]                                                                                 
+ ├─ Instance usage (Windows, pay as you go, Standard_DC4s)                             730  hours                          $355.51    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- azurerm_virtual_machine.windows_vms["Standard_DC4s"]                                                                                 
- ├─ Instance usage (Windows, pay as you go, Standard_DC4s)                             730  hours                          $355.51    
+ azurerm_virtual_machine.linux_vms["Standard_F8als_v6"]                                                                               
+ ├─ Instance usage (Linux, pay as you go, Standard_F8als_v6)                           730  hours                          $353.32    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1693,7 +1693,7 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- OVERALL TOTAL                                                                                                       $1,039,464.56 
+ OVERALL TOTAL                                                                                                       $1,053,518.52 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -1705,5 +1705,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃    $1,039,464 ┃       $0.55 ┃ $1,039,465 ┃
+┃ main                                               ┃    $1,053,518 ┃       $0.55 ┃ $1,053,519 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

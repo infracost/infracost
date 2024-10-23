@@ -14,6 +14,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	"golang.org/x/exp/maps"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -22,9 +23,7 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 )
 
-var (
-	defaultTerraformWorkspaceName = "default"
-)
+var defaultTerraformWorkspaceName = "default"
 
 type Option func(p *Parser)
 
@@ -411,9 +410,21 @@ func (p *Parser) DependencyPaths() []string {
 	} else {
 		sortedCalls = append(sortedCalls, p.RelativePath()+"/**")
 	}
-	sort.Strings(sortedCalls)
+	return p.uniqueDependencyPaths(sortedCalls)
+}
 
-	return sortedCalls
+func (p *Parser) uniqueDependencyPaths(paths []string) []string {
+	seen := make(map[string]struct{})
+
+	for _, path := range paths {
+		if _, ok := seen[path]; ok {
+			continue
+		}
+		seen[path] = struct{}{}
+	}
+	deps := maps.Keys(seen)
+	sort.Strings(deps)
+	return deps
 }
 
 // ParseDirectory parses all the terraform files in the detectedProjectPath into Blocks and then passes them to an Evaluator

@@ -7,7 +7,7 @@
  ├─ Kinesis Firehose notifications                                         4  1M notifications                   $0.76  * 
  ├─ Mobile Push notifications                                              5  1M notifications                   $2.50  * 
  ├─ MacOS notifications                                                    6  1M notifications                   $3.00  * 
- └─ SMS notifications (over 100)                                           9  100 notifications                  $6.75  * 
+ └─ SMS notifications (over 100)                                           9  100 notifications              not found  * 
                                                                                                                           
  aws_sns_topic.sns_topic_customSmsPrice                                                                                   
  └─ SMS notifications (over 100)                                           9  100 notifications                  $8.88  * 
@@ -52,7 +52,7 @@
  ├─ Kinesis Firehose notifications                       Monthly cost depends on usage: $0.19 per 1M notifications        
  ├─ Mobile Push notifications                            Monthly cost depends on usage: $0.50 per 1M notifications        
  ├─ MacOS notifications                                  Monthly cost depends on usage: $0.50 per 1M notifications        
- └─ SMS notifications (over 100)                         Monthly cost depends on usage: $0.75 per 100 notifications       
+ └─ SMS notifications (over 100)                         not found                                                        
                                                                                                                           
  aws_sns_topic.sns_topic_another_region                                                                                   
  ├─ API requests (over 1M)                               Monthly cost depends on usage: $0.50 per 1M requests             
@@ -61,9 +61,9 @@
  ├─ Kinesis Firehose notifications                       Monthly cost depends on usage: $0.19 per 1M notifications        
  ├─ Mobile Push notifications                            Monthly cost depends on usage: $0.50 per 1M notifications        
  ├─ MacOS notifications                                  Monthly cost depends on usage: $0.50 per 1M notifications        
- └─ SMS notifications (over 100)                         Monthly cost depends on usage: $0.75 per 100 notifications       
+ └─ SMS notifications (over 100)                         not found                                                        
                                                                                                                           
- OVERALL TOTAL                                                                                                  $34.13 
+ OVERALL TOTAL                                                                                                  $27.38 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -75,5 +75,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃         $0.00 ┃         $34 ┃        $34 ┃
+┃ main                                               ┃         $0.00 ┃         $27 ┃        $27 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
