@@ -48,7 +48,7 @@ func NewPriceFetcher(ctx *config.RunContext) *PriceFetcher {
 		components: make(map[string]int),
 		mux:        &sync.RWMutex{},
 		runCtx:     ctx,
-		client:     apiclient.NewPricingAPIClient(ctx),
+		client:     apiclient.GetPricingAPIClient(ctx),
 	}
 }
 
