@@ -1823,7 +1823,7 @@ func (p *ProjectLocator) processFile(name string) bool {
 
 func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
 	var rawMatches []string
-	globMatches := make(map[string]struct{})
+	globMatchers := []glob.Glob{}
 
 	for _, dir := range dirs {
 		var absoluteDir string
@@ -1837,17 +1837,19 @@ func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
 			absoluteDir = filepath.Join(fullPath, dir)
 		}
 
-		globs, err := filepath.Glob(absoluteDir)
-		if err == nil {
-			for _, m := range globs {
-				globMatches[m] = struct{}{}
-			}
+		g, err := glob.Compile(absoluteDir)
+		if err != nil {
+			continue
 		}
+
+		globMatchers = append(globMatchers, g)
 	}
 
 	return func(dir string) bool {
-		if _, ok := globMatches[dir]; ok {
-			return true
+		for _, g := range globMatchers {
+			if g.Match(dir) {
+				return true
+			}
 		}
 
 		base := filepath.Base(dir)
