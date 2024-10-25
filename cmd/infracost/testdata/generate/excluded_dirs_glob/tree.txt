@@ -1,0 +1,10 @@
+.
+└── apps/
+    ├── bar/
+    │   └── main.tf
+    └── foo/
+        ├── bar/
+        │   ├── main.tf
+        │   └── bat/
+        │       └── main.tf
+        └── main.tf
