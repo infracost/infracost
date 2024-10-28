@@ -409,24 +409,29 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 	// in future we should get all stacks for the remote name and then
 	// dynamically create projects out of the stacks returned.
 	stacks, err := s.getStacks(context.Background(), &getStackOptions{
-		count:          1,
+		count:          2, // We only want 1 stack, but want to check if there's more than 1
 		repositoryName: s.Metadata.Remote.Name,
-		name:           options.EnvName,
+		fullTextSearch: options.EnvName,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("could not get stacks: %w", err)
 	}
 
-	var stackEnvs []stackConfig
-	for _, s := range stacks {
-		if s.Name == options.EnvName {
-			stackEnvs = s.Config
-			break
-		}
+	if len(stacks) == 0 {
+		logging.Logger.Debug().Msg("no stack found, skipping Spacelift remote variable loading")
+		return nil, nil
 	}
 
+	if len(stacks) > 1 {
+		logging.Logger.Debug().Msg("more than one stack found, skipping Spacelift remote variable loading")
+		return nil, nil
+	}
+
+	logging.Logger.Debug().Msgf("found stack %s for environment %s", stacks[0].Name, options.EnvName)
+	stackEnvs := stacks[0].Config
+
 	if len(stackEnvs) == 0 {
-		logging.Logger.Trace().Msg("no stack environments found, skipping Spacelift remote variable loading")
+		logging.Logger.Debug().Msg("no stack environment variables found, skipping Spacelift remote variable loading")
 		return nil, nil
 	}
 
@@ -453,7 +458,7 @@ type getStackOptions struct {
 	count int32
 
 	repositoryName string
-	name           string
+	fullTextSearch string
 }
 
 func (s *SpaceliftRemoteVariableLoader) getStacks(ctx context.Context, p *getStackOptions) ([]stack, error) {
@@ -479,20 +484,16 @@ func (s *SpaceliftRemoteVariableLoader) getStacks(ctx context.Context, p *getSta
 		})
 	}
 
-	if p.name != "" {
-		conditions = append(conditions, structs.QueryPredicate{
-			Field: graphql.String("name"),
-			Constraint: structs.QueryFieldConstraint{
-				StringMatches: &[]graphql.String{graphql.String(p.name)},
-			},
-		})
-
-	}
-
-	variables := map[string]interface{}{"input": structs.SearchInput{
+	input := structs.SearchInput{
 		First:      graphql.NewInt(graphql.Int(p.count)),
 		Predicates: &conditions,
-	}}
+	}
+
+	if p.fullTextSearch != "" {
+		input.FullTextSearch = graphql.NewString(graphql.String(p.fullTextSearch))
+	}
+
+	variables := map[string]interface{}{"input": input}
 
 	if err := s.Client.Query(
 		ctx,
