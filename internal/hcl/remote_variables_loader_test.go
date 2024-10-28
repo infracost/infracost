@@ -57,7 +57,7 @@ func TestSpaceliftRemoteVariableLoader_Load(t *testing.T) {
 					assert.Equal(t, "POST", r.Method)
 					s, err := io.ReadAll(r.Body)
 					assert.NoError(t, err)
-					assert.JSONEq(t, `{"query":"query($input:SearchInput!){searchStacks(input: $input){edges{node{id,name,config{id,value}}},pageInfo{endCursor,hasNextPage,hasPreviousPage}}}","variables":{"input":{"first":1,"after":null,"fullTextSearch":null,"predicates":[{"field":"repository","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["test/test"]}},{"field":"name","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["dev"]}}],"orderBy":null}}}`, string(s))
+					assert.JSONEq(t, `{"query":"query($input:SearchInput!){searchStacks(input: $input){edges{node{id,name,config{id,value}}},pageInfo{endCursor,hasNextPage,hasPreviousPage}}}","variables":{"input":{"first":2,"after":null,"fullTextSearch":"dev","predicates":[{"field":"repository","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["test/test"]}}],"orderBy":null}}}`, string(s))
 					assert.Equal(t, "Bearer test", r.Header.Get("Authorization"))
 
 					_, err = w.Write([]byte(`{"data":{"searchStacks":{"edges":[{"node":{"id":"dev","name":"dev","config":[{"id":"test","value":"1"},{"id":"test2","value":"foo"}]}}],"pageInfo":{"endCursor":"MDFKNEtQMzVETjFYRDcxNTY1UkJCMzBITUQ=","hasNextPage":true,"hasPreviousPage":false}}}}`))
@@ -87,10 +87,67 @@ func TestSpaceliftRemoteVariableLoader_Load(t *testing.T) {
 					assert.Equal(t, "POST", r.Method)
 					s, err := io.ReadAll(r.Body)
 					assert.NoError(t, err)
-					assert.JSONEq(t, `{"query":"query($input:SearchInput!){searchStacks(input: $input){edges{node{id,name,config{id,value}}},pageInfo{endCursor,hasNextPage,hasPreviousPage}}}","variables":{"input":{"first":1,"after":null,"fullTextSearch":null,"predicates":[{"field":"repository","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["test/test"]}},{"field":"name","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["dev"]}}],"orderBy":null}}}`, string(s))
-					assert.Equal(t, "Bearer test", r.Header.Get("Authorization"))
+					assert.JSONEq(t, `{"query":"query($input:SearchInput!){searchStacks(input: $input){edges{node{id,name,config{id,value}}},pageInfo{endCursor,hasNextPage,hasPreviousPage}}}","variables":{"input":{"first":2,"after":null,"fullTextSearch":"dev","predicates":[{"field":"repository","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["test/test"]}}],"orderBy":null}}}`, string(s))
 
 					_, err = w.Write([]byte(`{"data":{"searchStacks":{"edges":[{"node":{"id":"dev","name":"dev","config":[]}}],"pageInfo":{"endCursor":"MDFKNEtQMzVETjFYRDcxNTY1UkJCMzBITUQ=","hasNextPage":true,"hasPreviousPage":false}}}}`))
+					assert.NoError(t, err)
+				}
+			},
+		},
+		{
+			name: "returns empty map if no stack is found",
+			fields: fields{
+				Metadata: vcs.Metadata{
+					Remote: vcs.Remote{
+						Name: "test/test",
+					},
+				},
+			},
+			args: args{
+				options: RemoteVarLoaderOptions{
+					EnvName: "dev",
+				},
+			},
+			want:    nil,
+			wantErr: assert.NoError,
+			testServerFunc: func(t *testing.T) http.HandlerFunc {
+				// test that the /graqphl endpoint has been called and the correct query has been sent
+				return func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, "POST", r.Method)
+					s, err := io.ReadAll(r.Body)
+					assert.NoError(t, err)
+					assert.JSONEq(t, `{"query":"query($input:SearchInput!){searchStacks(input: $input){edges{node{id,name,config{id,value}}},pageInfo{endCursor,hasNextPage,hasPreviousPage}}}","variables":{"input":{"first":2,"after":null,"fullTextSearch":"dev","predicates":[{"field":"repository","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["test/test"]}}],"orderBy":null}}}`, string(s))
+
+					_, err = w.Write([]byte(`{"data":{"searchStacks":{"edges":[],"pageInfo":{"endCursor":"MDFKNEtQMzVETjFYRDcxNTY1UkJCMzBITUQ=","hasNextPage":true,"hasPreviousPage":false}}}}`))
+					assert.NoError(t, err)
+				}
+			},
+		},
+		{
+			name: "returns empty map if more than one stack is found",
+			fields: fields{
+				Metadata: vcs.Metadata{
+					Remote: vcs.Remote{
+						Name: "test/test",
+					},
+				},
+			},
+			args: args{
+				options: RemoteVarLoaderOptions{
+					EnvName: "dev",
+				},
+			},
+			want:    nil,
+			wantErr: assert.NoError,
+			testServerFunc: func(t *testing.T) http.HandlerFunc {
+				// test that the /graqphl endpoint has been called and the correct query has been sent
+				return func(w http.ResponseWriter, r *http.Request) {
+					assert.Equal(t, "POST", r.Method)
+					s, err := io.ReadAll(r.Body)
+					assert.NoError(t, err)
+					assert.JSONEq(t, `{"query":"query($input:SearchInput!){searchStacks(input: $input){edges{node{id,name,config{id,value}}},pageInfo{endCursor,hasNextPage,hasPreviousPage}}}","variables":{"input":{"first":2,"after":null,"fullTextSearch":"dev","predicates":[{"field":"repository","constraint":{"booleanEquals":null,"enumEquals":null,"stringMatches":["test/test"]}}],"orderBy":null}}}`, string(s))
+
+					_, err = w.Write([]byte(`{"data":{"searchStacks":{"edges":[{"node":{"id":"dev-a","name":"dev-a","config":[]}},{"node":{"id":"dev-b","name":"dev-b","config":[]}}],"pageInfo":{"endCursor":"MDFKNEtQMzVETjFYRDcxNTY1UkJCMzBITUQ=","hasNextPage":true,"hasPreviousPage":false}}}}`))
 					assert.NoError(t, err)
 				}
 			},
