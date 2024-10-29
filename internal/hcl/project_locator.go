@@ -107,8 +107,8 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 		// will create separate envs for dev-staging and dev-legacy. We don't want these
 		// wildcards to appear in the envNames list as this will create unwanted env
 		// grouping.
-		if strings.Contains(name, "*") {
-			wildcards = append(wildcards, name)
+		if strings.Contains(name, "*") || strings.Contains(name, "?") {
+			wildcards = append(wildcards, strings.ToLower(name))
 			continue
 		}
 
@@ -170,6 +170,7 @@ func (e *EnvFileMatcher) IsGlobalVarFile(file string) bool {
 // IsEnvName checks if the var file is an environment specific var file.
 func (e *EnvFileMatcher) IsEnvName(file string) bool {
 	clean := e.clean(file)
+
 	_, ok := e.envLookup[clean]
 	if ok {
 		return true

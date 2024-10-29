@@ -4,49 +4,81 @@ projects:
   - path: terraform
     name: terraform-conf-dev-foo
     terraform_var_files:
+      - env/other-uat.tfvars
       - env/conf-dev-foo.tfvars
     skip_autodetect: true
     dependency_paths:
       - terraform/**
       - terraform/env/conf-dev-foo.tfvars
+      - terraform/env/other-uat.tfvars
   - path: terraform
     name: terraform-conf-prod-foo
     terraform_var_files:
+      - env/other-uat.tfvars
       - env/conf-prod-foo.tfvars
     skip_autodetect: true
     dependency_paths:
       - terraform/**
       - terraform/env/conf-prod-foo.tfvars
+      - terraform/env/other-uat.tfvars
   - path: terraform
     name: terraform-dev
     terraform_var_files:
+      - env/other-uat.tfvars
       - env/dev.tfvars
     skip_autodetect: true
     dependency_paths:
       - terraform/**
       - terraform/env/dev.tfvars
+      - terraform/env/other-uat.tfvars
   - path: terraform
     name: terraform-ops-dev
     terraform_var_files:
+      - env/other-uat.tfvars
       - env/ops-dev.tfvars
     skip_autodetect: true
     dependency_paths:
       - terraform/**
       - terraform/env/ops-dev.tfvars
+      - terraform/env/other-uat.tfvars
   - path: terraform
     name: terraform-ops-prod-bar
     terraform_var_files:
+      - env/other-uat.tfvars
       - env/ops-prod-bar.tfvars
     skip_autodetect: true
     dependency_paths:
       - terraform/**
       - terraform/env/ops-prod-bar.tfvars
+      - terraform/env/other-uat.tfvars
   - path: terraform
     name: terraform-ops-prod-foo
     terraform_var_files:
+      - env/other-uat.tfvars
       - env/ops-prod-foo.tfvars
     skip_autodetect: true
     dependency_paths:
       - terraform/**
       - terraform/env/ops-prod-foo.tfvars
+      - terraform/env/other-uat.tfvars
+  - path: terraform
+    name: terraform-uk-uat
+    terraform_var_files:
+      - env/other-uat.tfvars
+      - env/uk-uat.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - terraform/**
+      - terraform/env/other-uat.tfvars
+      - terraform/env/uk-uat.tfvars
+  - path: terraform
+    name: terraform-us-uat
+    terraform_var_files:
+      - env/other-uat.tfvars
+      - env/us-uat.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - terraform/**
+      - terraform/env/other-uat.tfvars
+      - terraform/env/us-uat.tfvars
 
