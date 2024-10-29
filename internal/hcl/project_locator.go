@@ -170,7 +170,6 @@ func (e *EnvFileMatcher) IsGlobalVarFile(file string) bool {
 // IsEnvName checks if the var file is an environment specific var file.
 func (e *EnvFileMatcher) IsEnvName(file string) bool {
 	clean := e.clean(file)
-
 	_, ok := e.envLookup[clean]
 	if ok {
 		return true

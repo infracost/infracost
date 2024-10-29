@@ -62,6 +62,7 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"base":       p.base,
 		"stem":       p.stem,
 		"ext":        p.ext,
+		"lower":      p.lower,
 		"startsWith": p.startsWith,
 		"endsWith":   p.endsWith,
 		"contains":   p.contains,
@@ -143,6 +144,11 @@ func (p *Parser) stem(path string) string {
 // ext returns the file name extension used by path.
 func (p *Parser) ext(path string) string {
 	return filepath.Ext(path)
+}
+
+// lower returns a copy of the string s with all Unicode letters mapped to their lower case.
+func (p *Parser) lower(s string) string {
+	return strings.ToLower(s)
 }
 
 // startsWith tests whether the string s begins with prefix.
