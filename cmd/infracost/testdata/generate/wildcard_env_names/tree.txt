@@ -6,5 +6,8 @@
     │   ├── ops-dev.tfvars
     │   ├── conf-dev-foo.tfvars
     │   ├── dev.tfvars
+    │   ├── uk-uat.tfvars
+    │   ├── us-uat.tfvars
+    │   ├── other-uat.tfvars
     │   └── conf-prod-foo.tfvars
     └── main.tf
