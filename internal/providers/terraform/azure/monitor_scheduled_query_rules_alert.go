@@ -16,7 +16,7 @@ func getMonitorScheduledQueryRulesAlertRegistryItem() *schema.RegistryItem {
 }
 
 func newMonitorScheduledQueryRulesAlert(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	return &azure.MonitorScheduledQueryRulesAlert{
 		Address:          d.Address,
 		Region:           region,

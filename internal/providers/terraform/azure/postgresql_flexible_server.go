@@ -4,21 +4,20 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
+func getPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_postgresql_flexible_server",
-		RFunc: newPostgreSQLFlexibleServer,
+		Name:      "azurerm_postgresql_flexible_server",
+		CoreRFunc: newPostgreSQLFlexibleServer,
 	}
 }
 
-func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
+	region := d.Region
 	sku := d.Get("sku_name").String()
 	storage := d.Get("storage_mb").Int()
 
@@ -26,7 +25,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 
 	s := strings.Split(sku, "_")
 	if len(s) < 3 || len(s) > 4 {
-		log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
+		logging.Logger.Warn().Msgf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -41,7 +40,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 
 	supportedTiers := []string{"b", "gp", "mo"}
 	if !contains(supportedTiers, tier) {
-		log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server tier prefix for resource %s: %s", d.Address, sku)
+		logging.Logger.Warn().Msgf("Unrecognised PostgreSQL Flexible Server tier prefix for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -49,7 +48,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 		coreRegex := regexp.MustCompile(`(\d+)`)
 		match := coreRegex.FindStringSubmatch(size)
 		if len(match) < 1 {
-			log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server size for resource %s: %s", d.Address, sku)
+			logging.Logger.Warn().Msgf("Unrecognised PostgreSQL Flexible Server size for resource %s: %s", d.Address, sku)
 			return nil
 		}
 	}
@@ -63,7 +62,5 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 		InstanceVersion: version,
 		Storage:         storage,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

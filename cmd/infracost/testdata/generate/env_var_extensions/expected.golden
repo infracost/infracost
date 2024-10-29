@@ -1,0 +1,80 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+    name: apps-bar-baz
+    terraform_var_files:
+      - ../default.tfvars
+      - ../common.tfvars.json
+      - ../baz-custom-ext
+    skip_autodetect: true
+    dependency_paths:
+      - apps/bar/**
+      - apps/baz-custom-ext
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+  - path: apps/bar
+    name: apps-bar-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../common.tfvars.json
+      - ../dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - apps/bar/**
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/dev.tfvars
+  - path: apps/bar
+    name: apps-bar-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../common.tfvars.json
+      - ../prod.env.tfvars
+      - ../prod-custom-ext
+    skip_autodetect: true
+    dependency_paths:
+      - apps/bar/**
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/prod-custom-ext
+      - apps/prod.env.tfvars
+  - path: apps/foo
+    name: apps-foo-baz
+    terraform_var_files:
+      - ../default.tfvars
+      - ../common.tfvars.json
+      - ../baz-custom-ext
+    skip_autodetect: true
+    dependency_paths:
+      - apps/baz-custom-ext
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/foo/**
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../common.tfvars.json
+      - ../dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/dev.tfvars
+      - apps/foo/**
+  - path: apps/foo
+    name: apps-foo-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../common.tfvars.json
+      - ../prod.env.tfvars
+      - ../prod-custom-ext
+    skip_autodetect: true
+    dependency_paths:
+      - apps/common.tfvars.json
+      - apps/default.tfvars
+      - apps/foo/**
+      - apps/prod-custom-ext
+      - apps/prod.env.tfvars
+

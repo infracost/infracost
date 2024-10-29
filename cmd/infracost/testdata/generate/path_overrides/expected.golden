@@ -1,0 +1,50 @@
+version: 0.1
+
+projects:
+  - path: infra/components/bar
+    name: infra-components-bar-bip
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../bip.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/bip.tfvars
+      - infra/components/bar/**
+      - infra/default.tfvars
+  - path: infra/components/blah
+    name: infra-components-blah-bat
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../network-bat.tfvars
+      - ../../bat.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/bat.tfvars
+      - infra/components/blah/**
+      - infra/default.tfvars
+      - infra/network-bat.tfvars
+  - path: infra/components/blah
+    name: infra-components-blah-bip
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../bip.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/bip.tfvars
+      - infra/components/blah/**
+      - infra/default.tfvars
+  - path: infra/components/foo
+    name: infra-components-foo-baz
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../network-baz.tfvars
+      - ../../baz.tfvars
+      - var.auto.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/baz.tfvars
+      - infra/components/foo/**
+      - infra/components/foo/var.auto.tfvars
+      - infra/default.tfvars
+      - infra/network-baz.tfvars
+

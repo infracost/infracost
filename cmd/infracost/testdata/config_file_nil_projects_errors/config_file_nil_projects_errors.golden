@@ -1,5 +1,11 @@
 
  OVERALL TOTAL           - 
 
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+
 Err:
 
+
+Logs:
+ERROR All provided config file paths are invalid or do not contain any supported projects

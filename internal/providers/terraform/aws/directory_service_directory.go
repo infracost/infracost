@@ -4,8 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -14,16 +13,16 @@ var adReg = regexp.MustCompile(`(AD)`)
 
 func getDirectoryServiceDirectory() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_directory_service_directory",
-		RFunc: newDirectoryServiceDirectory,
+		Name:      "aws_directory_service_directory",
+		CoreRFunc: newDirectoryServiceDirectory,
 	}
 }
 
-func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDirectoryServiceDirectory(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	regionName, ok := aws.RegionMapping[region]
 	if !ok {
-		log.Warn().Msgf("Could not find mapping for resource %s region %s", d.Address, region)
+		logging.Logger.Warn().Msgf("Could not find mapping for resource %s region %s", d.Address, region)
 	}
 
 	a := &aws.DirectoryServiceDirectory{
@@ -34,9 +33,8 @@ func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *
 		Edition:    d.Get("edition").String(),
 		Size:       d.Get("size").String(),
 	}
-	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a
 }
 
 // getType returns the terraform directory type with AD spaced, e.g:

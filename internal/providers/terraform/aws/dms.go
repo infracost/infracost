@@ -7,12 +7,12 @@ import (
 
 func getDMSRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_dms_replication_instance",
-		RFunc: NewDMSReplicationInstance,
+		Name:      "aws_dms_replication_instance",
+		CoreRFunc: NewDMSReplicationInstance,
 	}
 }
 
-func NewDMSReplicationInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDMSReplicationInstance(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.DMSReplicationInstance{
 		Address:                  d.Address,
 		MultiAZ:                  d.Get("multi_az").Bool(),
@@ -20,7 +20,5 @@ func NewDMSReplicationInstance(d *schema.ResourceData, u *schema.UsageData) *sch
 		ReplicationInstanceClass: d.Get("replication_instance_class").String(),
 		Region:                   d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

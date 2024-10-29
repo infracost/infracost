@@ -1,55 +1,60 @@
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace
+Project: testdata-hclmulti_workspace-blue
+Module path: REPLACED_PROJECT_PATH/testdata/hclmulti_workspace
 Workspace: blue
 
- Name                                                           Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                      
- aws_instance.web_app                                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
- ├─ root_block_device                                                                                                 
- │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                               
-    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
-    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
-                                                                                                                      
- aws_lambda_function.hello_world                                                                                      
- ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                      
- Project total                                                                                                $742.64 
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $742.64   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace
+Project: testdata-hclmulti_workspace-yellow
+Module path: REPLACED_PROJECT_PATH/testdata/hclmulti_workspace
 Workspace: yellow
 
- Name                                                           Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                      
- aws_instance.web_app                                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
- ├─ root_block_device                                                                                                 
- │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                               
-    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
-    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
-                                                                                                                      
- aws_lambda_function.hello_world                                                                                      
- ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                      
- Project total                                                                                                $742.64 
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                                50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $742.64   
 
- OVERALL TOTAL                                                                                              $1,485.28 
+ OVERALL TOTAL                                                                                             $1,485.28 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                       ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/hclmulti_workspace ┃ $743         ┃
-┃ infracost/infracost/cmd/infracost/testdata/hclmulti_workspace ┃ $743         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ testdata-hclmulti_workspace-blue                   ┃          $743 ┃           - ┃       $743 ┃
+┃ testdata-hclmulti_workspace-yellow                 ┃          $743 ┃           - ┃       $743 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

@@ -1,25 +1,26 @@
 
- Name                               Monthly Qty  Unit              Monthly Cost 
-                                                                                
- azurerm_lb.example                                                             
- └─ Data processed               Monthly cost depends on usage: $0.005 per GB   
-                                                                                
- azurerm_lb_outbound_rule.rules                                                 
- └─ Rule usage                              730  hours                    $7.30 
-                                                                                
- azurerm_public_ip.example                                                      
- └─ IP address (static)                     730  hours                    $2.63 
-                                                                                
- OVERALL TOTAL                                                            $9.93 
+ Name                                 Monthly Qty  Unit              Monthly Cost   
+                                                                                    
+ azurerm_lb_outbound_rule.rules                                                     
+ └─ Rule usage                                730  hours                    $7.30   
+                                                                                    
+ azurerm_public_ip.example                                                          
+ └─ IP address (static, regional)             730  hours                    $3.65   
+                                                                                    
+ azurerm_lb.example                                                                 
+ └─ Data processed                 Monthly cost depends on usage: $0.005 per GB     
+                                                                                    
+ OVERALL TOTAL                                                            $10.95 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 3 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_lb_backend_address_pool
-  ∙ 1 x azurerm_resource_group
+∙ 3 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMLoadBalancerOutboundRuleV2GoldenFile    ┃ $10          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $11 ┃           - ┃        $11 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

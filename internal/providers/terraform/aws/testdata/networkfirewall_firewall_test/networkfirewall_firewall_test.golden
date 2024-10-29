@@ -1,21 +1,24 @@
 
- Name                                                                 Monthly Qty  Unit              Monthly Cost 
-                                                                                                                  
- aws_networkfirewall_firewall.networkfirewall_firewall                                                            
- ├─ Network Firewall Endpoint                                                 730  hours                  $288.35 
- └─ Data Processed                                                 Monthly cost depends on usage: $0.065 per GB   
-                                                                                                                  
- aws_networkfirewall_firewall.networkfirewall_firewall_with_usage                                                 
- ├─ Network Firewall Endpoint                                                 730  hours                  $288.35 
- └─ Data Processed                                                            100  GB                       $6.50 
-                                                                                                                  
+ Name                                                                 Monthly Qty  Unit              Monthly Cost    
+                                                                                                                     
+ aws_networkfirewall_firewall.networkfirewall_firewall_with_usage                                                    
+ ├─ Network Firewall Endpoint                                                 730  hours                  $288.35    
+ └─ Data Processed                                                            100  GB                       $6.50  * 
+                                                                                                                     
+ aws_networkfirewall_firewall.networkfirewall_firewall                                                               
+ ├─ Network Firewall Endpoint                                                 730  hours                  $288.35    
+ └─ Data Processed                                                 Monthly cost depends on usage: $0.065 per GB      
+                                                                                                                     
  OVERALL TOTAL                                                                                            $583.20 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNetworkfirewallFirewallGoldenFile              ┃ $583         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $577 ┃          $7 ┃       $583 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -32,7 +32,7 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
       terraform show -json tfplan.binary > plan.json
       infracost diff --path plan.json`,
 		ValidArgs: []string{"--", "-"},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: checkAPIKeyIsValid(ctx, func(cmd *cobra.Command, args []string) error {
 			if err := checkAPIKey(ctx.Config.APIKey, ctx.Config.PricingAPIEndpoint, ctx.Config.DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}
@@ -55,7 +55,7 @@ func diffCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			return runDiff(cmd, ctx)
-		},
+		}),
 	}
 
 	addRunFlags(cmd)
@@ -129,7 +129,7 @@ func checkDiffConfig(cfg *config.Config) error {
 		}
 
 		projectType := providers.DetectProjectType(projectConfig.Path, projectConfig.TerraformForceCLI)
-		if (projectType == "terraform_dir" || projectType == "terragrunt_dir") && cfg.CompareTo == "" {
+		if (projectType == providers.ProjectTypeAutodetect) && cfg.CompareTo == "" {
 			examplePath := "/code"
 			if projectConfig.Path != "" {
 				examplePath = projectConfig.Path

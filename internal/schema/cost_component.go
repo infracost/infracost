@@ -23,6 +23,8 @@ type CostComponent struct {
 	priceHash            string
 	HourlyCost           *decimal.Decimal
 	MonthlyCost          *decimal.Decimal
+	UsageBased           bool
+	PriceNotFound        bool
 }
 
 func (c *CostComponent) CalculateCosts() {
@@ -46,6 +48,13 @@ func (c *CostComponent) fillQuantities() {
 
 func (c *CostComponent) SetPrice(price decimal.Decimal) {
 	c.price = price
+}
+
+// SetPriceNotFound zeros the price and marks the component as having a price not
+// found.
+func (c *CostComponent) SetPriceNotFound() {
+	c.price = decimal.Zero
+	c.PriceNotFound = true
 }
 
 func (c *CostComponent) Price() decimal.Decimal {

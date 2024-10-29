@@ -15,7 +15,13 @@ type AutomationJobSchedule struct {
 	MonthlyJobRunMins *int64 `infracost_usage:"monthly_job_run_mins"`
 }
 
-var AutomationJobScheduleUsageSchema = []*schema.UsageItem{{Key: "monthly_job_run_mins", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *AutomationJobSchedule) CoreType() string {
+	return "AutomationJobSchedule"
+}
+
+func (r *AutomationJobSchedule) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_job_run_mins", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *AutomationJobSchedule) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -34,7 +40,8 @@ func (r *AutomationJobSchedule) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AutomationJobScheduleUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -59,5 +66,6 @@ func automationRunTimeCostComponent(location, startUsage, meterName, skuName str
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

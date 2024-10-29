@@ -1,0 +1,10 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+    name: apps-bar
+  - path: apps/baz/bip
+    name: apps-baz-bip
+  - path: apps/foo
+    name: apps-foo
+

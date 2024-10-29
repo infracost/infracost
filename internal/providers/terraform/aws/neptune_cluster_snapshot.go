@@ -7,15 +7,15 @@ import (
 
 func getNeptuneClusterSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_neptune_cluster_snapshot",
-		RFunc: NewNeptuneClusterSnapshot,
+		Name:      "aws_neptune_cluster_snapshot",
+		CoreRFunc: NewNeptuneClusterSnapshot,
 		ReferenceAttributes: []string{
 			"db_cluster_identifier",
 		},
 	}
 }
 
-func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneClusterSnapshot(d *schema.ResourceData) schema.CoreResource {
 	var backupRetentionPeriod *int64
 
 	dbClusterIdentifiers := d.References("db_cluster_identifier")
@@ -29,7 +29,5 @@ func NewNeptuneClusterSnapshot(d *schema.ResourceData, u *schema.UsageData) *sch
 		Region:                d.Get("region").String(),
 		BackupRetentionPeriod: backupRetentionPeriod,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

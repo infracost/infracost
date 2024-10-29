@@ -157,7 +157,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
       
   
-  <p class="project-name">Project: infracost/infracost/cmd/infracost/testdata/example_plan.json</p>
+  <p class="project-name">Project: REPLACED_PROJECT_PATH/testdata/example_plan.json</p>
   <table class="breakdown">
     <thead>
       
@@ -220,182 +220,6 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
       
         <td class="monthly-cost">$560.64</td>
-      
-    
-  </tr>
-
-  
-  
-    
-  
-  <tr class="resource">
-    <td class="name">
-      
-      <span class="arrow">&#8627;</span>
-      root_block_device
-    </td>
-    
-  
-    <td class="monthly-quantity"></td>
-  
-  
-    <td class="unit"></td>
-  
-  
-  
-  
-    <td class="monthly-cost"></td>
-  
-
-  </tr>
-  
-  
-  
-    
-  <tr class="cost-component">
-    <td class="name">
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <span class="arrow">&#8627;</span>
-      Storage (general purpose SSD, gp2)
-    </td>
-    
-      
-        <td class="monthly-quantity">50</td>
-      
-      
-        <td class="unit">GB</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$5.00</td>
-      
-    
-  </tr>
-
-  
-  
-
-  
-    
-  
-  <tr class="resource">
-    <td class="name">
-      
-      <span class="arrow">&#8627;</span>
-      ebs_block_device[0]
-    </td>
-    
-  
-    <td class="monthly-quantity"></td>
-  
-  
-    <td class="unit"></td>
-  
-  
-  
-  
-    <td class="monthly-cost"></td>
-  
-
-  </tr>
-  
-  
-  
-    
-  <tr class="cost-component">
-    <td class="name">
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <span class="arrow">&#8627;</span>
-      Storage (provisioned IOPS SSD, io1)
-    </td>
-    
-      
-        <td class="monthly-quantity">1,000</td>
-      
-      
-        <td class="unit">GB</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$125.00</td>
-      
-    
-  </tr>
-
-  
-    
-  <tr class="cost-component">
-    <td class="name">
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <span class="arrow">&#8627;</span>
-      Provisioned IOPS
-    </td>
-    
-      
-        <td class="monthly-quantity">800</td>
-      
-      
-        <td class="unit">IOPS</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$52.00</td>
-      
-    
-  </tr>
-
-  
-  
-
-  
-
-      
-        
-  
-  <tr class="resource top-level">
-    <td class="name">
-      
-      
-      aws_instance.zero_cost_instance
-    </td>
-    
-  
-    <td class="monthly-quantity"></td>
-  
-  
-    <td class="unit"></td>
-  
-  
-  
-  
-    <td class="monthly-cost"></td>
-  
-
-  </tr>
-  
-  
-  
-    
-  <tr class="cost-component">
-    <td class="name">
-      
-      <span class="arrow">&#8627;</span>
-      Instance usage (Linux/UNIX, reserved, m5.4xlarge)
-    </td>
-    
-      
-        <td class="monthly-quantity">730</td>
-      
-      
-        <td class="unit">hours</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$0.00</td>
       
     
   </tr>
@@ -605,6 +429,182 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
         
   
+  <tr class="resource top-level">
+    <td class="name">
+      
+      
+      aws_instance.zero_cost_instance
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Instance usage (Linux/UNIX, reserved, m5.4xlarge)
+    </td>
+    
+      
+        <td class="monthly-quantity">730</td>
+      
+      
+        <td class="unit">hours</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$0.00</td>
+      
+    
+  </tr>
+
+  
+  
+    
+  
+  <tr class="resource">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      root_block_device
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Storage (general purpose SSD, gp2)
+    </td>
+    
+      
+        <td class="monthly-quantity">50</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$5.00</td>
+      
+    
+  </tr>
+
+  
+  
+
+  
+    
+  
+  <tr class="resource">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      ebs_block_device[0]
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Storage (provisioned IOPS SSD, io1)
+    </td>
+    
+      
+        <td class="monthly-quantity">1,000</td>
+      
+      
+        <td class="unit">GB</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$125.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <span class="arrow">&#8627;</span>
+      Provisioned IOPS
+    </td>
+    
+      
+        <td class="monthly-quantity">800</td>
+      
+      
+        <td class="unit">IOPS</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$52.00</td>
+      
+    
+  </tr>
+
+  
+  
+
+  
+
+      
+        
+  
 
       
         
@@ -630,7 +630,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </table>
 
     <div class="warnings">
-      <p>5 cloud resources were detected:<br />∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file</p>
+      <p>5 cloud resources were detected:<br />∙ 5 were estimated</p>
     </div>
   </body>
 </html>

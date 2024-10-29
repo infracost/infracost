@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getLambdaFunctionRegistryItem() *schema.RegistryItem {

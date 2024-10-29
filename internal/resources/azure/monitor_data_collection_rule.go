@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // MonitorDataCollectionRule struct represents an Azure Monitor Data Collection Rule.
@@ -71,5 +72,6 @@ func (r *MonitorDataCollectionRule) metricsIngestionCostComponent(quantity *int6
 				{Key: "meterName", Value: strPtr("Metrics ingestion Metric samples")},
 			},
 		},
+		UsageBased: true,
 	}
 }

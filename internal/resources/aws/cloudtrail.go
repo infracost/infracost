@@ -34,10 +34,16 @@ type Cloudtrail struct {
 	MonthlyInsightEvents              *float64 `infracost_usage:"monthly_insight_events"`
 }
 
-var cloudTrailUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_additional_management_events", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_data_events", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_insight_events", DefaultValue: 0, ValueType: schema.Float64},
+func (r *Cloudtrail) CoreType() string {
+	return "Cloudtrail"
+}
+
+func (r *Cloudtrail) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_additional_management_events", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_data_events", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_insight_events", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the Cloudtrail.
@@ -75,7 +81,7 @@ func (r *Cloudtrail) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    cloudTrailUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -131,5 +137,6 @@ func (r *Cloudtrail) eventCostComponent(name string, quantity *decimal.Decimal) 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

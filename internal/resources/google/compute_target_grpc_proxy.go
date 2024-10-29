@@ -14,7 +14,13 @@ type ComputeTargetGRPCProxy struct {
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var ComputeTargetGRPCProxyUsageSchema = []*schema.UsageItem{{Key: "monthly_proxy_instances", ValueType: schema.Float64, DefaultValue: 0.000000}, {Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *ComputeTargetGRPCProxy) CoreType() string {
+	return "ComputeTargetGRPCProxy"
+}
+
+func (r *ComputeTargetGRPCProxy) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_proxy_instances", ValueType: schema.Float64, DefaultValue: 0.000000}, {Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *ComputeTargetGRPCProxy) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -39,11 +45,18 @@ func (r *ComputeTargetGRPCProxy) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ComputeTargetGRPCProxyUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
-func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
+func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(instanceCount *decimal.Decimal) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if instanceCount != nil {
+		instanceHours := schema.HourToMonthUnitMultiplier.Mul(*instanceCount)
+		quantity = &instanceHours
+	}
+
 	return &schema.CostComponent{
 		Name:            "Proxy instance",
 		Unit:            "hours",
@@ -61,6 +74,7 @@ func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(quantity *decimal.De
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("OnDemand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -82,5 +96,6 @@ func dataProcessedCostComponent(region string, quantity *decimal.Decimal) *schem
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("OnDemand"),
 		},
+		UsageBased: true,
 	}
 }

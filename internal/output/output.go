@@ -23,96 +23,46 @@ import (
 var outputVersion = "0.2"
 
 type Root struct {
-	Version              string           `json:"version"`
-	Metadata             Metadata         `json:"metadata"`
-	RunID                string           `json:"runId,omitempty"`
-	ShareURL             string           `json:"shareUrl,omitempty"`
-	CloudURL             string           `json:"cloudUrl,omitempty"`
-	Currency             string           `json:"currency"`
-	Projects             Projects         `json:"projects"`
-	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
-	FinOpsPolicies       []FinOpsPolicy   `json:"finOpsPolicies,omitempty"`
-	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
-	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
-	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
-	PastTotalMonthlyCost *decimal.Decimal `json:"pastTotalMonthlyCost"`
-	DiffTotalHourlyCost  *decimal.Decimal `json:"diffTotalHourlyCost"`
-	DiffTotalMonthlyCost *decimal.Decimal `json:"diffTotalMonthlyCost"`
-	TimeGenerated        time.Time        `json:"timeGenerated"`
-	Summary              *Summary         `json:"summary"`
-	FullSummary          *Summary         `json:"-"`
-	IsCIRun              bool             `json:"-"`
+	Version                   string           `json:"version"`
+	Metadata                  Metadata         `json:"metadata"`
+	RunID                     string           `json:"runId,omitempty"`
+	ShareURL                  string           `json:"shareUrl,omitempty"`
+	CloudURL                  string           `json:"cloudUrl,omitempty"`
+	Currency                  string           `json:"currency"`
+	Projects                  Projects         `json:"projects"`
+	TotalHourlyCost           *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost          *decimal.Decimal `json:"totalMonthlyCost"`
+	TotalMonthlyUsageCost     *decimal.Decimal `json:"totalMonthlyUsageCost,omitempty"`
+	PastTotalHourlyCost       *decimal.Decimal `json:"pastTotalHourlyCost"`
+	PastTotalMonthlyCost      *decimal.Decimal `json:"pastTotalMonthlyCost"`
+	PastTotalMonthlyUsageCost *decimal.Decimal `json:"pastTotalMonthlyUsageCost,omitempty"`
+	DiffTotalHourlyCost       *decimal.Decimal `json:"diffTotalHourlyCost"`
+	DiffTotalMonthlyCost      *decimal.Decimal `json:"diffTotalMonthlyCost"`
+	DiffTotalMonthlyUsageCost *decimal.Decimal `json:"diffTotalMonthlyUsageCost,omitempty"`
+	TimeGenerated             time.Time        `json:"timeGenerated"`
+	Summary                   *Summary         `json:"summary"`
+	FullSummary               *Summary         `json:"-"`
+	IsCIRun                   bool             `json:"-"`
 }
 
-type FinOpsPolicy struct {
-	Name                     string                 `json:"name"`
-	PolicyID                 string                 `json:"policyId"`
-	Message                  string                 `json:"message"`
-	PrComment                bool                   `json:"prComment"`
-	BlockPr                  bool                   `json:"blockPr"`
-	Resources                []FinOpsPolicyResource `json:"resources"`
-	TotalApplicableResources int                    `json:"totalApplicableResources"`
-}
-
-func (p *FinOpsPolicy) AllResourcesExcluded() bool {
-	for _, r := range p.Resources {
-		if r.ExclusionID == "" {
-			return false
-		}
+// HasUnsupportedResources returns if the summary has any unsupported resources.
+// This is used to determine if the summary should be shown in different output
+// formats.
+func (r *Root) HasUnsupportedResources() bool {
+	if r.Summary == nil {
+		return false
 	}
-	return true
-}
 
-type FinOpsPolicyResource struct {
-	Checksum     string                      `json:"checksum"`
-	Address      string                      `json:"address"`
-	ResourceType string                      `json:"resourceType"`
-	Path         string                      `json:"path"`
-	StartLine    int                         `json:"startLine"`
-	EndLine      int                         `json:"endLine"`
-	ProjectName  string                      `json:"projectName"`
-	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
-	ExclusionID  string                      `json:"exclusionId,omitempty"`
-}
+	if r.Summary.TotalUnsupportedResources == nil {
+		return false
+	}
 
-type FinOpsPolicyResourceIssue struct {
-	Attribute   string `json:"attribute"`
-	Value       string `json:"value"`
-	Description string `json:"description"`
-}
-
-// TagPolicy holds information if a given run has applicable tag policy checks.
-// This struct is returned from the tag policies API and used to create tag policy outputs.
-type TagPolicy struct {
-	Name                   string              `json:"name"`
-	TagPolicyID            string              `json:"tagPolicyId"`
-	Message                string              `json:"message"`
-	PrComment              bool                `json:"prComment"`
-	BlockPr                bool                `json:"blockPr"`
-	Resources              []TagPolicyResource `json:"resources"`
-	TotalDetectedResources int                 `json:"totalDetectedResources"`
-	TotalTaggableResources int                 `json:"totalTaggableResources"`
-}
-
-type TagPolicyResource struct {
-	Address              string                `json:"address"`
-	ResourceType         string                `json:"resourceType"`
-	Path                 string                `json:"path"`
-	Line                 int                   `json:"line"`
-	ProjectNames         []string              `json:"projectNames"`
-	MissingMandatoryTags []string              `json:"missingMandatoryTags"`
-	InvalidTags          []TagPolicyInvalidTag `json:"invalidTags"`
-}
-
-type TagPolicyInvalidTag struct {
-	Key         string   `json:"key"`
-	Value       string   `json:"value"`
-	ValidValues []string `json:"validValues"`
-	ValidRegex  string   `json:"validRegex"`
+	return *r.Summary.TotalUnsupportedResources > 0
 }
 
 type Project struct {
 	Name          string                  `json:"name"`
+	DisplayName   string                  `json:"displayName"`
 	Metadata      *schema.ProjectMetadata `json:"metadata"`
 	PastBreakdown *Breakdown              `json:"pastBreakdown"`
 	Breakdown     *Breakdown              `json:"breakdown"`
@@ -124,7 +74,7 @@ type Project struct {
 // ToSchemaProject generates a schema.Project from a Project. The created schema.Project is not suitable to be
 // used outside simple schema.Project to schema.Project comparisons. It contains missing information
 // that cannot be inferred from a Project.
-func (p Project) ToSchemaProject() *schema.Project {
+func (p *Project) ToSchemaProject() *schema.Project {
 	var pastResources []*schema.Resource
 	if p.PastBreakdown != nil {
 		pastResources = append(convertOutputResources(p.PastBreakdown.Resources, false), convertOutputResources(p.PastBreakdown.FreeResources, true)...)
@@ -145,6 +95,7 @@ func (p Project) ToSchemaProject() *schema.Project {
 
 	return &schema.Project{
 		Name:          p.Name,
+		DisplayName:   p.DisplayName,
 		Metadata:      clonedMetadata,
 		PastResources: pastResources,
 		Resources:     resources,
@@ -155,17 +106,36 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 	resources := make([]*schema.Resource, len(outResources))
 
 	for i, resource := range outResources {
+
+		var tagProp *schema.TagPropagation
+		if resource.TagPropagation != nil {
+			tagProp = &schema.TagPropagation{
+				To:                    resource.TagPropagation.To,
+				From:                  resource.TagPropagation.From,
+				Tags:                  resource.TagPropagation.Tags,
+				Attribute:             resource.TagPropagation.Attribute,
+				HasRequiredAttributes: resource.TagPropagation.HasRequiredAttributes,
+			}
+		}
+
 		resources[i] = &schema.Resource{
-			Name:           resource.Name,
-			IsSkipped:      skip,
-			Metadata:       convertMetadata(resource.Metadata),
-			CostComponents: convertCostComponents(resource.CostComponents),
-			ActualCosts:    convertActualCosts(resource.ActualCosts),
-			SubResources:   convertOutputResources(resource.SubResources, skip),
-			Tags:           resource.Tags,
-			HourlyCost:     resource.HourlyCost,
-			MonthlyCost:    resource.MonthlyCost,
-			ResourceType:   resource.ResourceType,
+			Name:                                    resource.Name,
+			IsSkipped:                               skip,
+			Metadata:                                convertMetadata(resource.Metadata),
+			CostComponents:                          convertCostComponents(resource.CostComponents),
+			ActualCosts:                             convertActualCosts(resource.ActualCosts),
+			SubResources:                            convertOutputResources(resource.SubResources, skip),
+			Tags:                                    resource.Tags,
+			DefaultTags:                             resource.DefaultTags,
+			TagPropagation:                          tagProp,
+			ProviderSupportsDefaultTags:             resource.ProviderSupportsDefaultTags,
+			ProviderLink:                            resource.ProviderLink,
+			HourlyCost:                              resource.HourlyCost,
+			MonthlyCost:                             resource.MonthlyCost,
+			MonthlyUsageCost:                        resource.MonthlyUsageCost,
+			ResourceType:                            resource.ResourceType,
+			MissingVarsCausingUnknownTagKeys:        resource.MissingVarsCausingUnknownTagKeys,
+			MissingVarsCausingUnknownDefaultTagKeys: resource.MissingVarsCausingUnknownDefaultTagKeys,
 		}
 	}
 
@@ -184,6 +154,8 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 			MonthlyCost:     c.MonthlyCost,
 			HourlyQuantity:  c.HourlyQuantity,
 			MonthlyQuantity: c.MonthlyQuantity,
+			UsageBased:      c.UsageBased,
+			PriceNotFound:   c.PriceNotFound,
 		}
 		sc.SetPrice(c.Price)
 
@@ -266,6 +238,10 @@ func (r *Root) HasDiff() bool {
 
 // Label returns the display name of the project
 func (p *Project) Label() string {
+	if p.DisplayName != "" {
+		return p.DisplayName
+	}
+
 	return p.Name
 }
 
@@ -288,10 +264,29 @@ func (p *Project) LabelWithMetadata() string {
 }
 
 type Breakdown struct {
-	Resources        []Resource       `json:"resources"`
-	FreeResources    []Resource       `json:"freeResources,omitempty"`
-	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
-	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
+	Resources             []Resource       `json:"resources"`
+	FreeResources         []Resource       `json:"freeResources,omitempty"`
+	TotalHourlyCost       *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost      *decimal.Decimal `json:"totalMonthlyCost"`
+	TotalMonthlyUsageCost *decimal.Decimal `json:"totalMonthlyUsageCost"`
+}
+
+// HasResources returns true if the breakdown has any resources or free resources.
+// This is used to determine if the breakdown should be shown in the output.
+func (b *Breakdown) HasResources() bool {
+	return len(b.Resources) > 0 || len(b.FreeResources) > 0
+}
+
+func (b *Breakdown) TotalMonthlyBaselineCost() *decimal.Decimal {
+	if b.TotalMonthlyCost == nil {
+		return nil
+	}
+
+	if b.TotalMonthlyUsageCost == nil {
+		return b.TotalMonthlyCost
+	}
+
+	return decimalPtr(b.TotalMonthlyCost.Sub(*b.TotalMonthlyUsageCost))
 }
 
 type CostComponent struct {
@@ -302,6 +297,8 @@ type CostComponent struct {
 	Price           decimal.Decimal  `json:"price"`
 	HourlyCost      *decimal.Decimal `json:"hourlyCost"`
 	MonthlyCost     *decimal.Decimal `json:"monthlyCost"`
+	UsageBased      bool             `json:"usageBased,omitempty"`
+	PriceNotFound   bool             `json:"priceNotFound"`
 }
 
 type ActualCosts struct {
@@ -312,17 +309,31 @@ type ActualCosts struct {
 }
 
 type Resource struct {
-	Name           string                 `json:"name"`
-	ResourceType   string                 `json:"resourceType,omitempty"`
-	Tags           *map[string]string     `json:"tags,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata"`
-	HourlyCost     *decimal.Decimal       `json:"hourlyCost,omitempty"`
-	MonthlyCost    *decimal.Decimal       `json:"monthlyCost,omitempty"`
-	CostComponents []CostComponent        `json:"costComponents,omitempty"`
-	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
-	SubResources   []Resource             `json:"subresources,omitempty"`
+	Name                                    string                 `json:"name"`
+	ResourceType                            string                 `json:"resourceType,omitempty"`
+	Tags                                    *map[string]string     `json:"tags,omitempty"`
+	DefaultTags                             *map[string]string     `json:"defaultTags,omitempty"`
+	TagPropagation                          *TagPropagation        `json:"tagPropagation,omitempty"`
+	ProviderSupportsDefaultTags             bool                   `json:"providerSupportsDefaultTags,omitempty"`
+	ProviderLink                            string                 `json:"providerLink,omitempty"`
+	Metadata                                map[string]interface{} `json:"metadata"`
+	HourlyCost                              *decimal.Decimal       `json:"hourlyCost,omitempty"`
+	MonthlyCost                             *decimal.Decimal       `json:"monthlyCost,omitempty"`
+	MonthlyUsageCost                        *decimal.Decimal       `json:"monthlyUsageCost,omitempty"`
+	CostComponents                          []CostComponent        `json:"costComponents,omitempty"`
+	ActualCosts                             []ActualCosts          `json:"actualCosts,omitempty"`
+	SubResources                            []Resource             `json:"subresources,omitempty"`
+	MissingVarsCausingUnknownTagKeys        []string               `json:"missingVarsCausingUnknownTagKeys,omitempty"`
+	MissingVarsCausingUnknownDefaultTagKeys []string               `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
 }
 
+type TagPropagation struct {
+	To                    string             `json:"to"`
+	From                  *string            `json:"from,omitempty"`
+	Tags                  *map[string]string `json:"tags,omitempty"`
+	Attribute             string             `json:"attribute"`
+	HasRequiredAttributes bool               `json:"hasRequiredAttributes,omitempty"`
+}
 type Summary struct {
 	TotalResources            *int `json:"totalResources,omitempty"`
 	TotalDetectedResources    *int `json:"totalDetectedResources,omitempty"`
@@ -447,16 +458,16 @@ func (p PolicyCheckFailures) Error() string {
 	return out.String()
 }
 
-// LoadAdditionalCommentData reads the file at the path  into a string.
-func LoadAdditionalCommentData(path string) (string, error) {
+// LoadCommentData reads the file at the path into a string.
+func LoadCommentData(path string) (string, error) {
 	_, err := os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
-		return "", errors.New("additional-comment-data-path does not exist ")
+		return "", errors.New("comment data path does not exist ")
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("error reading additional comment data file %w", err)
+		return "", fmt.Errorf("error reading comment data file %w", err)
 	}
 
 	return string(data), nil
@@ -509,13 +520,14 @@ func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown 
 	sortResources(supportedResources, "")
 	sortResources(freeResources, "")
 
-	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(supportedResources)
+	totalHourlyCost, totalMonthlyCost, totalMonthlyUsageCost := calculateTotalCosts(supportedResources)
 
 	return &Breakdown{
-		Resources:        supportedResources,
-		FreeResources:    freeResources,
-		TotalHourlyCost:  totalMonthlyCost,
-		TotalMonthlyCost: totalHourlyCost,
+		Resources:             supportedResources,
+		FreeResources:         freeResources,
+		TotalHourlyCost:       totalHourlyCost,
+		TotalMonthlyCost:      totalMonthlyCost,
+		TotalMonthlyUsageCost: totalMonthlyUsageCost,
 	}
 }
 func outputResource(r *schema.Resource) Resource {
@@ -537,16 +549,34 @@ func newResource(r *schema.Resource, comps []CostComponent, actualCosts []Actual
 		metadata[k] = v.Value()
 	}
 
+	var tagProp *TagPropagation
+	if r.TagPropagation != nil {
+		tagProp = &TagPropagation{
+			To:                    r.TagPropagation.To,
+			From:                  r.TagPropagation.From,
+			Tags:                  r.TagPropagation.Tags,
+			Attribute:             r.TagPropagation.Attribute,
+			HasRequiredAttributes: r.TagPropagation.HasRequiredAttributes,
+		}
+	}
+
 	return Resource{
-		Name:           r.Name,
-		ResourceType:   r.ResourceType,
-		Metadata:       metadata,
-		Tags:           r.Tags,
-		HourlyCost:     r.HourlyCost,
-		MonthlyCost:    r.MonthlyCost,
-		CostComponents: comps,
-		ActualCosts:    actualCosts,
-		SubResources:   subresources,
+		Name:                                    r.Name,
+		ResourceType:                            r.ResourceType,
+		Metadata:                                metadata,
+		Tags:                                    r.Tags,
+		DefaultTags:                             r.DefaultTags,
+		TagPropagation:                          tagProp,
+		ProviderSupportsDefaultTags:             r.ProviderSupportsDefaultTags,
+		ProviderLink:                            r.ProviderLink,
+		HourlyCost:                              r.HourlyCost,
+		MonthlyCost:                             r.MonthlyCost,
+		MonthlyUsageCost:                        r.MonthlyUsageCost,
+		CostComponents:                          comps,
+		ActualCosts:                             actualCosts,
+		SubResources:                            subresources,
+		MissingVarsCausingUnknownTagKeys:        r.MissingVarsCausingUnknownTagKeys,
+		MissingVarsCausingUnknownDefaultTagKeys: r.MissingVarsCausingUnknownDefaultTagKeys,
 	}
 }
 
@@ -561,6 +591,8 @@ func outputCostComponents(costComponents []*schema.CostComponent) []CostComponen
 			Price:           c.UnitMultiplierPrice(),
 			HourlyCost:      c.HourlyCost,
 			MonthlyCost:     c.MonthlyCost,
+			UsageBased:      c.UsageBased,
+			PriceNotFound:   c.PriceNotFound,
 		})
 	}
 	return comps
@@ -580,9 +612,9 @@ func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
 }
 
 func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) {
-	var totalMonthlyCost, totalHourlyCost,
-		pastTotalMonthlyCost, pastTotalHourlyCost,
-		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
+	var totalMonthlyCost, totalHourlyCost, totalMonthlyUsageCost,
+		pastTotalMonthlyCost, pastTotalHourlyCost, pastTotalMonthlyUsageCost,
+		diffTotalMonthlyCost, diffTotalHourlyCost, diffTotalMonthlyUsageCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
 	summaries := make([]*Summary, 0, len(projects))
@@ -607,6 +639,13 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 				}
 				totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 			}
+
+			if breakdown.TotalMonthlyUsageCost != nil {
+				if totalMonthlyUsageCost == nil {
+					totalMonthlyUsageCost = decimalPtr(decimal.Zero)
+				}
+				totalMonthlyUsageCost = decimalPtr(totalMonthlyUsageCost.Add(*breakdown.TotalMonthlyUsageCost))
+			}
 		}
 
 		if project.HasDiff {
@@ -627,6 +666,13 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 					}
 					pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*pastBreakdown.TotalMonthlyCost))
 				}
+
+				if pastBreakdown.TotalMonthlyUsageCost != nil {
+					if pastTotalMonthlyUsageCost == nil {
+						pastTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+					}
+					pastTotalMonthlyUsageCost = decimalPtr(pastTotalMonthlyUsageCost.Add(*pastBreakdown.TotalMonthlyUsageCost))
+				}
 			}
 
 			if diff != nil {
@@ -642,6 +688,13 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 						diffTotalMonthlyCost = decimalPtr(decimal.Zero)
 					}
 					diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*diff.TotalMonthlyCost))
+				}
+
+				if diff.TotalMonthlyUsageCost != nil {
+					if diffTotalMonthlyUsageCost == nil {
+						diffTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+					}
+					diffTotalMonthlyUsageCost = decimalPtr(diffTotalMonthlyUsageCost.Add(*diff.TotalMonthlyUsageCost))
 				}
 			}
 		}
@@ -670,6 +723,7 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 
 		outProjects = append(outProjects, Project{
 			Name:          project.Name,
+			DisplayName:   project.DisplayName,
 			Metadata:      project.Metadata,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,
@@ -680,17 +734,20 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 	}
 
 	out := Root{
-		Version:              outputVersion,
-		Projects:             outProjects,
-		TotalHourlyCost:      totalHourlyCost,
-		TotalMonthlyCost:     totalMonthlyCost,
-		PastTotalHourlyCost:  pastTotalHourlyCost,
-		PastTotalMonthlyCost: pastTotalMonthlyCost,
-		DiffTotalHourlyCost:  diffTotalHourlyCost,
-		DiffTotalMonthlyCost: diffTotalMonthlyCost,
-		TimeGenerated:        time.Now().UTC(),
-		Summary:              MergeSummaries(summaries),
-		FullSummary:          MergeSummaries(fullSummaries),
+		Version:                   outputVersion,
+		Projects:                  outProjects,
+		TotalHourlyCost:           totalHourlyCost,
+		TotalMonthlyCost:          totalMonthlyCost,
+		TotalMonthlyUsageCost:     totalMonthlyUsageCost,
+		PastTotalHourlyCost:       pastTotalHourlyCost,
+		PastTotalMonthlyCost:      pastTotalMonthlyCost,
+		PastTotalMonthlyUsageCost: pastTotalMonthlyUsageCost,
+		DiffTotalHourlyCost:       diffTotalHourlyCost,
+		DiffTotalMonthlyCost:      diffTotalMonthlyCost,
+		DiffTotalMonthlyUsageCost: diffTotalMonthlyUsageCost,
+		TimeGenerated:             time.Now().UTC(),
+		Summary:                   MergeSummaries(summaries),
+		FullSummary:               MergeSummaries(fullSummaries),
 	}
 
 	return out, nil
@@ -723,24 +780,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		} else {
 			msg += fmt.Sprintf("\n∙ %d were estimated", *r.Summary.TotalSupportedResources)
 		}
-
-		allUsageBased := *r.Summary.TotalUsageBasedResources == *r.Summary.TotalSupportedResources
-
-		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
-			usageBasedCount := "1 of which"
-			if allUsageBased {
-				usageBasedCount = "it includes"
-			}
-
-			if *r.Summary.TotalUsageBasedResources > 1 {
-				usageBasedCount = fmt.Sprintf("%d of which include", *r.Summary.TotalUsageBasedResources)
-				if allUsageBased {
-					usageBasedCount = "all of which include"
-				}
-			}
-
-			msg += fmt.Sprintf(", %s usage-based costs, see %s", usageBasedCount, ui.SecondaryLinkString("https://infracost.io/usage-file"))
-		}
 	}
 
 	if r.Summary.TotalNoPriceResources != nil && *r.Summary.TotalNoPriceResources > 0 {
@@ -748,13 +787,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 			msg += "\n∙ 1 was free"
 		} else {
 			msg += fmt.Sprintf("\n∙ %d were free", *r.Summary.TotalNoPriceResources)
-		}
-
-		if showSkipped {
-			msg += ":"
-			msg += formatCounts(r.Summary.NoPriceResourceCounts)
-		} else {
-			msg += seeDetailsMessage
 		}
 	}
 
@@ -811,8 +843,11 @@ func formatCounts(countMap *map[string]int) string {
 	return msg
 }
 
-func hasSupportedTerraformProvider(rType string) bool {
-	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
+func hasSupportedProvider(rType string) bool {
+	return strings.HasPrefix(rType, "aws_") || // tf
+		strings.HasPrefix(rType, "google_") || // tf
+		strings.HasPrefix(rType, "azurerm_") || // tf
+		strings.HasPrefix(rType, "AWS::") // cf
 }
 
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
@@ -838,7 +873,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) && !pulumi.HasSupportedProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedProvider(r.ResourceType) && !pulumi.HasSupportedProvider(r.ResourceType) {
 			continue
 		}
 
@@ -959,9 +994,10 @@ func MergeSummaries(summaries []*Summary) *Summary {
 	return merged
 }
 
-func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decimal) {
+func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decimal, *decimal.Decimal) {
 	totalHourlyCost := decimalPtr(decimal.Zero)
 	totalMonthlyCost := decimalPtr(decimal.Zero)
+	totalMonthlyUsageCost := decimalPtr(decimal.Zero)
 
 	for _, r := range resources {
 		if r.HourlyCost != nil {
@@ -979,25 +1015,40 @@ func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decim
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*r.MonthlyCost))
 		}
 
+		if r.MonthlyUsageCost != nil {
+			if totalMonthlyUsageCost == nil {
+				totalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyUsageCost = decimalPtr(totalMonthlyUsageCost.Add(*r.MonthlyUsageCost))
+
+		}
+
 	}
 
-	return totalHourlyCost, totalMonthlyCost
+	return totalHourlyCost, totalMonthlyCost, totalMonthlyUsageCost
 }
 
 func sortResources(resources []Resource, groupKey string) {
 	sort.Slice(resources, func(i, j int) bool {
-		// If an empty group key is passed just sort by name
-		if groupKey == "" {
-			return resources[i].Name < resources[j].Name
+		// if they are in different groups, sort by group name
+		if groupKey != "" && resources[i].Metadata[groupKey] != resources[j].Metadata[groupKey] {
+			return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
 		}
 
-		// If the resources are in the same group then sort by name
-		if resources[i].Metadata[groupKey] == resources[j].Metadata[groupKey] {
-			return resources[i].Name < resources[j].Name
+		// if the costs are different, sort by cost descending
+		if resources[i].MonthlyCost == nil {
+			if resources[j].MonthlyCost != nil {
+				return false
+			}
+		} else if resources[j].MonthlyCost == nil {
+			return true
+		} else if !resources[i].MonthlyCost.Equal(*resources[j].MonthlyCost) {
+			return resources[i].MonthlyCost.GreaterThan(*resources[j].MonthlyCost)
 		}
 
-		// Sort by the group key
-		return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
+		// Sort by name
+		return resources[i].Name < resources[j].Name
 	})
 }
 
@@ -1053,4 +1104,8 @@ func addIntPtrs(i1 *int, i2 *int) *int {
 
 	res := val1 + val2
 	return &res
+}
+
+func usageCostsEnabled(out Root) bool {
+	return out.Metadata.UsageApiEnabled || out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile
 }

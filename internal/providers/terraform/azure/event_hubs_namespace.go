@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {
@@ -22,7 +23,7 @@ func NewAzureRMEventHubs(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	var includedRetention decimal.Decimal
 	sku := "Basic"
 	meterName := ""
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()

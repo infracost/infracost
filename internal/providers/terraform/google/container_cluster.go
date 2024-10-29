@@ -3,17 +3,17 @@ package google
 import (
 	"fmt"
 
-	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 )
 
 func getContainerClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_container_cluster",
-		RFunc: newContainerCluster,
+		Name:      "google_container_cluster",
+		CoreRFunc: newContainerCluster,
 		// this is a reverse reference, it depends on the container_node_pool RegistryItem
 		// defining "cluster" as a ReferenceAttribute
 		ReferenceAttributes: []string{"google_container_node_pool.cluster"},
@@ -30,16 +30,22 @@ func getContainerClusterRegistryItem() *schema.RegistryItem {
 			"Costs associated with non-standard Linux images, such as Windows and RHEL are not supported.",
 			"Custom machine types are not supported.",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			region := d.Get("location").String()
+			isZone := isZone(region)
+
+			if isZone {
+				region = zoneToRegion(region)
+			}
+
+			return region
+		},
 	}
 }
 
-func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+func newContainerCluster(d *schema.ResourceData) schema.CoreResource {
+	region := d.Region
 	isZone := isZone(region)
-
-	if isZone {
-		region = zoneToRegion(region)
-	}
 
 	autopilotEnabled := d.Get("enable_autopilot").Bool()
 
@@ -58,7 +64,7 @@ func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		nameIndex := 0
 		for _, values := range d.Get("node_pool").Array() {
 			if contains(definedNodePoolNames, values.Get("name").String()) {
-				log.Debug().Msgf("Skipping node pool with name %s since it is defined in another resource", values.Get("name").String())
+				logging.Logger.Debug().Msgf("Skipping node pool with name %s since it is defined in another resource", values.Get("name").String())
 				continue
 			}
 
@@ -104,9 +110,7 @@ func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		DefaultNodePool:  defaultNodePool,
 		NodePools:        nodePools,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func zoneCount(d gjson.Result, location string) int {

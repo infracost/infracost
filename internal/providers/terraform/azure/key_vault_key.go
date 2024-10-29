@@ -3,12 +3,12 @@ package azure
 import (
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 )
@@ -20,18 +20,21 @@ func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"key_vault_id"})
+		},
 	}
 }
 
 func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"key_vault_id"})
+	region := d.Region
 
 	var skuName, keyType, keySize, meterName string
 	keyVault := d.References("key_vault_id")
 	if len(keyVault) > 0 {
 		skuName = cases.Title(language.English).String(keyVault[0].Get("sku_name").String())
 	} else {
-		log.Warn().Msgf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
 		return nil
 	}
 

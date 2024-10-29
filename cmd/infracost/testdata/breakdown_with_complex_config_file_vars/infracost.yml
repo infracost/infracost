@@ -1,0 +1,11 @@
+version: 0.1
+projects:
+  - path: "./testdata/breakdown_with_complex_config_file_vars"
+    usage_file: "./testdata/breakdown_with_complex_config_file_vars/infracost-usage.yml"
+    terraform_vars:
+      instance_config:
+        instance_type: t2.micro
+        storage: 20
+      lambda_configs:
+        - memory_size: 128
+        - memory_size: 256

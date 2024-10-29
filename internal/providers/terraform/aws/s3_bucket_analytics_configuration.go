@@ -7,17 +7,15 @@ import (
 
 func getS3BucketAnalyticsConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_s3_bucket_analytics_configuration",
-		RFunc: NewS3BucketAnalyticsConfiguration,
+		Name:      "aws_s3_bucket_analytics_configuration",
+		CoreRFunc: NewS3BucketAnalyticsConfiguration,
 	}
 }
 
-func NewS3BucketAnalyticsConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewS3BucketAnalyticsConfiguration(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.S3BucketAnalyticsConfiguration{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

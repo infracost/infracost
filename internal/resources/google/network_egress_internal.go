@@ -32,6 +32,14 @@ var StorageBucketNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "australia"},
 }
 
+func (r *StorageBucketNetworkEgressUsage) CoreType() string {
+	return "StorageBucketNetworkEgressUsage"
+}
+
+func (r *StorageBucketNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return StorageBucketNetworkEgressUsageSchema
+}
+
 func (r *StorageBucketNetworkEgressUsage) BuildResource() *schema.Resource {
 	regionsData := []*egressRegionData{
 		{
@@ -91,9 +99,10 @@ func (r *StorageBucketNetworkEgressUsage) BuildResource() *schema.Resource {
 			Region:     strPtr("global"),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("Networking Traffic Egress GCP Inter Region within Europe")},
+				{Key: "description", Value: strPtr("Network Data Transfer GCP Inter Region within Europe")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	for _, regData := range regionsData {
@@ -122,6 +131,14 @@ var ContainerRegistryNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "worldwide"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "china"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "australia"},
+}
+
+func (r *ContainerRegistryNetworkEgressUsage) CoreType() string {
+	return "ContainerRegistryNetworkEgressUsage"
+}
+
+func (r *ContainerRegistryNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return ContainerRegistryNetworkEgressUsageSchema
 }
 
 func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
@@ -192,13 +209,14 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 			Region:     strPtr("global"),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(fmt.Sprintf("Networking Traffic Egress GCP Inter Region within %s", continent))},
+				{Key: "description", Value: strPtr(fmt.Sprintf("Network Data Transfer GCP Inter Region within %s", continent))},
 				{Key: "resourceGroup", Value: strPtr("InterregionEgress")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: startUsage,
 		},
+		UsageBased: true,
 	})
 
 	for _, regData := range regionsData {
@@ -233,48 +251,56 @@ var ComputeVPNGatewayNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "worldwide"},
 }
 
+func (r *ComputeVPNGatewayNetworkEgressUsage) CoreType() string {
+	return "ComputeVPNGatewayNetworkEgressUsage"
+}
+
+func (r *ComputeVPNGatewayNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return ComputeVPNGatewayNetworkEgressUsageSchema
+}
+
 func (r *ComputeVPNGatewayNetworkEgressUsage) BuildResource() *schema.Resource {
 	regionsData := []*egressRegionData{
 		{
 			gRegion: fmt.Sprintf("%s within the same region", r.PrefixName),
 			// There is no same region option in APIs, so we always take this price in us-central1 region.
-			apiDescription: "Network Vpn Inter Region Egress from Americas to Americas",
+			apiDescription: "Network Inter Region Data Transfer Out from Americas to Virginia",
 			usageKey:       "same_region",
 			fixedRegion:    "us-central1",
 		},
 		{
 			gRegion:        fmt.Sprintf("%s within the US or Canada", r.PrefixName),
-			apiDescription: "Network Vpn Inter Region Egress from Americas to Montreal",
+			apiDescription: "Network Inter Region Data Transfer Out from Americas to Montreal",
 			usageKey:       "us_or_canada",
 			fixedRegion:    "us-central1",
 		},
 		{
 			gRegion:        fmt.Sprintf("%s within Europe", r.PrefixName),
-			apiDescription: "Network Vpn Inter Region Egress from EMEA to EMEA",
+			apiDescription: "Network Inter Region Data Transfer Out from EMEA to Frankfurt",
 			usageKey:       "europe",
 			fixedRegion:    "europe-west1",
 		},
 		{
 			gRegion:        fmt.Sprintf("%s within Asia", r.PrefixName),
-			apiDescription: "Network Vpn Inter Region Egress from Japan to Seoul",
+			apiDescription: "Network Inter Region Data Transfer Out from Japan to Seoul",
 			usageKey:       "asia",
 			fixedRegion:    "asia-northeast1",
 		},
 		{
 			gRegion:        fmt.Sprintf("%s within South America", r.PrefixName),
-			apiDescription: "Network Vpn Inter Region Egress from Sao Paulo to Sao Paulo",
+			apiDescription: "Network Inter Region Data Transfer Out from Sao Paulo to Sao Paulo",
 			usageKey:       "south_america",
 			fixedRegion:    "southamerica-east1",
 		},
 		{
 			gRegion:        fmt.Sprintf("%s to/from Indonesia and Oceania", r.PrefixName),
-			apiDescription: "Network Vpn Inter Region Egress from Sydney to Jakarta",
+			apiDescription: "Network Inter Region Data Transfer Out from Sydney to Jakarta",
 			usageKey:       "oceania",
 			fixedRegion:    "australia-southeast1",
 		},
 		{
 			gRegion:        fmt.Sprintf("%s between continents (excludes Oceania)", r.PrefixName),
-			apiDescription: "Network Vpn Inter Region Egress from Finland to Singapore",
+			apiDescription: "Network Inter Region Data Transfer Out from Finland to Singapore",
 			usageKey:       "worldwide",
 			fixedRegion:    "europe-north1",
 		},
@@ -318,23 +344,31 @@ var ComputeExternalVPNGatewayNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "australia"},
 }
 
+func (r *ComputeExternalVPNGatewayNetworkEgressUsage) CoreType() string {
+	return "ComputeExternalVPNGatewayNetworkEgressUsage"
+}
+
+func (r *ComputeExternalVPNGatewayNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return ComputeExternalVPNGatewayNetworkEgressUsageSchema
+}
+
 func (r *ComputeExternalVPNGatewayNetworkEgressUsage) BuildResource() *schema.Resource {
 	regionsData := []*egressRegionData{
 		{
 			gRegion: fmt.Sprintf("%s to worldwide excluding China, Australia but including Hong Kong", r.PrefixName),
 			// There is no worldwide option in APIs, so we take a random region.
-			apiDescriptionRegex: "/Vpn Internet Egress .* to Americas/",
-			usageKey:            "worldwide",
+			apiDescription: "Network Vpn Internet Data Transfer Out from Americas to Americas",
+			usageKey:       "worldwide",
 		},
 		{
-			gRegion:             fmt.Sprintf("%s to China excluding Hong Kong", r.PrefixName),
-			apiDescriptionRegex: "/Vpn Internet Egress .* to China/",
-			usageKey:            "china",
+			gRegion:        fmt.Sprintf("%s to China excluding Hong Kong", r.PrefixName),
+			apiDescription: "Network Vpn Internet Data Transfer Out from Americas to China",
+			usageKey:       "china",
 		},
 		{
-			gRegion:             fmt.Sprintf("%s to Australia", r.PrefixName),
-			apiDescriptionRegex: "/Vpn Internet Egress .* to Australia/",
-			usageKey:            "australia",
+			gRegion:        fmt.Sprintf("%s to Australia", r.PrefixName),
+			apiDescription: "Network Vpn Internet Data Transfer Out from Americas to Australia",
+			usageKey:       "australia",
 		},
 	}
 	usageFiltersData := []*egressRegionUsageFilterData{
@@ -442,6 +476,7 @@ func egressStepPricingHelper(usage float64, usageFiltersData []*egressRegionUsag
 			PriceFilter: &schema.PriceFilter{
 				EndUsageAmount: strPtr(usageFilter),
 			},
+			UsageBased: true,
 		})
 	}
 	return costComponents

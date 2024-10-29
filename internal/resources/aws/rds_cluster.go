@@ -3,10 +3,7 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 
-	"fmt"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -17,6 +14,7 @@ type RDSCluster struct {
 	Region                    string
 	EngineMode                string
 	Engine                    string
+	IOOptimized               bool
 	BackupRetentionPeriod     int64
 	WriteRequestsPerSec       *int64   `infracost_usage:"write_requests_per_sec"`
 	ReadRequestsPerSec        *int64   `infracost_usage:"read_requests_per_sec"`
@@ -25,20 +23,26 @@ type RDSCluster struct {
 	AverageStatementsPerHr    *int64   `infracost_usage:"average_statements_per_hr"`
 	BacktrackWindowHrs        *int64   `infracost_usage:"backtrack_window_hrs"`
 	SnapshotExportSizeGB      *float64 `infracost_usage:"snapshot_export_size_gb"`
-	CapacityUnitsPerHr        *int64   `infracost_usage:"capacity_units_per_hr"`
+	CapacityUnitsPerHr        *float64 `infracost_usage:"capacity_units_per_hr"`
 	BackupSnapshotSizeGB      *float64 `infracost_usage:"backup_snapshot_size_gb"`
 }
 
-var RDSClusterUsageSchema = []*schema.UsageItem{
-	{Key: "write_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "read_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "change_records_per_statement", ValueType: schema.Float64, DefaultValue: 0.0},
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "average_statements_per_hr", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backtrack_window_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "capacity_units_per_hr", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *RDSCluster) CoreType() string {
+	return "RDSCluster"
+}
+
+func (r *RDSCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "write_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "read_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "change_records_per_statement", ValueType: schema.Float64, DefaultValue: 0.0},
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "average_statements_per_hr", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "backtrack_window_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "capacity_units_per_hr", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
@@ -48,7 +52,7 @@ func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
 func (r *RDSCluster) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
-	databaseEngineMode := cases.Title(language.English).String(r.EngineMode)
+	databaseEngineMode := strings.ToLower(r.EngineMode)
 	if databaseEngineMode == "" {
 		databaseEngineMode = "provisioned"
 	}
@@ -59,6 +63,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 	switch r.Engine {
 	case "aurora", "aurora-mysql":
 		databaseEngine = "Aurora MySQL"
+		databaseEngineStorageType = "(Any|Aurora MySQL)"
 	case "aurora-postgresql":
 		databaseEngine = "Aurora PostgreSQL"
 		databaseEngineStorageType = databaseEngine
@@ -66,7 +71,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 
 	var auroraCapacityUnits *decimal.Decimal
 	if r.CapacityUnitsPerHr != nil {
-		auroraCapacityUnits = decimalPtr(decimal.NewFromInt(*r.CapacityUnitsPerHr))
+		auroraCapacityUnits = decimalPtr(decimal.NewFromFloat(*r.CapacityUnitsPerHr))
 	}
 
 	if strings.ToLower(databaseEngineMode) == "serverless" {
@@ -79,11 +84,12 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(r.Region),
 				Service:       strPtr("AmazonRDS"),
-				ProductFamily: strPtr(databaseEngineMode),
+				ProductFamily: strPtr("Serverless"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngine))},
+					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -99,7 +105,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, r.auroraBackupStorageCostComponent(totalBackupStorageGB, databaseEngine))
 	}
 
-	if databaseEngineMode != "Serverless" && !strings.Contains(r.Engine, "postgresql") {
+	if databaseEngineMode != "serverless" && !strings.Contains(r.Engine, "postgresql") {
 		var totalBacktrackChangeRecords *decimal.Decimal
 
 		if r.AverageStatementsPerHr != nil && r.ChangeRecordsPerStatement != nil && r.BacktrackWindowHrs != nil {
@@ -109,6 +115,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 
 			totalBacktrackChangeRecords = decimalPtr(r.calculateBacktrack(averageStatements, backtrackChangeRecords, backtrackWindowHours))
 		}
+
 		costComponents = append(costComponents, r.auroraBacktrackCostComponent(totalBacktrackChangeRecords))
 	}
 
@@ -128,15 +135,17 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 			Region:        strPtr(r.Region),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngine))},
-				{Key: "usagetype", ValueRegex: strPtr("/Aurora:SnapshotExportToS3/")},
+				{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:SnapshotExportToS3$")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: RDSClusterUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -153,9 +162,16 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 		monthlyIORequests = decimalPtr(r.calculateIORequests(*readRequestsPerSecond, *writeRequestsPerSecond))
 	}
 
+	label := "Storage"
+	usageType := "Aurora:StorageUsage$"
+	if r.IOOptimized {
+		label = "Storage (I/O-optimized)"
+		usageType = "Aurora:IO-OptimizedStorageUsage$"
+	}
+
 	return []*schema.CostComponent{
 		{
-			Name:            "Storage",
+			Name:            label,
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: storageGB,
@@ -165,10 +181,11 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Database Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngineStorageType))},
-					{Key: "usagetype", ValueRegex: strPtr("/Aurora:Storage/")},
+					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngineStorageType)},
+					{Key: "usagetype", ValueRegex: regexPtr(usageType)},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "I/O requests",
@@ -181,10 +198,11 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngineStorageType))},
-					{Key: "usagetype", ValueRegex: strPtr("/Aurora:Storage/")},
+					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngineStorageType)},
+					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageIOUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 }
@@ -201,27 +219,31 @@ func (r *RDSCluster) auroraBackupStorageCostComponent(totalBackupStorageGB *deci
 			Service:       strPtr("AmazonRDS"),
 			ProductFamily: strPtr("Storage Snapshot"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngine))},
+				{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BackupUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
 func (r *RDSCluster) auroraBacktrackCostComponent(backtrackChangeRecords *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Backtrack",
-		Unit:            "1M change-records",
-		UnitMultiplier:  decimal.NewFromInt(1000000),
-		MonthlyQuantity: backtrackChangeRecords,
+		Name:                 "Backtrack",
+		Unit:                 "1M change-records",
+		UnitMultiplier:       decimal.NewFromInt(1000000),
+		MonthlyQuantity:      backtrackChangeRecords,
+		IgnoreIfMissingPrice: true, // Backtrack is not available in all regions
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Service:       strPtr("AmazonRDS"),
 			Region:        strPtr(r.Region),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/Aurora:BacktrackUsage/")},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BacktrackUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

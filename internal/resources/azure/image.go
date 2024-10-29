@@ -85,7 +85,7 @@ func (r *Image) BuildResource() *schema.Resource {
 					ProductFamily: strPtr("Storage"),
 					AttributeFilters: []*schema.AttributeFilter{
 						{Key: "skuName", Value: strPtr("Snapshots LRS")},
-						{Key: "meterName", Value: strPtr("LRS Snapshots")},
+						{Key: "meterName", ValueRegex: regexPtr("LRS Snapshots$")},
 						{Key: "productName", Value: strPtr("Standard HDD Managed Disks")},
 					},
 				},

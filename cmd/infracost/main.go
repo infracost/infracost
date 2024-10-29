@@ -102,7 +102,7 @@ type debugWriter struct {
 
 func (d debugWriter) Write(p []byte) (n int, err error) {
 	p = bytes.Trim(p, " \n\t")
-	return d.f.Write(append(p, []byte(",\n")...))
+	return d.f.Write(append(p, []byte("\n")...))
 }
 
 func newRootCmd(ctx *config.RunContext) *cobra.Command {
@@ -265,11 +265,11 @@ func loadCloudSettings(ctx *config.RunContext) {
 	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
 	if result.UsageAPIEnabled && ctx.Config.UsageAPIEndpoint == "" {
 		ctx.Config.UsageAPIEndpoint = ctx.Config.DashboardAPIEndpoint
-		logging.Logger.Info().Msg("Enabled usage API")
+		logging.Logger.Debug().Msg("Enabled usage API")
 	}
 	if result.ActualCostsEnabled && ctx.Config.UsageAPIEndpoint != "" {
 		ctx.Config.UsageActualCosts = true
-		logging.Logger.Info().Msg("Enabled actual costs")
+		logging.Logger.Debug().Msg("Enabled actual costs")
 	}
 
 	if (result.PoliciesAPIEnabled || result.TagsAPIEnabled) && ctx.Config.PolicyV2APIEndpoint == "" {
@@ -279,12 +279,12 @@ func loadCloudSettings(ctx *config.RunContext) {
 
 	if result.PoliciesAPIEnabled {
 		ctx.Config.PoliciesEnabled = true
-		logging.Logger.Info().Msg("Enabled policies V2")
+		logging.Logger.Debug().Msg("Enabled policies V2")
 	}
 
 	if result.TagsAPIEnabled {
 		ctx.Config.TagPoliciesEnabled = true
-		logging.Logger.Info().Msg("Enabled tag policies")
+		logging.Logger.Debug().Msg("Enabled tag policies")
 	}
 }
 
@@ -322,7 +322,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 }
 
 func handleUnexpectedErr(ctx *config.RunContext, err error) {
-	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, err)
+	ui.PrintUnexpectedErrorStack(err)
 
 	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
@@ -381,11 +381,7 @@ func saveOutFileWithMsg(ctx *config.RunContext, cmd *cobra.Command, outFile, suc
 		return errors.Wrap(err, "Unable to save output")
 	}
 
-	if ctx.Config.IsLogging() {
-		logging.Logger.Info().Msg(successMsg)
-	} else {
-		cmd.PrintErrf("%s\n", successMsg)
-	}
+	logging.Logger.Info().Msg(successMsg)
 
 	return nil
 }

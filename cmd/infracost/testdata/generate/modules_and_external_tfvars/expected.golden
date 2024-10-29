@@ -1,0 +1,26 @@
+version: 0.1
+
+projects:
+  - path: db/dev
+    name: db-dev-dev
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../envs/dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - db/dev/**
+      - db/modules/db_config/**
+      - default.tfvars
+      - envs/dev.tfvars
+  - path: db/prod
+    name: db-prod-prod
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../envs/prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - db/modules/db_config/**
+      - db/prod/**
+      - default.tfvars
+      - envs/prod.tfvars
+

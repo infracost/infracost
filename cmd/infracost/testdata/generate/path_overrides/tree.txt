@@ -1,0 +1,16 @@
+.
+└── infra
+    ├── components
+    │   ├── foo
+    │   │   ├── var.auto.tfvars
+    │   │   └── main.tf
+    │   ├── blah
+    │   │   └── main.tf
+    │   └── bar
+    │       └── main.tf
+    ├── baz.tfvars
+    ├── bat.tfvars
+    ├── bip.tfvars
+    ├── network-baz.tfvars
+    ├── network-bat.tfvars
+    └── default.tfvars

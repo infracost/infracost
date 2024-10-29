@@ -1,0 +1,241 @@
+
+ Name                                                                                  Monthly Qty  Unit                      Monthly Cost   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV24.16"]                                                                        
+ └─ Instance usage (Linux, pay as you go, Standard_NV24)                                    11,680  hours                       $63,772.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC24.16"]                                                                        
+ └─ Instance usage (Linux, pay as you go, Standard_NC24)                                    11,680  hours                       $54,498.88   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV12.16"]                                                                        
+ └─ Instance usage (Linux, pay as you go, Standard_NV12)                                    11,680  hours                       $31,886.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV24.8"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV24)                                     5,840  hours                       $31,886.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC12.16"]                                                                        
+ └─ Instance usage (Linux, pay as you go, Standard_NC12)                                    11,680  hours                       $27,249.44   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC24.8"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC24)                                     5,840  hours                       $27,249.44   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV12.8"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV12)                                     5,840  hours                       $15,943.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV24.4"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV24)                                     2,920  hours                       $15,943.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV6.16"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV6)                                     11,680  hours                       $15,943.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E16s_v3.16"]                                                                     
+ └─ Instance usage (Linux, pay as you go, Standard_E16s_v3)                                 11,680  hours                       $14,950.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC12.8"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC12)                                     5,840  hours                       $13,624.72   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC24.4"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC24)                                     2,920  hours                       $13,624.72   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC6.16"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC6)                                     11,680  hours                       $13,618.88   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D16s_v3.16"]                                                                     
+ └─ Instance usage (Linux, pay as you go, Standard_D16s_v3)                                 11,680  hours                       $11,212.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F16s_v2.16"]                                                                     
+ └─ Instance usage (Linux, pay as you go, Standard_F16s_v2)                                 11,680  hours                        $9,063.68   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV12.4"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV12)                                     2,920  hours                        $7,971.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV6.8"]                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_NV6)                                      5,840  hours                        $7,971.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E16s_v3.8"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_E16s_v3)                                  5,840  hours                        $7,475.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E8s_v3.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_E8s_v3)                                  11,680  hours                        $7,475.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC12.4"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC12)                                     2,920  hours                        $6,812.36   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC6.8"]                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_NC6)                                      5,840  hours                        $6,809.44   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D16s_v3.8"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_D16s_v3)                                  5,840  hours                        $5,606.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D8s_v3.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_D8s_v3)                                  11,680  hours                        $5,606.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F16s_v2.8"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_F16s_v2)                                  5,840  hours                        $4,531.84   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F8s_v2.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_F8s_v2)                                  11,680  hours                        $4,531.84   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_DS12_v2.16"]                                                                     
+ └─ Instance usage (Linux, pay as you go, Standard_DS12_v2)                                 11,680  hours                        $4,426.72   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV24.1"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV24)                                       730  hours                        $3,985.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV6.4"]                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_NV6)                                      2,920  hours                        $3,985.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E16s_v3.4"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_E16s_v3)                                  2,920  hours                        $3,737.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E4s_v3.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_E4s_v3)                                  11,680  hours                        $3,737.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E8s_v3.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_E8s_v3)                                   5,840  hours                        $3,737.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC24.1"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC24)                                       730  hours                        $3,406.18   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC6.4"]                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_NC6)                                      2,920  hours                        $3,404.72   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D16s_v3.4"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_D16s_v3)                                  2,920  hours                        $2,803.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D4s_v3.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_D4s_v3)                                  11,680  hours                        $2,803.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D8s_v3.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D8s_v3)                                   5,840  hours                        $2,803.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F16s_v2.4"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_F16s_v2)                                  2,920  hours                        $2,265.92   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F4s_v2.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_F4s_v2)                                  11,680  hours                        $2,265.92   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F8s_v2.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_F8s_v2)                                   5,840  hours                        $2,265.92   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_DS12_v2.8"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_DS12_v2)                                  5,840  hours                        $2,213.36   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV12.1"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NV12)                                       730  hours                        $1,992.90   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E4s_v3.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_E4s_v3)                                   5,840  hours                        $1,868.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E8s_v3.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_E8s_v3)                                   2,920  hours                        $1,868.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC12.1"]                                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_NC12)                                       730  hours                        $1,703.09   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D2s_v3.16"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                  11,680  hours                        $1,401.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D4s_v3.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D4s_v3)                                   5,840  hours                        $1,401.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D8s_v3.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D8s_v3)                                   2,920  hours                        $1,401.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F4s_v2.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_F4s_v2)                                   5,840  hours                        $1,132.96   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F8s_v2.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_F8s_v2)                                   2,920  hours                        $1,132.96   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_DS12_v2.4"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_DS12_v2)                                  2,920  hours                        $1,106.68   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NV6.1"]                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_NV6)                                        730  hours                          $996.45   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E16s_v3.1"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_E16s_v3)                                    730  hours                          $934.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E4s_v3.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_E4s_v3)                                   2,920  hours                          $934.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.with_instances                                                                                     
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                   7,300  hours                          $876.00   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_NC6.1"]                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_NC6)                                        730  hours                          $851.18   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D16s_v3.1"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_D16s_v3)                                    730  hours                          $700.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D2s_v3.8"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                   5,840  hours                          $700.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D4s_v3.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D4s_v3)                                   2,920  hours                          $700.80   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F16s_v2.1"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_F16s_v2)                                    730  hours                          $566.48   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F4s_v2.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_F4s_v2)                                   2,920  hours                          $566.48   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E8s_v3.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_E8s_v3)                                     730  hours                          $467.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D2s_v3.4"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                   2,920  hours                          $350.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D8s_v3.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D8s_v3)                                     730  hours                          $350.40   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F8s_v2.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_F8s_v2)                                     730  hours                          $283.24   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_DS12_v2.1"]                                                                      
+ └─ Instance usage (Linux, pay as you go, Standard_DS12_v2)                                    730  hours                          $276.67   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_E4s_v3.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_E4s_v3)                                     730  hours                          $233.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D4s_v3.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D4s_v3)                                     730  hours                          $175.20   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_F4s_v2.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_F4s_v2)                                     730  hours                          $141.62   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.example["Standard_D2s_v3.1"]                                                                       
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                     730  hours                           $87.60   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.with_monthly_hrs                                                                                   
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                     200  hours                           $24.00   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.with_monthly_hrs_zero_min_node_count                                                               
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                     100  hours                           $12.00   
+                                                                                                                                             
+ azurerm_machine_learning_compute_cluster.with_instances_and_monthly_hrs                                                                     
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                                      20  hours                            $2.40   
+                                                                                                                                             
+ azurerm_storage_account.example                                                                                                             
+ ├─ Capacity                                                                    Monthly cost depends on usage: $0.0392 per GB                
+ ├─ Write operations                                                            Monthly cost depends on usage: $0.11 per 10k operations      
+ ├─ List and create container operations                                        Monthly cost depends on usage: $0.11 per 10k operations      
+ ├─ Read operations                                                             Monthly cost depends on usage: $0.0043 per 10k operations    
+ ├─ All other operations                                                        Monthly cost depends on usage: $0.0043 per 10k operations    
+ └─ Blob index                                                                  Monthly cost depends on usage: $0.075 per 10k tags           
+                                                                                                                                             
+ OVERALL TOTAL                                                                                                                $498,345.89 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+92 cloud resources were detected:
+∙ 90 were estimated
+∙ 2 were free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃      $498,346 ┃           - ┃   $498,346 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

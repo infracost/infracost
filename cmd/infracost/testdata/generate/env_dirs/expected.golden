@@ -1,0 +1,44 @@
+version: 0.1
+
+projects:
+  - path: infra/components/baz
+    name: infra-components-baz-dev
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/dev/bla.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/baz/**
+      - infra/variables/defaults.tfvars
+      - infra/variables/dev/bla.tfvars
+  - path: infra/components/baz
+    name: infra-components-baz-stag
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/stag/bop.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/baz/**
+      - infra/variables/defaults.tfvars
+      - infra/variables/stag/bop.tfvars
+  - path: infra/components/foo
+    name: infra-components-foo-dev
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/dev/bla.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/foo/**
+      - infra/variables/defaults.tfvars
+      - infra/variables/dev/bla.tfvars
+  - path: infra/components/foo
+    name: infra-components-foo-stag
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/stag/bop.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/foo/**
+      - infra/variables/defaults.tfvars
+      - infra/variables/stag/bop.tfvars
+

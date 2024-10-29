@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
 
 const (
-	sqlServerlessTier = "general purpose - serverless"
-	sqlHyperscaleTier = "hyperscale"
+	sqlServerlessTier     = "general purpose - serverless"
+	sqlHyperscaleTier     = "hyperscale"
+	sqlGeneralPurposeTier = "general purpose"
 )
 
 var (
@@ -73,11 +74,17 @@ func (r *SQLDatabase) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-var SQLDatabaseUsageSchema = []*schema.UsageItem{
-	{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+func (r *SQLDatabase) CoreType() string {
+	return "SQLDatabase"
+}
+
+func (r *SQLDatabase) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // BuildResource builds a schema.Resource from a valid SQLDatabase.
@@ -110,7 +117,7 @@ var SQLDatabaseUsageSchema = []*schema.UsageItem{
 func (r *SQLDatabase) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    SQLDatabaseUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: r.costComponents(),
 	}
 }
@@ -225,9 +232,11 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 		vCoreHours = decimalPtr(decimal.NewFromInt(*r.MonthlyVCoreHours))
 	}
 
+	name := fmt.Sprintf("Compute (serverless, %s)", r.SKU)
+
 	costComponents := []*schema.CostComponent{
 		{
-			Name:            fmt.Sprintf("Compute (serverless, %s)", r.SKU),
+			Name:            name,
 			Unit:            "vCore-hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: vCoreHours,
@@ -237,9 +246,11 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 				{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
 			}),
 			PriceFilter: priceFilterConsumption,
+			UsageBased:  true,
 		},
 	}
 
+	// Zone redundancy is free for premium and business critical tiers
 	if r.ZoneRedundant {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("Zone redundancy (serverless, %s)", r.SKU),
@@ -267,8 +278,6 @@ func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (provisioned, %s)", r.SKU)
 
-	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
-
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           name,
@@ -283,7 +292,8 @@ func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent
 		},
 	}
 
-	if r.ZoneRedundant {
+	// Zone redundancy is free for premium and business critical tiers
+	if strings.EqualFold(r.Tier, sqlGeneralPurposeTier) && r.ZoneRedundant {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Zone redundancy (provisioned, %s)", r.SKU),
 			Unit:           "hours",
@@ -330,7 +340,7 @@ func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 
 	redundancyType, ok := mssqlStorageRedundancyTypeMapping[strings.ToLower(r.BackupStorageType)]
 	if !ok {
-		log.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
+		logging.Logger.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
 		redundancyType = "RA-GRS"
 	}
 
@@ -345,6 +355,7 @@ func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -356,7 +367,7 @@ func (r *SQLDatabase) pitrBackupCostComponent() *schema.CostComponent {
 
 	redundancyType, ok := mssqlStorageRedundancyTypeMapping[strings.ToLower(r.BackupStorageType)]
 	if !ok {
-		log.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
+		logging.Logger.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
 		redundancyType = "RA-GRS"
 	}
 
@@ -371,6 +382,7 @@ func (r *SQLDatabase) pitrBackupCostComponent() *schema.CostComponent {
 			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -381,7 +393,7 @@ func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *sch
 		tier, ok = mssqlTierMapping[strings.ToLower(r.SKU)[:1]]
 
 		if !ok {
-			log.Warn().Msgf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
+			logging.Logger.Warn().Msgf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
 			return nil
 		}
 	}
@@ -432,6 +444,7 @@ func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorage
 			{Key: "meterName", Value: strPtr("Data Stored")},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -479,26 +492,32 @@ func mssqlStorageCostComponent(region string, tier string, zoneRedundant bool, m
 	}
 
 	storageTier := tier
-	if strings.ToLower(storageTier) == "general purpose - serverless" {
+	if strings.EqualFold(tier, sqlServerlessTier) {
 		storageTier = "General Purpose"
 	}
 
 	skuName := storageTier
-	if zoneRedundant {
+	if (strings.EqualFold(tier, sqlGeneralPurposeTier) || strings.EqualFold(tier, sqlServerlessTier)) && zoneRedundant {
 		skuName += " Zone Redundancy"
 	}
 
 	productNameRegex := fmt.Sprintf("/%s - Storage/", storageTier)
+
+	filters := []*schema.AttributeFilter{
+		{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+		{Key: "skuName", Value: strPtr(skuName)},
+		{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
+	}
+
+	if skuName == "Hyperscale" {
+		filters = append(filters, &schema.AttributeFilter{Key: "armSkuName", Value: strPtr(skuName)})
+	}
 
 	return &schema.CostComponent{
 		Name:            "Storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storageGB,
-		ProductFilter: mssqlProductFilter(region, []*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			{Key: "skuName", Value: strPtr(skuName)},
-			{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
-		}),
+		ProductFilter:   mssqlProductFilter(region, filters),
 	}
 }

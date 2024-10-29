@@ -161,6 +161,50 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 	}
 
+	// Build a set of all the provider keys so we can look up
+	// provider references later
+	providerKeys := make(map[string]string)
+	for _, vertex := range vertexes {
+		if _, ok := vertex.(*VertexProvider); ok {
+			providerKeys[vertex.ID()] = vertex.ID()
+		}
+	}
+
+	// Also add a mapping for all the provider attributes in module calls
+	// so we can look up the providers based on their alias later.
+	for _, vertex := range vertexes {
+		if v, ok := vertex.(*VertexModuleCall); ok {
+			// Decode the provider attribute to get the aliases
+			attr := v.block.GetAttribute("providers")
+			if attr == nil {
+				continue
+			}
+
+			providers := attr.DecodeProviders()
+			for alias, provider := range providers {
+				// Generate the full key and value for the provider map relative to the module
+				// For example, if the providers block is specified in a module like this:
+				//
+				// module "my_module" {
+				//   providers = {
+				//     aws = aws.my_provider
+				//   }
+				// }
+				//
+				// Then the key would be "module.my_module.provider.aws"
+				// And the value would be "aws.my_provider"
+				key := fmt.Sprintf("%s.provider.%s", stripModuleCallPrefix(vertex.ID()), alias)
+
+				val := fmt.Sprintf("provider.%s", provider)
+				if vertex.ModuleAddress() != "" {
+					val = fmt.Sprintf("%s.%s", vertex.ModuleAddress(), val)
+				}
+
+				providerKeys[key] = val
+			}
+		}
+	}
+
 	for _, vertex := range vertexes {
 		id := vertex.ID()
 
@@ -225,6 +269,23 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				modAddress := stripCount(ref.ModuleAddress)
 
 				srcID = fmt.Sprintf("%s.%s", modAddress, srcID)
+			}
+
+			// Find the correct provider vertex by looking in for a matching provider
+			// block in the module hierarchy. If we can't find one, then we should
+			// assume the reference is to a provider in the root module.
+			if strings.HasPrefix(srcID, "provider.") {
+				modAddress := vertex.ModuleAddress()
+
+				for modAddress != "" {
+					k := fmt.Sprintf("%s.%s", modAddress, srcID)
+					if v, ok := providerKeys[k]; ok {
+						srcID = v
+						break
+					}
+
+					modAddress, _ = splitModuleAddr(modAddress)
+				}
 			}
 
 			dstID := id
@@ -345,8 +406,8 @@ func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
 	g.ReduceTransitively()
 	g.Walk()
 
-	evaluator.module.Blocks = evaluator.filteredBlocks
 	evaluator.module = *evaluator.collectModules()
+	evaluator.module.Blocks = evaluator.filteredBlocks
 
 	return &evaluator.module, nil
 }
@@ -397,9 +458,8 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 				map[string]map[string]cty.Value{},
 				evaluator.workspace,
 				evaluator.blockBuilder,
-				nil,
 				evaluator.logger,
-				&Context{},
+				evaluator.isGraph,
 			)
 
 			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)

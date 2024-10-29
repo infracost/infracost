@@ -1,0 +1,7 @@
+version: 0.1
+
+projects:
+  - path: app/foo
+    name: app-foo
+    skip_autodetect: true
+

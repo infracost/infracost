@@ -18,7 +18,13 @@ type DMSReplicationInstance struct {
 	MultiAZ                  bool
 }
 
-var DMSReplicationInstanceUsageSchema = []*schema.UsageItem{}
+func (r *DMSReplicationInstance) CoreType() string {
+	return "DMSReplicationInstance"
+}
+
+func (r *DMSReplicationInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *DMSReplicationInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -43,7 +49,7 @@ func (r *DMSReplicationInstance) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    DMSReplicationInstanceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

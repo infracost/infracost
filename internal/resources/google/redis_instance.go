@@ -17,7 +17,13 @@ type RedisInstance struct {
 	MemorySizeGB float64
 }
 
-var RedisInstanceUsageSchema = []*schema.UsageItem{}
+func (r *RedisInstance) CoreType() string {
+	return "RedisInstance"
+}
+
+func (r *RedisInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *RedisInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -71,6 +77,6 @@ func (r *RedisInstance) BuildResource() *schema.Resource {
 					},
 				},
 			},
-		}, UsageSchema: RedisInstanceUsageSchema,
+		}, UsageSchema: r.UsageSchema(),
 	}
 }

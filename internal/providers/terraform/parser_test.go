@@ -413,10 +413,10 @@ func TestParseJSONResources(t *testing.T) {
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
-	partials := p.parseJSONResources(false, nil, usage, NewConfLoader(conf), parsed, providerConf, vars)
-	actual := make([]*schema.Resource, len(partials))
-	for i, partial := range partials {
-		actual[i] = schema.BuildResource(partial, nil)
+	parsedResources := p.parseJSONResources(false, nil, usage, NewConfLoader(conf), parsed, providerConf, vars)
+	actual := make([]*schema.Resource, len(parsedResources))
+	for i, pr := range parsedResources {
+		actual[i] = schema.BuildResource(pr.PartialResource, nil)
 	}
 
 	i := 0
@@ -486,8 +486,8 @@ func TestCreateResource(t *testing.T) {
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
 	for _, test := range tests {
-		partial := p.createPartialResource(test.data, nil)
-		actual := schema.BuildResource(partial, nil)
+		parsed := p.createParsedResource(test.data, nil)
+		actual := schema.BuildResource(parsed.PartialResource, nil)
 		assert.Equal(t, test.expected.Name, actual.Name)
 		assert.Equal(t, test.expected.ResourceType, actual.ResourceType)
 		assert.Equal(t, test.expected.IsSkipped, actual.IsSkipped)
@@ -535,7 +535,8 @@ func TestParseResourceData(t *testing.T) {
           "name": "instance1",
           "provider_name": "registry.terraform.io/hashicorp/aws",
           "schema_version": 0,
-          "values": {}
+          "values": {},
+          "region": "eu-west-2"
 				},
 				{
 					"address": "aws_instance.instance2",
@@ -544,7 +545,8 @@ func TestParseResourceData(t *testing.T) {
           "name": "instance2",
           "provider_name": "registry.terraform.io/hashicorp/aws",
           "schema_version": 0,
-          "values": {}
+          "values": {},
+          "region": "eu-west-2"
         }
 			],
 			"child_modules": [
@@ -558,7 +560,8 @@ func TestParseResourceData(t *testing.T) {
 							"name": "nat1",
 							"provider_name": "registry.terraform.io/hashicorp/aws",
 							"schema_version": 0,
-							"values": {}
+							"values": {},
+							"region": "eu-west-2"
 						},
 						{
 							"address": "module.module1.aws_nat_gateway.nat2",
@@ -567,7 +570,8 @@ func TestParseResourceData(t *testing.T) {
 							"name": "nat2",
 							"provider_name": "registry.terraform.io/hashicorp/aws",
 							"schema_version": 0,
-							"values": {}
+							"values": {},
+							"region": "eu-west-2"
 						}
 					]
 				}
@@ -606,7 +610,7 @@ func TestParseResourceData(t *testing.T) {
 								"mode": "managed",
 								"type": "aws_nat_gateway",
 								"name": "nat1",
-								"provider_config_key": "module1:aws",
+								"provider_config_key": "aws",
 								"expressions": {}
 							},
               {
@@ -614,7 +618,7 @@ func TestParseResourceData(t *testing.T) {
 								"mode": "managed",
 								"type": "aws_nat_gateway",
 								"name": "nat2",
-								"provider_config_key": "module1:aws.europe",
+								"provider_config_key": "aws.europe",
 								"expressions": {}
 							}
 						]
@@ -664,38 +668,29 @@ func TestParseResourceData(t *testing.T) {
 	}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
-	actual := p.parseResourceData(false, NewConfLoader(conf), providerConf, planVals, vars)
+	loader := NewConfLoader(conf)
+	actual := p.parseResourceData(false, loader, providerConf, planVals, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)
 		assert.Equal(t, expected[k].ProviderName, v.ProviderName)
 		assert.Equal(t, expected[k].Type, v.Type)
-		assert.Equal(t, expectedRegions[k], v.Get("region").String())
+
+		region := p.getRegion(loader, v, providerConf, vars)
+		assert.Equal(t, expectedRegions[k], region)
 	}
 }
 
 func TestParseReferences_plan(t *testing.T) {
-	vol1 := schema.NewResourceData(
-		"aws_ebs_volume",
-		"aws",
-		"aws_ebs_volume.volume1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw:  `{}`,
-		},
-	)
+	vol1 := schema.NewResourceData("aws_ebs_volume", "aws", "aws_ebs_volume.volume1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw:  `{}`,
+	})
 
-	snap1 := schema.NewResourceData(
-		"aws_ebs_snapshot",
-		"aws",
-		"aws_ebs_snapshot.snapshot1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw:  `{}`,
-		},
-	)
+	snap1 := schema.NewResourceData("aws_ebs_snapshot", "aws", "aws_ebs_snapshot.snapshot1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw:  `{}`,
+	})
 
 	resData := map[string]*schema.ResourceData{
 		vol1.Address:  vol1,
@@ -739,31 +734,19 @@ func TestParseReferences_plan(t *testing.T) {
 }
 
 func TestParseReferences_state(t *testing.T) {
-	vol1 := schema.NewResourceData(
-		"aws_ebs_volume",
-		"aws",
-		"aws_ebs_volume.volume1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	vol1 := schema.NewResourceData("aws_ebs_volume", "aws", "aws_ebs_volume.volume1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"id": "vol-12345"
 			}`,
-		},
-	)
+	})
 
-	snap1 := schema.NewResourceData(
-		"aws_ebs_snapshot",
-		"aws",
-		"aws_ebs_snapshot.snapshot1",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	snap1 := schema.NewResourceData("aws_ebs_snapshot", "aws", "aws_ebs_snapshot.snapshot1", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"volume_id": "vol-12345"
 			}`,
-		},
-	)
+	})
 
 	resData := map[string]*schema.ResourceData{
 		vol1.Address:  vol1,
@@ -779,14 +762,9 @@ func TestParseReferences_state(t *testing.T) {
 }
 
 func TestParseKnownModuleRefs(t *testing.T) {
-	res := schema.NewResourceData(
-		"aws_autoscaling_group",
-		"registry.terraform.io/hashicorp/aws",
-		"module.worker_groups_launch_template.aws_autoscaling_group.workers_launch_template[0]",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	res := schema.NewResourceData("aws_autoscaling_group", "registry.terraform.io/hashicorp/aws", "module.worker_groups_launch_template.aws_autoscaling_group.workers_launch_template[0]", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"capacity_rebalance":false,
 				"desired_capacity":6,
 				"enabled_metrics":null,
@@ -824,17 +802,11 @@ func TestParseKnownModuleRefs(t *testing.T) {
 				"wait_for_capacity_timeout":"10m",
 				"wait_for_elb_capacity":null,
 				"warm_pool":[]}`,
-		},
-	)
+	})
 
-	lt := schema.NewResourceData(
-		"aws_launch_template",
-		"registry.terraform.io/hashicorp/aws",
-		"module.worker_groups_launch_template.aws_launch_template.workers_launch_template[0]",
-		nil,
-		gjson.Result{
-			Type: gjson.JSON,
-			Raw: `{
+	lt := schema.NewResourceData("aws_launch_template", "registry.terraform.io/hashicorp/aws", "module.worker_groups_launch_template.aws_launch_template.workers_launch_template[0]", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
 				"block_device_mappings":[
 					{
 						"device_name":"/dev/xvda",
@@ -924,8 +896,7 @@ func TestParseKnownModuleRefs(t *testing.T) {
 				"update_default_version":false,
 				"vpc_security_group_ids":null
 			}`,
-		},
-	)
+	})
 
 	resData := map[string]*schema.ResourceData{
 		res.Address: res,
@@ -1014,6 +985,79 @@ func TestAddressModulePart(t *testing.T) {
 	}
 }
 
+func TestRemoveAddressCountIndex(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected int
+	}{
+		{"aws_instance.my_instance", -1},
+		{"data.aws_instance.my_instance", -1},
+		{"aws_instance.my_instance[3]", 3},
+		{"data.aws_instance.my_instance[3]", 3},
+		{"aws_instance.my_instance[3]", 3},
+		{"data.aws_instance.my_instance[3]", 3},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", -1},
+		{"module.my_module.data.aws_instance.my_instance", -1},
+		{"module.my_module.aws_instance.my_instance[3]", 3},
+		{"module.my_module.data.aws_instance.my_instance[3]", 3},
+		{"module.my_module.aws_instance.my_instance[3]", 3},
+		{"module.my_module.data.aws_instance.my_instance[3]", 3},
+		// Count modules
+		{"module.my_module[2].aws_instance.my_instance", -1},
+		{"module.my_module[2].data.aws_instance.my_instance", -1},
+		{"module.my_module[2].aws_instance.my_instance[3]", 3},
+		{"module.my_module[2].data.aws_instance.my_instance[3]", 3},
+		{"module.my_module[2].aws_instance.my_instance[3]", 3},
+		{"module.my_module[2].data.aws_instance.my_instance[3]", 3},
+		// Each resources
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance", -1},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance", -1},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index.1\"]", -1},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index.1\"]", -1},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index[1]\"]", -1},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index[1]\"]", -1},
+	}
+
+	for _, test := range tests {
+		actual := addressCountIndex(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestAddressKey(t *testing.T) {
+	tests := []struct {
+		address  string
+		expected string
+	}{
+		{"aws_instance.my_instance", ""},
+		{"data.aws_instance.my_instance", ""},
+		{"aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"data.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		{"data.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		// Modules
+		{"module.my_module.aws_instance.my_instance", ""},
+		{"module.my_module.data.aws_instance.my_instance", ""},
+		{"module.my_module.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		{"module.my_module.data.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		// Each modules
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance", ""},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance", ""},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index.1\"]", "index.1"},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index[1]\"]", "index[1]"},
+	}
+
+	for _, test := range tests {
+		actual := addressKey(test.address)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
 func TestRemoveAddressArrayPart(t *testing.T) {
 	tests := []struct {
 		address  string
@@ -1032,6 +1076,13 @@ func TestRemoveAddressArrayPart(t *testing.T) {
 		{"module.my_module.data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance"},
 		{"module.my_module.aws_instance.my_instance[\"index[1]\"]", "aws_instance.my_instance"},
 		{"module.my_module.data.aws_instance.my_instance[\"index[1]\"]", "data.aws_instance.my_instance"},
+		// Each modules
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance", "aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance", "data.aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index.1\"]", "aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index.1\"]", "data.aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].aws_instance.my_instance[\"index[1]\"]", "aws_instance.my_instance"},
+		{"module.my_module[\"modindex.0\"].data.aws_instance.my_instance[\"index[1]\"]", "data.aws_instance.my_instance"},
 	}
 
 	for _, test := range tests {

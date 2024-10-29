@@ -9,15 +9,15 @@ import (
 
 func getWAFWebACLRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_waf_web_acl",
-		RFunc: NewWAFWebACL,
+		Name:      "aws_waf_web_acl",
+		CoreRFunc: NewWAFWebACL,
 		Notes: []string{
 			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Terraform.",
 		},
 	}
 }
 
-func NewWAFWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewWAFWebACL(d *schema.ResourceData) schema.CoreResource {
 	rules := int64(0)
 	ruleGroups := int64(0)
 
@@ -37,7 +37,5 @@ func NewWAFWebACL(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		Rules:      rules,
 		RuleGroups: ruleGroups,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

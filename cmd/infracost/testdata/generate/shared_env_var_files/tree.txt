@@ -1,0 +1,12 @@
+.
+└── apps
+    ├── foo
+    │   ├── main.tf
+    ├── bar
+    │   ├── main.tf
+    │   ├── staging.tfvars
+    │   └── dev.tfvars
+    ├── prod-default.tfvars
+    ├── staging-default.tfvars
+    ├── dev-default.tfvars
+    └── default.tfvars

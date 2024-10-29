@@ -7,15 +7,14 @@ import (
 
 func getDNSTxtRecordRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_dns_txt_record",
-		RFunc: NewDNSTxtRecord,
+		Name:      "azurerm_dns_txt_record",
+		CoreRFunc: NewDNSTxtRecord,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewDNSTxtRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &azure.DNSTxtRecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+func NewDNSTxtRecord(d *schema.ResourceData) schema.CoreResource {
+	r := &azure.DNSTxtRecord{Address: d.Address, Region: d.Region}
+	return r
 }

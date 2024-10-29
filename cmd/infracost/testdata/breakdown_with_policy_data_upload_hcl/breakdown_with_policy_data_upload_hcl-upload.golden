@@ -30,10 +30,29 @@ storePolicyResources:
               "value": "bar"
             },
             {
+              "key": "volume_tags.DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "volume_tags.DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
               "key": "volume_tags.baz",
               "value": "bat"
             }
           ],
+          "defaultTags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "supportForDefaultTags": false,
           "values": {
             "ebs_block_device": [
               {
@@ -60,7 +79,8 @@ storePolicyResources:
             "endLine": 37,
             "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
             "startLine": 16
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }
@@ -91,10 +111,29 @@ storePolicyResources:
               "value": "bar"
             },
             {
+              "key": "volume_tags.DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "volume_tags.DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
               "key": "volume_tags.baz",
               "value": "bat"
             }
           ],
+          "defaultTags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "supportForDefaultTags": false,
           "values": {
             "ebs_block_device": [
               {
@@ -121,7 +160,8 @@ storePolicyResources:
             "endLine": 37,
             "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
             "startLine": 16
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }

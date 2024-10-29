@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -8,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/usage"
@@ -70,36 +70,42 @@ type cloudfrontDistributionShieldRequestsUsage struct {
 	India        *int64 `infracost_usage:"india"`
 }
 
-var CloudfrontDistributionUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_http_requests",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_http_requests", Items: cloudfrontDistributionRegionRequestsSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_https_requests",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_https_requests", Items: cloudfrontDistributionRegionRequestsSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_shield_requests",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_shield_requests", Items: cloudfrontDistributionShieldRequestsSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{Key: "monthly_invalidation_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_encryption_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_log_lines", ValueType: schema.Int64, DefaultValue: 0},
-	{
-		Key:          "monthly_data_transfer_to_internet_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_internet_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_data_transfer_to_origin_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_origin_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{Key: "custom_ssl_certificates", ValueType: schema.Int64, DefaultValue: 0},
+func (r *CloudfrontDistribution) CoreType() string {
+	return "CloudfrontDistribution"
+}
+
+func (r *CloudfrontDistribution) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "monthly_http_requests",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_http_requests", Items: cloudfrontDistributionRegionRequestsSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_https_requests",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_https_requests", Items: cloudfrontDistributionRegionRequestsSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_shield_requests",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_shield_requests", Items: cloudfrontDistributionShieldRequestsSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{Key: "monthly_invalidation_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_encryption_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_log_lines", ValueType: schema.Int64, DefaultValue: 0},
+		{
+			Key:          "monthly_data_transfer_to_internet_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_internet_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_data_transfer_to_origin_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_origin_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{Key: "custom_ssl_certificates", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 var cloudfrontDistributionRegionRequestsSchema = []*schema.UsageItem{
@@ -339,6 +345,7 @@ func (r *CloudfrontDistribution) buildDataOutCostComponent(usageName, fromLocati
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(strconv.Itoa(startUsage)),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -366,6 +373,7 @@ func (r *CloudfrontDistribution) dataOutToOriginCostComponents(regionData *cloud
 				{Key: "fromLocation", Value: strPtr(apiRegion)},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -394,6 +402,7 @@ func (r *CloudfrontDistribution) httpRequestsCostComponents(regionData *cloudfro
 				{Key: "requestType", Value: strPtr("CloudFront-Request-HTTP-Proxy")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -422,6 +431,7 @@ func (r *CloudfrontDistribution) httpsRequestsCostComponents(regionData *cloudfr
 				{Key: "requestType", Value: strPtr("CloudFront-Request-HTTPS-Proxy")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -448,6 +458,7 @@ var regionShieldMapping = map[string]string{
 	"ap-southeast-2":  "australia",
 	"ap-southeast-3":  "indonesia",
 	"ap-southeast-4":  "australia",
+	"ap-southeast-5":  "malaysia",
 	"ap-south-1":      "india",
 	"ap-south-2":      "india",
 	"sa-east-1":       "south_america",
@@ -471,7 +482,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 	}
 
 	if apiRegion == "" {
-		log.Warn().Msgf("Skipping Origin shield HTTP requests for resource %s. Could not find mapping for region %s", r.Address, region)
+		logging.Logger.Warn().Msgf("Skipping Origin shield HTTP requests for resource %s. Could not find mapping for region %s", r.Address, region)
 		return costComponents
 	}
 
@@ -481,7 +492,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 	}
 
 	if usageKey == "" {
-		log.Warn().Msgf("No usage for Origin shield HTTP requests for resource %s.  Region %s not supported in usage file.", r.Address, region)
+		logging.Logger.Warn().Msgf("No usage for Origin shield HTTP requests for resource %s.  Region %s not supported in usage file.", r.Address, region)
 	}
 
 	regionData := map[string]*int64{
@@ -517,6 +528,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 				{Key: "location", Value: strPtr(apiRegion)},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -552,6 +564,7 @@ func (r *CloudfrontDistribution) invalidationRequestsCostComponents() []*schema.
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	})
 
 	if paidQuantity != nil {
@@ -570,6 +583,7 @@ func (r *CloudfrontDistribution) invalidationRequestsCostComponents() []*schema.
 			PriceFilter: &schema.PriceFilter{
 				StartUsageAmount: strPtr("1000"),
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -601,6 +615,7 @@ func (r *CloudfrontDistribution) encryptionRequestsCostComponents() []*schema.Co
 				{Key: "location", Value: strPtr("Europe")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -630,6 +645,7 @@ func (r *CloudfrontDistribution) realtimeLogsCostComponents() []*schema.CostComp
 				{Key: "operation", Value: strPtr("RealTimeLog")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -659,6 +675,7 @@ func (r *CloudfrontDistribution) customSSLCertificateCostComponents() []*schema.
 				{Key: "usagetype", Value: strPtr("SSL-Cert-Custom")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents

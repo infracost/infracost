@@ -1,0 +1,9 @@
+tag_groups:
+  - name: required_tags
+    tags:
+      - name: A
+        value:
+          default: 123456
+      - name: B
+        value:
+          default: 654321

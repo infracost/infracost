@@ -1,0 +1,20 @@
+.
+└── apps
+    ├── bar
+    │   └── main.tf
+    ├── foo
+    │   └── main.tf
+    ├── baz
+    │   └── foo.tf
+    ├── bat
+    │   └── bip.tf
+    ├── .hidden
+    │   └── main.tf
+    ├── wildcard
+    │   ├── one
+    │   │   └── fip.tf
+    │   └── two
+    │       └── fip.tf
+    ├── dev.tfvars
+    ├── prod.tfvars
+    └── default.tfvars

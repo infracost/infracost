@@ -15,11 +15,14 @@ func getStorageShareRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"storage_account_name",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"storage_account_name"})
+		},
 	}
 }
 
 func newStorageShare(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"storage_account_name"})
+	region := d.Region
 
 	accountReplicationType := "LRS"
 

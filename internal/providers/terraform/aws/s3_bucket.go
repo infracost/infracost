@@ -15,6 +15,7 @@ func getS3BucketRegistryItem() *schema.RegistryItem {
 		CoreRFunc: NewS3BucketResource,
 		ReferenceAttributes: []string{
 			"aws_s3_bucket_lifecycle_configuration.bucket",
+			"aws_s3_bucket_versioning.bucket",
 			"aws_cloudfront_distribution.origin.0.domain_name",
 			"aws_cloudfront_distribution.origin.0.origin_id",
 		},

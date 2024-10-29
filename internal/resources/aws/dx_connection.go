@@ -5,8 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -25,15 +24,21 @@ type DXConnection struct {
 	DXConnectionType                                *string       `infracost_usage:"dx_connection_type"`
 }
 
-var DXConnectionUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_outbound_from_region_to_dx_connection_location",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_from_region_to_dx_connection_location", Items: RegionUsageSchema},
-	},
-	{Key: "monthly_outbound_region_to_dx_location_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "dx_virtual_interface_type", ValueType: schema.String, DefaultValue: "private"},
-	{Key: "dx_connection_type", ValueType: schema.String, DefaultValue: "dedicated"},
+func (r *DXConnection) CoreType() string {
+	return "DXConnection"
+}
+
+func (r *DXConnection) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "monthly_outbound_from_region_to_dx_connection_location",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_from_region_to_dx_connection_location", Items: RegionUsageSchema},
+		},
+		{Key: "monthly_outbound_region_to_dx_location_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "dx_virtual_interface_type", ValueType: schema.String, DefaultValue: "private"},
+		{Key: "dx_connection_type", ValueType: schema.String, DefaultValue: "dedicated"},
+	}
 }
 
 func (r *DXConnection) PopulateUsage(u *schema.UsageData) {
@@ -71,7 +76,7 @@ func (r *DXConnection) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: components,
-		UsageSchema:    DXConnectionUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -112,7 +117,7 @@ func (r *DXConnection) outboundDataTransferComponent(fromRegion string, dataProc
 	if !ok {
 		// This shouldn't happen because we're loading the regions into the RegionsUsage struct
 		// which should have same keys as the RegionMappings map
-		log.Warn().Msgf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", r.Address, fromRegion)
+		logging.Logger.Warn().Msgf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", r.Address, fromRegion)
 		return nil
 	}
 
@@ -131,5 +136,6 @@ func (r *DXConnection) outboundDataTransferComponent(fromRegion string, dataProc
 				{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
 			},
 		},
+		UsageBased: true,
 	}
 }

@@ -1,5 +1,7 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt/dev
+Project: REPLACED_PROJECT_PATH/terragrunt/dev
 Module path: dev
 
 + aws_instance.web_app
@@ -40,7 +42,7 @@ Monthly cost change for infracost/infracost/examples/terragrunt/dev (Module path
 Amount:  +$52 ($0.00 → $52)
 
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt/prod
+Project: REPLACED_PROJECT_PATH/terragrunt/prod
 Module path: prod
 
 + aws_instance.web_app
@@ -81,18 +83,20 @@ Monthly cost change for infracost/infracost/examples/terragrunt/prod (Module pat
 Amount:  +$748 ($0.00 → $748)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated
 
-Infracost estimate: Monthly cost will increase by $800 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Cost change ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terragrunt/dev        ┃        +$52 ┃ $52              ┃
-┃ infracost/infracost/examples/terragrunt/prod       ┃       +$748 ┃ $748             ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $800 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terragrunt/dev        ┃          +$52 ┃           - ┃         +$52 ┃
+┃ infracost/infracost/examples/terragrunt/prod       ┃         +$748 ┃           - ┃        +$748 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

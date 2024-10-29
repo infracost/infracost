@@ -7,15 +7,14 @@ import (
 
 func getPrivateDNSTXTRecordRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_private_dns_txt_record",
-		RFunc: NewPrivateDNSTXTRecord,
+		Name:      "azurerm_private_dns_txt_record",
+		CoreRFunc: NewPrivateDNSTXTRecord,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewPrivateDNSTXTRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &azure.PrivateDNSTXTRecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+func NewPrivateDNSTXTRecord(d *schema.ResourceData) schema.CoreResource {
+	r := &azure.PrivateDNSTXTRecord{Address: d.Address, Region: d.Region}
+	return r
 }

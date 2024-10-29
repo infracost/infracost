@@ -7,12 +7,12 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// getAzureRMFrontdoorFirewallPolicyRegistryItem returns a registry item for the
+// getFrontdoorFirewallPolicyRegistryItem returns a registry item for the
 // resource
-func getAzureRMFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
+func getFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_frontdoor_firewall_policy",
-		RFunc: newFrontdoorFirewallPolicy,
+		Name:      "azurerm_frontdoor_firewall_policy",
+		CoreRFunc: newFrontdoorFirewallPolicy,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
@@ -21,13 +21,13 @@ func getAzureRMFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 
 // newFrontdoorFirewallPolicy parses Terraform's data and uses it to build
 // a new resource
-func newFrontdoorFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+func newFrontdoorFirewallPolicy(d *schema.ResourceData) schema.CoreResource {
+	region := d.Region
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"
 	} else {
-		region = regionToZone(region)
+		region = regionToCDNZone(region)
 	}
 
 	customRules := 0
@@ -46,7 +46,5 @@ func newFrontdoorFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *sc
 		CustomRules:     customRules,
 		ManagedRulesets: managedRulesets,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

@@ -156,6 +156,26 @@ func TestDiffWithCompareToFormatJSON(t *testing.T) {
 	)
 }
 
+func TestDiffWithCompareToNoMetadataFormatJSON(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format",
+			"json",
+		}, &GoldenFileOptions{
+			RunTerraformCLI: true,
+			IsJSON:          true,
+		},
+	)
+}
+
 func TestDiffWithCompareToPreserveSummary(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(
@@ -200,7 +220,7 @@ projects:
 		path.Join(dir, "prod"))
 
 	configFilePath := path.Join(dir, "infracost.yml")
-	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm)
+	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm) // nolint: gosec
 	require.NoError(t, err)
 
 	defer os.Remove(configFilePath)
@@ -213,9 +233,7 @@ projects:
 			configFilePath,
 			"--compare-to",
 			path.Join(dir, "prior.json"),
-		}, &GoldenFileOptions{
-			RunTerraformCLI: true,
-		})
+		}, nil)
 }
 
 func TestDiffWithConfigFileCompareToDeletedProject(t *testing.T) {
@@ -227,7 +245,7 @@ projects:
 		path.Join(dir, "prod"))
 
 	configFilePath := path.Join(dir, "infracost.yml")
-	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm)
+	err := os.WriteFile(configFilePath, []byte(configFile), os.ModePerm) // nolint: gosec
 	require.NoError(t, err)
 
 	defer os.Remove(configFilePath)
@@ -240,9 +258,7 @@ projects:
 			configFilePath,
 			"--compare-to",
 			path.Join(dir, "prior.json"),
-		}, &GoldenFileOptions{
-			RunTerraformCLI: true,
-		})
+		}, nil)
 }
 
 func TestDiffCompareToError(t *testing.T) {
@@ -263,6 +279,21 @@ func TestDiffTerragrunt(t *testing.T) {
 
 func TestDiffTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples", "--terraform-force-cli"}, nil)
+}
+
+func TestDiffTerragruntSyntaxError(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--compare-to", filepath.Join(dir, "baseline.withouterror.json"),
+			"--config-file", filepath.Join(dir, "infracost.config.yml"),
+		},
+		&GoldenFileOptions{},
+	)
 }
 
 func TestDiffWithTarget(t *testing.T) {
@@ -319,4 +350,35 @@ func TestDiffWithPolicyDataUpload(t *testing.T) {
 			ctx.Config.PoliciesEnabled = true
 		},
 	)
+}
+
+func TestDiffPriorEmptyProject(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(), []string{
+			"diff",
+			"--compare-to",
+			path.Join(dir, "base.json"),
+			"--path",
+			dir,
+		}, nil)
+}
+
+func TestDiffPriorEmptyProjectJSON(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(), []string{
+			"diff",
+			"--compare-to",
+			path.Join(dir, "base.json"),
+			"--path",
+			dir,
+			"--format", "json",
+		}, &GoldenFileOptions{
+			IsJSON: true,
+		})
 }

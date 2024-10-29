@@ -1,19 +1,22 @@
 
- Name                                                   Monthly Qty  Unit            Monthly Cost 
-                                                                                                  
- google_logging_folder_bucket_config.basic                                                        
- └─ Logging data                                      Monthly cost depends on usage: $0.50 per GB 
-                                                                                                  
- google_logging_folder_bucket_config.basic_withUsage                                              
- └─ Logging data                                                100  GB                    $50.00 
-                                                                                                  
+ Name                                                   Monthly Qty  Unit            Monthly Cost    
+                                                                                                     
+ google_logging_folder_bucket_config.basic_withUsage                                                 
+ └─ Logging data                                                100  GB                    $50.00  * 
+                                                                                                     
+ google_logging_folder_bucket_config.basic                                                           
+ └─ Logging data                                      Monthly cost depends on usage: $0.50 per GB    
+                                                                                                     
  OVERALL TOTAL                                                                             $50.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestLoggingFolderBucketGoldenFile                  ┃ $50          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃         $50 ┃        $50 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

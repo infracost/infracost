@@ -1,27 +1,30 @@
 
- Name                                               Monthly Qty  Unit                  Monthly Cost 
-                                                                                                    
- aws_cloudwatch_event_bus.my_events                                                                 
- ├─ Custom events published                    Monthly cost depends on usage: $1.00 per 1M events   
- ├─ Third-party events published               Monthly cost depends on usage: $1.00 per 1M events   
- ├─ Archive processing                         Monthly cost depends on usage: $0.10 per GB          
- ├─ Archive storage                            Monthly cost depends on usage: $0.023 per GB         
- └─ Schema discovery                           Monthly cost depends on usage: $0.10 per 1M events   
-                                                                                                    
- aws_cloudwatch_event_bus.my_events_withUsage                                                       
- ├─ Custom events published                                   1  1M events                    $1.00 
- ├─ Third-party events published                              2  1M events                    $2.00 
- ├─ Archive processing                                      100  GB                          $10.00 
- ├─ Archive storage                                         200  GB                           $4.60 
- └─ Schema discovery                                          1  1M events                    $0.10 
-                                                                                                    
+ Name                                               Monthly Qty  Unit                  Monthly Cost    
+                                                                                                       
+ aws_cloudwatch_event_bus.my_events_withUsage                                                          
+ ├─ Custom events published                                   1  1M events                    $1.00  * 
+ ├─ Third-party events published                              2  1M events                    $2.00  * 
+ ├─ Archive processing                                      100  GB                          $10.00  * 
+ ├─ Archive storage                                         200  GB                           $4.60  * 
+ └─ Schema discovery                                          1  1M events                    $0.10  * 
+                                                                                                       
+ aws_cloudwatch_event_bus.my_events                                                                    
+ ├─ Custom events published                    Monthly cost depends on usage: $1.00 per 1M events      
+ ├─ Third-party events published               Monthly cost depends on usage: $1.00 per 1M events      
+ ├─ Archive processing                         Monthly cost depends on usage: $0.10 per GB             
+ ├─ Archive storage                            Monthly cost depends on usage: $0.023 per GB            
+ └─ Schema discovery                           Monthly cost depends on usage: $0.10 per 1M events      
+                                                                                                       
  OVERALL TOTAL                                                                               $17.70 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestCloudwatchEventBus                             ┃ $18          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃         $18 ┃        $18 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

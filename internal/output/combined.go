@@ -16,10 +16,9 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -55,6 +54,13 @@ func Load(p string) (Root, error) {
 
 	if !checkOutputVersion(out.Version) {
 		return out, fmt.Errorf("invalid Infracost JSON file version. Supported versions are %s ≤ x ≤ %s", minOutputVersion, maxOutputVersion)
+	}
+
+	for i, p := range out.Projects {
+		if p.Metadata == nil {
+			p.Metadata = &schema.ProjectMetadata{}
+			out.Projects[i] = p
+		}
 	}
 
 	return out, nil
@@ -112,6 +118,10 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 // in the prior Root. If we can't find a matching project then we assume that the project
 // has been newly created and will show a 100% increase in the output Root.
 func CompareTo(c *config.Config, current, prior Root) (Root, error) {
+	currentProjectLabels := make(map[string]bool, len(current.Projects))
+	for _, p := range current.Projects {
+		currentProjectLabels[p.LabelWithMetadata()] = true
+	}
 	priorProjects := make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
 		if _, ok := priorProjects[p.LabelWithMetadata()]; ok {
@@ -137,7 +147,7 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 				scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
 			}
 
-			if !p.Metadata.HasErrors() && v.Metadata.HasErrors() {
+			if !p.Metadata.HasErrors() && !v.Metadata.IsEmptyProjectError() && v.Metadata.HasErrors() {
 				// the prior project has errors, but the current one does not
 				// The prior errors will be copied over to the current, but we
 				// also need to remove the current project costs
@@ -147,6 +157,14 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 			}
 
 			for _, pastE := range v.Metadata.Errors {
+				if schema.IsEmptyPathTypeError(pastE) {
+					// If the error is a path type error we want to remove it from the metadata as
+					// this is normally indicative of a project that has been added. Thus the project
+					// path only appears in the current branch and so the baseline error is safe to
+					// be ignored.
+					continue
+				}
+
 				pastE.Message = "Diff baseline error: " + pastE.Message
 				scp.Metadata.Errors = append(scp.Metadata.Errors, pastE)
 			}
@@ -154,6 +172,10 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 			delete(priorProjects, metadata)
 		} else if children := findChildrenOfErroredProject(p, priorProjects); len(children) > 0 {
 			for _, child := range children {
+				if _, ok := currentProjectLabels[child]; ok {
+					// this child has a match in the current projects so it should not be deleted
+					continue
+				}
 				delete(priorProjects, child)
 			}
 		}
@@ -239,15 +261,16 @@ func Combine(inputs []ReportInput) (Root, error) {
 	var lastestGeneratedAt time.Time
 	var totalHourlyCost *decimal.Decimal
 	var totalMonthlyCost *decimal.Decimal
+	var totalMonthlyUsageCost *decimal.Decimal
 	var pastTotalHourlyCost *decimal.Decimal
 	var pastTotalMonthlyCost *decimal.Decimal
+	var pastTotalMonthlyUsageCost *decimal.Decimal
 	var diffTotalHourlyCost *decimal.Decimal
 	var diffTotalMonthlyCost *decimal.Decimal
+	var diffTotalMonthlyUsageCost *decimal.Decimal
 
 	projects := make([]Project, 0)
 	summaries := make([]*Summary, 0, len(inputs))
-	var tagPolicies []TagPolicy
-	var finOpsPolicies []FinOpsPolicy
 	currency := ""
 
 	var metadata Metadata
@@ -268,14 +291,6 @@ func Combine(inputs []ReportInput) (Root, error) {
 			lastestGeneratedAt = input.Root.TimeGenerated
 		}
 
-		if len(input.Root.TagPolicies) > 0 {
-			tagPolicies = append(tagPolicies, input.Root.TagPolicies...)
-		}
-
-		if len(input.Root.FinOpsPolicies) > 0 {
-			finOpsPolicies = append(finOpsPolicies, input.Root.FinOpsPolicies...)
-		}
-
 		if input.Root.TotalHourlyCost != nil {
 			if totalHourlyCost == nil {
 				totalHourlyCost = decimalPtr(decimal.Zero)
@@ -289,6 +304,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 			}
 
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*input.Root.TotalMonthlyCost))
+		}
+		if input.Root.TotalMonthlyUsageCost != nil {
+			if totalMonthlyUsageCost == nil {
+				totalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyUsageCost = decimalPtr(totalMonthlyUsageCost.Add(*input.Root.TotalMonthlyUsageCost))
 		}
 		if input.Root.PastTotalHourlyCost != nil {
 			if pastTotalHourlyCost == nil {
@@ -304,6 +326,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*input.Root.PastTotalMonthlyCost))
 		}
+		if input.Root.PastTotalMonthlyUsageCost != nil {
+			if pastTotalMonthlyUsageCost == nil {
+				pastTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
+
+			pastTotalMonthlyUsageCost = decimalPtr(pastTotalMonthlyUsageCost.Add(*input.Root.PastTotalMonthlyUsageCost))
+		}
 		if input.Root.DiffTotalMonthlyCost != nil {
 			if diffTotalMonthlyCost == nil {
 				diffTotalMonthlyCost = decimalPtr(decimal.Zero)
@@ -311,7 +340,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*input.Root.DiffTotalMonthlyCost))
 		}
+		if input.Root.DiffTotalMonthlyUsageCost != nil {
+			if diffTotalMonthlyUsageCost == nil {
+				diffTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
 
+			diffTotalMonthlyUsageCost = decimalPtr(diffTotalMonthlyUsageCost.Add(*input.Root.DiffTotalMonthlyUsageCost))
+		}
 		if input.Root.DiffTotalHourlyCost != nil {
 			if diffTotalHourlyCost == nil {
 				diffTotalHourlyCost = decimalPtr(decimal.Zero)
@@ -333,15 +368,16 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.Projects = projects
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost
+	combined.TotalMonthlyUsageCost = totalMonthlyUsageCost
 	combined.PastTotalHourlyCost = pastTotalHourlyCost
 	combined.PastTotalMonthlyCost = pastTotalMonthlyCost
+	combined.PastTotalMonthlyUsageCost = pastTotalMonthlyUsageCost
 	combined.DiffTotalHourlyCost = diffTotalHourlyCost
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
+	combined.DiffTotalMonthlyUsageCost = diffTotalMonthlyUsageCost
 	combined.TimeGenerated = lastestGeneratedAt
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
-	combined.TagPolicies = mergeTagPolicies(tagPolicies)
-	combined.FinOpsPolicies = mergeFinOpsPolicies(finOpsPolicies)
 	if len(inputs) > 0 {
 		combined.CloudURL = inputs[len(inputs)-1].Root.CloudURL
 	}
@@ -355,54 +391,6 @@ func Combine(inputs []ReportInput) (Root, error) {
 	}
 
 	return combined, nil
-}
-
-func mergeTagPolicies(tagPolicies []TagPolicy) []TagPolicy {
-	// gather and merge tag policies by name
-	tpMap := map[string]TagPolicy{}
-	for _, tp := range tagPolicies {
-		if existingTp, ok := tpMap[tp.Name]; ok {
-			tp.PrComment = existingTp.PrComment || tp.PrComment
-			tp.BlockPr = existingTp.BlockPr || tp.BlockPr
-			tp.Resources = append(existingTp.Resources, tp.Resources...)
-		}
-		tpMap[tp.Name] = tp
-	}
-
-	tpMerged := make([]TagPolicy, 0, len(tpMap))
-	// use the original tagPolicies array to iterate over the map so the order is preserved
-	for _, tp := range tagPolicies {
-		if mergedTp, ok := tpMap[tp.Name]; ok {
-			tpMerged = append(tpMerged, mergedTp)
-			delete(tpMap, tp.Name)
-		}
-	}
-
-	return tpMerged
-}
-
-func mergeFinOpsPolicies(finOpsPolicies []FinOpsPolicy) []FinOpsPolicy {
-	// gather and merge tag policies by id
-	fpMap := map[string]FinOpsPolicy{}
-	for _, fp := range finOpsPolicies {
-		if existingFp, ok := fpMap[fp.PolicyID]; ok {
-			fp.PrComment = existingFp.PrComment || fp.PrComment
-			fp.BlockPr = existingFp.BlockPr || fp.BlockPr
-			fp.Resources = append(existingFp.Resources, fp.Resources...)
-		}
-		fpMap[fp.PolicyID] = fp
-	}
-
-	fpMerged := make([]FinOpsPolicy, 0, len(fpMap))
-	// use the original tagPolicies array to iterate over the map so the order is preserved
-	for _, fp := range finOpsPolicies {
-		if mergedFp, ok := fpMap[fp.PolicyID]; ok {
-			fpMerged = append(fpMerged, mergedFp)
-			delete(fpMap, fp.PolicyID)
-		}
-	}
-
-	return fpMerged
 }
 
 func checkCurrency(inputCurrency, fileCurrency string) (string, error) {
@@ -475,7 +463,7 @@ func addCurrencyFormat(currencyFormat string) {
 	m := rgx.FindStringSubmatch(currencyFormat)
 
 	if len(m) == 0 {
-		log.Warn().Msgf("Invalid currency format: %s", currencyFormat)
+		logging.Logger.Warn().Msgf("Invalid currency format: %s", currencyFormat)
 		return
 	}
 

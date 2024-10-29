@@ -18,8 +18,14 @@ type CodeBuildProject struct {
 	MonthlyBuildMins *int64 `infracost_usage:"monthly_build_mins"`
 }
 
-var CodeBuildProjectUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_build_mins", ValueType: schema.Int64, DefaultValue: 0},
+func (r *CodeBuildProject) CoreType() string {
+	return "CodeBuildProject"
+}
+
+func (r *CodeBuildProject) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_build_mins", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *CodeBuildProject) PopulateUsage(u *schema.UsageData) {
@@ -51,9 +57,10 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), computeType))},
 					},
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: CodeBuildProjectUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 

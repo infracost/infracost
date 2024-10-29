@@ -1,41 +1,41 @@
 
- Name                                                             Monthly Qty  Unit                      Monthly Cost 
-                                                                                                                      
- azurerm_virtual_machine_scale_set.linux                                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_F2)                  1,460  hours                          $166.44 
- ├─ storage_os_disk                                                                                                   
- │  ├─ Storage (S4, LRS)                                                    1  months                           $1.54 
- │  └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
- ├─ storage_data_disk                                                                                                 
- │  ├─ Storage (E4, LRS)                                                    1  months                           $2.40 
- │  └─ Disk operations                                     Monthly cost depends on usage: $0.002 per 10k operations   
- └─ storage_data_disk                                                                                                 
-    ├─ Storage (S4, LRS)                                                    1  months                           $1.54 
-    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                      
- azurerm_virtual_machine_scale_set.windows                                                                            
- ├─ Instance usage (Windows, hybrid benefit, Standard_F2)               2,190  hours                          $249.66 
- ├─ storage_os_disk                                                                                                   
- │  ├─ Storage (S4, LRS)                                                    1  months                           $1.54 
- │  └─ Disk operations                                                    100  10k operations                   $0.05 
- ├─ storage_data_disk                                                                                                 
- │  ├─ Storage (E4, LRS)                                                    1  months                           $2.40 
- │  └─ Disk operations                                                    200  10k operations                   $0.40 
- └─ storage_data_disk                                                                                                 
-    ├─ Storage (S4, LRS)                                                    1  months                           $1.54 
-    └─ Disk operations                                                    200  10k operations                   $0.10 
-                                                                                                                      
+ Name                                                             Monthly Qty  Unit                      Monthly Cost    
+                                                                                                                         
+ azurerm_virtual_machine_scale_set.windows                                                                               
+ ├─ Instance usage (Windows, hybrid benefit, Standard_F2)               2,190  hours                          $249.66    
+ ├─ storage_os_disk                                                                                                      
+ │  ├─ Storage (S4, LRS)                                                    1  months                           $1.54    
+ │  └─ Disk operations                                                    100  10k operations                   $0.05  * 
+ ├─ storage_data_disk                                                                                                    
+ │  ├─ Storage (E4, LRS)                                                    1  months                           $2.40    
+ │  └─ Disk operations                                                    200  10k operations                   $0.40  * 
+ └─ storage_data_disk                                                                                                    
+    ├─ Storage (S4, LRS)                                                    1  months                           $1.54    
+    └─ Disk operations                                                    200  10k operations                   $0.10  * 
+                                                                                                                         
+ azurerm_virtual_machine_scale_set.linux                                                                                 
+ ├─ Instance usage (Linux, pay as you go, Standard_F2)                  1,460  hours                          $166.44    
+ ├─ storage_os_disk                                                                                                      
+ │  ├─ Storage (S4, LRS)                                                    1  months                           $1.54    
+ │  └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations     
+ ├─ storage_data_disk                                                                                                    
+ │  ├─ Storage (E4, LRS)                                                    1  months                           $2.40    
+ │  └─ Disk operations                                     Monthly cost depends on usage: $0.002 per 10k operations      
+ └─ storage_data_disk                                                                                                    
+    ├─ Storage (S4, LRS)                                                    1  months                           $1.54    
+    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                         
  OVERALL TOTAL                                                                                                $427.59 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 3 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_subnet
-  ∙ 1 x azurerm_virtual_network
+∙ 2 were estimated
+∙ 3 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureVirtualMachineScaleSetGoldenFile          ┃ $428         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $427 ┃       $0.55 ┃       $428 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

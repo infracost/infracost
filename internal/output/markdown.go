@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
+	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -19,19 +21,30 @@ import (
 //go:embed templates/*
 var templatesFS embed.FS
 
-func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
-	if pastCost != nil && pastCost.Equals(*cost) {
-		return formatWholeDecimalCurrency(currency, decimal.Zero)
+func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus, skipPercent, skipIfZero bool) string {
+	if pastCost == nil && cost == nil {
+		return "-"
 	}
 
-	percentChange := formatPercentChange(pastCost, cost)
-	if len(percentChange) > 0 {
-		percentChange = " " + "(" + percentChange + ")"
+	if skipIfZero && (pastCost == nil || pastCost.IsZero()) && (cost == nil || cost.IsZero()) {
+		return "-"
 	}
 
 	plusMinus := "+"
 	if skipPlusMinus {
 		plusMinus = ""
+	}
+
+	if pastCost != nil && cost != nil && pastCost.Equals(*cost) {
+		return plusMinus + formatWholeDecimalCurrency(currency, decimal.Zero)
+	}
+
+	percentChange := ""
+	if !skipPercent {
+		percentChange = formatPercentChange(pastCost, cost)
+		if len(percentChange) > 0 {
+			percentChange = " " + "(" + percentChange + ")"
+		}
 	}
 
 	// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
@@ -62,21 +75,21 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 	}
 
 	if pastCost == nil {
-		return "Monthly cost will increase by " + formatCost(currency, cost) + " " + up
+		return "Monthly estimate increased by " + formatCost(currency, cost) + " " + up
 	}
 
 	diff := cost.Sub(*pastCost).Abs()
 	change := formatCost(currency, &diff)
 
 	if pastCost.Equals(*cost) {
-		return "Monthly cost will not change"
+		return "Monthly estimate generated"
 	}
 
 	if pastCost.GreaterThan(*cost) {
-		return "Monthly cost will decrease by " + change + " " + down
+		return "Monthly estimate decreased by " + change + " " + down
 	}
 
-	return "Monthly cost will increase by " + change + " " + up
+	return "Monthly estimate increased by " + change + " " + up
 }
 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
@@ -120,6 +133,8 @@ type MarkdownCtx struct {
 	Options                      Options
 	MarkdownOptions              MarkdownOptions
 	RunQuotaMsg                  string
+	UsageCostsMsg                string
+	CostDetailsMsg               string
 }
 
 // MarkdownOutput holds the message converted to markdown with additional
@@ -159,6 +174,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		filename = "run-quota-exceeded.tmpl"
 	}
 
+	skipUsageCostIfZero := !usageCostsEnabled(out)
+
 	tmpl := template.New(filename)
 	tmpl.Funcs(sprig.TxtFuncMap())
 	tmpl.Funcs(template.FuncMap{
@@ -168,8 +185,17 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 			}
 			return formatCost(out.Currency, d)
 		},
+		"formatUsageCost": func(d *decimal.Decimal) string {
+			return formatUsageCost(out, d)
+		},
 		"formatCostChange": func(pastCost, cost *decimal.Decimal) string {
-			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, false, false)
+		},
+		"formatCostChangeWithoutPercent": func(pastCost, cost *decimal.Decimal) string {
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, false)
+		},
+		"formatUsageCostChangeWithoutPercent": func(pastCost, cost *decimal.Decimal) string {
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true, skipUsageCostIfZero)
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
@@ -198,6 +224,13 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		"displayOutput": func() bool {
 			if markdownOpts.OmitDetails {
 				return false
+			}
+
+			// we always want to show the output if there are unsupported resources. This is
+			// because we want to show the unsupported resources in the output so that the
+			// user can see why the cost changes are different from expectations.
+			if out.HasUnsupportedResources() {
+				return true
 			}
 
 			var valid Projects
@@ -283,6 +316,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		Options:                      opts,
 		MarkdownOptions:              markdownOpts,
 		RunQuotaMsg:                  runQuotaMsg,
+		UsageCostsMsg:                usageCostsMessage(out, true),
+		CostDetailsMsg:               costsDetailsMessage(out),
 	})
 	if err != nil {
 		return MarkdownOutput{}, err
@@ -315,4 +350,76 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 
 func hasCodeChanges(options Options, project Project) bool {
 	return options.ShowOnlyChanges && project.Metadata.VCSCodeChanged != nil && *project.Metadata.VCSCodeChanged
+}
+
+var (
+	usageFileDocsURL             = "https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml"
+	usageDefaultsDocsURL         = "https://www.infracost.io/docs/features/usage_based_resources"
+	usageDefaultsDashboardSuffix = "settings/usage-defaults"
+	cloudURLRegex                = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
+)
+
+func usageCostsMessage(out Root, useLinks bool) string {
+	if !out.Metadata.UsageApiEnabled {
+		return handleUsageApiDisabledMessage(out, useLinks)
+	}
+
+	return handleUsageApiEnabledMessage(out, useLinks)
+}
+
+func cloudSettingsStr(out Root, useMarkdownLinks bool) string {
+	if !useMarkdownLinks {
+		return "Infracost Cloud settings"
+	}
+	usageDefaultsURL := usageDefaultsDocsURL
+	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)
+	if len(match) > 0 {
+		usageDefaultsURL = match[0] + usageDefaultsDashboardSuffix
+	}
+	return fmt.Sprintf("[Infracost Cloud settings](%s)", usageDefaultsURL)
+}
+
+func usageDocsStr(useMarkdownLinks bool) string {
+	if !useMarkdownLinks {
+		return "docs"
+	}
+
+	return fmt.Sprintf("[docs](%s)", usageFileDocsURL)
+}
+
+func handleUsageApiEnabledMessage(out Root, useMarkdownLinks bool) string {
+	if out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile {
+		return fmt.Sprintf("*Usage costs were estimated by merging infracost-usage.yml and %s.", cloudSettingsStr(out, useMarkdownLinks))
+	}
+
+	return fmt.Sprintf("*Usage costs were estimated using %s, see %s for other options.", cloudSettingsStr(out, useMarkdownLinks), usageDocsStr(useMarkdownLinks))
+}
+
+func handleUsageApiDisabledMessage(out Root, useMarkdownLinks bool) string {
+	if out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile {
+		return fmt.Sprintf("*Usage costs were estimated using infracost-usage.yml, see %s for other options.", usageDocsStr(useMarkdownLinks))
+	}
+
+	return fmt.Sprintf("*Usage costs can be estimated by updating %s, see %s for other options.", cloudSettingsStr(out, useMarkdownLinks), usageDocsStr(useMarkdownLinks))
+}
+
+func costsDetailsMessage(out Root) string {
+	var msgs []string
+
+	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil && *out.Summary.TotalUnsupportedResources > 0 {
+		msgs = append(msgs, "unsupported resources")
+	}
+
+	for _, p := range out.Projects {
+		if len(p.Metadata.Errors) > 0 {
+			msgs = append(msgs, "skipped projects due to errors")
+			break
+		}
+	}
+
+	if len(msgs) == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("(includes details of %s)", strings.Join(msgs, " and "))
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/pulumi/aws"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/display"
+	"github.com/pulumi/pulumi/pkg/v3/display"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )

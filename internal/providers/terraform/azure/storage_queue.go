@@ -3,8 +3,7 @@ package azure
 import (
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -16,11 +15,14 @@ func getStorageQueueRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"storage_account_name",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"storage_account_name"})
+		},
 	}
 }
 
 func newStorageQueue(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"storage_account_name"})
+	region := d.Region
 
 	accountReplicationType := "LRS"
 	accountKind := "StorageV2"
@@ -30,7 +32,7 @@ func newStorageQueue(d *schema.ResourceData) schema.CoreResource {
 
 		accountTier := storageAccount.Get("account_tier").String()
 		if strings.EqualFold(accountTier, "premium") {
-			log.Warn().Msgf("Skipping resource %s. Storage Queues don't support %s tier", d.Address, accountTier)
+			logging.Logger.Warn().Msgf("Skipping resource %s. Storage Queues don't support %s tier", d.Address, accountTier)
 			return nil
 		}
 

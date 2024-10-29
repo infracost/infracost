@@ -1,11 +1,13 @@
 package modules
 
 import (
+	"bytes"
 	"crypto/md5" //nolint
 	"errors"
 	"fmt"
 	"net/url"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -22,7 +24,6 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	intSync "github.com/infracost/infracost/internal/sync"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -34,6 +35,12 @@ var (
 	tfManifestPath = ".terraform/modules/modules.json"
 
 	supportedManifestVersion = "2.0"
+
+	// maxSparseCheckoutDepth is the maximum depth to which we will follow symlinks when adding directories
+	// to the sparse-checkout file list. This is currently set to a low value, since increasing it is likely
+	// to cause performance issues. If we need to increase it in the future, we should consider adding an
+	// option to allow users to set this value.
+	maxSparseCheckoutDepth = 1
 )
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
@@ -43,8 +50,6 @@ var (
 // .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
 // to go with the same approach as Terraform.
 type ModuleLoader struct {
-	NewSpinner ui.SpinnerFunc
-
 	// cachePath is the path to the directory that Infracost will download modules to.
 	// This is normally the top level directory of a multi-project environment, where the
 	// Infracost config file resides or project auto-detection starts from.
@@ -116,11 +121,6 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 			man.cachePath = m.cachePath
 		}
 	}()
-
-	if m.NewSpinner != nil {
-		spin := m.NewSpinner("Downloading Terraform modules")
-		defer spin.Success()
-	}
 
 	manifest := &Manifest{}
 	manifestFilePath := m.manifestFilePath(path)
@@ -209,7 +209,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 				}
 
 				// only include non-local modules in the manifest since we don't want to cache local ones.
-				if !isLocalModule(metadata.Source) {
+				if !IsLocalModule(metadata.Source) {
 					manifestMu.Lock()
 					manifestModules = append(manifestModules, metadata)
 					manifestMu.Unlock()
@@ -280,13 +280,36 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	} else {
 		m.logger.Debug().Msgf("module %s needs loading: %s", key, err.Error())
 	}
-	if isLocalModule(source) {
+	if IsLocalModule(source) {
 		dir, err := m.cachePathRel(filepath.Join(parentPath, source))
 		if err != nil {
 			return nil, err
 		}
 
 		m.logger.Debug().Msgf("loading local module %s from %s", key, dir)
+
+		// If the module is in a git repo we need to check that it has been checked out.
+		// If it hasn't been checked out then we need to add it to the sparse-checkout file list.
+		m.logger.Trace().Msgf("finding git repo root for path %s", parentPath)
+		repoRoot, err := findGitRepoRoot(parentPath)
+		if err == nil {
+			// Get the dir relative to the repoRoot
+			absDir, err := filepath.Abs(dir)
+			if err != nil {
+				return nil, err
+			}
+
+			relDir, err := filepath.Rel(repoRoot, absDir)
+			if err != nil {
+				return nil, err
+			}
+
+			err = m.checkoutPathIfRequired(repoRoot, relDir)
+			if err != nil {
+				return nil, err
+			}
+		}
+
 		return &ManifestModule{
 			Key:    key,
 			Source: source,
@@ -321,6 +344,227 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	return manifestModule, nil
+}
+
+// checkoutPathIfRequired checks if the given directories are in the sparse-checkout file list and adds them if not.
+func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) error {
+	// Lock the git repo root so we don't have multiple calls trying to read and update the sparse-checkout file list.
+	unlock := m.sync.Lock(repoRoot)
+	defer unlock()
+
+	// Check if sparse-checkout is enabled for the repo
+	enabled, err := isSparseCheckoutEnabled(repoRoot)
+	if err != nil {
+		return err
+	}
+
+	if !enabled {
+		m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
+		return nil
+	}
+
+	// Get the list of sparse checkout directories (and assume sparse checkout is enabled if this succeeds)
+	m.logger.Trace().Msgf("getting sparse checkout directories for path %s", repoRoot)
+	existingDirs, err := getSparseCheckoutDirs(repoRoot)
+	if err != nil {
+		// If the error indicates that sparse checkout is not enabled, just return nil
+		if err.Error() == "sparse-checkout not enabled" {
+			m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
+			return nil
+		}
+		return err
+	}
+
+	mu := &sync.Mutex{}
+
+	return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, []string{dirs}, mu, m.logger, 0)
+}
+
+// RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
+// It then checks any symlinks within the directories and adds them to the sparse-checkout file list as well.
+func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
+	var newDirs []string
+
+	// Sort the existing directories and dirs to be added by length
+	// This ensures that parent directories are added before child directories
+	// since they cover the child directories anyway.
+	sort.Slice(existingDirs, func(i, j int) bool {
+		return len(existingDirs[i]) < len(existingDirs[j])
+	})
+	sort.Slice(dirs, func(i, j int) bool {
+		return len(dirs[i]) < len(dirs[j])
+	})
+
+	for _, dir := range dirs {
+		if isCoveredByExistingDirs(existingDirs, dir) {
+			continue
+		}
+
+		existingDirs = append(existingDirs, dir)
+		newDirs = append(newDirs, dir)
+	}
+	if len(newDirs) == 0 {
+		return nil
+	}
+
+	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
+	mu.Lock()
+	err := setSparseCheckoutDirs(repoRoot, existingDirs)
+	mu.Unlock()
+	if err != nil {
+		return err
+	}
+
+	if depth >= maxSparseCheckoutDepth {
+		return nil
+	}
+
+	var additionalDirs []string
+	for _, dir := range newDirs {
+		symlinkedDirs, err := ResolveSymLinkedDirs(repoRoot, dir)
+		if err != nil {
+			return err
+		}
+
+		for _, symlinkedDir := range symlinkedDirs {
+			if !isCoveredByExistingDirs(existingDirs, symlinkedDir) {
+				additionalDirs = append(additionalDirs, symlinkedDir)
+			}
+		}
+	}
+
+	if len(additionalDirs) > 0 {
+		logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", repoRoot, additionalDirs)
+		return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, additionalDirs, mu, logger, depth+1)
+	}
+
+	return nil
+}
+
+// isCoveredByExistingDirs checks if the given directory is covered by any of the existing directories
+// i.e. if it is a subdirectory of any of the existing directories.
+func isCoveredByExistingDirs(existingDirs []string, dir string) bool {
+	for _, existingDir := range existingDirs {
+		if dir == existingDir || strings.HasPrefix(dir, existingDir+string(filepath.Separator)) {
+			return true
+		}
+	}
+	return false
+}
+
+// findGitRepoRoot finds the root of the Git repository given a starting path
+func findGitRepoRoot(startPath string) (string, error) {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	cmd.Dir = startPath
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("not a git repository")
+	}
+	return strings.TrimSpace(string(output)), nil
+}
+
+// isSparseCheckoutEnabled checks if sparse-checkout is enabled in the repository
+func isSparseCheckoutEnabled(repoRoot string) (bool, error) {
+	cmd := exec.Command("git", "config", "--get", "core.sparseCheckout")
+	cmd.Dir = repoRoot
+	output, err := cmd.Output()
+	if err != nil {
+		// if exit status is 1, then the config is not set
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) && exitErr.ExitCode() == 1 {
+			return false, nil
+		}
+
+		return false, fmt.Errorf("error checking if sparse-checkout is enabled: %w", err)
+	}
+	return string(output) == "true\n", nil
+}
+
+// getSparseCheckoutDirs gets the list of directories currently in sparse-checkout
+func getSparseCheckoutDirs(repoRoot string) ([]string, error) {
+	cmd := exec.Command("git", "sparse-checkout", "list")
+	cmd.Dir = repoRoot
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		stderrStr := strings.TrimSpace(stderr.String())
+		if strings.Contains(stderrStr, "this worktree is not sparse") {
+			return nil, errors.New("sparse-checkout not enabled")
+		}
+
+		return nil, fmt.Errorf("error getting sparse-checkout list: %w", err)
+	}
+
+	output := strings.TrimSpace(stdout.String())
+	if output == "" {
+		return nil, nil
+	}
+
+	return strings.Split(output, "\n"), nil
+}
+
+// setSparseCheckoutDirs sets the sparse-checkout list to include the given directories
+func setSparseCheckoutDirs(repoRoot string, dirs []string) error {
+	cmd := exec.Command("git", "sparse-checkout", "set")
+	cmd.Dir = repoRoot
+	cmd.Args = append(cmd.Args, dirs...)
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error setting sparse-checkout list: %w", err)
+	}
+
+	return nil
+}
+
+// ResolveSymLinkedDirs traverses the directory to find symlinks and resolve their destinations
+func ResolveSymLinkedDirs(repoRoot, dir string) ([]string, error) {
+	dirsToInclude := make(map[string]struct{})
+	basePath := path.Join(repoRoot, dir)
+
+	err := filepath.Walk(basePath, func(currentPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return fmt.Errorf("error walking the path: %w", err)
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			resolvedPath, err := resolveSymlink(currentPath)
+			if err != nil {
+				return fmt.Errorf("error resolving symlink: %w", err)
+			}
+
+			// Ensure the resolved path is within the repoRoot
+			if !strings.HasPrefix(resolvedPath, repoRoot) {
+				return nil
+			}
+
+			resolvedDir := filepath.Dir(resolvedPath)
+
+			resolvedRelDir, err := filepath.Rel(repoRoot, resolvedDir)
+			if err != nil {
+				return fmt.Errorf("error getting relative path: %w", err)
+			}
+
+			// Skip if it's already included or within the original directory
+			if _, alreadyIncluded := dirsToInclude[resolvedRelDir]; alreadyIncluded || strings.HasPrefix(resolvedRelDir, dir) {
+				return nil
+			}
+
+			dirsToInclude[resolvedRelDir] = struct{}{}
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	dirs := make([]string, 0, len(dirsToInclude))
+	for d := range dirsToInclude {
+		dirs = append(dirs, d)
+	}
+
+	return dirs, nil
 }
 
 func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, error) {
@@ -392,7 +636,7 @@ func (m *ModuleLoader) loadRegistryModule(key string, source string, version str
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, version)
 	if err != nil {
-		return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to lookup module %q - %s", key, err)}
+		return nil, schema.NewPrivateRegistryDiag(source, nil, err)
 	}
 
 	if lookupResult.OK {
@@ -409,13 +653,17 @@ func (m *ModuleLoader) loadRegistryModule(key string, source string, version str
 
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
-			return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to download registry module %q - %s", key, err)}
+			return nil, schema.NewPrivateRegistryDiag(source, strPtr(lookupResult.ModuleURL.Location), err)
 		}
 
 		return manifestModule, nil
 	}
 
 	return nil, nil
+}
+
+func strPtr(s string) *string {
+	return &s
 }
 
 func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestModule, error) {
@@ -427,6 +675,19 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 	moduleAddr, submodulePath, err := splitModuleSubDir(source)
 	if err != nil {
 		return nil, err
+	}
+
+	// If sparse checkout is enabled add the subdir to the module URL as a query param
+	// so go-getter only downloads the required directory.
+	if os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true" {
+		u, err := url.Parse(moduleAddr)
+		if err != nil {
+			return nil, err
+		}
+		q := u.Query()
+		q.Set("subdir", submodulePath)
+		u.RawQuery = q.Encode()
+		moduleAddr = u.String()
 	}
 
 	dest := m.downloadDest(moduleAddr, "")
@@ -447,7 +708,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
-		return nil, newFailedDownloadDiagnostic(fmt.Sprintf("Failed to download remote module %q - %s", key, err))
+		return nil, schema.NewFailedDownloadDiagnostic(source, err)
 	}
 
 	return manifestModule, nil
@@ -463,28 +724,28 @@ func (m *ModuleLoader) cachePathRel(targetPath string) (string, error) {
 	if relerr == nil {
 		return rel, nil
 	}
-	m.logger.Info().Msgf("Failed to filepath.Rel cache=%s target=%s: %v", m.cachePath, targetPath, relerr)
+	m.logger.Debug().Msgf("Failed to filepath.Rel cache=%s target=%s: %v", m.cachePath, targetPath, relerr)
 
 	// try converting to absolute paths
 	absCachePath, abserr := filepath.Abs(m.cachePath)
 	if abserr != nil {
-		m.logger.Info().Msgf("Failed to filepath.Abs cachePath: %v", abserr)
+		m.logger.Debug().Msgf("Failed to filepath.Abs cachePath: %v", abserr)
 		return "", relerr
 	}
 
 	absTargetPath, abserr := filepath.Abs(targetPath)
 	if abserr != nil {
-		m.logger.Info().Msgf("Failed to filepath.Abs target: %v", abserr)
+		m.logger.Debug().Msgf("Failed to filepath.Abs target: %v", abserr)
 		return "", relerr
 	}
 
-	m.logger.Info().Msgf("Attempting filepath.Rel on abs paths cache=%s, target=%s", absCachePath, absTargetPath)
+	m.logger.Debug().Msgf("Attempting filepath.Rel on abs paths cache=%s, target=%s", absCachePath, absTargetPath)
 	return filepath.Rel(absCachePath, absTargetPath)
 }
 
-// isLocalModule checks if the module is a local module by checking
+// IsLocalModule checks if the module is a local module by checking
 // if the module source starts with any known local prefixes
-func isLocalModule(source string) bool {
+func IsLocalModule(source string) bool {
 	return strings.HasPrefix(source, "./") ||
 		strings.HasPrefix(source, "../") ||
 		strings.HasPrefix(source, ".\\") ||
@@ -605,6 +866,20 @@ func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapRes
 	return result, nil
 }
 
+// resolveSymlink resolves symlinks even if the target does not exist
+func resolveSymlink(path string) (string, error) {
+	link, err := os.Readlink(path)
+	if err != nil {
+		return "", err
+	}
+
+	if filepath.IsAbs(link) {
+		return link, nil
+	}
+
+	return filepath.Join(filepath.Dir(path), link), nil
+}
+
 func getProcessCount() int {
 	numWorkers := 4
 	numCPU := runtime.NumCPU()
@@ -617,19 +892,4 @@ func getProcessCount() int {
 	}
 
 	return numWorkers
-}
-
-func newFailedDownloadDiagnostic(msg string) *schema.ProjectDiag {
-	src := "https"
-	if strings.Contains(msg, "ssh://") {
-		src = "ssh"
-	}
-
-	return &schema.ProjectDiag{
-		Code:    schema.DiagPrivateModuleDownloadFailure,
-		Message: msg,
-		Data: map[string]interface{}{
-			"source": src,
-		},
-	}
 }

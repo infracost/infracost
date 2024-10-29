@@ -17,7 +17,13 @@ type CloudwatchMetricAlarm struct {
 	Period             int64
 }
 
-var CloudwatchMetricAlarmUsageSchema = []*schema.UsageItem{}
+func (r *CloudwatchMetricAlarm) CoreType() string {
+	return "CloudwatchMetricAlarm"
+}
+
+func (r *CloudwatchMetricAlarm) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *CloudwatchMetricAlarm) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -31,7 +37,7 @@ func (r *CloudwatchMetricAlarm) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    CloudwatchMetricAlarmUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

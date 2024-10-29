@@ -107,7 +107,7 @@ func newAzureReposAPIClient(ctx context.Context, token string) (*http.Client, er
 	return httpClient, nil
 }
 
-// buildAPIURL converts repo URL to repo's API URL.
+// buildAzureAPIURL converts repo URL to repo's API URL.
 func buildAzureAPIURL(repoURL string) (string, error) {
 	apiURL, err := url.Parse(repoURL)
 	if err != nil {

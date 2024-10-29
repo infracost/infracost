@@ -13,7 +13,6 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -43,107 +42,9 @@ func NewPolicyAPIClient(ctx *config.RunContext) (*PolicyAPIClient, error) {
 	return &c, nil
 }
 
-type PolicyOutput struct {
-	TagPolicies    []output.TagPolicy
-	FinOpsPolicies []output.FinOpsPolicy
-}
-
-func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root, onlyDiff bool) (*PolicyOutput, error) {
-	ri, err := newRunInput(ctx, out)
-	if err != nil {
-		return nil, err
-	}
-
-	q := `
-		query EvaluatePolicies($run: RunInput!, $onlyDiff: Boolean) {
-			evaluatePolicies(run: $run, onlyDiff: $onlyDiff) {
-				tagPolicyResults {
-					name
-					tagPolicyId
-					message
-					prComment
-					blockPr
-					totalDetectedResources
-					totalTaggableResources
-					resources {
-						address
-						resourceType
-						path
-						line
-						projectNames
-						missingMandatoryTags
-						invalidTags {
-							key
-							value
-							validValues
-							validRegex
-						}
-					}
-				}
-				finopsPolicyResults {
-					name
-					policyId
-					message
-					blockPr
-					prComment
-					totalApplicableResources
-					resources {
-						checksum
-						address
-						resourceType
-						path
-						startLine
-						endLine
-						projectName
-						issues {
-							attribute
-							value
-							description
-						}
-						exclusionId
-					}
-				}
-			}
-		}
-	`
-
-	v := map[string]interface{}{
-		"run":      *ri,
-		"onlyDiff": onlyDiff,
-	}
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
-	if err != nil {
-		return nil, fmt.Errorf("query failed when checking tag policies %w", err)
-	}
-
-	if len(results) == 0 {
-		return nil, nil
-	}
-
-	if results[0].Get("errors").Exists() {
-		return nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
-	}
-
-	data := results[0].Get("data")
-
-	var policies = struct {
-		EvaluatePolicies struct {
-			TagPolicies    []output.TagPolicy    `json:"tagPolicyResults"`
-			FinOpsPolicies []output.FinOpsPolicy `json:"finopsPolicyResults"`
-		} `json:"evaluatePolicies"`
-	}{}
-
-	err = json.Unmarshal([]byte(data.Raw), &policies)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal policies %w", err)
-	}
-
-	return &PolicyOutput{policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies}, nil
-}
-
 // UploadPolicyData sends a filtered set of a project's resource information to Infracost Cloud and
 // potentially adds PolicySha and PastPolicySha to the project's metadata.
-func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project) error {
+func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds []*schema.ResourceData) error {
 	if project.Metadata == nil {
 		project.Metadata = &schema.ProjectMetadata{}
 	}
@@ -153,7 +54,7 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project) error {
 		return err
 	}
 
-	filteredResources := c.filterResources(project.PartialResources)
+	filteredResources := c.filterResources(rds)
 	if len(filteredResources) > 0 {
 		sha, err := c.uploadProjectPolicyData(filteredResources)
 		if err != nil {
@@ -164,7 +65,7 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project) error {
 		project.Metadata.PolicySha = "0" // set a fake sha so we can tell policy checks actually ran
 	}
 
-	filteredPastResources := c.filterResources(project.PartialPastResources)
+	filteredPastResources := c.filterResources(pastRds)
 	if len(filteredPastResources) > 0 {
 		sha, err := c.uploadProjectPolicyData(filteredPastResources)
 		if err != nil {
@@ -191,7 +92,7 @@ func (c *PolicyAPIClient) uploadProjectPolicyData(p2rs []policy2Resource) (strin
 		"policyResources": p2rs,
 	}
 
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return "", fmt.Errorf("query storePolicyResources failed  %w", err)
 	}
@@ -234,21 +135,36 @@ type policy2Reference struct {
 }
 
 type policy2Resource struct {
-	ResourceType string                   `json:"resourceType"`
-	ProviderName string                   `json:"providerName"`
-	Address      string                   `json:"address"`
-	Tags         *[]policy2Tag            `json:"tags,omitempty"`
-	Values       json.RawMessage          `json:"values"`
-	References   []policy2Reference       `json:"references"`
-	Metadata     policy2InfracostMetadata `json:"infracostMetadata"`
+	ResourceType                            string                   `json:"resourceType"`
+	ProviderName                            string                   `json:"providerName"`
+	Address                                 string                   `json:"address"`
+	Tags                                    *[]policy2Tag            `json:"tags,omitempty"`
+	DefaultTags                             *[]policy2Tag            `json:"defaultTags,omitempty"`
+	SupportForDefaultTags                   bool                     `json:"supportForDefaultTags"`
+	TagPropagation                          *TagPropagation          `json:"tagPropagation,omitempty"`
+	Values                                  json.RawMessage          `json:"values"`
+	References                              []policy2Reference       `json:"references"`
+	Metadata                                policy2InfracostMetadata `json:"infracostMetadata"`
+	Region                                  string                   `json:"region"`
+	MissingVarsCausingUnknownTagKeys        []string                 `json:"missingVarsCausingUnknownTagKeys,omitempty"`
+	MissingVarsCausingUnknownDefaultTagKeys []string                 `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
+}
+
+type TagPropagation struct {
+	To                    string        `json:"to"`
+	From                  *string       `json:"from"`
+	Tags                  *[]policy2Tag `json:"tags"`
+	Attribute             string        `json:"attribute"`
+	HasRequiredAttributes bool          `json:"hasRequiredAttributes"`
 }
 
 type policy2InfracostMetadata struct {
-	Calls     []policy2InfracostMetadataCall `json:"calls"`
-	Checksum  string                         `json:"checksum"`
-	EndLine   int64                          `json:"endLine"`
-	Filename  string                         `json:"filename"`
-	StartLine int64                          `json:"startLine"`
+	Calls          []policy2InfracostMetadataCall `json:"calls"`
+	Checksum       string                         `json:"checksum"`
+	EndLine        int64                          `json:"endLine"`
+	Filename       string                         `json:"filename"`
+	StartLine      int64                          `json:"startLine"`
+	ModuleFilename string                         `json:"moduleFilename,omitempty"`
 }
 
 type policy2InfracostMetadataCall struct {
@@ -258,14 +174,11 @@ type policy2InfracostMetadataCall struct {
 	EndLine   int64  `json:"endLine"`
 }
 
-func (c *PolicyAPIClient) filterResources(partials []*schema.PartialResource) []policy2Resource {
+func (c *PolicyAPIClient) filterResources(rds []*schema.ResourceData) []policy2Resource {
 	var p2rs []policy2Resource
-	for _, partial := range partials {
-		if partial != nil && partial.ResourceData != nil {
-			rd := partial.ResourceData
-			if f, ok := c.allowLists[rd.Type]; ok {
-				p2rs = append(p2rs, filterResource(rd, f))
-			}
+	for _, rd := range rds {
+		if f, ok := c.allowLists[rd.Type]; ok {
+			p2rs = append(p2rs, filterResource(rd, f))
 		}
 	}
 
@@ -290,10 +203,35 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		tagsPtr = &tags
 	}
 
+	var defaultTagsPtr *[]policy2Tag
+	if rd.DefaultTags != nil {
+		tags := make([]policy2Tag, 0, len(*rd.DefaultTags))
+		for k, v := range *rd.DefaultTags {
+			tags = append(tags, policy2Tag{Key: k, Value: v})
+		}
+		sort.Slice(tags, func(i, j int) bool {
+			return tags[i].Key < tags[j].Key
+		})
+
+		defaultTagsPtr = &tags
+	}
+
+	var propagatedTagsPtr *[]policy2Tag
+	if rd.TagPropagation != nil && rd.TagPropagation.Tags != nil {
+		tags := make([]policy2Tag, 0, len(*rd.Tags))
+		for k, v := range *rd.TagPropagation.Tags {
+			tags = append(tags, policy2Tag{Key: k, Value: v})
+		}
+		sort.Slice(tags, func(i, j int) bool {
+			return tags[i].Key < tags[j].Key
+		})
+		propagatedTagsPtr = &tags
+	}
+
 	// make sure the keys in the values json are sorted so we get consistent policyShas
 	valuesJSON, err := jsonSorted.Marshal(filterValues(rd.RawValues, al))
 	if err != nil {
-		logging.Logger.Warn().Err(err).Str("address", rd.Address).Msg("Failed to marshal filtered values")
+		logging.Logger.Debug().Err(err).Str("address", rd.Address).Msg("Failed to marshal filtered values")
 	}
 
 	references := make([]policy2Reference, 0, len(rd.ReferencesMap))
@@ -312,9 +250,9 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	for _, c := range rd.Metadata["calls"].Array() {
 		mdCalls = append(mdCalls, policy2InfracostMetadataCall{
 			BlockName: c.Get("blockName").String(),
-			EndLine:   rd.Metadata["endLine"].Int(),
-			Filename:  rd.Metadata["filename"].String(),
-			StartLine: rd.Metadata["startLine"].Int(),
+			EndLine:   c.Get("endLine").Int(),
+			Filename:  c.Get("filename").String(),
+			StartLine: c.Get("startLine").Int(),
 		})
 	}
 
@@ -325,20 +263,39 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		checksum = calcChecksum(rd)
 	}
 
+	var tagPropagation *TagPropagation
+	if rd.TagPropagation != nil {
+		tagPropagation = &TagPropagation{
+			To:                    rd.TagPropagation.To,
+			From:                  rd.TagPropagation.From,
+			Tags:                  propagatedTagsPtr,
+			Attribute:             rd.TagPropagation.Attribute,
+			HasRequiredAttributes: rd.TagPropagation.HasRequiredAttributes,
+		}
+	}
+
+	metadata := policy2InfracostMetadata{
+		Calls:          mdCalls,
+		Checksum:       checksum,
+		EndLine:        rd.Metadata["endLine"].Int(),
+		Filename:       rd.Metadata["filename"].String(),
+		StartLine:      rd.Metadata["startLine"].Int(),
+		ModuleFilename: rd.Metadata["moduleFilename"].String(),
+	}
+
 	return policy2Resource{
-		ResourceType: rd.Type,
-		ProviderName: rd.ProviderName,
-		Address:      rd.Address,
-		Tags:         tagsPtr,
-		Values:       valuesJSON,
-		References:   references,
-		Metadata: policy2InfracostMetadata{
-			Calls:     mdCalls,
-			Checksum:  checksum,
-			EndLine:   rd.Metadata["endLine"].Int(),
-			Filename:  rd.Metadata["filename"].String(),
-			StartLine: rd.Metadata["startLine"].Int(),
-		},
+		ResourceType:                            rd.Type,
+		ProviderName:                            rd.ProviderName,
+		Address:                                 rd.Address,
+		Tags:                                    tagsPtr,
+		DefaultTags:                             defaultTagsPtr,
+		TagPropagation:                          tagPropagation,
+		Values:                                  valuesJSON,
+		References:                              references,
+		Metadata:                                metadata,
+		Region:                                  rd.Region,
+		MissingVarsCausingUnknownTagKeys:        rd.MissingVarsCausingUnknownTagKeys,
+		MissingVarsCausingUnknownDefaultTagKeys: rd.MissingVarsCausingUnknownDefaultTagKeys,
 	}
 }
 
@@ -363,7 +320,7 @@ func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string
 					values[k] = filterValues(v, nestedAllow)
 				}
 			} else {
-				logging.Logger.Warn().Str("Key", k).Str("Type", allow.Type.String()).Msg("Unknown allow type")
+				logging.Logger.Debug().Str("Key", k).Str("Type", allow.Type.String()).Msg("Unknown allow type")
 			}
 		}
 	}
@@ -404,7 +361,7 @@ func (c *PolicyAPIClient) getPolicyResourceAllowList() (map[string]allowList, er
 	`
 	v := map[string]interface{}{}
 
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return nil, fmt.Errorf("query policyResourceAllowList failed %w", err)
 	}

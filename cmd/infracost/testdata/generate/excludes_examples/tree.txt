@@ -1,0 +1,11 @@
+.
+├── examples
+│   └── foo
+│       └── main.tf
+└── infra
+    ├── examples
+    │   ├── bar
+    │   │   └── main.tf
+    │   └── baz
+    │       └── main.tf
+    └── blank.tf

@@ -7,17 +7,15 @@ import (
 
 func getACMCertificate() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_acm_certificate",
-		RFunc: NewACMCertificate,
+		Name:      "aws_acm_certificate",
+		CoreRFunc: NewACMCertificate,
 	}
 }
-func NewACMCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewACMCertificate(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.ACMCertificate{
 		Address:                 d.Address,
 		Region:                  d.Get("region").String(),
 		CertificateAuthorityARN: d.Get("certificate_authority_arn").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -7,17 +7,16 @@ import (
 
 func getBigQueryDatasetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_bigquery_dataset",
-		RFunc: NewBigQueryDataset,
+		Name:      "google_bigquery_dataset",
+		CoreRFunc: NewBigQueryDataset,
 	}
 }
 
-func NewBigQueryDataset(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewBigQueryDataset(d *schema.ResourceData) schema.CoreResource {
 	r := &google.BigQueryDataset{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

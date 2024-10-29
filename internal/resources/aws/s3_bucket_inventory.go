@@ -13,7 +13,13 @@ type S3BucketInventory struct {
 	MonthlyListedObjects *int64 `infracost_usage:"monthly_listed_objects"`
 }
 
-var S3BucketInventoryUsageSchema = []*schema.UsageItem{{Key: "monthly_listed_objects", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *S3BucketInventory) CoreType() string {
+	return "S3BucketInventory"
+}
+
+func (r *S3BucketInventory) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_listed_objects", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *S3BucketInventory) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -41,8 +47,9 @@ func (r *S3BucketInventory) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/Inventory-ObjectsListed/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: S3BucketInventoryUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

@@ -5,8 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -50,18 +49,21 @@ func (d dtuMapping) usesDTUUnits(sku string) bool {
 	return d[sanitized[0:1]]
 }
 
-func getAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
+func getMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_mssql_database",
-		RFunc: newAzureRMMSSQLDatabase,
+		Name:      "azurerm_mssql_database",
+		CoreRFunc: newAzureRMMSSQLDatabase,
 		ReferenceAttributes: []string{
 			"server_id",
+		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"server_id"})
 		},
 	}
 }
 
-func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"server_id"})
+func newAzureRMMSSQLDatabase(d *schema.ResourceData) schema.CoreResource {
+	region := d.Region
 
 	sku := d.GetStringOrDefault("sku_name", "GP_S_Gen5_2")
 
@@ -96,7 +98,7 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 	} else if !dtuMap.usesDTUUnits(sku) {
 		c, err := parseMSSQLSku(d.Address, sku)
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 			return nil
 		}
 
@@ -105,8 +107,7 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		r.Cores = c.cores
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }
 
 type skuConfig struct {

@@ -1,31 +1,32 @@
 
- Name                                            Monthly Qty  Unit                      Monthly Cost 
-                                                                                                     
- azurerm_hdinsight_spark_cluster.example                                                             
- ├─ Head node (Standard_G2)                            1,460  hours                        $2,154.96 
- ├─ Worker node (Standard_G2)                          2,190  hours                        $3,232.44 
- └─ Zookeeper node (Standard_G2)                       2,190  hours                        $3,232.44 
-                                                                                                     
- azurerm_storage_account.example                                                                     
- ├─ Capacity                              Monthly cost depends on usage: $0.01 per GB                
- ├─ Write operations                      Monthly cost depends on usage: $0.10 per 10k operations    
- ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations   
- ├─ Read operations                       Monthly cost depends on usage: $0.01 per 10k operations    
- ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations  
- ├─ Data retrieval                        Monthly cost depends on usage: $0.01 per GB                
- ├─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags         
- └─ Early deletion                        Monthly cost depends on usage: $0.01 per GB                
-                                                                                                     
- OVERALL TOTAL                                                                             $8,619.84 
+ Name                                            Monthly Qty  Unit                      Monthly Cost   
+                                                                                                       
+ azurerm_hdinsight_spark_cluster.example                                                               
+ ├─ Head node (Standard_G2)                            1,460  hours                        $2,154.96   
+ ├─ Worker node (Standard_G2)                          2,190  hours                        $3,232.44   
+ └─ Zookeeper node (Standard_G2)                       2,190  hours                        $3,232.44   
+                                                                                                       
+ azurerm_storage_account.example                                                                       
+ ├─ Capacity                              Monthly cost depends on usage: $0.01 per GB                  
+ ├─ Write operations                      Monthly cost depends on usage: $0.10 per 10k operations      
+ ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations     
+ ├─ Read operations                       Monthly cost depends on usage: $0.01 per 10k operations      
+ ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations    
+ ├─ Data retrieval                        Monthly cost depends on usage: $0.01 per GB                  
+ ├─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags           
+ └─ Early deletion                        Monthly cost depends on usage: $0.01 per GB                  
+                                                                                                       
+ OVERALL TOTAL                                                                            $8,619.84 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_storage_container
+∙ 2 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMHDInsightSparkClusterGoldenFile         ┃ $8,620       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃        $8,620 ┃           - ┃     $8,620 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -15,16 +15,21 @@ if $(git rev-parse --is-shallow-repository); then
   git fetch --quiet --unshallow
 fi
 
-if git describe --tags --exact-match "${COMMITISH}" >/dev/null 2>&1; then
-  TAG=$(git describe --tags --exact-match "${COMMITISH}")
-elif git describe --tags "${COMMITISH}" > /dev/null 2>&1; then
-  full_tag=$(git describe --tags "${COMMITISH}")
-  commit_count=$(echo ${full_tag} | awk -F'-' '{print $2}')
-  commit_sha=$(echo ${full_tag} | awk -F'-' '{print $3}')
+# Get the latest tag with a "v" prefix
+LATEST_V_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
 
-  TAG=$(echo ${full_tag} | awk -F'-' '{print $1}')
-  BUILD=$(echo +${commit_count}-${commit_sha})
+if [ -n "$LATEST_V_TAG" ]; then
+  if git describe --tags --exact-match "${COMMITISH}" 2>/dev/null | grep -q "^${LATEST_V_TAG}$"; then
+    TAG=$LATEST_V_TAG
+  else
+    full_tag=$(git describe --tags "${COMMITISH}" --match 'v*')
+    if [[ $full_tag =~ ^(v[0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)-g([0-9a-f]+)$ ]]; then
+      TAG=${BASH_REMATCH[1]}
+      BUILD=$(echo +${BASH_REMATCH[2]}-${BASH_REMATCH[3]})
+    else
+      TAG=${full_tag}
+    fi
+  fi
 fi
-
 
 echo $TAG$BUILD$DIRTY_SUFFIX

@@ -1,27 +1,30 @@
 
- Name                                          Monthly Qty  Unit                  Monthly Cost 
-                                                                                               
- aws_neptune_cluster.fiveDaysRetenPeriod                                                       
- ├─ Storage                                            100  GB                          $11.60 
- ├─ I/O requests                                        10  1M request                   $2.32 
- └─ Backup storage                                   1,000  GB                          $22.00 
-                                                                                               
- aws_neptune_cluster.oneDayRetenPeriod                                                         
- ├─ Storage                                            100  GB                          $11.60 
- └─ I/O requests                                        10  1M request                   $2.32 
-                                                                                               
- aws_neptune_cluster.withoutUsage                                                              
- ├─ Storage                               Monthly cost depends on usage: $0.12 per GB          
- ├─ I/O requests                          Monthly cost depends on usage: $0.23 per 1M request  
- └─ Backup storage                        Monthly cost depends on usage: $0.022 per GB         
-                                                                                               
+ Name                                          Monthly Qty  Unit                  Monthly Cost    
+                                                                                                  
+ aws_neptune_cluster.fiveDaysRetenPeriod                                                          
+ ├─ Storage                                            100  GB                          $11.60  * 
+ ├─ I/O requests                                        10  1M request                   $2.32  * 
+ └─ Backup storage                                   1,000  GB                          $22.00  * 
+                                                                                                  
+ aws_neptune_cluster.oneDayRetenPeriod                                                            
+ ├─ Storage                                            100  GB                          $11.60  * 
+ └─ I/O requests                                        10  1M request                   $2.32  * 
+                                                                                                  
+ aws_neptune_cluster.withoutUsage                                                                 
+ ├─ Storage                               Monthly cost depends on usage: $0.12 per GB             
+ ├─ I/O requests                          Monthly cost depends on usage: $0.23 per 1M request     
+ └─ Backup storage                        Monthly cost depends on usage: $0.022 per GB            
+                                                                                                  
  OVERALL TOTAL                                                                          $49.84 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNeptuneClusterGoldenFile                       ┃ $50          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃         $50 ┃        $50 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

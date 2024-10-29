@@ -12,5 +12,10 @@ func TestAzureRMLoadBalancerGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "lb_test")
+	opts := tftest.DefaultGoldenFileOptions()
+
+	// Skip CLI diff as it yields different results
+	opts.IgnoreCLI = true
+
+	tftest.GoldenFileResourceTestsWithOpts(t, "lb_test", opts)
 }

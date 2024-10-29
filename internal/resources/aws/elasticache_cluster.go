@@ -1,10 +1,10 @@
 package aws
 
 import (
-	"github.com/rs/zerolog/log"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -27,10 +27,16 @@ type ElastiCacheCluster struct {
 	ReservedInstancePaymentOption *string  `infracost_usage:"reserved_instance_payment_option"`
 }
 
-var ElastiCacheClusterUsageSchema = []*schema.UsageItem{
-	{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+func (r *ElastiCacheCluster) CoreType() string {
+	return "ElastiCacheCluster"
+}
+
+func (r *ElastiCacheCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+		{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	}
 }
 
 func (r *ElastiCacheCluster) PopulateUsage(u *schema.UsageData) {
@@ -43,7 +49,7 @@ func (r *ElastiCacheCluster) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: ElastiCacheClusterUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -74,7 +80,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 		}
 		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 		} else {
 			priceFilter = reservedFilter
 		}
@@ -103,6 +109,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 			},
 		},
 		PriceFilter: priceFilter,
+		UsageBased:  autoscaling,
 	}
 }
 
@@ -127,6 +134,7 @@ func (r *ElastiCacheCluster) backupStorageCostComponent() *schema.CostComponent 
 			Service:       strPtr("AmazonElastiCache"),
 			ProductFamily: strPtr("Storage Snapshot"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -176,7 +184,7 @@ func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, erro
 	}
 	nodeType := strings.Split(r.cacheNodeType, ".")[1] // Get node type from cache node type. cache.m3.large -> m3
 	if stringInSlice(elasticacheReservedNodeLegacyTypes, nodeType) {
-		log.Warn().Msgf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
+		logging.Logger.Warn().Msgf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
 	}
 	return &schema.PriceFilter{
 		PurchaseOption:     strPtr(purchaseOptionLabel),

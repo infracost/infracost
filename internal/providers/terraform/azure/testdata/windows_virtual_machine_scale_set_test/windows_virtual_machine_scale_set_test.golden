@@ -1,25 +1,28 @@
 
- Name                                                             Monthly Qty  Unit                      Monthly Cost 
-                                                                                                                      
- azurerm_windows_virtual_machine_scale_set.basic_a2                                                                   
- ├─ Instance usage (Windows, pay as you go, Basic_A2)                   2,190  hours                          $291.27 
- └─ os_disk                                                                                                           
-    ├─ Storage (S4, LRS)                                                    3  months                           $4.61 
-    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                      
- azurerm_windows_virtual_machine_scale_set.basic_a2_usage                                                             
- ├─ Instance usage (Windows, pay as you go, Basic_A2)                   2,920  hours                          $388.36 
- └─ os_disk                                                                                                           
-    ├─ Storage (S4, LRS)                                                    4  months                           $6.14 
-    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                      
- OVERALL TOTAL                                                                                                $690.38 
+ Name                                                             Monthly Qty  Unit                      Monthly Cost   
+                                                                                                                        
+ azurerm_windows_virtual_machine_scale_set.basic_a2_usage                                                               
+ ├─ Instance usage (Windows, pay as you go, Basic_A2)                   2,920  hours                          $388.36   
+ └─ os_disk                                                                                                             
+    ├─ Storage (S4, LRS)                                                    4  months                           $6.14   
+    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations    
+                                                                                                                        
+ azurerm_windows_virtual_machine_scale_set.basic_a2                                                                     
+ ├─ Instance usage (Windows, pay as you go, Basic_A2)                   2,190  hours                          $291.27   
+ └─ os_disk                                                                                                             
+    ├─ Storage (S4, LRS)                                                    3  months                           $4.61   
+    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations    
+                                                                                                                        
+ OVERALL TOTAL                                                                                               $690.38 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMWindowsVirtualMachineScaleSetGoldenFile ┃ $690         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $690 ┃           - ┃       $690 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

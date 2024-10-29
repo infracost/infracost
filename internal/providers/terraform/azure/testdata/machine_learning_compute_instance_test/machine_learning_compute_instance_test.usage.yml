@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_machine_learning_compute_instance.with_monthly_hrs:
+    monthly_hrs: 100

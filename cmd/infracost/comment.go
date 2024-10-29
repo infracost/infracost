@@ -8,24 +8,30 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/logging"
-
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/spf13/cobra"
 
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/logging"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 type CommentOutput struct {
-	Body    string
-	HasDiff bool
-	ValidAt *time.Time
+	Body           string
+	HasDiff        bool
+	ValidAt        *time.Time
+	AddRunResponse apiclient.AddRunResponse
 }
+
+var (
+	validCommentOutputFormats = []string{
+		"json",
+	}
+)
 
 func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -51,15 +57,17 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 
 	cmds := []*cobra.Command{commentGitHubCmd(ctx), commentGitLabCmd(ctx), commentAzureReposCmd(ctx), commentBitbucketCmd(ctx)}
 	for _, subCmd := range cmds {
+		subCmd.RunE = checkAPIKeyIsValid(ctx, subCmd.RunE)
+
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")
-		subCmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
+		subCmd.Flags().Bool("show-skipped", true, "List unsupported resources")
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
-		subCmd.Flags().String("additional-comment-data-path", "", "Path to additional comment text (experimental)")
-		_ = subCmd.Flags().MarkHidden("additional-comment-data-path")
+		subCmd.Flags().String("comment-path", "", "Path to comment content file (experimental)")
+		_ = subCmd.Flags().MarkHidden("comment-path")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -75,51 +83,46 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	combined, err := output.Combine(inputs)
 	if errors.As(err, &clierror.WarningError{}) {
-		ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
+		logging.Logger.Warn().Msg(err.Error())
 	} else if err != nil {
 		return nil, err
 	}
 
 	combined.IsCIRun = ctx.IsCIRun()
 
-	if ctx.IsCloudUploadEnabled() && ctx.Config.PolicyV2APIEndpoint != "" {
-		policyClient, err := apiclient.NewPolicyAPIClient(ctx)
-		if err != nil {
-			logging.Logger.Err(err).Msg("Failed to initialize policies client")
-		} else {
-			policies, err := policyClient.CheckPolicies(ctx, combined, true)
-			if err != nil {
-				logging.Logger.Err(err).Msg("Failed to check policies")
-			}
-
-			combined.TagPolicies = policies.TagPolicies
-			combined.FinOpsPolicies = policies.FinOpsPolicies
-		}
-	}
-
-	var additionalCommentData string
+	var commentData string
 	var governanceFailures output.GovernanceFailures
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	var result apiclient.AddRunResponse
 	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
-			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+			logging.Logger.Warn().Msg("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			commentFormat := apiclient.CommentFormatMarkdownHTML
-			if mdOpts.BasicSyntax {
-				commentFormat = apiclient.CommentFormatMarkdown
-			}
-			result := shareCombinedRun(ctx, combined, inputs, commentFormat)
+			result = shareCombinedRun(ctx, combined, inputs)
 			combined.RunID, combined.ShareURL, combined.CloudURL, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GovernanceFailures
-			additionalCommentData = result.GovernanceComment
+			commentData = result.CommentMarkdown
 		}
 	}
 
-	additionalPath, _ := cmd.Flags().GetString("additional-comment-data-path")
-	if additionalPath != "" {
-		additionalCommentData, err = output.LoadAdditionalCommentData(additionalPath)
+	var out *CommentOutput
+
+	commentPath, _ := cmd.Flags().GetString("comment-path")
+	if commentPath != "" {
+		commentData, err = output.LoadCommentData(commentPath)
 		if err != nil {
-			return nil, fmt.Errorf("Error loading %s used by --additional-comment-data-path flag. %s", additionalPath, err)
+			return nil, fmt.Errorf("Error loading %s used by --comment-path flag. %s", commentPath, err)
+		}
+	}
+
+	if commentData != "" {
+		// the full comment markdown has been received from the API addRun or loaded from the comment-path file,
+		// so use that instead of building the output using the output.ToMarkdown templates.
+		out = &CommentOutput{
+			Body:           commentData,
+			HasDiff:        combined.HasDiff(),
+			ValidAt:        &combined.TimeGenerated,
+			AddRunResponse: result,
 		}
 	}
 
@@ -135,29 +138,31 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		ctx.ContextValues.SetValue("failedPolicyCount", len(policyChecks.Failures))
 	}
 
-	opts := output.Options{
-		DashboardEndpoint: ctx.Config.DashboardEndpoint,
-		NoColor:           ctx.Config.NoColor,
-		PolicyOutput:      output.NewPolicyOutput(policyChecks),
-	}
-	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
-	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
-	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
+	if out == nil {
+		opts := output.Options{
+			DashboardEndpoint: ctx.Config.DashboardEndpoint,
+			NoColor:           ctx.Config.NoColor,
+			PolicyOutput:      output.NewPolicyOutput(policyChecks),
+		}
+		opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
+		opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
+		opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-	mdOpts.Additional = additionalCommentData
-	md, err := output.ToMarkdown(combined, opts, mdOpts)
-	if err != nil {
-		return nil, err
-	}
+		md, err := output.ToMarkdown(combined, opts, mdOpts)
+		if err != nil {
+			return nil, err
+		}
 
-	b := md.Msg
-	ctx.ContextValues.SetValue("truncated", md.OriginalMsgSize != md.RuneLen)
-	ctx.ContextValues.SetValue("originalLength", md.OriginalMsgSize)
+		b := md.Msg
+		ctx.ContextValues.SetValue("truncated", md.OriginalMsgSize != md.RuneLen)
+		ctx.ContextValues.SetValue("originalLength", md.OriginalMsgSize)
 
-	out := &CommentOutput{
-		Body:    string(b),
-		HasDiff: combined.HasDiff(),
-		ValidAt: &combined.TimeGenerated,
+		out = &CommentOutput{
+			Body:           string(b),
+			HasDiff:        combined.HasDiff(),
+			ValidAt:        &combined.TimeGenerated,
+			AddRunResponse: result,
+		}
 	}
 
 	if policyChecks.HasFailed() {

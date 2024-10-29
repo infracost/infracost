@@ -1,0 +1,41 @@
+
+ Name                                                          Monthly Qty  Unit                    Monthly Cost    
+                                                                                                                    
+ azurerm_app_configuration.usage["standard.replicas.3"]                                                             
+ ├─ Instance (3 replicas)                                               30  days                         $144.00    
+ └─ Requests (over 200k/day per replica)                                 3  10k requests                   $0.18  * 
+                                                                                                                    
+ azurerm_app_configuration.base["standard.replicas.3"]                                                              
+ ├─ Instance (3 replicas)                                               30  days                         $144.00    
+ └─ Requests (over 200k/day per replica)                 Monthly cost depends on usage: $0.06 per 10k requests      
+                                                                                                                    
+ azurerm_app_configuration.usage["standard.replicas.1"]                                                             
+ ├─ Instance (1 replica)                                                30  days                          $72.00    
+ └─ Requests (over 200k/day per replica)                                 3  10k requests                   $0.18  * 
+                                                                                                                    
+ azurerm_app_configuration.base["standard.replicas.1"]                                                              
+ ├─ Instance (1 replica)                                                30  days                          $72.00    
+ └─ Requests (over 200k/day per replica)                 Monthly cost depends on usage: $0.06 per 10k requests      
+                                                                                                                    
+ azurerm_app_configuration.usage["standard.replicas.0"]                                                             
+ ├─ Instance                                                            30  days                          $36.00    
+ └─ Requests (over 200k/day per replica)                                 3  10k requests                   $0.18  * 
+                                                                                                                    
+ azurerm_app_configuration.base["standard.replicas.0"]                                                              
+ ├─ Instance                                                            30  days                          $36.00    
+ └─ Requests (over 200k/day per replica)                 Monthly cost depends on usage: $0.06 per 10k requests      
+                                                                                                                    
+ OVERALL TOTAL                                                                                           $504.54 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+19 cloud resources were detected:
+∙ 6 were estimated
+∙ 13 were free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $504 ┃       $0.54 ┃       $505 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

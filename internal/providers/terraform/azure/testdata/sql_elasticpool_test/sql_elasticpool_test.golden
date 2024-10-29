@@ -1,27 +1,28 @@
 
- Name                                  Monthly Qty  Unit   Monthly Cost 
-                                                                        
- azurerm_sql_elasticpool.basic_100                                      
- └─ Compute (Basic, 100 DTUs)                  730  hours       $147.22 
-                                                                        
- azurerm_sql_elasticpool.premium_500                                    
- ├─ Compute (Premium, 500 DTUs)                730  hours     $2,737.50 
- └─ Extra data storage                         274  GB          $121.11 
-                                                                        
- azurerm_sql_elasticpool.standard_200                                   
- ├─ Compute (Standard, 200 DTUs)               730  hours       $441.04 
- └─ Extra data storage                         100  GB           $22.10 
-                                                                        
+ Name                                  Monthly Qty  Unit   Monthly Cost    
+                                                                           
+ azurerm_sql_elasticpool.premium_500                                       
+ ├─ Compute (Premium, 500 DTUs)                730  hours     $2,737.50    
+ └─ Extra data storage                         274  GB          $121.11  * 
+                                                                           
+ azurerm_sql_elasticpool.standard_200                                      
+ ├─ Compute (Standard, 200 DTUs)               730  hours       $441.04    
+ └─ Extra data storage                         100  GB           $22.10  * 
+                                                                           
+ azurerm_sql_elasticpool.basic_100                                         
+ └─ Compute (Basic, 100 DTUs)                  730  hours       $147.22    
+                                                                           
  OVERALL TOTAL                                                $3,468.97 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 3 were estimated
-∙ 2 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_sql_server
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSQLElasticPool                                 ┃ $3,469       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃        $3,326 ┃        $143 ┃     $3,469 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

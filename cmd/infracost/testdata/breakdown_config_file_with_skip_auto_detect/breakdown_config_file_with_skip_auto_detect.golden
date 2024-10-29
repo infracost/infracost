@@ -1,0 +1,48 @@
+Project: testdata-breakdown_config_file_with_skip_auto_detect-infra
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_config_file_with_skip_auto_detect/infra
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                           
+ aws_instance.web_app                                                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.8xlarge)          730  hours     $1,121.28   
+ ├─ root_block_device                                                                      
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                    
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00   
+    └─ Provisioned IOPS                                         800  IOPS         $52.00   
+                                                                                           
+ Project total                                                                 $1,303.28   
+
+──────────────────────────────────
+Project: testdata-breakdown_config_file_with_skip_auto_detect-infra-dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_config_file_with_skip_auto_detect/infra/dev
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                           
+ aws_instance.web_app                                                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64   
+ ├─ root_block_device                                                                      
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                    
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00   
+    └─ Provisioned IOPS                                         800  IOPS         $52.00   
+                                                                                           
+ Project total                                                                   $742.64   
+
+ OVERALL TOTAL                                                                $2,045.92 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                        ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ testdata-breakdown_config_file_with_skip_auto_detect-infra     ┃        $1,303 ┃           - ┃     $1,303 ┃
+┃ testdata-breakdown_config_file_with_skip_auto_detect-infra-dev ┃          $743 ┃           - ┃       $743 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+

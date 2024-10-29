@@ -208,3 +208,55 @@ func regionToContinent(region string) string {
 
 	return continent
 }
+
+func GetRegionTier(region string) string {
+	tier, ok := regionTierMapping[region]
+	if !ok {
+		return "Tier Unknown"
+	}
+	return tier
+}
+
+var regionTierMapping = map[string]string{
+	"asia-east1":        "Tier 1",
+	"asia-northeast1":   "Tier 1",
+	"asia-northeast2":   "Tier 1",
+	"europe-north1":     "Tier 1",
+	"europe-southwest1": "Tier 1",
+	"europe-west1":      "Tier 1",
+	"europe-west4":      "Tier 1",
+	"europe-west8":      "Tier 1",
+	"europe-west9":      "Tier 1",
+	"me-west1":          "Tier 1",
+	"us-central1":       "Tier 1",
+	"us-east1":          "Tier 1",
+	"us-east4":          "Tier 1",
+	"us-east5":          "Tier 1",
+	"us-south1":         "Tier 1",
+	"us-west1":          "Tier 1",
+
+	"africa-south1":           "Tier 2",
+	"asia-east2":              "Tier 2",
+	"asia-northeast3":         "Tier 2",
+	"asia-southeast1":         "Tier 2",
+	"asia-southeast2":         "Tier 2",
+	"asia-south1":             "Tier 2",
+	"asia-south2":             "Tier 2",
+	"australia-southeast1":    "Tier 2",
+	"australia-southeast2":    "Tier 2",
+	"europe-central2":         "Tier 2",
+	"europe-west10":           "Tier 2",
+	"europe-west12":           "Tier 2",
+	"europe-west2":            "Tier 2",
+	"europe-west3":            "Tier 2",
+	"europe-west6":            "Tier 2",
+	"me-central1":             "Tier 2",
+	"me-central2":             "Tier 2",
+	"northamerica-northeast1": "Tier 2",
+	"northamerica-northeast2": "Tier 2",
+	"southamerica-east1":      "Tier 2",
+	"southamerica-west1":      "Tier 2",
+	"us-west2":                "Tier 2",
+	"us-west3":                "Tier 2",
+	"us-west4":                "Tier 2",
+}

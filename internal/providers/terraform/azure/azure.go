@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"github.com/tidwall/gjson"
-
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -21,20 +19,19 @@ func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	return map[string]interface{}{}
 }
 
-func GetResourceRegion(resourceType string, v gjson.Result) string {
-	return ""
-}
-
-func ParseTags(r *schema.ResourceData) *map[string]string {
+func ParseTags(externalTags map[string]string, r *schema.ResourceData) (map[string]string, []string) {
 	_, supportsTags := provider_schemas.AzureTagsSupport[r.Type]
 	rTags := r.Get("tags").Map()
+	missing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags")
 	if !supportsTags && len(rTags) == 0 {
-		return nil
+		return nil, missing
 	}
-
 	tags := make(map[string]string)
 	for k, v := range rTags {
 		tags[k] = v.String()
 	}
-	return &tags
+	for k, v := range externalTags {
+		tags[k] = v
+	}
+	return tags, missing
 }

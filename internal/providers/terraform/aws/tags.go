@@ -29,23 +29,109 @@ func parseLaunchTemplateTags(tags map[string]string, r *schema.ResourceData) {
 	}
 }
 
-func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[string]string {
+// TagParsingConfig defines options that can be used to configure the ParseTags function.
+type TagParsingConfig struct {
+	// PropagateDefaultsToVolumeTags specifies whether default provider tags should be
+	// propagated to volume tags. This feature was added in Terraform AWS provider
+	// version 5.39.0.
+	PropagateDefaultsToVolumeTags bool
+}
+
+type TagPropagationConfig struct {
+	Attribute string
+	To        string
+	RefMap    map[string]string
+	Requires  []string
+}
+
+// ExpectedPropagations describe known tag propagation configurations
+var ExpectedPropagations = map[string]TagPropagationConfig{
+	"aws_ecs_service": {
+		Attribute: "propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "task_definition",
+			"SERVICE":         "", // empty string means self-reference
+		},
+	},
+	"aws_scheduler_schedule": {
+		Attribute: "ecs_parameters.0.propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "ecs_parameters.0.task_definition_arn",
+		},
+	},
+	"aws_batch_job_definition": {
+		Attribute: "propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"true": "", // empty string means self-reference
+		},
+	},
+	"aws_dynamodb_table": {
+		Attribute: "replica.0.propagate_tags",
+		To:        "replica",
+		RefMap: map[string]string{
+			"true": "", // empty string means self-reference
+		},
+		Requires: []string{"replica.0.region_name"},
+	},
+	"aws_pipes_pipe": {
+		Attribute: "target_parameters.0.ecs_task_parameters.0.propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "target_parameters.0.ecs_task_parameters.0.task_definition_arn",
+		},
+	},
+	"aws_cloudwatch_event_target": {
+		Attribute: "ecs_target.0.propagate_tags",
+		To:        "task",
+		RefMap: map[string]string{
+			"TASK_DEFINITION": "ecs_target.0.task_definition_arn",
+		},
+		Requires: []string{"ecs_target.0.task_definition_arn"},
+	},
+}
+
+func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) (map[string]string, []string) {
 	_, supportsTags := provider_schemas.AWSTagsSupport[r.Type]
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
+	var missing []string
+	tagsMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags")
+	missing = append(missing, tagsMissing...)
+	tagsAllMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags_all")
+	missing = append(missing, tagsAllMissing...)
+
 	rTags := r.Get("tags").Map()
-	if !supportsTags && !supportsTagBlock && len(rTags) == 0 {
-		return nil
+	rTagsAll := r.Get("tags_all").Map()
+	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
+		return nil, missing
 	}
 
 	tags := make(map[string]string)
 
+	if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
+		for k, v := range defaultTags {
+			k = fmt.Sprintf("volume_tags.%s", k)
+			tags[k] = v
+		}
+	}
+
 	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[r.Type]
 	if supportsDefaultTags && defaultTags != nil {
-		keysAndValues := make([]string, 0, len(*defaultTags)*2)
-		for k, v := range *defaultTags {
+		keysAndValues := make([]string, 0, len(defaultTags)*2)
+		for k, v := range defaultTags {
 			tags[k] = v
 			keysAndValues = append(keysAndValues, k, v)
+		}
+
+		if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
+			for k, v := range defaultTags {
+				k = fmt.Sprintf("volume_tags.%s", k)
+				tags[k] = v
+				keysAndValues = append(keysAndValues, k, v)
+			}
 		}
 
 		sort.Strings(keysAndValues)
@@ -60,6 +146,8 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 	}
 
 	if supportsTagBlock {
+		tagBlockMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tag")
+		missing = append(missing, tagBlockMissing...)
 		for _, el := range r.Get("tag").Array() {
 			k := el.Get("key").String()
 			if k == "" {
@@ -79,11 +167,21 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 		tags[k] = v.String()
 	}
 
+	// tags_all is only set on plan.json runs, so we can prefer them over our own calculations
+	for k, v := range rTagsAll {
+		tags[k] = v.String()
+	}
+
+	// external tags (e.g. yor)
+	for k, v := range externalTags {
+		tags[k] = v
+	}
+
 	if f, ok := tagProviders[r.Type]; ok {
 		f(tags, r)
 	}
 
-	return &tags
+	return tags, missing
 }
 
 func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {

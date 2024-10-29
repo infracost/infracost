@@ -1,14 +1,13 @@
 package azure
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"fmt"
-
 	"github.com/shopspring/decimal"
-
-	"strings"
 )
 
 type AppServiceCertificateOrder struct {
@@ -16,7 +15,13 @@ type AppServiceCertificateOrder struct {
 	ProductType string
 }
 
-var AppServiceCertificateOrderUsageSchema = []*schema.UsageItem{}
+func (r *AppServiceCertificateOrder) CoreType() string {
+	return "AppServiceCertificateOrder"
+}
+
+func (r *AppServiceCertificateOrder) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *AppServiceCertificateOrder) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -59,6 +64,7 @@ func (r *AppServiceCertificateOrder) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AppServiceCertificateOrderUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

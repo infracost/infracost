@@ -20,7 +20,6 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 )
 
@@ -55,6 +54,7 @@ type PriceQueryKey struct {
 type PriceQueryResult struct {
 	PriceQueryKey
 	Result gjson.Result
+	Query  GraphQLQuery
 
 	filled bool
 }
@@ -76,6 +76,22 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		return pricingClient
 	}
 
+	c := NewPricingAPIClient(ctx)
+	if c == nil {
+		return nil
+	}
+
+	initCache(ctx, c)
+	pricingClient = c
+	return c
+}
+
+// NewPricingAPIClient creates a new instance of PricingAPIClient using the given
+// RunContext configuration. Most callers should use GetPricingAPIClient instead
+// of this function to ensure that the client cache is global across the
+// application. This function is useful for creating isolated pricing clients
+// which do not share the global cache.
+func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	if ctx == nil {
 		return nil
 	}
@@ -95,14 +111,14 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 
 		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
-			log.Error().Msgf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
+			logging.Logger.Error().Msgf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
 		} else {
 			ok := rootCAs.AppendCertsFromPEM(caCerts)
 
 			if !ok {
-				log.Warn().Msgf("No CA certs appended, only using system certs")
+				logging.Logger.Warn().Msgf("No CA certs appended, only using system certs")
 			} else {
-				log.Debug().Msgf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
+				logging.Logger.Debug().Msgf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
 
@@ -129,8 +145,6 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		EventsDisabled: ctx.Config.EventsDisabled,
 	}
 
-	initCache(ctx, c)
-	pricingClient = c
 	return c
 }
 
@@ -303,7 +317,7 @@ type pricingQuery struct {
 // checking a local cache for previous results. If the results of a given query
 // are cached, they are used directly; otherwise, a request to the API is made.
 func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult, error) {
-	log.Debug().Msgf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
+	logging.Logger.Debug().Msgf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
 	res := make([]PriceQueryResult, len(req.keys))
 	for i, key := range req.keys {
 		res[i].PriceQueryKey = key
@@ -320,6 +334,8 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 			hash:  key,
 			query: query,
 		}
+
+		res[i].Query = query
 	}
 
 	// first filter any queries that have been stored in the cache. We don't need to
@@ -334,11 +350,8 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 			if ok {
 				logging.Logger.Debug().Msgf("cache hit for query hash: %d", query.hash)
 				hit++
-				res[i] = PriceQueryResult{
-					PriceQueryKey: req.keys[i],
-					Result:        v.Result,
-					filled:        true,
-				}
+				res[i].Result = v.Result
+				res[i].filled = true
 			} else {
 				serverQueries = append(serverQueries, query)
 			}
@@ -364,7 +377,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	for i, query := range deduplicatedServerQueries {
 		rawQueries[i] = query.query
 	}
-	resultsFromServer, err := c.doQueries(rawQueries)
+	resultsFromServer, err := c.DoQueries(rawQueries)
 	if err != nil {
 		return []PriceQueryResult{}, err
 	}

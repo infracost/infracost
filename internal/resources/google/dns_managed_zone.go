@@ -11,7 +11,13 @@ type DNSManagedZone struct {
 	Address string
 }
 
-var DNSManagedZoneUsageSchema = []*schema.UsageItem{}
+func (r *DNSManagedZone) CoreType() string {
+	return "DNSManagedZone"
+}
+
+func (r *DNSManagedZone) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *DNSManagedZone) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -40,6 +46,6 @@ func (r *DNSManagedZone) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: DNSManagedZoneUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

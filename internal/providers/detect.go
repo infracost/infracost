@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/awslabs/goformation/v4"
+	"github.com/awslabs/goformation/v7"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
@@ -17,141 +17,225 @@ import (
 	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pulumi/pulumi/sdk/v3/go/common/display"
+	"github.com/pulumi/pulumi/pkg/v3/display"
 )
 
-// ValidationError represents an error that is raised because provider conditions are not met.
-// This error is commonly used to show requirements to a user running an Infracost command.
-type ValidationError struct {
-	err  string
-	warn string
+type DetectionOutput struct {
+	Providers   []schema.Provider
+	RootModules int
 }
 
-// Warn returns the ValidationError warning message. A warning highlights a potential issue with runtime
-// configuration but a condition that the Provider can proceed with.
-//
-// Warn can return nil if there are no validation warnings.
-func (e ValidationError) Warn() *string {
-	if e.warn == "" {
+// Detect returns a list of providers for the given path. Multiple returned
+// providers are because of auto-detected root modules residing under the
+// original path.
+func Detect(ctx *config.RunContext, project *config.Project, includePastResources bool) (*DetectionOutput, error) {
+	if _, err := os.Stat(project.Path); os.IsNotExist(err) {
+		return &DetectionOutput{}, fmt.Errorf("No such file or directory %s", project.Path)
+	}
+
+	forceCLI := project.TerraformForceCLI
+	projectType := DetectProjectType(project.Path, forceCLI)
+	projectContext := config.NewProjectContext(ctx, project, nil)
+	if projectType != ProjectTypeAutodetect {
+		projectContext.ContextValues.SetValue("project_type", projectType)
+	}
+
+	switch projectType {
+	case ProjectTypeTerraformPlanJSON:
+		return &DetectionOutput{Providers: []schema.Provider{terraform.NewPlanJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeTerraformPlanBinary:
+		return &DetectionOutput{Providers: []schema.Provider{terraform.NewPlanProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeTerraformCLI:
+		return &DetectionOutput{Providers: []schema.Provider{terraform.NewDirProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeTerragruntCLI:
+		return &DetectionOutput{Providers: []schema.Provider{terraform.NewTerragruntProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeTerraformStateJSON:
+		return &DetectionOutput{Providers: []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeCloudFormation:
+		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	}
+
+	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
+	for i, override := range ctx.Config.Autodetect.PathOverrides {
+		pathOverrides[i] = hcl.PathOverrideConfig{
+			Path:    override.Path,
+			Only:    override.Only,
+			Exclude: override.Exclude,
+		}
+	}
+
+	locatorConfig := &hcl.ProjectLocatorConfig{
+		ExcludedDirs:   append(project.ExcludePaths, ctx.Config.Autodetect.ExcludeDirs...),
+		IncludedDirs:   ctx.Config.Autodetect.IncludeDirs,
+		PathOverrides:  pathOverrides,
+		EnvNames:       ctx.Config.Autodetect.EnvNames,
+		ChangedObjects: ctx.VCSMetadata.Commit.ChangedObjects,
+		UseAllPaths:    project.IncludeAllPaths,
+		// If the user has specified terraform var files, we should skip auto-detection
+		// as terraform var files are relative to the project root, so invalid path errors
+		// will occur if any autodetect projects are outside the current project path.
+		SkipAutoDetection:          project.SkipAutodetect || len(project.TerraformVarFiles) > 0,
+		FallbackToIncludePaths:     ctx.IsAutoDetect(),
+		MaxSearchDepth:             ctx.Config.Autodetect.MaxSearchDepth,
+		ForceProjectType:           ctx.Config.Autodetect.ForceProjectType,
+		TerraformVarFileExtensions: ctx.Config.Autodetect.TerraformVarFileExtensions,
+	}
+
+	// if the config file path is set, we should set the project locator to use the
+	// working directory this is so that the paths of the detected RootPaths are
+	// relative to the working directory and not the paths specified in the config
+	// file.
+	if ctx.Config.ConfigFilePath != "" {
+		locatorConfig.WorkingDirectory = ctx.Config.WorkingDirectory()
+	}
+
+	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
+	rootPaths := pl.FindRootModules(project.Path)
+	if len(rootPaths) == 0 {
+		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", project.Path)
+	}
+
+	var autoProviders []schema.Provider
+	for _, rootPath := range rootPaths {
+		detectedProjectContext := config.NewProjectContext(ctx, project, nil)
+		if rootPath.IsTerragrunt {
+			detectedProjectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
+			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, detectedProjectContext))
+		} else {
+			detectedProjectContext.ContextValues.SetValue("project_type", "terraform_dir")
+			if ctx.Config.ConfigFilePath == "" && len(project.TerraformVarFiles) == 0 {
+				autoProviders = append(autoProviders, autodetectedRootToProviders(detectedProjectContext, rootPath)...)
+			} else {
+				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, nil, detectedProjectContext, pl))
+			}
+
+		}
+	}
+
+	return &DetectionOutput{Providers: autoProviders, RootModules: len(rootPaths)}, nil
+}
+
+// configFileRootToProvider returns a provider for the given root path which is
+// assumed to be a root module defined with a config file. In this case the
+// terraform var files should not be grouped/reordered as the user has specified
+// these manually.
+func configFileRootToProvider(rootPath hcl.RootPath, options []hcl.Option, projectContext *config.ProjectContext, pl *hcl.ProjectLocator) *terraform.HCLProvider {
+	var autoVarFiles []string
+	for _, varFile := range rootPath.TerraformVarFiles {
+		if hcl.IsAutoVarFile(varFile.RelPath) && (filepath.Dir(varFile.RelPath) == rootPath.DetectedPath || filepath.Dir(varFile.RelPath) == ".") {
+			autoVarFiles = append(autoVarFiles, varFile.RelPath)
+		}
+	}
+
+	if len(autoVarFiles) > 0 {
+		options = append(options, hcl.OptionWithTFVarsPaths(autoVarFiles, false))
+	}
+
+	h, providerErr := terraform.NewHCLProvider(
+		projectContext,
+		rootPath,
+		nil,
+		options...,
+	)
+	if providerErr != nil {
+		logging.Logger.Warn().Err(providerErr).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)
+	}
+	return h
+}
+
+// autodetectedRootToProviders returns a list of providers for the given root
+// path. These providers are generated by autodetected environments defined in
+// the root module. These are defined by var file naming conventions.
+func autodetectedRootToProviders(projectContext *config.ProjectContext, rootPath hcl.RootPath, options ...hcl.Option) []schema.Provider {
+	var providers []schema.Provider
+	autoVarFiles := rootPath.AutoFiles()
+	autoVarFiles = append(autoVarFiles, rootPath.GlobalFiles()...)
+	varFileGrouping := rootPath.EnvGroupings()
+
+	if len(varFileGrouping) > 0 {
+		for _, env := range varFileGrouping {
+			provider, err := terraform.NewHCLProvider(
+				projectContext,
+				rootPath,
+				nil,
+				append(
+					options,
+					hcl.OptionWithTFVarsPaths(append(autoVarFiles.ToPaths(), env.TerraformVarFiles.ToPaths()...), true),
+					hcl.OptionWithModuleSuffix(env.Name),
+				)...)
+			if err != nil {
+				logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)
+				continue
+			}
+
+			providers = append(providers, provider)
+		}
+
+		return providers
+	}
+
+	varFiles := rootPath.EnvFiles()
+	providerOptions := options
+	if len(autoVarFiles) > 0 {
+		providerOptions = append(providerOptions, hcl.OptionWithTFVarsPaths(append(varFiles.ToPaths(), autoVarFiles.ToPaths()...), true))
+	}
+
+	provider, err := terraform.NewHCLProvider(
+		projectContext,
+		rootPath,
+		nil,
+		providerOptions...,
+	)
+	if err != nil {
+		logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)
 		return nil
 	}
 
-	return &e.warn
+	return []schema.Provider{provider}
 }
 
-// Error returns ValidationError as a string, implementing the error interface.
-func (e *ValidationError) Error() string {
-	return e.err
-}
+type ProjectType string
 
-func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provider, error) {
-	path := ctx.ProjectConfig.Path
+var (
+	ProjectTypeTerraformPlanJSON   ProjectType = "terraform_plan_json"
+	ProjectTypeTerraformPlanBinary ProjectType = "terraform_plan_binary"
+	ProjectTypeTerraformCLI        ProjectType = "terraform_cli"
+	ProjectTypeTerragruntCLI       ProjectType = "terragrunt_cli"
+	ProjectTypeTerraformStateJSON  ProjectType = "terraform_state_json"
+	ProjectTypeCloudFormation      ProjectType = "cloudformation"
+	ProjectTypeAutodetect          ProjectType = "autodetect"
+)
 
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("No such file or directory %s", path)
-	}
-
-	forceCLI := ctx.ProjectConfig.TerraformForceCLI
-	projectType := DetectProjectType(path, forceCLI)
-
-	switch projectType {
-	case "terraform_dir":
-		h, providerErr := terraform.NewHCLProvider(
-			ctx,
-			nil,
-			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
-		)
-
-		if providerErr != nil {
-			return nil, providerErr
-		}
-
-		if err := validateProjectForHCL(ctx); err != nil {
-			return h, err
-		}
-
-		return h, nil
-	case "terragrunt_dir":
-		h := terraform.NewTerragruntHCLProvider(ctx, includePastResources)
-		if err := validateProjectForHCL(ctx); err != nil {
-			return h, err
-		}
-
-		return h, nil
-	case "terraform_plan_json":
-		return terraform.NewPlanJSONProvider(ctx, includePastResources), nil
-	case "terraform_plan_binary":
-		return terraform.NewPlanProvider(ctx, includePastResources), nil
-	case "terraform_cli":
-		return terraform.NewDirProvider(ctx, includePastResources), nil
-	case "terragrunt_cli":
-		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
-	case "terraform_state_json":
-		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
-	case "cloudformation":
-		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
-	case "pulumi_preview_json":
-		return pulumi.NewPreviewJSONProvider(ctx, includePastResources), nil
-	}
-
-	return nil, fmt.Errorf("could not detect path type for '%s'", path)
-}
-
-func validateProjectForHCL(ctx *config.ProjectContext) error {
-	if ctx.ProjectConfig.TerraformInitFlags != "" {
-		return &ValidationError{
-			warn: "Flag terraform-init-flags is deprecated and only compatible with --terraform-force-cli.",
-		}
-	}
-
-	if ctx.ProjectConfig.TerraformPlanFlags != "" {
-		return &ValidationError{
-			warn: "Flag terraform-plan-flags is deprecated and only compatible with --terraform-force-cli. If you want to pass Terraform variables use the --terraform-vars or --terraform-var-file flag.",
-		}
-	}
-
-	if ctx.ProjectConfig.TerraformUseState {
-		return &ValidationError{
-			warn: "Flag terraform-use-state is deprecated and only compatible with --terraform-force-cli.",
-		}
-	}
-
-	return nil
-}
-
-func DetectProjectType(path string, forceCLI bool) string {
+func DetectProjectType(path string, forceCLI bool) ProjectType {
 	if isCloudFormationTemplate(path) {
-		return "cloudformation"
+		return ProjectTypeCloudFormation
 	}
 
 	if isTerraformPlanJSON(path) {
-		return "terraform_plan_json"
+		return ProjectTypeTerraformPlanJSON
 	}
 
 	if isTerraformStateJSON(path) {
-		return "terraform_state_json"
+		return ProjectTypeTerraformStateJSON
 	}
 
 	if isTerraformPlan(path) {
-		return "terraform_plan_binary"
-	}
-
-	if isTerragruntNestedDir(path, 5) {
-		if forceCLI {
-			return "terragrunt_cli"
-		}
-		return "terragrunt_dir"
+		return ProjectTypeTerraformPlanBinary
 	}
 
 	if isPulumiPreviewJSON(path) {
-		return "pulumi_preview_json"
+		return pulumi.NewPreviewJSONProvider(ctx, includePastResources), nil
 	}
 
 	if forceCLI {
-		return "terraform_cli"
+		if isTerragruntNestedDir(path, 5) {
+			return ProjectTypeTerragruntCLI
+		}
+
+		return ProjectTypeTerraformCLI
 	}
 
-	return "terraform_dir"
+	return ProjectTypeAutodetect
 }
 
 func isTerraformPlanJSON(path string) bool {

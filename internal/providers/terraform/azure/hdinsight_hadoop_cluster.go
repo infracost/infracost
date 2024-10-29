@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMHDInsightHadoopClusterRegistryItem() *schema.RegistryItem {
@@ -17,7 +18,7 @@ func GetAzureRMHDInsightHadoopClusterRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMHDInsightHadoopCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	costComponents := []*schema.CostComponent{}
 

@@ -9,18 +9,21 @@ import (
 
 func getVirtualNetworkPeeringRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_virtual_network_peering",
-		RFunc: newVirtualNetworkPeering,
+		Name:      "azurerm_virtual_network_peering",
+		CoreRFunc: newVirtualNetworkPeering,
 		ReferenceAttributes: []string{
 			"virtual_network_name",
 			"remote_virtual_network_id",
 			"resource_group_name",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"virtual_network_name"})
+		},
 	}
 }
 
-func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	sourceRegion := lookupRegion(d, []string{"virtual_network_name"})
+func newVirtualNetworkPeering(d *schema.ResourceData) schema.CoreResource {
+	sourceRegion := d.Region
 	destinationRegion := lookupRegion(d, []string{"remote_virtual_network_id"})
 
 	sourceZone := virtualNetworkPeeringConvertRegion(sourceRegion)
@@ -33,20 +36,12 @@ func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *sche
 		DestinationZone:   destinationZone,
 		SourceZone:        sourceZone,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func virtualNetworkPeeringConvertRegion(region string) string {
-	zone := regionToZone(region)
+	zone := regionToVNETZone(region)
 
-	if strings.HasPrefix(strings.ToLower(region), "usgov") {
-		zone = "US Gov Zone 1"
-	}
-	if strings.HasPrefix(strings.ToLower(region), "germany") {
-		zone = "DE Zone 1"
-	}
 	if strings.HasPrefix(strings.ToLower(region), "china") {
 		zone = "CN Zone 1"
 	}

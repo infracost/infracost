@@ -28,9 +28,16 @@ type MySQLFlexibleServer struct {
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
 }
 
-// MySQLFlexibleServerUsageSchema defines a list which represents the usage schema of MySQLFlexibleServer.
-var MySQLFlexibleServerUsageSchema = []*schema.UsageItem{
-	{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+// CoreType returns the name of this resource type
+func (r *MySQLFlexibleServer) CoreType() string {
+	return "MySQLFlexibleServer"
+}
+
+// UsageSchema defines a list which represents the usage schema of MySQLFlexibleServerUsageSchema.
+func (r *MySQLFlexibleServer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the MySQLFlexibleServer.
@@ -56,7 +63,7 @@ func (r *MySQLFlexibleServer) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    MySQLFlexibleServerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -71,10 +78,17 @@ func (r *MySQLFlexibleServer) computeCostComponent() *schema.CostComponent {
 		tierName = "Business Critical"
 	}
 
+	// Dadsv5 is a valid series, but its pricing is not present in db.
+	// The pricing is the same as Ddsv4, so we use it instead.
+	series := attrs.Series
+	if attrs.Series == "Dadsv5" {
+		series = "Ddsv4"
+	}
+
 	// We've seen two spaces in the data in the past hence '\s+'
-	seriesSuffix := fmt.Sprintf("\\s+%s Series", attrs.Series)
+	seriesSuffix := fmt.Sprintf("\\s+%s Series", series)
 	// This seems to be a special case where the series doesn't appear in the product name
-	if tierName == "Business Critical" && attrs.Series == "Edsv4" {
+	if tierName == "Business Critical" && series == "Edsv4" {
 		seriesSuffix = ""
 	}
 
@@ -186,5 +200,6 @@ func (r *MySQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
+		UsageBased: true,
 	}
 }

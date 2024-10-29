@@ -1,0 +1,976 @@
+# This predefined usage file attempts to set each usage-based cost as
+# $20/month for common configurations, helping engineers understand that
+# these resources are not free.
+# See docs: https://infracost.io/usage-file/
+version: 0.1
+resource_type_default_usage:
+  aws_acmpca_certificate_authority:
+    monthly_requests: 27 # Monthly private certificate requests.
+  aws_alb:
+    new_connections: 10000 # Number of newly established connections per second on average.
+    active_connections: 10000 # Number of active connections per minute on average.
+    processed_bytes_gb: 1000 # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    rule_evaluations: 10000 # The product of number of rules processed by the load balancer and the request rate.
+  aws_api_gateway_rest_api:
+    monthly_requests: 5750000 # Monthly requests to the Rest API Gateway.
+  aws_apigatewayv2_api:
+    monthly_requests: 20000000 # Monthly requests to the HTTP API Gateway.
+    request_size_kb: 512 # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
+    monthly_messages: 20000000 # Monthly number of messages sent to the Websocket API Gateway.
+    message_size_kb: 32 # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
+    monthly_connection_mins: 80000000 # Monthly total connection minutes to Websockets.
+  aws_backup_vault:
+    monthly_efs_warm_restore_gb: 833 # Monthly number of EFS warm restore in GB.
+    monthly_efs_cold_restore_gb: 555 # Monthly number of EFS cold restore in GB.
+    monthly_efs_item_restore_requests: 33 # Monthly number of EFS item-level restore requests.
+    monthly_efs_warm_backup_gb: 333 # Monthly number of EFS warm backups in GB.
+    monthly_efs_cold_backup_gb: 1666 # Monthly number of EFS cold backups in GB.
+    monthly_ebs_snapshot_gb: 363 # Monthly number of EBS snapshots in GB.
+    monthly_rds_snapshot_gb: 210 # Monthly number of RDS snapshots in GB.
+    monthly_aurora_snapshot_gb: 833 # Monthly number of Aurora snapshots in GB.
+    monthly_dynamodb_backup_gb: 178 # Monthly number of DynamoDB backups in GB.
+    monthly_dynamodb_restore_gb: 119 # Monthly number of DynamoDB restore in GB.
+    monthly_fsx_windows_backup_gb: 380 # Monthly number of FSX Windows backups in GB.
+    monthly_fsx_lustre_backup_gb: 380 # Monthly number of FSX Lustre backups in GB.
+  aws_cloudformation_stack:
+    monthly_handler_operations: 22222 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 250000 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.
+  aws_cloudformation_stack_set:
+    monthly_handler_operations: 22222 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
+    monthly_duration_secs: 250000 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.
+  aws_cloudfront_distribution:
+    monthly_data_transfer_to_internet_gb: # Monthly regional data transfer out to internet from the following, in GB:
+      us: 240 # United States, Mexico, Canada
+      europe: 240 # Europe, Israel
+      south_africa: 0 # South Africa, Kenya, Middle East
+      south_america: 0 # South America
+      japan: 0 # Japan
+      australia: 0 # Australia, New Zealand
+      asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 0 # India
+    monthly_data_transfer_to_origin_gb: # Monthly regional data transfer out to origin from the following, in GB:
+      us: 1000 # United States, Mexico, Canada
+      europe: 1000 # Europe, Israel
+      south_africa: 0 # South Africa, Kenya, Middle East
+      south_america: 0 # South America
+      japan: 0 # Japan
+      australia: 0 # Australia, New Zealand
+      asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 0 # India
+    monthly_http_requests: # Monthly number of HTTP requests to:
+      us: 27000000 # United States, Mexico, Canada
+      europe: 23000000 # Europe, Israel
+      south_africa: 0 # South Africa, Kenya, Middle East
+      south_america: 0 # South America
+      japan: 0 # Japan
+      australia: 0 # Australia, New Zealand
+      asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 0 # India
+    monthly_https_requests: # Monthly number of HTTPS requests to:
+      us: 20000000 # United States, Mexico, Canada
+      europe: 17000000 # Europe, Israel
+      south_africa: 0 # South Africa, Kenya, Middle East
+      south_america: 0 # South America
+      japan: 0 # Japan
+      australia: 0 # Australia, New Zealand
+      asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 0 # India
+    monthly_shield_requests: # Monthly number of shield requests to:
+      us: 12500000 # United States
+      europe: 12500000 # Europe
+      south_america: 0 # South America
+      japan: 0 # Japan
+      australia: 0 # Australia
+      singapore: 0 # Singapore
+      south_korea: 0 # South Korea
+      india: 0 # India
+    monthly_invalidation_requests: 5000 # Monthly number of invalidation requests.
+    monthly_encryption_requests: 10000000 # Monthly number of field level encryption requests.
+    monthly_log_lines: 2000000000 # Monthly number of real-time log lines.
+    custom_ssl_certificates: 1 # Number of dedicated IP custom SSL certificates.
+  aws_cloudhsm_v2_hsm:
+    monthly_hrs: 12.5 # Monthly number of hours the HSM ran for.
+  aws_cloudtrail:
+    monthly_additional_management_events: 1000000 # Monthly additional copies of read and write management events. The first copy of management events per region is free, so this should only be non-zero if there are multiple trails recording management events in this region.
+    monthly_data_events: 20000000 # Monthly data events delivered to S3, Lambda or DynamoDB
+    monthly_insight_events: 5714285 # Monthly CloudTrail Insight events
+  aws_cloudwatch_event_bus:
+    monthly_custom_events: 20000000 # Monthly custom events published. Each 64 KB chunk of payload is billed as 1 event.
+    monthly_third_party_events: 20000000 # Monthly third-party and cross-account events published. Each 64 KB chunk of payload is billed as 1 event.
+    monthly_archive_processing_gb: 200 # Monthly archive event processing in GB.
+    archive_storage_gb: 869 # Archive storage used for event replay in GB.
+    monthly_schema_discovery_events: 200000000 # Monthly events ingested for schema discovery. Each 8 KB chunk of payload is billed as 1 event.
+  aws_cloudwatch_log_group:
+    storage_gb: 667 # Total data stored by CloudWatch logs in GB.
+    monthly_data_ingested_gb: 40 # Monthly data ingested by CloudWatch logs in GB.
+    monthly_data_scanned_gb: 4000 # Monthly data scanned by CloudWatch logs insights in GB.
+  aws_codebuild_project:
+    monthly_build_mins: 2000 # Monthly total duration of builds in minutes. Each build is rounded up to the nearest minute.
+  aws_config_config_rule:
+    monthly_rule_evaluations: 20000 # Monthly config rule evaluations.
+  aws_config_configuration_recorder:
+    monthly_config_items: 6666 # Monthly config item records.
+    monthly_custom_config_items: 6666 # Monthly custom config item records.
+  aws_config_organization_custom_rule:
+    monthly_rule_evaluations: 20000 # Monthly config rule evaluations.
+  aws_config_organization_managed_rule:
+    monthly_rule_evaluations: 20000 # Monthly config rule evaluations.
+  aws_db_instance:
+    additional_backup_storage_gb: 952 # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
+    monthly_standard_io_requests: 200000000 # Monthly number of input/output requests for database.
+    monthly_additional_performance_insights_requests: 2000000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+  aws_directory_service_directory:
+    additional_domain_controllers: 0.54 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
+    shared_accounts: 1.5 # Number of accounts that Microsoft AD directory is shared with
+  aws_docdb_cluster:
+    backup_storage_gb: 952 # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+  aws_docdb_cluster_instance:
+    data_storage_gb: 200 # Total storage for cluster in GB.
+    monthly_io_requests: 100000000 # Monthly number of input/output requests for cluster.
+    monthly_cpu_credit_hrs: 222 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 instances.
+  aws_docdb_cluster_snapshot:
+    backup_storage_gb: 952 # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
+  aws_dx_gateway_association:
+    monthly_data_processed_gb: 1000 # Monthly data processed by the DX gateway association per month in GB.
+  aws_dynamodb_table:
+    monthly_write_request_units: 16000000 # Monthly write request units in (used for on-demand DynamoDB).
+    monthly_read_request_units: 80000000 # Monthly read request units in (used for on-demand DynamoDB).
+    storage_gb: 80 # Total storage for tables in GB.
+    pitr_backup_storage_gb: 100 # Total storage for Point-In-Time Recovery (PITR) backups in GB.
+    on_demand_backup_storage_gb: 200 # Total storage for on-demand backups in GB.
+    monthly_data_restored_gb: 133 # Monthly size of restored data in GB.
+    monthly_streams_read_request_units: 100000000 # Monthly streams read request units.
+  aws_ebs_snapshot:
+    monthly_list_block_requests: 33333333 # Monthly number of ListChangedBlocks and ListSnapshotBlocks requests.
+    monthly_get_block_requests: 6666666 # Monthly number of GetSnapshotBlock requests (block size is 512KiB).
+    monthly_put_block_requests: 3333333 # Monthly number of PutSnapshotBlock requests (block size is 512KiB).
+    fast_snapshot_restore_hours: 26 # Monthly number of DSU-hours for Fast snapshot restore
+  aws_ebs_volume:
+    monthly_standard_io_requests: 400000000 # Monthly I/O requests for standard volume (Magnetic storage).
+  aws_ec2_transit_gateway_vpc_attachment:
+    monthly_data_processed_gb: 1000 # Monthly data processed by the EC2 transit gateway attachment(s) in GB.
+  aws_ecr_repository:
+    storage_gb: 200 # Total size of ECR repository in GB.
+  aws_efs_file_system:
+    storage_gb: 125 # Total storage for Standard class in GB.
+    infrequent_access_storage_gb: 1503 # Total storage for Infrequent Access class in GB.
+    monthly_infrequent_access_read_gb: 2000 # Monthly infrequent access read requests in GB.
+    monthly_infrequent_access_write_gb: 2000 # Monthly infrequent access write requests in GB.
+  aws_elasticache_cluster:
+    snapshot_storage_size_gb: 235 # Size of Redis snapshots in GB.
+  aws_elasticache_replication_group:
+    snapshot_storage_size_gb: 235 # Size of Redis snapshots in GB.
+  aws_elb:
+    monthly_data_processed_gb: 2500 # Monthly data processed by a Classic Load Balancer in GB.
+  aws_fsx_openzfs_file_system:
+    backup_storage_gb: 400 # Total storage used for backups in GB.
+  aws_fsx_windows_file_system:
+    backup_storage_gb: 400 # Total storage used for backups in GB.
+  aws_glue_catalog_database:
+    monthly_objects: 2000000 # Monthly number of objects stored above the free one million object storage limit.
+    monthly_requests: 20000000 # Monthly number of requests to the db beyond the free one million requests limit.
+  aws_glue_crawler:
+    monthly_hours: 45 # Monthly number of hours the Glue crawler ran for.
+  aws_glue_job:
+    monthly_hours: 45 # Monthly number of hours the Glue job ran for.
+  aws_kinesis_analytics_application:
+    kinesis_processing_units: 0.21 # Number of Kinesis processing units.
+    durable_application_backup_gb: 833 # Total amount of durable application backup in GB.
+  aws_kinesisanalyticsv2_application:
+    kinesis_processing_units: 0.21 # Number of Kinesis processing units.
+    durable_application_backup_gb: 833 # Total amount of durable application backup in GB.
+  aws_kinesisanalyticsv2_application_snapshot:
+    durable_application_backup_gb: 833 # Total amount of durable application backups in GB.
+  aws_kinesis_firehose_delivery_stream:
+    monthly_data_ingested_gb: 571 # Monthly data ingested by the Delivery Stream in GB.
+  aws_kinesis_stream:
+    monthly_on_demand_data_in_gb: 250 # Monthly data ingested by the stream in GB.
+    monthly_on_demand_data_out_gb: 500 # Monthly data egressed by the stream in GB total, (not per consumer application).
+    monthly_on_demand_efo_data_out_gb: 400 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_on_demand_extended_retention_gb: 200 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_on_demand_long_term_retention_gb: 869 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_put_units: 1428571428 # Monthly provisioned put units for the stream.
+    monthly_provisioned_extended_retention_gb: 1000 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_provisioned_long_term_retention_gb: 869 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_long_term_retrieval_gb: 952 # Monthly data retrieved by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_efo_data_out_gb: 1538 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_provisioned_efo_consumer_hours: 1333 # Monthly hours of EFO consumer application usage.
+  aws_lambda_function:
+    monthly_requests: 100000000 # Monthly requests to the Lambda function.
+    request_duration_ms: 100 # Average duration of each request in milliseconds.
+  aws_lambda_provisioned_concurrency_config:
+    monthly_duration_hrs: 53 # Number of hours in a month that provisioned concurrency will be enabled.
+    request_duration_ms: 41 # Average duration of each request in milliseconds during the enabled period.
+    monthly_requests: 100000000 # Number of requests sent to the function during the enabled period.
+    memory_mb: 512 # Memory size of the Lambda function.
+  aws_lb:
+    new_connections: 10000 # Number of newly established connections per second on average.
+    active_connections: 10000 # Number of active connections per minute on average.
+    processed_bytes_gb: 1000 # The number of bytes processed by the load balancer for HTTP(S) requests and responses in GB.
+    rule_evaluations: 10000 # The product of number of rules processed by the load balancer and the request rate.
+  aws_mq_broker:
+    storage_size_gb: 200 # Data storage per instance in GB.
+  aws_mwaa_environment:
+    additional_workers: 2.5 # Average number of monthly additional worker instances
+    additional_schedulers: 2 # Average number of monthly additional scheduler instances
+    meta_database_gb: 200 # Total storage used for meta database
+  aws_nat_gateway:
+    monthly_data_processed_gb: 444 # Monthly data processed by the NAT Gateway in GB.
+  aws_neptune_cluster:
+    storage_gb: 172 # Total storage for the cluster in GB.
+    monthly_io_requests: 86206896 # Monthly number of input/output requests for cluster.
+    backup_storage_gb: 909 # Total storage used for backups in GB.
+  aws_neptune_cluster_instance:
+    monthly_cpu_credit_hrs: 10 # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
+  aws_neptune_cluster_snapshot:
+    backup_storage_gb: 909 # Total storage used for backup snapshots in GB.
+  aws_networkfirewall_firewall:
+    monthly_data_processed_gb: 307 # Monthly data processed by the Network Firewall in GB.
+  aws_rds_cluster:
+    capacity_units_per_hr: 0.5 # Number of Aurora Capacity Units per hour. Only used when engine_mode is "serverless"
+    storage_gb: 200 # Storage amount in GB allocated to the aurora cluster.
+    write_requests_per_sec: 19 # Total number of writes per second for the cluster.
+    read_requests_per_sec: 19 # Total number of reads per second for the cluster.
+    backup_snapshot_size_gb: 238 # Individual storage size for backup snapshots, used in conjunction with resource parameter "backup_retention_period".
+    average_statements_per_hr: 10000 # Number of statements generated per hour when backtrack is enabled. Only available for MySQl-compatible Aurora
+    change_records_per_statement: 0.38 # Records changed per statement executed.
+    backtrack_window_hrs: 600 # The duration window for which Aurora will support rewinding the DB cluster to a specific point in time.
+    snapshot_export_size_gb: 2000 # Size of snapshot that's exported to s3 in parquet format.
+  aws_rds_cluster_instance:
+    monthly_additional_performance_insights_requests: 2000000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    capacity_units_per_hr: 0.5 # Number of Aurora Capacity Units per hour. Only used for Aurora Serverless V2 (when instance class is "db.serverless")
+  aws_redshift_cluster:
+    managed_storage_gb: 833
+    excess_concurrency_scaling_secs: 22222
+    spectrum_data_scanned_tb: 4
+    backup_storage_gb: 869
+  aws_route53_record:
+    monthly_standard_queries: 50000000 # Monthly number of Standard queries.
+    monthly_latency_based_queries: 33333333 # Monthly number of Latency Based Routing queries.
+    monthly_geo_queries: 28571428 # Monthly number of Geo DNS and Geoproximity queries.
+  aws_route53_resolver_endpoint:
+    monthly_queries: 50000000 # Monthly number of DNS queries processed through the endpoints.
+  aws_s3_bucket_analytics_configuration:
+    monthly_monitored_objects: 200000000 # Monthly number of monitored objects by S3 Analytics Storage Class Analysis.
+  aws_s3_bucket_inventory:
+    monthly_listed_objects: 8000000000 # Monthly number of listed objects.
+  aws_s3_bucket:
+    object_tags: 20000000 # Total object tags. Only for AWS provider V3.
+    standard: # Usages of S3 Standard:
+      storage_gb: 900 # Total storage in GB.
+      monthly_tier_1_requests: 4000000 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 50000000 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_select_data_scanned_gb: 10000 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 29000 # Monthly data returned by S3 Select in GB.
+    intelligent_tiering: # Usages of S3 Intelligent - Tiering:
+      frequent_access_storage_gb: 0 # Total storage for Frequent Access Tier in GB.
+      infrequent_access_storage_gb: 0 # Total storage for Infrequent Access Tier in GB.
+      monitored_objects: 0 # Total objects monitored by the Intelligent Tiering.
+      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.
+      early_delete_gb: 0 # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
+    standard_infrequent_access: # Usages of S3 Standard - Infrequent Access:
+      storage_gb: 0 # Total storage in GB.
+      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      monthly_data_retrieval_gb: 0 # Monthly data retrievals in GB
+      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.
+    one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
+      storage_gb: 0 # Total storage in GB.
+      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      monthly_data_retrieval_gb: 0 # Monthly data retrievals in GB
+      monthly_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB.
+      monthly_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB.
+    glacier_flexible_retrieval: # Usages of S3 Glacier Flexible Retrieval:
+      storage_gb: 0 # Total storage in GB.
+      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      monthly_standard_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_standard_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB (for standard level of S3 Glacier).
+      monthly_bulk_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_bulk_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB (for bulk level of S3 Glacier)
+      monthly_expedited_select_data_scanned_gb: 0 # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_expedited_select_data_returned_gb: 0 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
+      monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      monthly_expedited_data_retrieval_requests: 0 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
+      monthly_standard_data_retrieval_gb: 0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      monthly_expedited_data_retrieval_gb: 0 # Monthly data retrievals in GB (for expedited level of S3 Glacier).
+      early_delete_gb: 0 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
+    glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
+      storage_gb: 0 # Total storage in GB.
+      monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_requests: 0 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
+      monthly_standard_data_retrieval_gb: 0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      monthly_bulk_data_retrieval_gb: 0 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
+      early_delete_gb: 0 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
+  aws_secretsmanager_secret:
+    monthly_requests: 4000000 # Monthly API requests to Secrets Manager.
+  aws_sfn_state_machine:
+    monthly_transitions: 800000 # Monthly number of state transitions. Only applicable for Standard Workflows.
+    monthly_requests: 20000000 # Monthly number of workflow requests. Only applicable for Express Workflows.
+    memory_mb: 128 # Average amount of memory consumed by workflow in MB. Only applicable for Express Workflows.
+    workflow_duration_ms: 500 # Average duration of workflow in milliseconds. Only applicable for Express Workflows.
+  aws_sns_topic:
+    monthly_requests: 1300 # Monthly requests to SNS.
+    request_size_kb: 64 # Size of requests to SNS
+    http_subscriptions: 26000 # Number of HTTP/HTTPS subscriptions
+    email_subscriptions: 800 # Number of Email/Email-JSON subscriptions
+    kinesis_subscriptions: 80000 # Number of Kinesis Firehose subscriptions
+    mobile_push_subscriptions: 32000 # Number of Mobile Push subscriptions
+    macos_subscriptions: 32000 # Number of MacOS subscriptions
+    sms_subscriptions: 2 # Number of SMS subscriptions
+    sms_notification_price: 0.008 # Average price for each SMS notification
+  aws_sqs_queue:
+    monthly_requests: 50000000 # Monthly requests to SQS.
+    request_size_kb: 64 # Size of requests to SQS, billed in 64KB chunks. So 1M requests at 128KB uses 2M requests.
+  aws_ssm_activation:
+    instances: 4 # Number of instances being managed.
+  aws_ssm_parameter:
+    monthly_api_interactions: 4000000 # Monthly API interactions.
+    parameter_storage_hrs: 730 # Number of hours in the month parameters will be stored for.
+  aws_transfer_server:
+    monthly_data_downloaded_gb: 500 # Monthly data downloaded over enabled protocols in GB.
+    monthly_data_uploaded_gb: 500 # Monthly data uploaded over enabled protocols in GB.
+  aws_vpc_endpoint:
+    monthly_data_processed_gb: 2000 # Monthly data processed by the VPC endpoint(s) in GB.
+  aws_vpn_connection:
+    monthly_data_processed_gb: 1000 # Monthly data processed through a transit gateway attached to your VPN Connection in GB.
+  aws_waf_web_acl:
+    rule_group_rules: 5 # Total number of Rule Group rules used by the Web ACL.
+    monthly_requests: 33333333 # Monthly number of web requests received.
+  aws_wafv2_web_acl:
+    rule_group_rules: 5 # Total number of Rule Group rules used by the Web ACL.
+    managed_rule_group_rules: 10 # Total number of Managed Rule Group rules used by the Web ACL.
+    monthly_requests: 33333333 # Monthly number of web requests received.
+  #
+  # Terraform AzureRM resources
+  #
+  azurerm_app_configuration:
+    monthly_additional_requests: 3333333 # Monthly number of requests which are above the included 200,000 per day per replica.
+  azurerm_api_management:
+    monthly_api_calls: 5710000 # Monthly number of api calls (only for consumption tier).
+    self_hosted_gateway_count: 1 # Number of self-hosted gateways (only for premium tier).
+  azurerm_application_gateway:
+    monthly_data_processed_gb: 0 #  Monthly data processed by the Application Gateway in GB.
+    monthly_v2_capacity_units: 1400 # Number capacity(for v2) units gateway.
+  azurerm_application_insights:
+    monthly_data_ingested_gb: 8.7 # Monthly amount of data ingested in GB.
+  azurerm_automation_account:
+    non_azure_config_node_count: 3 # Number of non-Azure configuration nodes.
+    monthly_watcher_hrs: 10000 # Monthly number of watcher hours.
+    monthly_job_run_mins: 10000 # Monthly number of job run minutes.
+  azurerm_automation_dsc_configuration:
+    non_azure_config_node_count: 3 # Number of non-Azure configuration nodes.
+  azurerm_automation_dsc_nodeconfiguration:
+    non_azure_config_node_count: 3 # Number of non-Azure configuration nodes.
+  azurerm_automation_job_schedule:
+    monthly_job_run_mins: 10000 # Monthly number of job run minutes.
+  azurerm_bastion_host:
+    monthly_outbound_data_gb: 166 # Monthly outbound data in GB.
+  azurerm_cdn_endpoint:
+    monthly_outbound_gb: 247 # Monthly number of outbound data transfers in GB.
+    monthly_rules_engine_requests: 33000000 # Monthly number of rules engine requests.
+  azurerm_cognitive_account:
+    monthly_speech_to_text_standard_hrs: 20 # Monthly number of hours of Speech to Text audio hours
+    monthly_speech_to_text_standard_batch_hrs: 56 # Monthly number of hours of Speech to Text audio hours for batch processing
+    monthly_speech_to_text_custom_hrs: 17 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model
+    monthly_speech_to_text_custom_batch_hrs: 44 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model batch processing
+    monthly_speech_to_text_custom_endpoint_hrs: 372 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model endpoint hosting
+    monthly_speech_to_text_custom_training_hrs: 2 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model training
+    monthly_speech_to_text_enhanced_add_ons_hrs: 67 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 9.5 # Monthly number of hours of Speech to Text audio hours for conversation transcription multi-channel audio
+    monthly_text_to_speech_neural_chars: 1_333_333 # Monthly number of characters for Text to Speech with neural voices
+    monthly_text_to_speech_custom_neural_training_hrs: 0.4 # Monthly number of hours of Text to Speech Customized Neural training
+    monthly_text_to_speech_custom_neural_chars: 833_333 # Monthly number of characters for Text to Speech with Custom Ceural Voices
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 5 # Monthly number of hours of Text to Speech Custom Neural Voice endpoint hosting
+    monthly_text_to_speech_long_audio_chars: 200_000 # Monthly number of characters for Text to Speech with Long Audio Creation
+    monthly_text_to_speech_personal_voice_profiles: 33 # Monthly number of personal voice profiles for Text to Speech
+    monthly_text_to_speech_personal_voice_chars: 833_333 # Monthly number of characters for Text to Speech with Personal Voice Profiles
+    monthly_speech_translation_hrs: 8 # Monthly number of hours of Speech Translation audio hours
+    monthly_speaker_verification_transactions: 4_000 # Monthly number of speaker verification transactions
+    monthly_speaker_identification_transactions: 2_000 # Monthly number of speaker identification transactions
+    monthly_voice_profiles: 100_000 # Monthly number of voice profiles
+    # LUIS
+    monthly_luis_text_requests: 13_333 # Monthly number of text requests to LUIS
+    monthly_luis_speech_requests: 3_636 # Monthly number of speech requests to LUIS
+    # TextAnalytics
+    monthly_language_text_analytics_records: 20_000 # Monthly number of Text Analytics records (Sentiment Analysis, Key Phrase Extraction, Language Detection, Named Entity Recognition, PII Detection)
+    monthly_language_summarization_records: 10_000 # Monthly number of summarization records
+    monthly_language_conversational_language_understanding_records: 10_000 # Monthly number of Conversational Language Understanding and Orchestration Workflow records.
+    monthly_language_conversational_language_understanding_advanced_training_hours: 6.7 # Monthly number of Conversational Language Understanding and Orchestration Workflow advanced training hours.
+    monthly_language_customized_text_classification_records: 4_000 # Monthly number of customized text classification records.
+    monthly_language_customized_summarization_records: 5_000 # Monthly number of customized summarization records.
+    monthly_language_customized_question_answering_records: 13_333 # Monthly number of customized question answering records.
+    monthly_language_customized_training_hours: 6.7 # Monthly number of customized training hours.
+    monthly_language_text_analytics_for_health_records: 5_800 # Monthly number of Text Analytics for health records.
+  azurerm_cognitive_deployment:
+    # SpeechServices
+    monthly_language_input_tokens: 40_000_000 # Monthly number of language input tokens.
+    monthly_language_output_tokens: 13_333_333 # Monthly number of language output tokens.
+    monthly_code_interpreter_sessions: 667 # Monthly number of code interpreter sessions.
+    monthly_base_model_tokens: 2847 # Monthly number of base model tokens.
+    monthly_fine_tuning_training_hours: 0.4 # Monthly number of fine-tuning training hours.
+    monthly_fine_tuning_hosting_hours: 6.6 # Monthly number of fine-tuning hosting hours.
+    monthly_fine_tuning_input_tokens: 13_333_333 # Monthly number of fine-tuning input tokens.
+    monthly_fine_tuning_output_tokens: 10_000_000 # Monthly number of fine-tuning output tokens.
+    monthly_standard_1024_1024_images: 500 # Monthly number of standard 1024x1024 (low res) images.
+    monthly_standard_1024_1792_images: 250 # Monthly number of standard 1024x1792 (high res) images.
+    monthly_hd_1024_1024_images: 250 # Monthly number of HD 1024x1024 (low res) images.
+    monthly_hd_1024_1792_images: 167 # Monthly number of HD 1024x1792 (high res) images.
+    monthly_text_embedding_tokens: 1_000_000_000 # Monthly number of text embedding tokens.
+    monthly_text_to_speech_characters: 1_333_333 # Monthly number of text to speech characters.
+    monthly_text_to_speech_hours: 55.6 # Monthly number of text to speech hours.
+  azurerm_container_registry:
+    storage_gb: 200
+    monthly_build_vcpu_hrs: 55.5
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_cosmosdb_cassandra_keyspace:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_cassandra_table:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_gremlin_database:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_gremlin_graph:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_mongo_collection:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_mongo_database:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_sql_container:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_sql_database:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_table:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  azurerm_data_factory:
+    monthly_read_write_operation_entities: 2000000 # Monthly entities for Read/Write operations.
+    monthly_monitoring_operation_entities: 4000000 # Monthly entities for Monitoring operations.
+  azurerm_data_factory_integration_runtime_azure:
+    monthly_orchestration_runs: 20000 # Monthly Orchestration runs for runtime.
+  azurerm_data_factory_integration_runtime_managed:
+    monthly_orchestration_runs: 20000 # Monthly Orchestration runs for runtime.
+  azurerm_data_factory_integration_runtime_self_hosted:
+    monthly_orchestration_runs: 13333 # Monthly Orchestration runs for runtime.
+  azurerm_databricks_workspace:
+    monthly_all_purpose_compute_dbu_hrs: 50 # Monthly number of All-purpose Compute Databricks Units in DBU-hours.
+    monthly_jobs_compute_dbu_hrs: 133 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
+    monthly_jobs_light_compute_dbu_hrs: 285 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
+  azurerm_federated_identity_credential:
+    monthly_active_p1_users: 56153 # Monthly number of active users if you are using the Premium P1 license.
+  azurerm_function_app:
+    monthly_executions: 100000000 # Monthly executions to the function. Only applicable for Consumption plan.
+    execution_duration_ms: 100 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    memory_mb: 128
+  azurerm_dns_a_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_aaaa_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_caa_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_cname_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_mx_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_ns_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_ptr_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_srv_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_dns_txt_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_eventgrid_topic:
+    monthly_operations: 3330000 # Monthly number of operations above the free 100k operation limit.
+  azurerm_eventgrid_system_topic:
+    monthly_operations: 3330000 # Monthly number of operations above the free 100k operation limit.
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_eventhub_namespace:
+  #    monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
+  #    retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
+  #    throughput_or_capacity_units: 10  # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
+  #    capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
+  #  azurerm_firewall:
+  #    monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
+  #
+  azurerm_frontdoor:
+    monthly_outbound_data_transfer_gb: # Monthly outbound data transfer from the following, in GB:
+      us_gov: 0 # US Gov
+      north_america_europe_africa: 200000 # North America, Europe and Africa
+      asia_pacific: 0 # Asia Pacific (including Japan)
+      south_america: 0 # South America
+      australia: 0 # Australia
+      india: 0 # India
+    monthly_inbound_data_transfer_gb: 2000 # Monthly inbound data transfer in GB
+  azurerm_frontdoor_firewall_policy:
+    monthly_custom_rule_requests: 3330000 # Monthly number of custom rule requests
+    monthly_managed_ruleset_requests: 20000000 # Monthly number of managed ruleset requests
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_hdinsight_kafka_cluster:
+  #    monthly_os_disk_operations: 1000000 # Average number of disk operations (writes, reads, deletes) using a unit size of 256KiB per OS disk per month.
+  #
+  azurerm_iothub_dps:
+    monthly_operations: 200000 # Monthly number of device provisioning operations
+  azurerm_linux_function_app:
+    monthly_executions: 100000000 # Monthly executions to the function. Only applicable for Consumption plan.
+    execution_duration_ms: 100 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    memory_mb: 128
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_key_vault_certificate:
+  #    monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
+  #    monthly_certificate_other_operations: 100000 # Monthly number of non-renewal certificate operations.
+  #
+  #  azurerm_key_vault_key:
+  #    monthly_secrets_operations: 10000          # Monthly number of secrets transactions.
+  #    monthly_key_rotation_renewals: 50          # Monthly number of Managed Azure Storage account key rotation renewals.
+  #    monthly_protected_keys_operations: 1000000 # Monthly number of Software or HSM transactions.
+  #    hsm_protected_keys: 3000                   # Number of protected keys.
+  #
+  azurerm_kubernetes_cluster:
+    load_balancer:
+      monthly_data_processed_gb: 40000 # Monthly inbound and outbound data processed in GB.
+  azurerm_lb:
+    monthly_data_processed_gb: 4000 # Monthly inbound and outbound data processed in GB.
+  azurerm_log_analytics_workspace:
+    monthly_log_data_ingestion_gb: 6.6 # Monthly log data ingested by the workspace in GB (only used for Pay-as-you-go workspaces).
+    monthly_additional_log_data_retention_gb: 150 # Monthly additional GB of data retained past the free allowance.
+    monthly_log_data_export_gb: 150 # Monthly data in GB exported from the workspace.
+    monthly_sentinel_data_ingestion_gb: 6.6 # Monthly data in GB exported from Microsoft Sentinel, this only applies when it is enabled.
+    monthly_basic_log_data_ingestion_gb: 31 # Monthly data ingested by the workspace to basic tables in GB
+    monthly_basic_log_search_gb: 3100 # Monthly basic log data queried in GB
+    monthly_archive_data_gb: 770 # Monthly archived data in GB
+    monthly_archive_data_restored_gb: 150 # Monthly data restored from archive in GB
+    monthly_archive_data_searched_gb: 3100 # Monthly data searched in archive with a Search Job, in GB
+  azurerm_logic_app_standard:
+    monthly_standard_connector_calls: 160000 # Monthly number of Standard Connector calls.
+    monthly_enterprise_connector_calls: 20000 # Monthly number of Enterprise Connector calls.
+  azurerm_managed_disk:
+    monthly_disk_operations: 400000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_mariadb_server:
+  #    additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
+  #
+  azurerm_monitor_action_group:
+    monthly_notifications: 1000000
+  azure_monitor_data_collection_rule:
+    monthly_custom_metrics_samples: 1250000000
+  azurerm_monitor_diagnostic_setting:
+    monthly_platform_log_gb: 61
+  azurerm_mssql_database:
+    monthly_vcore_hours: 38 # Monthly number of used vCore-hours for serverless compute.
+    long_term_retention_storage_gb: 400 # Number of GBs used by long-term retention backup storage.
+    backup_storage_gb: 100 # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
+    extra_data_storage_gb: 120 # Override number of GBs used by extra data storage.
+  azurerm_mssql_managed_instance:
+    backup_storage_gb: 170 # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
+    long_term_retention_storage_gb: 670 # Number of GBs used by long-term retention backup storage.
+  azurerm_mysql_flexible_server:
+    additional_backup_storage_gb: 210 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
+  azurerm_mysql_server:
+    additional_backup_storage_gb: 200 # Additional consumption of backup storage in GB.
+  azurerm_linux_virtual_machine:
+    os_disk:
+      monthly_disk_operations: 4000000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
+  azurerm_linux_virtual_machine_scale_set:
+    os_disk:
+      monthly_disk_operations: 4000000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+  azurerm_nat_gateway:
+    monthly_data_processed_gb: 444 # Monthly data processed by the NAT Gateway in GB.
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_network_connection_monitor:
+  #    tests: 100000 # Overrides the number of tests done in the connection monitor
+  azurerm_network_ddos_protection_plan:
+    overage_amount: 50 # Monthly number of protected resources over the plan protection limit (100).
+  azurerm_network_watcher:
+    monthly_diagnostic_checks: 20000 # Monthly number of diagnostic API calls.
+  azurerm_network_watcher_flow_log:
+    monthly_logs_collected_gb: 45 # Monthly amount of logs collected in GB.
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_network_watcher_flow_log, Traffic Analytics data processed (10 min interval), GB, 3.5, 5.71
+  #  azurerm_network_watcher_flow_log, Traffic Analytics data processed (60 min interval), GB, 2.3, 8.7
+  #
+  #  azurerm_notification_hub_namespace:
+  #    monthly_pushes: 1000000 # Monthly total number number of additional pushes.
+  #
+  azurerm_point_to_site_vpn_gateway:
+    monthly_p2s_connections_hrs: 1640 # Monthly connection hours to the point to site gateway
+  azurerm_virtual_network_peering:
+    monthly_data_transfer_gb: 570 # Monthly inbound/outbound data transferred by the VNET peering in GB.
+  azurerm_postgresql_flexible_server:
+    additional_backup_storage_gb: 210 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_postgresql_server:
+  #    additional_backup_storage_gb: 200 # Additional consumption of backup storage in GB.
+  #
+  azurerm_private_dns_a_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_private_dns_aaaa_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_private_dns_cname_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_private_dns_mx_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_private_dns_ptr_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_private_dns_srv_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  azurerm_private_dns_txt_record:
+    monthly_queries: 50000000 # Monthly number of DNS queries
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_private_endpoint:
+  #    monthly_inbound_data_processed_gb: 100 # Monthly inbound data processed in GB.
+  #    monthly_outbound_data_processed_gb: 100 # Monthly outbound data processed in GB.
+  #
+  azurerm_recovery_services_vault:
+    azurerm_backup_protected_vm: # Any protected VMs that come under this vault can be configured with the following
+      disk_utilization_gb: 400 # Total size in GB of the data that will be backed up into the recovery service vault. Defaults to the entire storage capacity of the VM.
+      additional_backup_retention_gb: 100 # Total size in GB of the additional data stored by this VM because of retention rules.
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_search_service:
+  #    monthly_images_extracted: 1000000 # Monthly number of extracted images
+  #
+  azurerm_security_center_subscription_pricing:
+    cosmosdb_request_units: 2300 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
+    monthly_app_service_nodes: 1.4 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
+    monthly_arm_subscriptions: 4 # Monthly number of subscriptions for Microsoft Defender for ARM. Applied when resource_type = Arm.
+    monthly_container_registry_images: 69 # Monthly number of images for Microsoft Defender for Container Registries. Applied when resource_type = ContainerRegistry.
+    monthly_containers_vcores: 3 # Monthly number of vCores for Microsoft Defender for Containers. Applied when resource_type = Containers.
+    monthly_dns_queries: 29000000 # Monthly number of queries for Microsoft Defender for DNS. Applied when resource_type = Dns.
+    monthly_key_vaults: 80 # Monthly number of key vaults for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
+    monthly_kubernetes_cores: 10 # Monthly number of cores for Microsoft Defender for Kubernetes. Applied when resource_type = KubernetesService.
+    monthly_mariadb_instances: 1.3 # Monthly number of instances for Microsoft Defender for MariaDB. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_mysql_instances: 1.3 # Monthly number of instances for Microsoft Defender for MySQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_postgresql_instances: 1.3 # Monthly number of instances for Microsoft Defender for PostgreSQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_servers_plan_1_nodes: 4 # Monthly number of servers for Microsoft Defender for Servers Plan 1. Applied when resource_type = VirtualMachines.
+    monthly_servers_plan_2_nodes: 1.4 # Monthly number of servers for Microsoft Defender for Servers Plan 2. Applied when resource_type = VirtualMachines.
+    monthly_sql_azure_connected_instances: 1.3 # Monthly number of instances for Microsoft Defender for SQL on Azure-connected databases. Applied when resource_type = SqlServerVirtualMachines.
+    monthly_sql_outside_azure_vcores: 1.8 # Monthly number of vCores for Microsoft Defender for SQL outside Azure. Applied when resource_type = SqlServers.
+    monthly_storage_accounts: 2 # Monthly number of storage accounts for Microsoft Defender for Storage. Applied when resource_type = StorageAccounts.
+  azurerm_servicebus_namespace:
+    monthly_messaging_operations: 38000000 # Monthly number of messaging operations, used for Standard tier only
+    monthly_brokered_connections: 660 # Monthly number of brokered connections, used for Standard tier only
+  azurerm_signalr_service:
+    monthly_additional_messages: 20000000 # Monthly number of messages above the included 1M per unit per day
+  azurerm_snapshot:
+    storage_gb: 400 # Total size of snapshot disk in GB.
+  azurerm_sql_database:
+    monthly_vcore_hours: 38 # Monthly number of used vCore-hours for serverless compute.
+    long_term_retention_storage_gb: 400 # Number of GBs used by long-term retention backup storage.
+    backup_storage_gb: 100 # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
+    extra_data_storage_gb: 120 # Override number of GBs used by extra data storage.
+  azurerm_sql_managed_instance:
+    backup_storage_gb: 170 # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
+    long_term_retention_storage_gb: 670 # Number of GBs used by long-term retention backup storage.
+  azurerm_storage_account:
+    data_at_rest_storage_gb: 880 # Total size of Data at Rest in GB (File storage).
+    early_deletion_gb: 1300 # Total size of Early deletion data in GB.
+    snapshots_storage_gb: 880 # Total size of Snapshots in GB (File storage).
+    metadata_at_rest_storage_gb: 670 # Total size of Metadata in GB (File storage).
+    storage_gb: 1000 # Total size of storage in GB.
+    monthly_iterative_write_operations: 1400000 # Monthly number of Iterative write operations (GPv2).
+    monthly_write_operations: 3700000 # Monthly number of Write operations.
+    monthly_list_and_create_container_operations: 3700000 # Monthly number of List and Create Container operations.
+    monthly_iterative_read_operations: 1400000 # Monthly number of Iterative read operations (GPv2).
+    monthly_read_operations: 46000000 # Monthly number of Read operations.
+    monthly_other_operations: 46000000 # Monthly number of All other operations.
+    monthly_data_retrieval_gb: 2000 # Monthly number of data retrieval in GB.
+    monthly_data_write_gb: 1000 # Monthly number of data write in GB.
+    blob_index_tags: 5100000 # Total number of Blob indexes.
+  azurerm_storage_queue:
+    monthly_storage_gb: 333 # Monthly amount of storage used in GB.
+    monthly_class_1_operations: 50000000 # Monthly number of Class 1 operations
+    monthly_class_2_operations: 55000000 # Monthly number of Class 2 operations
+    monthly_geo_replication_data_transfer_gb: 1000 # Monthly amount of Geo-replication data transfer in GB
+  azurerm_storage_share:
+    storage_gb: 1000 # Total size of storage in GB. Overrides any provided `quota`.
+    monthly_write_operations: 3700000 # Monthly number of Write operations.
+    monthly_list_operations: 3700000 # Monthly number of List and Create Container operations.
+    monthly_read_operations: 46000000 # Monthly number of Read operations.
+    monthly_other_operations: 46000000 # Monthly number of All other operations.
+    monthly_data_retrieval_gb: 2000 # Monthly number of data retrieval in GB.
+    snapshots_storage_gb: 880 # Total size of Snapshots in GB
+    metadata_at_rest_storage_gb: 670 # Total size of Metadata in GB
+  azurerm_synapse_sql_pool:
+    storage_tb: 1 # Total storage size, including snapshots, in TB.
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_synapse_workspace:
+  #    serverless_sql_pool_size_tb: 4 # Total storage size, including snapshots, in TB.
+  #    monthly_datapipeline_azure_hosted_activity_runs: 3 # Monthly number of Azure hosted activity runs.
+  #    monthly_datapipeline_azure_hosted_data_integration_units: 1 # Monthly number of Azure hosted data integration units.
+  #    monthly_datapipeline_azure_hosted_data_integration_hours: 31 # Monthly number of Azure hosted data integration hours.
+  #    monthly_datapipeline_azure_hosted_integration_runtime_hours: 200 # Monthly number of Azure hosted integration runtime hours.
+  #    monthly_datapipeline_azure_hosted_external_integration_runtime_hours: 4000 # Monthly number of Azure hosted external integration runtime hours.
+  #    monthly_datapipeline_self_hosted_activity_runs: 1 # Monthly number of self hosted activity runs.
+  #    monthly_datapipeline_self_hosted_data_movement_hours: 10 # Monthly number of self hosted data movement hours.
+  #    monthly_datapipeline_self_hosted_integration_runtime_hours: 200 # Monthly number of self hosted integration runtime hours.
+  #    monthly_datapipeline_self_hosted_external_integration_runtime_hours: 4000 # Monthly number of self hosted external integration runtime hours.
+  #    dataflow_basic_instances: 1 # Number of Data Flow basic instances.
+  #    dataflow_basic_vcores: 8 # Number of Data Flow basic vCores.
+  #    monthly_dataflow_basic_hours: 1 # Monthly number of Data Flow basic hours (this is multiplied by the number of instances and vCores).
+  #    dataflow_standard_instances: 1 # Number of Data Flow standard instances.
+  #    dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
+  #    monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
+  #
+  azurerm_traffic_manager_profile:
+    monthly_dns_queries: 37000000 # Monthly number of DNS queries
+    monthly_traffic_view_data_points: 10000000 # Monthly number of Traffic View data points processes
+  azurerm_virtual_hub:
+    monthly_data_processed_gb: 1000 # Monthly data processed by the Virtual WAN Hub in GB
+  azurerm_virtual_machine_scale_set:
+    storage_profile_os_disk:
+      monthly_disk_operations: 4000000000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+    storage_profile_data_disk:
+      monthly_disk_operations: 100000000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
+  azurerm_virtual_machine:
+    storage_os_disk:
+      monthly_disk_operations: 4000000000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
+    storage_data_disk:
+      monthly_disk_operations: 100000000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
+  azurerm_windows_function_app:
+    monthly_executions: 100000000 # Monthly executions to the function. Only applicable for Consumption plan.
+    execution_duration_ms: 100 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    memory_mb: 128
+  azurerm_windows_virtual_machine:
+    os_disk:
+      monthly_disk_operations: 4000000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
+  azurerm_windows_virtual_machine_scale_set:
+    os_disk:
+      monthly_disk_operations: 4000000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB per instance in the scale set.
+  azurerm_virtual_network_gateway:
+    p2s_connection: 131 # Total number of p2s tunnels.
+    monthly_data_transfer_gb: 570 # Monthly data transfer in GB.
+  #
+  # Terraform GCP resources
+  #
+  google_artifact_registry_repository:
+    storage_gb: 200 # Total data stored in the repository in GB
+    monthly_egress_data_transfer_gb: # Monthly data delivered from the artifact registry repository in GB. You can specify any number of Google Cloud regions below, replacing - for _ e.g.:
+      europe_north1: 0 # GB of data delivered from the artifact registry to europe-north1.
+  google_bigquery_dataset:
+    monthly_queries_tb: 3.2 # Monthly number of bytes processed (also referred to as bytes read) in TB.
+  google_bigquery_table:
+    monthly_active_storage_gb: 870 # Monthly number of active storage modifications in GB.
+    monthly_long_term_storage_gb: 1250 # Monthly number of long-term storage modifications in GB.
+    monthly_streaming_inserts_mb: 400000 # Monthly number of streaming data inserts in MB.
+    monthly_storage_write_api_gb: 800 # Monthly number of storage write api in GB.
+    monthly_storage_read_api_tb: 18 # Monthly number of storage read api in TB.
+  google_cloudfunctions_function:
+    request_duration_ms: 40 # Average duration of each request in milliseconds.
+    monthly_function_invocations: 50000000 # Monthly number of function invocations.
+    monthly_outbound_data_gb: 166 # Monthly data transferred from the function out to somewhere else in GB.
+  google_compute_external_vpn_gateway:
+    monthly_egress_data_transfer_gb: # Monthly data transfer from VPN gateway to the following, in GB:
+      worldwide: 0 # to a Google Cloud region on another continent.
+      china: 0 # China excluding Hong Kong.
+      australia: 0 # Australia.
+  google_compute_forwarding_rule:
+    monthly_ingress_data_gb: 2500
+  google_compute_global_forwarding_rule:
+    monthly_ingress_data_gb: 2500
+  google_compute_ha_vpn_gateway:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 0 # VMs in the same Google Cloud region.
+      us_or_canada: 0 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 0 # Between Google Cloud regions within Europe.
+      asia: 0 # Between Google Cloud regions within Asia.
+      south_america: 0 # Between Google Cloud regions within South America.
+      oceania: 0 # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 0 # to a Google Cloud region on another continent.
+  google_compute_image:
+    storage_gb: 400 # Total size of image storage in GB.
+  google_compute_machine_image:
+    storage_gb: 400 # Total size of machine image storage in GB.
+  google_compute_region_target_http_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_region_target_https_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_router_nat:
+    assigned_vms: 19 # Number of VM instances assigned to the NAT gateway
+    monthly_data_processed_gb: 444 # Monthly data processed (ingress and egress) by the NAT gateway in GB
+  google_compute_snapshot:
+    storage_gb: 770 # Total size of snapshot disk storage in GB.
+  google_compute_target_grpc_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_target_http_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_target_https_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_target_ssl_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_target_tcp_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+  google_compute_vpn_gateway:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 0 # VMs in the same Google Cloud region.
+      us_or_canada: 0 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 0 # Between Google Cloud regions within Europe.
+      asia: 0 # Between Google Cloud regions within Asia.
+      south_america: 0 # Between Google Cloud regions within South America.
+      oceania: 0 # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 0 # to a Google Cloud region on another continent.
+  google_container_cluster:
+    autopilot_vcpu_count: 615 # Number of vCPUs used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_memory_gb: 5.5 # Total memory used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_ephemeral_storage_gb: 500 # Total ephemeral storage used by Autopilot pods. Only relevant for Autopilot mode.
+  google_container_registry:
+    storage_gb: 770 # Total size of bucket in GB.
+    monthly_class_a_operations: 4000000 # Monthly number of class A operations (object adds, bucket/object list).
+    monthly_class_b_operations: 50000000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
+    monthly_data_retrieval_gb: 1000 # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb: # Monthly data transfer from Cloud Storage to the following, in GB:
+      same_continent: 0 # Same continent.
+      worldwide: 0 # Worldwide excluding Asia, Australia.
+      asia: 0 # Asia excluding China, but including Hong Kong.
+      china: 0 # China excluding Hong Kong.
+      australia: 0 # Australia.
+  google_dns_record_set:
+    monthly_queries: 50000000 # Monthly DNS queries.
+  google_kms_crypto_key:
+    key_versions: 333 # Number of key versions.
+    monthly_key_operations: 6666666 # Monthly number of key operations.
+  google_logging_billing_account_bucket_config:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_billing_account_sink:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_folder_bucket_config:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_folder_sink:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_organization_bucket_config:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_organization_sink:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_project_bucket_config:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_logging_project_sink:
+    monthly_logging_data_gb: 40 # Monthly logging data in GB.
+  google_monitoring_metric_descriptor:
+    monthly_monitoring_data_mb: 77 # Monthly monitoring data in MB (only for chargeable metrics).
+    monthly_api_calls: 2000000 # Monthly read API calls (write calls are free).
+  google_pubsub_subscription:
+    monthly_message_data_tb: 0.5 # Monthly amount of message data pulled by the subscription in TB.
+    storage_gb: 74 # Storage for retaining acknowledged messages in GB.
+    snapshot_storage_gb: 74 # Snapshot storage for unacknowledged messages in GB.
+  google_pubsub_topic:
+    monthly_message_data_tb: 0.5 # Monthly amount of message data published to the topic in TB.
+  google_secret_manager_secret:
+    active_secret_versions: 333 # Number of active secret versions in each month. NOTE: this is used only when secret versions are not defined.
+    monthly_access_operations: 6666666 # Monthly number of access operations
+    monthly_rotation_notifications: 400 # Monthly number of rotation notifications
+  google_secret_manager_secret_version:
+    monthly_access_operations: 6666666 # Monthly number of access operations
+  google_service_networking_connection:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 0 # VMs in the same Google Cloud region.
+      us_or_canada: 0 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 0 # Between Google Cloud regions within Europe.
+      asia: 0 # Between Google Cloud regions within Asia.
+      south_america: 0 # Between Google Cloud regions within South America.
+      oceania: 0 # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 0 # to a Google Cloud region on another continent.
+  google_sql_database_instance:
+    backup_storage_gb: 250 # Amount of backup storage in GB.
+  google_storage_bucket:
+    storage_gb: 770 # Total size of bucket in GB.
+    monthly_class_a_operations: 4000000 # Monthly number of class A operations (object adds, bucket/object list).
+    monthly_class_b_operations: 50000000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
+    monthly_data_retrieval_gb: 1000 # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb: # Monthly data transfer from Cloud Storage to the following, in GB:
+      same_continent: 0 # Same continent.
+      worldwide: 0 # Worldwide excluding Asia, Australia.
+      asia: 0 # Asia excluding China, but including Hong Kong.
+      china: 0 # China excluding Hong Kong.
+      australia: 0 # Australia.

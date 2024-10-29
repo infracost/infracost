@@ -14,7 +14,13 @@ type DXGatewayAssociation struct {
 	MonthlyDataProcessedGB  *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var DXGatewayAssociationUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *DXGatewayAssociation) CoreType() string {
+	return "DXGatewayAssociation"
+}
+
+func (r *DXGatewayAssociation) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *DXGatewayAssociation) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -38,6 +44,6 @@ func (r *DXGatewayAssociation) BuildResource() *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			transitGatewayDataProcessingCostComponent(region, "TransitGatewayDirectConnect", gbDataProcessed),
 			transitGatewayAttachmentCostComponent(region, "TransitGatewayDirectConnect"),
-		}, UsageSchema: DXGatewayAssociationUsageSchema,
+		}, UsageSchema: r.UsageSchema(),
 	}
 }

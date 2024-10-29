@@ -13,7 +13,13 @@ type KMSKey struct {
 	CustomerMasterKeySpec string
 }
 
-var KMSKeyUsageSchema = []*schema.UsageItem{}
+func (r *KMSKey) CoreType() string {
+	return "KMSKey"
+}
+
+func (r *KMSKey) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *KMSKey) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -29,7 +35,7 @@ func (r *KMSKey) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    KMSKeyUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

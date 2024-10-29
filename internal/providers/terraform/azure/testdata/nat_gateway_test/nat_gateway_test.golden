@@ -1,31 +1,31 @@
 
- Name                                 Monthly Qty  Unit              Monthly Cost 
-                                                                                  
- azurerm_nat_gateway.my_gateway                                                   
- ├─ NAT gateway                               730  hours                   $32.85 
- └─ Data processed                             10  GB                       $0.45 
-                                                                                  
- azurerm_nat_gateway.my_gateway2                                                  
- ├─ NAT gateway                               730  hours                   $32.85 
- └─ Data processed                 Monthly cost depends on usage: $0.045 per GB   
-                                                                                  
- azurerm_public_ip.example                                                        
- └─ IP address (static)                       730  hours                    $3.65 
-                                                                                  
- azurerm_public_ip_prefix.example                                                 
- └─ IP prefix                                 730  hours                    $4.38 
-                                                                                  
- OVERALL TOTAL                                                             $74.18 
+ Name                                 Monthly Qty  Unit              Monthly Cost   
+                                                                                    
+ azurerm_nat_gateway.my_gateway                                                     
+ ├─ NAT gateway                               730  hours                   $32.85   
+ └─ Data processed                             10  GB                       $0.45   
+                                                                                    
+ azurerm_nat_gateway.my_gateway2                                                    
+ ├─ NAT gateway                               730  hours                   $32.85   
+ └─ Data processed                 Monthly cost depends on usage: $0.045 per GB     
+                                                                                    
+ azurerm_public_ip_prefix.example                                                   
+ └─ IP prefix                                 730  hours                    $4.38   
+                                                                                    
+ azurerm_public_ip.example                                                          
+ └─ IP address (static, regional)             730  hours                    $3.65   
+                                                                                    
+ OVERALL TOTAL                                                            $74.18 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 9 cloud resources were detected:
-∙ 4 were estimated, 2 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 5 were free:
-  ∙ 2 x azurerm_nat_gateway_public_ip_association
-  ∙ 2 x azurerm_nat_gateway_public_ip_prefix_association
-  ∙ 1 x azurerm_resource_group
+∙ 4 were estimated
+∙ 5 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMNATGateway                              ┃ $74          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $74 ┃           - ┃        $74 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

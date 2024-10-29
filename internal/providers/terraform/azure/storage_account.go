@@ -7,7 +7,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
+func getStorageAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:      "azurerm_storage_account",
 		CoreRFunc: newAzureRMStorageAccount,
@@ -21,7 +21,7 @@ func getAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
 }
 
 func newAzureRMStorageAccount(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	accountKind := "StorageV2"
 	if !d.IsEmpty("account_kind") {

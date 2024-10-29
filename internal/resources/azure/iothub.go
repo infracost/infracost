@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 const (
@@ -19,6 +20,14 @@ type IoTHub struct {
 	Region   string
 	Sku      string
 	Capacity int64
+}
+
+func (r *IoTHub) CoreType() string {
+	return "IoTHub"
+}
+
+func (r *IoTHub) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
 }
 
 func (r *IoTHub) PopulateUsage(u *schema.UsageData) {
@@ -79,8 +88,14 @@ type IoTHubDPS struct {
 	MonthlyOperations *int64 `infracost_usage:"monthly_operations"`
 }
 
-var OperationsUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_operations", DefaultValue: 0, ValueType: schema.Int64},
+func (r *IoTHubDPS) CoreType() string {
+	return "IoTHubDPS"
+}
+
+func (r *IoTHubDPS) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_operations", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 func (r *IoTHubDPS) PopulateUsage(u *schema.UsageData) {
@@ -97,7 +112,7 @@ func (r *IoTHubDPS) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:        r.Address,
-		UsageSchema: OperationsUsageSchema,
+		UsageSchema: r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Device provisioning",
@@ -114,6 +129,7 @@ func (r *IoTHubDPS) BuildResource() *schema.Resource {
 						{Key: "meterName", ValueRegex: regexPtr("Operations$")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}

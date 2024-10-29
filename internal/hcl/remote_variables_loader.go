@@ -1,29 +1,44 @@
 package hcl
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
+	"strings"
+	"sync"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
+	"github.com/shurcooL/graphql"
+	"github.com/spacelift-io/spacectl/client"
+	spaceliftSession "github.com/spacelift-io/spacectl/client/session"
+	"github.com/spacelift-io/spacectl/client/structs"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/extclient"
-	"github.com/infracost/infracost/internal/ui"
+	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/vcs"
 )
 
-// RemoteVariablesLoader handles loading remote variables from Terraform Cloud.
-type RemoteVariablesLoader struct {
+// RemoteVariableLoader is an interface for loading remote variables from a remote service.
+type RemoteVariableLoader interface {
+	// Load fetches remote variables from a remote service.
+	Load(options RemoteVarLoaderOptions) (map[string]cty.Value, error)
+}
+
+// TFCRemoteVariablesLoader handles loading remote variables from Terraform Cloud.
+type TFCRemoteVariablesLoader struct {
 	client         *extclient.AuthedAPIClient
 	localWorkspace string
-	newSpinner     ui.SpinnerFunc
+	remoteConfig   *TFCRemoteConfig
 	logger         zerolog.Logger
 }
 
-// RemoteVariablesLoaderOption defines a function that can set properties on an RemoteVariablesLoader.
-type RemoteVariablesLoaderOption func(r *RemoteVariablesLoader)
+// TFCRemoteVariablesLoaderOption defines a function that can set properties on an TFCRemoteVariablesLoader.
+type TFCRemoteVariablesLoaderOption func(r *TFCRemoteVariablesLoader)
 
 type tfcWorkspaceResponse struct {
 	Data struct {
@@ -53,6 +68,7 @@ type tfcVar struct {
 	Value     string `json:"value"`
 	Sensitive bool   `json:"sensitive"`
 	Category  string `json:"category"`
+	HCL       bool   `json:"hcl"`
 }
 
 type tfcVarsetResponse struct {
@@ -75,21 +91,22 @@ type tfcVarResponse struct {
 	} `json:"data"`
 }
 
-// RemoteVariablesLoaderWithSpinner enables the RemoteVariablesLoader to use an ui.Spinner to
-// show the progress of loading the remote variables.
-func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOption {
-	return func(r *RemoteVariablesLoader) {
-		r.newSpinner = f
+// RemoteVariablesLoaderWithRemoteConfig sets a user defined configuration for
+// the TFCRemoteVariablesLoader. This is normally done to override the configuration
+// detected from the HCL blocks.
+func RemoteVariablesLoaderWithRemoteConfig(config TFCRemoteConfig) TFCRemoteVariablesLoaderOption {
+	return func(r *TFCRemoteVariablesLoader) {
+		r.remoteConfig = &config
 	}
 }
 
-// NewRemoteVariablesLoader constructs a new loader for fetching remote variables.
-func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger zerolog.Logger, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
+// NewTFCRemoteVariablesLoader constructs a new loader for fetching remote variables.
+func NewTFCRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger zerolog.Logger, opts ...TFCRemoteVariablesLoaderOption) *TFCRemoteVariablesLoader {
 	if localWorkspace == "" {
 		localWorkspace = os.Getenv("TF_WORKSPACE")
 	}
 
-	r := &RemoteVariablesLoader{
+	r := &TFCRemoteVariablesLoader{
 		client:         client,
 		localWorkspace: localWorkspace,
 		logger:         logger,
@@ -102,60 +119,58 @@ func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace 
 	return r
 }
 
+type RemoteVarLoaderOptions struct {
+	Blocks  Blocks
+	EnvName string
+}
+
 // Load fetches remote variables if terraform block contains organization and
 // workspace name.
-func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error) {
-	spinnerMsg := "Downloading Terraform remote variables"
+func (r *TFCRemoteVariablesLoader) Load(options RemoteVarLoaderOptions) (map[string]cty.Value, error) {
+	blocks := options.Blocks
+
+	r.logger.Debug().Msg("Downloading Terraform remote variables")
 	vars := map[string]cty.Value{}
 
-	var err error
-	config := r.getCloudOrganizationWorkspace(blocks)
-	if !config.valid() {
-		config, err = r.getBackendOrganizationWorkspace(blocks)
-
-		if err != nil {
-			var spinner *ui.Spinner
-			if r.newSpinner != nil {
-				// In case name prefix is set, but workspace flag is missing show the
-				// failed spinner message. Otherwise the remote variables loading is
-				// skipped entirely.
-				spinner = r.newSpinner(spinnerMsg)
-				spinner.Fail()
-			}
-			return vars, err
-		}
-
+	var config TFCRemoteConfig
+	if r.remoteConfig != nil {
+		config = *r.remoteConfig
+	} else {
+		var err error
+		config = r.getCloudOrganizationWorkspace(blocks)
 		if !config.valid() {
-			return vars, nil
+			config, err = r.getBackendOrganizationWorkspace(blocks)
+			if err != nil {
+				r.logger.Warn().Err(err).Msg("could not detect Terraform Cloud organization and workspace")
+				return vars, nil
+			}
+
+			if !config.valid() {
+				return vars, nil
+			}
 		}
 	}
 
-	if config.host != "" {
-		r.client.SetHost(config.host)
+	if config.Host != "" {
+		r.client.SetHost(config.Host)
 	}
 
-	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.organization, config.workspace)
+	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.Organization, config.Workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		r.logger.Warn().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.workspace, config.organization)
+		r.logger.Debug().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		r.logger.Warn().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.workspace, config.organization)
+		r.logger.Debug().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	if workspaceResponse.Data.Attributes.ExecutionMode == "local" {
-		r.logger.Debug().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
+		r.logger.Debug().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.Workspace)
 		return vars, nil
-	}
-
-	var spinner *ui.Spinner
-	if r.newSpinner != nil {
-		spinner = r.newSpinner(spinnerMsg)
-		defer spinner.Success()
 	}
 
 	workspaceID := workspaceResponse.Data.ID
@@ -169,17 +184,11 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		endpoint = fmt.Sprintf("/api/v2/workspaces/%s/varsets?include=vars&page[number]=%d&page[size]=50", workspaceID, pageNumber)
 		body, err = r.client.Get(endpoint)
 		if err != nil {
-			if spinner != nil {
-				spinner.Fail()
-			}
 			return vars, err
 		}
 
 		var varsetsResponse tfcVarsetResponse
 		if json.Unmarshal(body, &varsetsResponse) != nil {
-			if spinner != nil {
-				spinner.Fail()
-			}
 			return vars, errors.New("unable to parse Workspace Variable Sets response")
 		}
 
@@ -216,9 +225,11 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		for _, v := range varset.Relationships.Vars.Data {
 			vv, ok := varsMap[v.ID]
 			if ok {
-				val := getVarValue(vv)
+				val := r.getVarValue(vv)
 				if !val.IsNull() && val.IsKnown() {
-					vars[vv.Key] = val
+					k := r.getVarKey(vv)
+					r.logger.Debug().Msgf("adding variable %s from varset %s", k, varset.Attributes.Name)
+					vars[k] = val
 				}
 			}
 		}
@@ -227,50 +238,46 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	endpoint = fmt.Sprintf("/api/v2/workspaces/%s/vars", workspaceID)
 	body, err = r.client.Get(endpoint)
 	if err != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
 		return vars, err
 	}
 
 	var varsResponse tfcVarResponse
 	if json.Unmarshal(body, &varsResponse) != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
 		return vars, errors.New("unable to parse Workspace Variables response")
 	}
 
 	for _, v := range varsResponse.Data {
-		val := getVarValue(v.Attributes)
+		val := r.getVarValue(v.Attributes)
 		if !val.IsNull() {
-			vars[v.Attributes.Key] = val
+			k := r.getVarKey(v.Attributes)
+			r.logger.Debug().Msgf("adding variable %s from workspace", k)
+			vars[k] = val
 		}
 	}
 
 	return vars, nil
 }
 
-type remoteConfig struct {
-	organization string
-	workspace    string
-	host         string
+type TFCRemoteConfig struct {
+	Organization string
+	Workspace    string
+	Host         string
 }
 
-func (c remoteConfig) valid() bool {
-	return c.organization != "" && c.workspace != ""
+func (c TFCRemoteConfig) valid() bool {
+	return c.Organization != "" && c.Workspace != ""
 }
 
-func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) remoteConfig {
-	var conf remoteConfig
+func (r *TFCRemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) TFCRemoteConfig {
+	var conf TFCRemoteConfig
 
 	for _, block := range blocks.OfType("terraform") {
 		for _, c := range block.childBlocks.OfType("cloud") {
-			conf.organization = getAttribute(c, "organization")
-			conf.host = getAttribute(c, "hostname")
+			conf.Organization = getAttribute(c, "organization")
+			conf.Host = getAttribute(c, "hostname")
 
 			for _, cc := range c.childBlocks.OfType("workspaces") {
-				conf.workspace = getAttribute(cc, "name")
+				conf.Workspace = getAttribute(cc, "name")
 				return conf
 			}
 		}
@@ -279,8 +286,8 @@ func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) rem
 	return conf
 }
 
-func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (remoteConfig, error) {
-	var conf remoteConfig
+func (r *TFCRemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (TFCRemoteConfig, error) {
+	var conf TFCRemoteConfig
 
 	for _, block := range blocks.OfType("terraform") {
 		for _, c := range block.childBlocks.OfType("backend") {
@@ -288,14 +295,14 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 				continue
 			}
 
-			conf.organization = getAttribute(c, "organization")
-			conf.host = getAttribute(c, "hostname")
+			conf.Organization = getAttribute(c, "organization")
+			conf.Host = getAttribute(c, "hostname")
 
 			for _, cc := range c.childBlocks.OfType("workspaces") {
 				name := getAttribute(cc, "name")
 
 				if name != "" {
-					conf.workspace = name
+					conf.Workspace = name
 					return conf, nil
 				}
 
@@ -306,7 +313,7 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 						return conf, errors.Errorf("--terraform-workspace is not specified. Unable to detect organization or workspace.")
 					}
 
-					conf.workspace = namePrefix + r.localWorkspace
+					conf.Workspace = namePrefix + r.localWorkspace
 					return conf, nil
 				}
 			}
@@ -314,6 +321,42 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 	}
 
 	return conf, nil
+}
+
+func (r *TFCRemoteVariablesLoader) getVarKey(variable tfcVar) string {
+	if variable.Category == "env" && strings.HasPrefix(variable.Key, "TF_VAR_") {
+		return strings.TrimPrefix(variable.Key, "TF_VAR_")
+	}
+
+	return variable.Key
+}
+
+func (r *TFCRemoteVariablesLoader) getVarValue(variable tfcVar) cty.Value {
+	if variable.Sensitive {
+		r.logger.Debug().Msgf("skipping sensitive variable %s", variable.Key)
+		return cty.DynamicVal
+	}
+
+	if variable.Value == "" {
+		r.logger.Debug().Msgf("skipping empty variable %s", variable.Key)
+		return cty.DynamicVal
+	}
+
+	if variable.Category == "env" && !strings.HasPrefix(variable.Key, "TF_VAR_") {
+		r.logger.Debug().Msgf("skipping environment variable %s", variable.Key)
+		return cty.DynamicVal
+	}
+
+	if variable.HCL {
+		val, err := ParseVariable(variable.Value)
+		if err != nil {
+			r.logger.Debug().Err(err).Msgf("could not parse variable %s with HCL value", variable.Key)
+			return cty.DynamicVal
+		}
+		return val
+	}
+
+	return cty.StringVal(variable.Value)
 }
 
 func getAttribute(block *Block, name string) string {
@@ -329,10 +372,141 @@ func getAttribute(block *Block, name string) string {
 	return ""
 }
 
-func getVarValue(variable tfcVar) cty.Value {
-	if variable.Sensitive || variable.Category != "terraform" || variable.Value == "" {
-		return cty.DynamicVal
+// SpaceliftRemoteVariableLoader orchestrates communicating with the Spacelift API to fetch remote variables.
+type SpaceliftRemoteVariableLoader struct {
+	Client   client.Client
+	Metadata vcs.Metadata
+
+	cache *sync.Map
+}
+
+// NewSpaceliftRemoteVariableLoader creates a new SpaceliftRemoteVariableLoader, this function
+// expects that the required environment variables are set.
+func NewSpaceliftRemoteVariableLoader(metadata vcs.Metadata, apiKeyEndpoint, apiKeyId, apiKeySecret string) (*SpaceliftRemoteVariableLoader, error) {
+	httpClient := http.DefaultClient
+
+	session, err := spaceliftSession.FromAPIKey(context.Background(), httpClient)(apiKeyEndpoint, apiKeyId, apiKeySecret)
+	if err != nil {
+		return nil, fmt.Errorf("could not create Spacelift session: %w", err)
 	}
 
-	return cty.StringVal(variable.Value)
+	return &SpaceliftRemoteVariableLoader{
+		Client:   client.New(httpClient, session),
+		Metadata: metadata,
+		cache:    &sync.Map{},
+	}, nil
+}
+
+// Load fetches remote variables from Spacelift by querying the stacks for the
+// provided environment name and remote name.
+func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (map[string]cty.Value, error) {
+	if options.EnvName == "" {
+		logging.Logger.Trace().Msg("no environment name provided, skipping Spacelift remote variable loading")
+		return nil, nil
+	}
+
+	// get the stack which matches the remote name and the environment name
+	// in future we should get all stacks for the remote name and then
+	// dynamically create projects out of the stacks returned.
+	stacks, err := s.getStacks(context.Background(), &getStackOptions{
+		count:          1,
+		repositoryName: s.Metadata.Remote.Name,
+		name:           options.EnvName,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("could not get stacks: %w", err)
+	}
+
+	var stackEnvs []stackConfig
+	for _, s := range stacks {
+		if s.Name == options.EnvName {
+			stackEnvs = s.Config
+			break
+		}
+	}
+
+	if len(stackEnvs) == 0 {
+		logging.Logger.Trace().Msg("no stack environments found, skipping Spacelift remote variable loading")
+		return nil, nil
+	}
+
+	vars := map[string]cty.Value{}
+	for _, env := range stackEnvs {
+		vars[env.ID] = cty.StringVal(env.Value)
+	}
+
+	return vars, nil
+}
+
+type stack struct {
+	ID     string        `graphql:"id" json:"id,omitempty"`
+	Name   string        `graphql:"name" json:"name,omitempty"`
+	Config []stackConfig `graphql:"config" json:"config,omitempty"`
+}
+
+type stackConfig struct {
+	ID    string `graphql:"id" json:"id,omitempty"`
+	Value string `graphql:"value" json:"value,omitempty"`
+}
+
+type getStackOptions struct {
+	count int32
+
+	repositoryName string
+	name           string
+}
+
+func (s *SpaceliftRemoteVariableLoader) getStacks(ctx context.Context, p *getStackOptions) ([]stack, error) {
+	if v, ok := s.cache.Load(p); ok {
+		return v.([]stack), nil
+	}
+
+	var query struct {
+		SearchStacksOutput struct {
+			Edges []struct {
+				Node stack `graphql:"node"`
+			} `graphql:"edges"`
+			PageInfo structs.PageInfo `graphql:"pageInfo"`
+		} `graphql:"searchStacks(input: $input)"`
+	}
+	var conditions []structs.QueryPredicate
+	if p.repositoryName != "" {
+		conditions = append(conditions, structs.QueryPredicate{
+			Field: graphql.String("repository"),
+			Constraint: structs.QueryFieldConstraint{
+				StringMatches: &[]graphql.String{graphql.String(p.repositoryName)},
+			},
+		})
+	}
+
+	if p.name != "" {
+		conditions = append(conditions, structs.QueryPredicate{
+			Field: graphql.String("name"),
+			Constraint: structs.QueryFieldConstraint{
+				StringMatches: &[]graphql.String{graphql.String(p.name)},
+			},
+		})
+
+	}
+
+	variables := map[string]interface{}{"input": structs.SearchInput{
+		First:      graphql.NewInt(graphql.Int(p.count)),
+		Predicates: &conditions,
+	}}
+
+	if err := s.Client.Query(
+		ctx,
+		&query,
+		variables,
+	); err != nil {
+		return nil, errors.Wrap(err, "failed search for stacks")
+	}
+
+	result := make([]stack, 0)
+	for _, q := range query.SearchStacksOutput.Edges {
+		result = append(result, q.Node)
+	}
+
+	s.cache.Store(p, result)
+	return result, nil
 }

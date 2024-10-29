@@ -1,31 +1,42 @@
 
- Name                                                  Monthly Qty  Unit                  Monthly Cost 
-                                                                                                       
- aws_neptune_cluster.default                                                                           
- ├─ Storage                                       Monthly cost depends on usage: $0.12 per GB          
- └─ I/O requests                                  Monthly cost depends on usage: $0.23 per 1M request  
-                                                                                                       
- aws_neptune_cluster_instance.dbR4LargeCount2[0]                                                       
- └─ Database instance (on-demand, db.r4.large)                 730  hours                      $297.84 
-                                                                                                       
- aws_neptune_cluster_instance.dbR4LargeCount2[1]                                                       
- └─ Database instance (on-demand, db.r4.large)                 730  hours                      $297.84 
-                                                                                                       
- aws_neptune_cluster_instance.dbT3Medium                                                               
- ├─ Database instance (on-demand, db.t3.medium)                730  hours                       $81.76 
- └─ CPU credits                                              7,300  vCPU-hours               $1,095.00 
-                                                                                                       
- aws_neptune_cluster_instance.dbT3WithoutUsage                                                         
- ├─ Database instance (on-demand, db.t3.medium)                730  hours                       $81.76 
- └─ CPU credits                                   Monthly cost depends on usage: $0.15 per vCPU-hours  
-                                                                                                       
- OVERALL TOTAL                                                                               $1,854.20 
-──────────────────────────────────
-5 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+ Name                                                      Monthly Qty  Unit                  Monthly Cost    
+                                                                                                              
+ aws_neptune_cluster_instance.dbT3Medium                                                                      
+ ├─ Database instance (on-demand, db.t3.medium)                    730  hours                       $81.76    
+ └─ CPU credits                                                  7,300  vCPU-hours               $1,095.00  * 
+                                                                                                              
+ aws_neptune_cluster_instance.dbR4LargeCount2[0]                                                              
+ └─ Database instance (on-demand, db.r4.large)                     730  hours                      $297.84    
+                                                                                                              
+ aws_neptune_cluster_instance.dbR4LargeCount2[1]                                                              
+ └─ Database instance (on-demand, db.r4.large)                     730  hours                      $297.84    
+                                                                                                              
+ aws_neptune_cluster_instance.dbT3Medium-iooptimized                                                          
+ ├─ Database instance (on-demand, db.t3.medium)                    730  hours                      $110.23    
+ └─ CPU credits                                       Monthly cost depends on usage: $0.15 per vCPU-hours     
+                                                                                                              
+ aws_neptune_cluster_instance.dbT3WithoutUsage                                                                
+ ├─ Database instance (on-demand, db.t3.medium)                    730  hours                       $81.76    
+ └─ CPU credits                                       Monthly cost depends on usage: $0.15 per vCPU-hours     
+                                                                                                              
+ aws_neptune_cluster.default                                                                                  
+ ├─ Storage                                           Monthly cost depends on usage: $0.12 per GB             
+ └─ I/O requests                                      Monthly cost depends on usage: $0.23 per 1M request     
+                                                                                                              
+ aws_neptune_cluster.iooptimized                                                                              
+ ├─ Storage                                           Monthly cost depends on usage: $0.12 per GB             
+ └─ I/O requests                                      Monthly cost depends on usage: $0.23 per 1M request     
+                                                                                                              
+ OVERALL TOTAL                                                                                   $1,964.43 
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNeptuneClusterInstanceGoldenFile               ┃ $1,854       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 7 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $869 ┃      $1,095 ┃     $1,964 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

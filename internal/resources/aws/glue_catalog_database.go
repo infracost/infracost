@@ -23,6 +23,17 @@ type GlueCatalogDatabase struct {
 	MonthlyRequests *float64 `infracost_usage:"monthly_requests"`
 }
 
+func (r *GlueCatalogDatabase) CoreType() string {
+	return "GlueCatalogDatabase"
+}
+
+func (r *GlueCatalogDatabase) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_objects", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Float64},
+	}
+}
+
 // PopulateUsage parses the u schema.UsageData into the GlueCatalogDatabase.
 // It uses the `infracost_usage` struct tags to populate data into the GlueCatalogDatabase.
 func (r *GlueCatalogDatabase) PopulateUsage(u *schema.UsageData) {
@@ -33,16 +44,13 @@ func (r *GlueCatalogDatabase) PopulateUsage(u *schema.UsageData) {
 // schema.CostComponents associated with it:
 //
 //  1. Storage - charged for every 100,000 objects stored above 1M, per month.
-//  2. Requests - charged per million requests above 1M in a month.
+//  2. MonthlyAdditionalRequests - charged per million requests above 1M in a month.
 //
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *GlueCatalogDatabase) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: r.Address,
-		UsageSchema: []*schema.UsageItem{
-			{Key: "monthly_objects", DefaultValue: 0, ValueType: schema.Float64},
-			{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Float64},
-		},
+		Name:        r.Address,
+		UsageSchema: r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			r.storageObjectsCostComponent(),
 			r.requestsCostComponent(),
@@ -78,6 +86,7 @@ func (r *GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponen
 				{Key: "group", ValueRegex: strPtr("/^data catalog storage$/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -108,5 +117,6 @@ func (r *GlueCatalogDatabase) requestsCostComponent() *schema.CostComponent {
 				{Key: "group", ValueRegex: strPtr("/^data catalog requests$/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }

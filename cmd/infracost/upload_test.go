@@ -21,12 +21,17 @@ func TestUploadHelp(t *testing.T) {
 }
 
 func TestUploadSelfHosted(t *testing.T) {
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer s.Close()
+
 	GoldenFileCommandTest(t,
 		testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"upload", "--path", "./testdata/example_out.json"},
 		&GoldenFileOptions{CaptureLogs: true},
 		func(c *config.RunContext) {
-			c.Config.PricingAPIEndpoint = "https://fake.url"
+			c.Config.PricingAPIEndpoint = s.URL
 		},
 	)
 }
@@ -52,6 +57,58 @@ func TestUploadWithPath(t *testing.T) {
 	GoldenFileCommandTest(t,
 		testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{CaptureLogs: true},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = ts.URL
+		},
+	)
+}
+
+func TestUploadWithPathFormatJSON(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+		  "id": "ff050cb8-eaaa-479f-8865-3fc0fd689b9f",
+		  "shareUrl": "",
+		  "cloudUrl": "https://dashboard.infracost.io/org/tim/repos/4e936c53-6091-4836-82da-e106ff653aec/runs/ff050cb8-eaaa-479f-8865-3fc0fd689b9f",
+		  "pullRequestUrl": "https://dashboard.infracost.io/org/tim/repos/4e936c53-6091-4836-82da-e106ff653aec/pulls/null",
+		  "governanceFailures": null,
+		  "commentMarkdown": "\n<h4>Governance checks</h4>\n\n<details>\n<summary><strong>🔴 4 failures</strong>...",
+		  "governanceResults": [
+			{
+			  "govType": "tag_policy",
+			  "checked": 1,
+			  "warnings": [
+				"Timtags"
+			  ],
+			  "failures": [],
+			  "unblocked": []
+			},
+			{
+			  "govType": "finops_policy",
+			  "checked": 48,
+			  "warnings": [
+				"Cloudwatch - consider using a retention policy to reduce storage costs",
+				"EBS - consider upgrading gp2 volumes to gp3",
+				"S3 - consider using a lifecycle policy to reduce storage costs"
+			  ],
+			  "failures": [],
+			  "unblocked": []
+			},
+			{
+			  "govType": "guardrail",
+			  "checked": 0,
+			  "warnings": [],
+			  "failures": [],
+			  "unblocked": []
+			}
+		  ]
+		}}}]`)
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info", "--format", "json"},
 		&GoldenFileOptions{CaptureLogs: true},
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = ts.URL
@@ -103,7 +160,7 @@ func TestUploadWithCloudDisabled(t *testing.T) {
 
 func TestUploadWithGuardrailSuccess(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 2,
@@ -125,7 +182,7 @@ func TestUploadWithGuardrailSuccess(t *testing.T) {
 
 func TestUploadWithGuardrailFailure(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 2,
@@ -151,7 +208,7 @@ func TestUploadWithGuardrailFailure(t *testing.T) {
 
 func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 2,
@@ -185,7 +242,7 @@ func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
 	defer policyV2Api.Close()
 
 	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "Tag policy failure",
+		CommentMarkdown: "Tag policy failure",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "tag_policy",
 			Checked: 2,
@@ -254,7 +311,7 @@ func TestUploadWithBlockingFinOpsPolicyFailure(t *testing.T) {
 	defer policyV2Api.Close()
 
 	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "FinOPs policy failure",
+		CommentMarkdown: "FinOPs policy failure",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "finops_policy",
 			Checked: 2,

@@ -30,10 +30,29 @@ storePolicyResources:
               "value": "bar"
             },
             {
+              "key": "volume_tags.DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "volume_tags.DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
               "key": "volume_tags.baz",
               "value": "bat"
             }
           ],
+          "defaultTags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "supportForDefaultTags": false,
           "values": {
             "ebs_block_device": [
               {
@@ -53,7 +72,8 @@ storePolicyResources:
             "endLine": 0,
             "filename": "",
             "startLine": 0
-          }
+          },
+          "region": "us-east-1"
         }
       ]
     }

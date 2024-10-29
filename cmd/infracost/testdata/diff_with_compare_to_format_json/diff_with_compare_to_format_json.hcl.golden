@@ -3,6 +3,7 @@
   "metadata": {
     "infracostCommand": "diff",
     "vcsBranch": "stub-branch",
+    "vcsBaseCommitSha": "71785af96bce822bd54f359d0883cfa4ca805432",
     "vcsCommitSha": "stub-sha",
     "vcsCommitAuthorName": "stub-author",
     "vcsCommitAuthorEmail": "stub@stub.com",
@@ -13,15 +14,16 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_format_json",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/diff_with_compare_to_format_json",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -29,6 +31,72 @@
       },
       "pastBreakdown": {
         "resources": [
+          {
+            "name": "aws_instance.web_app2",
+            "metadata": {},
+            "hourlyCost": "1.785315068493150679",
+            "monthlyCost": "1303.28",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.8xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.536",
+                "hourlyCost": "1.536",
+                "monthlyCost": "1121.28",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
           {
             "name": "aws_instance.web_app",
             "metadata": {},
@@ -42,7 +110,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -59,7 +128,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -76,7 +146,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -85,69 +156,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "name": "aws_instance.web_app2",
-            "metadata": {},
-            "hourlyCost": "1.785315068493150679",
-            "monthlyCost": "1303.28",
-            "costComponents": [
-              {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.8xlarge)",
-                "unit": "hours",
-                "hourlyQuantity": "1",
-                "monthlyQuantity": "730",
-                "price": "1.536",
-                "hourlyCost": "1.536",
-                "monthlyCost": "1121.28"
-              }
-            ],
-            "subresources": [
-              {
-                "name": "root_block_device",
-                "metadata": {},
-                "hourlyCost": "0.00684931506849315",
-                "monthlyCost": "5",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "0.0684931506849315",
-                    "monthlyQuantity": "50",
-                    "price": "0.1",
-                    "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
-                  }
-                ]
-              },
-              {
-                "name": "ebs_block_device[0]",
-                "metadata": {},
-                "hourlyCost": "0.242465753424657529",
-                "monthlyCost": "177",
-                "costComponents": [
-                  {
-                    "name": "Storage (provisioned IOPS SSD, io1)",
-                    "unit": "GB",
-                    "hourlyQuantity": "1.3698630136986301",
-                    "monthlyQuantity": "1000",
-                    "price": "0.125",
-                    "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
-                  },
-                  {
-                    "name": "Provisioned IOPS",
-                    "unit": "IOPS",
-                    "hourlyQuantity": "1.0958904109589041",
-                    "monthlyQuantity": "800",
-                    "price": "0.065",
-                    "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -155,7 +165,8 @@
           }
         ],
         "totalHourlyCost": "2.802630136986301358",
-        "totalMonthlyCost": "2045.92"
+        "totalMonthlyCost": "2045.92",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -163,18 +174,20 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "3326e79d502305b9e1f50ad5efedb7528b9e59ded094785b1ca91c6f88812fa5",
               "endLine": 23,
-              "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_format_json/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.785315068493150679",
@@ -187,7 +200,8 @@
                 "monthlyQuantity": "730",
                 "price": "1.536",
                 "hourlyCost": "1.536",
-                "monthlyCost": "1121.28"
+                "monthlyCost": "1121.28",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -204,7 +218,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -221,7 +236,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -230,7 +246,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -238,7 +255,8 @@
           }
         ],
         "totalHourlyCost": "1.785315068493150679",
-        "totalMonthlyCost": "1303.28"
+        "totalMonthlyCost": "1303.28",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [
@@ -249,6 +267,7 @@
             "metadata": {},
             "hourlyCost": "0.768",
             "monthlyCost": "560.64",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)",
@@ -257,7 +276,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ]
           },
@@ -266,6 +286,7 @@
             "metadata": {},
             "hourlyCost": "-1.785315068493150679",
             "monthlyCost": "-1303.28",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.8xlarge)",
@@ -274,7 +295,8 @@
                 "monthlyQuantity": "-730",
                 "price": "-1.536",
                 "hourlyCost": "-1.536",
-                "monthlyCost": "-1121.28"
+                "monthlyCost": "-1121.28",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -283,6 +305,7 @@
                 "metadata": {},
                 "hourlyCost": "-0.00684931506849315",
                 "monthlyCost": "-5",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (general purpose SSD, gp2)",
@@ -291,7 +314,8 @@
                     "monthlyQuantity": "-50",
                     "price": "-0.1",
                     "hourlyCost": "-0.00684931506849315",
-                    "monthlyCost": "-5"
+                    "monthlyCost": "-5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -300,6 +324,7 @@
                 "metadata": {},
                 "hourlyCost": "-0.242465753424657529",
                 "monthlyCost": "-177",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (provisioned IOPS SSD, io1)",
@@ -308,7 +333,8 @@
                     "monthlyQuantity": "-1000",
                     "price": "-0.125",
                     "hourlyCost": "-0.1712328767123287625",
-                    "monthlyCost": "-125"
+                    "monthlyCost": "-125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -317,7 +343,8 @@
                     "monthlyQuantity": "-800",
                     "price": "-0.065",
                     "hourlyCost": "-0.0712328767123287665",
-                    "monthlyCost": "-52"
+                    "monthlyCost": "-52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -325,7 +352,8 @@
           }
         ],
         "totalHourlyCost": "-1.017315068493150679",
-        "totalMonthlyCost": "-742.64"
+        "totalMonthlyCost": "-742.64",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 1,
@@ -340,10 +368,13 @@
   ],
   "totalHourlyCost": "1.785315068493150679",
   "totalMonthlyCost": "1303.28",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "2.802630136986301358",
   "pastTotalMonthlyCost": "2045.92",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "-1.017315068493150679",
   "diffTotalMonthlyCost": "-742.64",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 1,

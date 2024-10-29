@@ -1,0 +1,7 @@
+version: 0.1
+
+projects:
+  - path: infra
+    name: infra
+    skip_autodetect: true
+

@@ -1,44 +1,62 @@
 
-<h3>Infracost report</h3>
-<h4>💰 Monthly cost will decrease by $2,242 📉</h4>
+<h4>💰 Infracost report</h4>
+<h4>Monthly estimate decreased by $2,242 📉</h4>
 <table>
   <thead>
-    <td>Project</td>
-    <td>Cost change</td>
+    <td>Changed project</td>
+    <td><span title="Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).">Baseline cost</span></td>
+    <td><span title="Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.">Usage cost</span>*</td>
+    <td>Total change</td>
     <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>my first project</td>
-      <td>-$561 (-43%)</td>
+      <td align="right">-$561</td>
+      <td align="right">-</td>
+      <td align="right">-$561 (-43%)</td>
       <td align="right">$743</td>
     </tr>
     <tr>
       <td>my first project again</td>
-      <td>-$561 (-43%)</td>
+      <td align="right">-$561</td>
+      <td align="right">-</td>
+      <td align="right">-$561 (-43%)</td>
       <td align="right">$743</td>
     </tr>
     <tr>
       <td>my terragrunt dev project</td>
-      <td>+$0.88 (+2%)</td>
+      <td align="right">+$0.88</td>
+      <td align="right">-</td>
+      <td align="right">+$0.88 (+2%)</td>
       <td align="right">$52</td>
     </tr>
     <tr>
       <td>my terragrunt prod project</td>
-      <td>-$561 (-43%)</td>
+      <td align="right">-$561</td>
+      <td align="right">-</td>
+      <td align="right">-$561 (-43%)</td>
       <td align="right">$748</td>
     </tr>
     <tr>
       <td>my workspace project</td>
-      <td>-$561 (-43%)</td>
+      <td align="right">-$561</td>
+      <td align="right">-</td>
+      <td align="right">-$561 (-43%)</td>
       <td align="right">$743</td>
     </tr>
   </tbody>
 </table>
+
+
+*Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
-<summary>Cost details</summary>
+
+<summary>Estimate details </summary>
 
 ```
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: my first project
 
@@ -74,9 +92,6 @@ Project: my terragrunt dev project
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
       +$0.88 ($8 → $8)
 
-    - CPU credits
-      $0.00
-
 Monthly cost change for my terragrunt dev project
 Amount:  +$0.88 ($51 → $52)
 Percent: +2%
@@ -109,21 +124,23 @@ Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 10 cloud resources were detected:
-∙ 10 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 10 were estimated
 
-Infracost estimate: Monthly cost will decrease by $2,242 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ my first project                                   ┃ -$561 (-43%) ┃ $743             ┃
-┃ my first project again                             ┃ -$561 (-43%) ┃ $743             ┃
-┃ my terragrunt dev project                          ┃ +$0.88 (+2%) ┃ $52              ┃
-┃ my terragrunt prod project                         ┃ -$561 (-43%) ┃ $748             ┃
-┃ my workspace project                               ┃ -$561 (-43%) ┃ $743             ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate decreased by $2,242 ↓
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ my first project                                   ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my first project again                             ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my terragrunt dev project                          ┃        +$0.88 ┃           - ┃ +$0.88 (+2%) ┃
+┃ my terragrunt prod project                         ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┃ my workspace project                               ┃         -$561 ┃           - ┃ -$561 (-43%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 

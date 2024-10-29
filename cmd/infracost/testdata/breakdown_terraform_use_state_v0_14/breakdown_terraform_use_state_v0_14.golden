@@ -1,52 +1,56 @@
-Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_state.json
+Project: REPLACED_PROJECT_PATH/testdata/terraform_v0.14_state.json
 
- Name                                                              Monthly Qty  Unit   Monthly Cost 
-                                                                                                    
- aws_instance.instance_1                                                                            
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
- └─ root_block_device                                                                               
-    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
-                                                                                                    
- aws_instance.instance_counted[0]                                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
- └─ root_block_device                                                                               
-    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
-                                                                                                    
- aws_instance.instance_named["test.1"]                                                              
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
- └─ root_block_device                                                                               
-    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
-                                                                                                    
- module.db.module.db_1.module.db_instance.aws_db_instance.this[0]                                   
- ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                  730  hours        $12.41 
- └─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
-                                                                                                    
- module.instances.aws_instance.module_instance_1                                                    
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
- └─ root_block_device                                                                               
-    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
-                                                                                                    
- module.instances.aws_instance.module_instance_counted[0]                                           
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
- └─ root_block_device                                                                               
-    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
-                                                                                                    
- module.instances.aws_instance.module_instance_named["test.1"]                                      
- ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
- └─ root_block_device                                                                               
-    └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
-                                                                                                    
- OVERALL TOTAL                                                                               $40.56 
+ Name                                                              Monthly Qty  Unit        Monthly Cost   
+                                                                                                           
+ module.db.module.db_1.module.db_instance.aws_db_instance.this[0]                                          
+ ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                  730  hours             $12.41   
+ ├─ Storage (general purpose SSD, gp2)                                       5  GB                 $0.58   
+ └─ Extended support (year 1)                                            1,460  vCPU-hours       $146.00   
+                                                                                                           
+ aws_instance.instance_1                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours              $3.80   
+ └─ root_block_device                                                                                      
+    └─ Storage (general purpose SSD, gp2)                                    8  GB                 $0.80   
+                                                                                                           
+ aws_instance.instance_counted[0]                                                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours              $3.80   
+ └─ root_block_device                                                                                      
+    └─ Storage (general purpose SSD, gp2)                                    8  GB                 $0.80   
+                                                                                                           
+ aws_instance.instance_named["test.1"]                                                                     
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours              $3.80   
+ └─ root_block_device                                                                                      
+    └─ Storage (general purpose SSD, gp2)                                    8  GB                 $0.80   
+                                                                                                           
+ module.instances.aws_instance.module_instance_1                                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours              $3.80   
+ └─ root_block_device                                                                                      
+    └─ Storage (general purpose SSD, gp2)                                    8  GB                 $0.80   
+                                                                                                           
+ module.instances.aws_instance.module_instance_counted[0]                                                  
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours              $3.80   
+ └─ root_block_device                                                                                      
+    └─ Storage (general purpose SSD, gp2)                                    8  GB                 $0.80   
+                                                                                                           
+ module.instances.aws_instance.module_instance_named["test.1"]                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours              $3.80   
+ └─ root_block_device                                                                                      
+    └─ Storage (general purpose SSD, gp2)                                    8  GB                 $0.80   
+                                                                                                           
+ OVERALL TOTAL                                                                                  $186.56 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 14 cloud resources were detected:
-∙ 7 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 7 were free, rerun with --show-skipped to see details
+∙ 7 were estimated
+∙ 7 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ata/terraform_v0.14_state.json ┃ $41          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ata/terraform_v0.14_state.json ┃          $187 ┃           - ┃       $187 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

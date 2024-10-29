@@ -13,13 +13,14 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
+      "displayName": "",
       "metadata": {
-        "path": "testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
         "type": "terraform_plan_json",
         "policySha": "someshastring",
         "pastPolicySha": "0",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
         "providers": [
           {
             "name": "aws",
@@ -33,10 +34,174 @@
       "pastBreakdown": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
+              "volume_tags.baz": "bat"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "metadata": {
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c"
+            },
+            "hourlyCost": "0.91197260273972602",
+            "monthlyCost": "665.74",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00698630136986301",
+                "monthlyCost": "5.1",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0698630136986301",
+                    "monthlyQuantity": "51",
+                    "price": "0.1",
+                    "hourlyCost": "0.00698630136986301",
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.13698630136986301",
+                "monthlyCost": "100",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.1",
+                    "hourlyCost": "0.13698630136986301",
+                    "monthlyCost": "100",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
+            "resourceType": "aws_dynamodb_table",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "tagPropagation": {
+              "to": "replica",
+              "from": "",
+              "attribute": "replica.0.propagate_tags"
+            },
+            "providerSupportsDefaultTags": true,
+            "metadata": {
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
+            },
+            "hourlyCost": "0.0078",
+            "monthlyCost": "5.694",
+            "monthlyUsageCost": "2.847",
+            "costComponents": [
+              {
+                "name": "Write capacity unit (WCU, autoscaling)",
+                "unit": "WCU",
+                "hourlyQuantity": "0.0082191780821918",
+                "monthlyQuantity": "6",
+                "price": "0.4745",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Read capacity unit (RCU)",
+                "unit": "RCU",
+                "hourlyQuantity": "0.0410958904109589",
+                "monthlyQuantity": "30",
+                "price": "0.0949",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "priceNotFound": false
+              },
+              {
+                "name": "Data storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.25",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "On-demand backup storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.1",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Table data restored",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.15",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Streams read request unit (sRRU)",
+                "unit": "sRRUs",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000002",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
           {
             "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
             "resourceType": "aws_appautoscaling_target",
@@ -44,6 +209,11 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
             }
@@ -55,244 +225,41 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "metadata": {
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
-            }
-          },
-          {
-            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
-            "resourceType": "aws_dynamodb_table",
-            "tags": {
+            "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
+            "providerSupportsDefaultTags": true,
             "metadata": {
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
-            },
-            "hourlyCost": "0.0078",
-            "monthlyCost": "5.694",
-            "costComponents": [
-              {
-                "name": "Write capacity unit (WCU, autoscaling)",
-                "unit": "WCU",
-                "hourlyQuantity": "0.0082191780821918",
-                "monthlyQuantity": "6",
-                "price": "0.4745",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Read capacity unit (RCU)",
-                "unit": "RCU",
-                "hourlyQuantity": "0.0410958904109589",
-                "monthlyQuantity": "30",
-                "price": "0.0949",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Data storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.25",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Point-In-Time Recovery (PITR) backup storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.2",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "On-demand backup storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.1",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Table data restored",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.15",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Streams read request unit (sRRU)",
-                "unit": "sRRUs",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.0000002",
-                "hourlyCost": null,
-                "monthlyCost": null
-              }
-            ]
-          },
-          {
-            "name": "aws_instance.web_app",
-            "resourceType": "aws_instance",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
-              "foo": "bar",
-              "volume_tags.baz": "bat"
-            },
-            "metadata": {
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
-            },
-            "hourlyCost": "0.91197260273972602",
-            "monthlyCost": "665.74",
-            "costComponents": [
-              {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
-                "unit": "hours",
-                "hourlyQuantity": "1",
-                "monthlyQuantity": "730",
-                "price": "0.768",
-                "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
-              }
-            ],
-            "subresources": [
-              {
-                "name": "root_block_device",
-                "metadata": {},
-                "hourlyCost": "0.00698630136986301",
-                "monthlyCost": "5.1",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "0.0698630136986301",
-                    "monthlyQuantity": "51",
-                    "price": "0.1",
-                    "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
-                  }
-                ]
-              },
-              {
-                "name": "ebs_block_device[0]",
-                "metadata": {},
-                "hourlyCost": "0.13698630136986301",
-                "monthlyCost": "100",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "1.3698630136986301",
-                    "monthlyQuantity": "1000",
-                    "price": "0.1",
-                    "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
-                  }
-                ]
-              }
-            ]
+            }
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
-        "totalMonthlyCost": "671.434"
+        "totalMonthlyCost": "671.434",
+        "totalMonthlyUsageCost": "2.847"
       },
       "diff": {
         "resources": [
           {
-            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
-            "resourceType": "aws_dynamodb_table",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {},
-            "hourlyCost": "0.0078",
-            "monthlyCost": "5.694",
-            "costComponents": [
-              {
-                "name": "Write capacity unit (WCU, autoscaling)",
-                "unit": "WCU",
-                "hourlyQuantity": "0.0082191780821918",
-                "monthlyQuantity": "6",
-                "price": "0.4745",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Read capacity unit (RCU)",
-                "unit": "RCU",
-                "hourlyQuantity": "0.0410958904109589",
-                "monthlyQuantity": "30",
-                "price": "0.0949",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Data storage",
-                "unit": "GB",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.25",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Point-In-Time Recovery (PITR) backup storage",
-                "unit": "GB",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "On-demand backup storage",
-                "unit": "GB",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.1",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Table data restored",
-                "unit": "GB",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.15",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Streams read request unit (sRRU)",
-                "unit": "sRRUs",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000002",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              }
-            ]
-          },
-          {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
             },
             "metadata": {},
             "hourlyCost": "0.91197260273972602",
             "monthlyCost": "665.74",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
@@ -301,7 +268,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -310,6 +278,7 @@
                 "metadata": {},
                 "hourlyCost": "0.00698630136986301",
                 "monthlyCost": "5.1",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (general purpose SSD, gp2)",
@@ -318,7 +287,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -327,6 +297,7 @@
                 "metadata": {},
                 "hourlyCost": "0.13698630136986301",
                 "monthlyCost": "100",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (general purpose SSD, gp2)",
@@ -335,15 +306,100 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
+            "resourceType": "aws_dynamodb_table",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0078",
+            "monthlyCost": "5.694",
+            "monthlyUsageCost": "2.847",
+            "costComponents": [
+              {
+                "name": "Write capacity unit (WCU, autoscaling)",
+                "unit": "WCU",
+                "hourlyQuantity": "0.0082191780821918",
+                "monthlyQuantity": "6",
+                "price": "0.4745",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Read capacity unit (RCU)",
+                "unit": "RCU",
+                "hourlyQuantity": "0.0410958904109589",
+                "monthlyQuantity": "30",
+                "price": "0.0949",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "priceNotFound": false
+              },
+              {
+                "name": "Data storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.25",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "On-demand backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.1",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Table data restored",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.15",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Streams read request unit (sRRU)",
+                "unit": "sRRUs",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000002",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
-        "totalMonthlyCost": "671.434"
+        "totalMonthlyCost": "671.434",
+        "totalMonthlyUsageCost": "2.847"
       },
       "summary": {
         "totalDetectedResources": 4,
@@ -358,10 +414,13 @@
   ],
   "totalHourlyCost": "0.91977260273972602",
   "totalMonthlyCost": "671.434",
+  "totalMonthlyUsageCost": "2.847",
   "pastTotalHourlyCost": "0",
   "pastTotalMonthlyCost": "0",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0.91977260273972602",
   "diffTotalMonthlyCost": "671.434",
+  "diffTotalMonthlyUsageCost": "2.847",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 4,

@@ -64,15 +64,8 @@ func (v *VertexResource) evaluate(e *Evaluator, b *Block) error {
 		return fmt.Errorf("resource block %s has no label", v.ID())
 	}
 
-	var existingVals map[string]cty.Value
-	existingCtx := e.ctx.Get(b.TypeLabel())
-	if !existingCtx.IsNull() {
-		existingVals = existingCtx.AsValueMap()
-	} else {
-		existingVals = make(map[string]cty.Value)
-	}
-
-	val := e.evaluateResource(b, existingVals)
+	// We don't care about the existing values, this is only needed by the legacy evaluator
+	val := e.evaluateResourceOrData(b, map[string]cty.Value{})
 
 	v.logger.Debug().Msgf("adding resource %s to the evaluation context", v.ID())
 	e.ctx.SetByDot(val, b.TypeLabel())

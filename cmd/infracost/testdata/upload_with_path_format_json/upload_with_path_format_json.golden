@@ -1,0 +1,45 @@
+{
+  "id": "ff050cb8-eaaa-479f-8865-3fc0fd689b9f",
+  "shareUrl": "",
+  "cloudUrl": "https://dashboard.infracost.io/org/tim/repos/4e936c53-6091-4836-82da-e106ff653aec/runs/ff050cb8-eaaa-479f-8865-3fc0fd689b9f",
+  "pullRequestUrl": "https://dashboard.infracost.io/org/tim/repos/4e936c53-6091-4836-82da-e106ff653aec/pulls/null",
+  "commentMarkdown": "\n\u003ch4\u003eGovernance checks\u003c/h4\u003e\n\n\u003cdetails\u003e\n\u003csummary\u003e\u003cstrong\u003e🔴 4 failures\u003c/strong\u003e...",
+  "governanceFailures": null,
+  "governanceResults": [
+    {
+      "govType": "tag_policy",
+      "checked": 1,
+      "warnings": [
+        "Timtags"
+      ],
+      "failures": [],
+      "unblocked": []
+    },
+    {
+      "govType": "finops_policy",
+      "checked": 48,
+      "warnings": [
+        "Cloudwatch - consider using a retention policy to reduce storage costs",
+        "EBS - consider upgrading gp2 volumes to gp3",
+        "S3 - consider using a lifecycle policy to reduce storage costs"
+      ],
+      "failures": [],
+      "unblocked": []
+    },
+    {
+      "govType": "guardrail",
+      "checked": 0,
+      "warnings": [],
+      "failures": [],
+      "unblocked": []
+    }
+  ]
+}
+Logs:
+INFO Estimate uploaded to Infracost Cloud
+INFO 1 tag policy checked
+INFO tag policy check failed: Timtags
+INFO 48 finops policies checked
+INFO finops policy check failed: Cloudwatch - consider using a retention policy to reduce storage costs
+INFO finops policy check failed: EBS - consider upgrading gp2 volumes to gp3
+INFO finops policy check failed: S3 - consider using a lifecycle policy to reduce storage costs

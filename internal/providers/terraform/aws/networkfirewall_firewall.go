@@ -7,18 +7,17 @@ import (
 
 func getNetworkfirewallFirewallRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_networkfirewall_firewall",
-		RFunc: newNetworkfirewallFirewall,
+		Name:      "aws_networkfirewall_firewall",
+		CoreRFunc: newNetworkfirewallFirewall,
 	}
 }
 
-func newNetworkfirewallFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newNetworkfirewallFirewall(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	r := &aws.NetworkfirewallFirewall{
 		Address: d.Address,
 		Region:  region,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

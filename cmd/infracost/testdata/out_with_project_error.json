@@ -21,7 +21,7 @@
         "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error/dev",
         "errors": [
           {
-            "code": 2,
+            "code": 102,
             "message": "Error loading Terraform modules: failed to inspect module path testdata/breakdown_multi_project_with_error/dev diag: Invalid block definition: Either a quoted string block label or an opening brace (\"{\") is expected here. (and 1 other messages)",
             "data": null
           }

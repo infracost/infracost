@@ -1,8 +1,9 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMKeyVaultManagedHSMRegistryItem() *schema.RegistryItem {
@@ -13,7 +14,7 @@ func GetAzureRMKeyVaultManagedHSMRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMKeyVaultManagedHSM(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	var costComponents []*schema.CostComponent
 

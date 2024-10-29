@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // DataFactoryIntegrationRuntimeAzure struct represents Azure Data Factory's
@@ -24,9 +25,14 @@ type DataFactoryIntegrationRuntimeAzure struct {
 	MonthlyOrchestrationRuns *int64 `infracost_usage:"monthly_orchestration_runs"`
 }
 
-// DataFactoryIntegrationRuntimeAzureUsageSchema defines a list which represents the usage schema of DataFactoryIntegrationRuntimeAzure.
-var DataFactoryIntegrationRuntimeAzureUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+func (r *DataFactoryIntegrationRuntimeAzure) CoreType() string {
+	return "DataFactoryIntegrationRuntimeAzure"
+}
+
+func (r *DataFactoryIntegrationRuntimeAzure) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataFactoryIntegrationRuntimeAzure.
@@ -51,7 +57,7 @@ func (r *DataFactoryIntegrationRuntimeAzure) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    DataFactoryIntegrationRuntimeAzureUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -61,14 +67,17 @@ func (r *DataFactoryIntegrationRuntimeAzure) BuildResource() *schema.Resource {
 // CPAPI contains 2 records with the same price, but one is newer and its
 // armSkuName is not empty thus using a non-empty filter.
 func (r *DataFactoryIntegrationRuntimeAzure) computeCostComponent() *schema.CostComponent {
+
 	productType := map[string]string{
 		"general":           "General Purpose",
 		"compute_optimized": "Compute Optimized",
 		"memory_optimized":  "Memory Optimized",
 	}[r.ComputeType]
 
+	name := fmt.Sprintf("Compute (%s, %d vCores)", productType, r.Cores)
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s, %d vCores)", productType, r.Cores),
+		Name:           name,
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(r.Cores),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.Cores)),
@@ -78,7 +87,6 @@ func (r *DataFactoryIntegrationRuntimeAzure) computeCostComponent() *schema.Cost
 			Service:       strPtr("Azure Data Factory v2"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "armSkuName", ValueRegex: strPtr("/.+/")},
 				{Key: "skuName", ValueRegex: regexPtr("^vCore$")},
 				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("^Azure Data Factory v2 Data Flow - %s$", productType))},
 			},
@@ -116,6 +124,7 @@ func dataFactoryOrchestrationCostComponent(region string, filter string, runs *i
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 

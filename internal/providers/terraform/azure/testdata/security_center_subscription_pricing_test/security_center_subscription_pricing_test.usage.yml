@@ -20,9 +20,9 @@ resource_usage:
   azurerm_security_center_subscription_pricing.standard_example_with_usage["AppServices"]:
     monthly_app_service_nodes: 12
   azurerm_security_center_subscription_pricing.standard_example_with_usage["KeyVaults"]:
-    monthly_key_vault_transactions: 130000
+    monthly_key_vaults: 13
   azurerm_security_center_subscription_pricing.standard_example_with_usage["Arm"]:
-    monthly_arm_api_calls: 14000000
+    monthly_arm_subscriptions: 14
   azurerm_security_center_subscription_pricing.standard_example_with_usage["Dns"]:
     monthly_dns_queries: 15000000
   azurerm_security_center_subscription_pricing.standard_example_with_usage["KubernetesService"]:

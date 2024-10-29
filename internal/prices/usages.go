@@ -126,53 +126,111 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 	return nil
 }
 
+// chunkPartialResourcesWithUsage collects all partiral resources with a core resource usage schema
+// into groups of the specified chunkSize
+func chunkPartialResourcesWithUsage(resources []*schema.PartialResource, chunkSize int) [][]*schema.PartialResource {
+	var usageResourceChunks [][]*schema.PartialResource
+	var currentChunk []*schema.PartialResource
+	for _, rb := range resources {
+		if rb.CoreResource != nil && len(rb.CoreResource.UsageSchema()) > 0 {
+			if len(currentChunk) >= chunkSize {
+				usageResourceChunks = append(usageResourceChunks, currentChunk)
+				currentChunk = nil
+			}
+			currentChunk = append(currentChunk, rb)
+		}
+	}
+	if len(currentChunk) > 0 {
+		usageResourceChunks = append(usageResourceChunks, currentChunk)
+	}
+
+	return usageResourceChunks
+}
+
 // FetchUsageData fetches usage estimates derived from cloud provider reported usage
 // from the Infracost Cloud Usage API for each supported resource in the project
 func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.UsageMap, error) {
 	c := apiclient.NewUsageAPIClient(ctx)
 
-	// gather all the CoreResource
-	coreResources := make(map[string]schema.CoreResource)
-	for _, rb := range project.AllPartialResources() {
-		if rb.CoreResource != nil {
-			coreResources[rb.ResourceData.Address] = rb.CoreResource
-		}
+	// Set the number of workers
+	numWorkers := 4
+	numCPU := runtime.NumCPU()
+	if numCPU*4 > numWorkers {
+		numWorkers = numCPU * 4
+	}
+	if numWorkers > 16 {
+		numWorkers = 16
 	}
 
-	usageMap := make(map[string]*schema.UsageData, len(coreResources))
-	// look up the usage for each core resource.
-	for address, cr := range coreResources {
-		// TODO: add concurrency
-		usageKeys := flattenUsageKeys(cr.UsageSchema())
+	// gather all the CoreResource into chunks
+	usageResourceChunks := chunkPartialResourcesWithUsage(project.AllPartialResources(), 10)
 
-		if len(usageKeys) > 0 {
-			var usageParams []schema.UsageParam
-			if crWithUsageParams, ok := cr.(schema.CoreResourceWithUsageParams); ok {
-				usageParams = crWithUsageParams.UsageEstimationParams()
-			}
+	usageMap := make(map[string]*schema.UsageData, len(usageResourceChunks)*10)
 
-			vars := apiclient.UsageQuantitiesQueryVariables{
-				RepoURL:              ctx.VCSRepositoryURL(),
-				ProjectWithWorkspace: project.NameWithWorkspace(),
-				ResourceType:         cr.CoreType(),
-				Address:              address,
-				UsageKeys:            usageKeys,
-				UsageParams:          usageParams,
-			}
+	numJobs := len(usageResourceChunks)
+	jobs := make(chan []*schema.PartialResource, numJobs)
+	responses := make(chan batchResponse, numJobs)
 
-			attributes, err := c.ListUsageQuantities(vars)
-			if err != nil {
-				return schema.NewUsageMap(usageMap), err
+	// Fire up the workers
+	for i := 0; i < numWorkers; i++ {
+		go func(jobs <-chan []*schema.PartialResource, responses chan<- batchResponse) {
+			for req := range jobs {
+				res := fetchUsageDataBatch(ctx, c, project, req)
+				responses <- res
 			}
+		}(jobs, responses)
+	}
 
-			usageMap[address] = &schema.UsageData{
-				Address:    address,
-				Attributes: attributes,
-			}
+	// Feed the workers the jobs
+	for _, r := range usageResourceChunks {
+		jobs <- r
+	}
+
+	// Get the result of the jobs
+	for i := 0; i < numJobs; i++ {
+		res := <-responses
+		if res.Error != nil {
+			return schema.NewUsageMap(usageMap), res.Error
+		}
+
+		for _, ud := range res.UsageData {
+			usageMap[ud.Address] = ud
 		}
 	}
 
 	return schema.NewUsageMap(usageMap), nil
+}
+
+type batchResponse struct {
+	UsageData []*schema.UsageData
+	Error     error
+}
+
+func fetchUsageDataBatch(ctx *config.RunContext, c *apiclient.UsageAPIClient, project *schema.Project, resources []*schema.PartialResource) batchResponse {
+	chunkedQueryVars := make([]*apiclient.UsageQuantitiesQueryVariables, 0, len(resources))
+	for _, partialResource := range resources {
+		var usageParams []schema.UsageParam
+		if crWithUsageParams, ok := partialResource.CoreResource.(schema.CoreResourceWithUsageParams); ok {
+			usageParams = crWithUsageParams.UsageEstimationParams()
+		}
+
+		queryVars := apiclient.UsageQuantitiesQueryVariables{
+			RepoURL:              ctx.VCSRepositoryURL(),
+			ProjectWithWorkspace: project.NameWithWorkspace(),
+			ResourceType:         partialResource.CoreResource.CoreType(),
+			Address:              partialResource.Address,
+			UsageKeys:            flattenUsageKeys(partialResource.CoreResource.UsageSchema()),
+			UsageParams:          usageParams,
+		}
+		chunkedQueryVars = append(chunkedQueryVars, &queryVars)
+	}
+
+	ud, err := c.ListUsageQuantities(chunkedQueryVars)
+
+	return batchResponse{
+		UsageData: ud,
+		Error:     err,
+	}
 }
 
 // UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used
@@ -184,7 +242,7 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 	for _, partial := range project.AllPartialResources() {
 		for _, resourceID := range partial.CloudResourceIDs {
 			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{
-				Address:    partial.ResourceData.Address,
+				Address:    partial.Address,
 				ResourceID: resourceID},
 			)
 		}
@@ -205,16 +263,16 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 }
 
 func flattenUsageKeys(usageSchema []*schema.UsageItem) []string {
-	usageKeys := make([]string, len(usageSchema))
-	for i, usageItem := range usageSchema {
+	usageKeys := make([]string, 0, len(usageSchema))
+	for _, usageItem := range usageSchema {
 		if usageItem.ValueType == schema.SubResourceUsage {
 			ru := usageItem.DefaultValue.(*usage.ResourceUsage)
 			// recursively flatten any nested keys, then add them to the current list
 			for _, nestedKey := range flattenUsageKeys(ru.Items) {
-				usageKeys[i] = usageItem.Key + "." + nestedKey
+				usageKeys = append(usageKeys, usageItem.Key+"."+nestedKey)
 			}
 		} else {
-			usageKeys[i] = usageItem.Key
+			usageKeys = append(usageKeys, usageItem.Key)
 		}
 	}
 

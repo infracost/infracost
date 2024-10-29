@@ -1,0 +1,8 @@
+.
+├── dup
+│   ├── terragrunt.hcl
+│   ├── main.tf
+│   ├── prod.tfvars
+│   └── dev.tfvars
+└── nondup
+    └── terragrunt.hcl

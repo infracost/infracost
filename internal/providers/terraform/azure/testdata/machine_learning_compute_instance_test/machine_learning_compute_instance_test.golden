@@ -1,0 +1,79 @@
+
+ Name                                                                          Monthly Qty  Unit                      Monthly Cost   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_NV24"]                                                                  
+ └─ Instance usage (Linux, pay as you go, Standard_NV24)                               730  hours                        $3,328.80   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_NC24"]                                                                  
+ └─ Instance usage (Linux, pay as you go, Standard_NC24)                               730  hours                        $2,628.00   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_NV12"]                                                                  
+ └─ Instance usage (Linux, pay as you go, Standard_NV12)                               730  hours                        $1,664.40   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_NC12"]                                                                  
+ └─ Instance usage (Linux, pay as you go, Standard_NC12)                               730  hours                        $1,314.00   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_NV6"]                                                                   
+ └─ Instance usage (Linux, pay as you go, Standard_NV6)                                730  hours                          $832.20   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_E16s_v3"]                                                               
+ └─ Instance usage (Linux, pay as you go, Standard_E16s_v3)                            730  hours                          $735.84   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_NC6"]                                                                   
+ └─ Instance usage (Linux, pay as you go, Standard_NC6)                                730  hours                          $657.00   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_D16s_v3"]                                                               
+ └─ Instance usage (Linux, pay as you go, Standard_D16s_v3)                            730  hours                          $560.64   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_F16s_v2"]                                                               
+ └─ Instance usage (Linux, pay as you go, Standard_F16s_v2)                            730  hours                          $494.21   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_E8s_v3"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_E8s_v3)                             730  hours                          $367.92   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_D8s_v3"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_D8s_v3)                             730  hours                          $280.32   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_DS12_v2"]                                                               
+ └─ Instance usage (Linux, pay as you go, Standard_DS12_v2)                            730  hours                          $270.83   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_F8s_v2"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_F8s_v2)                             730  hours                          $246.74   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_E4s_v3"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_E4s_v3)                             730  hours                          $183.96   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_D4s_v3"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_D4s_v3)                             730  hours                          $140.16   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_F4s_v2"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_F4s_v2)                             730  hours                          $123.37   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.example["Standard_D2s_v3"]                                                                
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                             730  hours                           $70.08   
+                                                                                                                                     
+ azurerm_machine_learning_compute_instance.with_monthly_hrs                                                                          
+ └─ Instance usage (Linux, pay as you go, Standard_D2s_v3)                             100  hours                            $9.60   
+                                                                                                                                     
+ azurerm_storage_account.example                                                                                                     
+ ├─ Capacity                                                            Monthly cost depends on usage: $0.0392 per GB                
+ ├─ Write operations                                                    Monthly cost depends on usage: $0.11 per 10k operations      
+ ├─ List and create container operations                                Monthly cost depends on usage: $0.11 per 10k operations      
+ ├─ Read operations                                                     Monthly cost depends on usage: $0.0043 per 10k operations    
+ ├─ All other operations                                                Monthly cost depends on usage: $0.0043 per 10k operations    
+ └─ Blob index                                                          Monthly cost depends on usage: $0.075 per 10k tags           
+                                                                                                                                     
+ OVERALL TOTAL                                                                                                         $13,908.07 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+21 cloud resources were detected:
+∙ 19 were estimated
+∙ 2 were free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃       $13,908 ┃           - ┃    $13,908 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

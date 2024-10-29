@@ -29,11 +29,14 @@ func newReference(parts []string) (*Reference, error) {
 
 	ref.blockType = *blockType
 
+	remainderIndex := 3
+
 	if ref.blockType.removeTypeInReference && parts[0] != blockType.name {
 		ref.typeLabel = parts[0]
 		if len(parts) > 1 {
 			ref.nameLabel = parts[1]
 		}
+		remainderIndex = 2
 	} else if len(parts) > 1 {
 		ref.typeLabel = parts[1]
 		if len(parts) > 2 {
@@ -50,8 +53,8 @@ func newReference(parts []string) (*Reference, error) {
 		ref.key = "[" + bits[1]
 	}
 
-	if len(parts) > 3 {
-		ref.remainder = parts[3:]
+	if len(parts) > remainderIndex {
+		ref.remainder = parts[remainderIndex:]
 	}
 
 	return &ref, nil

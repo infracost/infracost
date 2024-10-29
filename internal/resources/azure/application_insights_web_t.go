@@ -2,11 +2,10 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +17,13 @@ type ApplicationInsightsWebTest struct {
 	Enabled bool
 }
 
-var ApplicationInsightsWebTestUsageSchema = []*schema.UsageItem{}
+func (r *ApplicationInsightsWebTest) CoreType() string {
+	return "ApplicationInsightsWebTest"
+}
+
+func (r *ApplicationInsightsWebTest) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ApplicationInsightsWebTest) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -50,15 +55,17 @@ func (r *ApplicationInsightsWebTest) BuildResource() *schema.Resource {
 
 	if len(costComponents) == 0 {
 		return &schema.Resource{
-			Name:      r.Address,
-			IsSkipped: true,
-			NoPrice:   true, UsageSchema: ApplicationInsightsWebTestUsageSchema,
+			Name:        r.Address,
+			IsSkipped:   true,
+			NoPrice:     true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ApplicationInsightsWebTestUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 
 }

@@ -1,0 +1,30 @@
+Project: main
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ module.mod_eu1.aws_instance.instance_eu1[0]                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $9.20   
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB            $0.88   
+                                                                                         
+ module.mod_us2.aws_instance.instance_us2[0]                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $8.47   
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB            $0.80   
+                                                                                         
+ OVERALL TOTAL                                                                 $19.35 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $19 ┃           - ┃        $19 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+

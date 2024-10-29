@@ -1,98 +1,106 @@
 
- Name                                                              Monthly Qty  Unit   Monthly Cost 
-                                                                                                    
- google_compute_instance.custom                                                                     
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.71 
- ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)                  730  hours        $45.44 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.custom_ext                                                                 
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 2 vCPUs)                730  hours        $33.90 
- ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 13 GB)                  730  hours        $29.53 
- ├─ Custom Instance Extended RAM (Linux/UNIX, on-demand, N1 2 GB)          730  hours         $9.76 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.custom_n1                                                                  
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.71 
- ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)                  730  hours        $45.44 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.custom_n2                                                                  
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N2 6 vCPUs)                730  hours       $116.24 
- ├─ Custom Instance RAM (Linux/UNIX, on-demand, N2 20 GB)                  730  hours        $51.93 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.custom_n2d                                                                 
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $14.02 
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours         $9.43 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.custom_preemptible                                                         
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $30.57 
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $13.72 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.gpu                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)                 730  hours       $388.36 
- ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ NVIDIA Tesla K80 (on-demand)                                         2,920  hours       $919.80 
-                                                                                                    
- google_compute_instance.gpu_with_hours                                                             
- ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)                 100  hours        $76.00 
- ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ NVIDIA Tesla K80 (on-demand)                                           400  hours       $126.00 
-                                                                                                    
- google_compute_instance.local_ssd                                                                  
- ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88 
- ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ Local SSD provisioned storage                                          750  GB           $60.00 
-                                                                                                    
- google_compute_instance.preemptible                                                                
- ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $2.56 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.preemptible_gpu                                                            
- ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $116.80 
- ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $525.60 
-                                                                                                    
- google_compute_instance.preemptible_local_ssd                                                      
- ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $2.56 
- ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ Local SSD provisioned storage                                          375  GB           $19.80 
-                                                                                                    
- google_compute_instance.ssd                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88 
- └─ SSD provisioned storage (pd-ssd)                                        40  GB            $6.80 
-                                                                                                    
- google_compute_instance.standard                                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.sud_20_perc_with_hours                                                     
- ├─ Instance usage (Linux/UNIX, on-demand, n2-standard-8)                  730  hours       $226.87 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.sud_30_perc_with_hours                                                     
- ├─ Instance usage (Linux/UNIX, on-demand, m1-ultramem-80)                 730  hours     $6,431.55 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- google_compute_instance.with_hours                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       100  hours         $0.76 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
- OVERALL TOTAL                                                                            $9,524.91 
+ Name                                                              Monthly Qty  Unit   Monthly Cost   
+                                                                                                      
+ google_compute_instance.sud_30_perc_with_hours                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, m1-ultramem-80)                 730  hours     $6,431.55   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.gpu                                                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)                 730  hours       $388.36   
+ ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+ └─ NVIDIA Tesla K80 (on-demand)                                         2,920  hours       $919.80   
+                                                                                                      
+ google_compute_instance.gpu_l4                                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, g2-standard-4)                  730  hours       $515.99   
+ ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+ └─ NVIDIA L4 (on-demand)                                                  730  hours       $286.18   
+                                                                                                      
+ google_compute_instance.preemptible_gpu                                                              
+ ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $152.19   
+ ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+ └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $501.95   
+                                                                                                      
+ google_compute_instance.sud_20_perc_with_hours                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, n2-standard-8)                  730  hours       $226.87   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.gpu_with_hours                                                               
+ ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)                 100  hours        $76.00   
+ ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+ └─ NVIDIA Tesla K80 (on-demand)                                           400  hours       $126.00   
+                                                                                                      
+ google_compute_instance.custom_n2                                                                    
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N2 6 vCPUs)                730  hours       $116.30   
+ ├─ Custom Instance RAM (Linux/UNIX, on-demand, N2 20 GB)                  730  hours        $51.96   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.custom                                                                       
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.77   
+ ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)                  730  hours        $45.44   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.custom_n1                                                                    
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.77   
+ ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)                  730  hours        $45.44   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.custom_ext                                                                   
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 2 vCPUs)                730  hours        $33.92   
+ ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 13 GB)                  730  hours        $29.53   
+ ├─ Custom Instance Extended RAM (Linux/UNIX, on-demand, N1 2 GB)          730  hours         $9.76   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.local_ssd                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88   
+ ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+ └─ Local SSD provisioned storage                                          750  GB           $60.00   
+                                                                                                      
+ google_compute_instance.custom_preemptible                                                           
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $40.47   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $17.29   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.custom_n2d                                                                   
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $15.27   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours        $10.21   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.preemptible_local_ssd                                                        
+ ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $2.56   
+ ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+ └─ Local SSD provisioned storage                                          375  GB           $21.00   
+                                                                                                      
+ google_compute_instance.ssd                                                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88   
+ └─ SSD provisioned storage (pd-ssd)                                        40  GB            $6.80   
+                                                                                                      
+ google_compute_instance.standard                                                                     
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.preemptible                                                                  
+ ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $2.56   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.with_hours                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       100  hours         $0.76   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ OVERALL TOTAL                                                                          $10,356.12 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
-18 cloud resources were detected:
-∙ 17 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+19 cloud resources were detected:
+∙ 18 were estimated
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x google_compute_instance
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeInstanceGoldenFile                      ┃ $9,525       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃       $10,356 ┃           - ┃    $10,356 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource google_compute_instance.e2_custom. Infracost currently does not support E2 custom instances
+WARN Skipping resource google_compute_instance.e2_custom. Infracost currently does not support E2 custom instances

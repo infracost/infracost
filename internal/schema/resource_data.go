@@ -2,22 +2,41 @@ package schema
 
 import (
 	"encoding/json"
+	"strings"
 
-	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation"
 	"github.com/tidwall/gjson"
 )
 
 type ResourceData struct {
-	Type          string
-	ProviderName  string
-	Address       string
-	Tags          *map[string]string
-	RawValues     gjson.Result
-	ReferencesMap map[string][]*ResourceData
-	CFResource    cloudformation.Resource
-	UsageData     *UsageData
-	Metadata      map[string]gjson.Result
-	pulumiUrn     string
+	Type                                    string
+	ProviderName                            string
+	Address                                 string
+	Tags                                    *map[string]string
+	DefaultTags                             *map[string]string
+	ProviderSupportsDefaultTags             bool
+	ProviderLink                            string
+	TagPropagation                          *TagPropagation
+	RawValues                               gjson.Result
+	ReferencesMap                           map[string][]*ResourceData
+	CFResource                              cloudformation.Resource
+	UsageData                               *UsageData
+	Metadata                                map[string]gjson.Result
+	MissingVarsCausingUnknownTagKeys        []string
+	MissingVarsCausingUnknownDefaultTagKeys []string
+	// Region is the region of the resource. When building a resource callers should
+	// use this value instead of the deprecated d.Get("region").String() or
+	// lookupRegion method.
+	Region string
+	PulumiUrn     string
+}
+
+type TagPropagation struct {
+	To                    string             // a human-readable name of the type being propagated to - will not always have a tf type
+	From                  *string            // e.g. SERVICE, TASK_DEFINITION
+	Tags                  *map[string]string // tags that were propagated from the above resource, if any
+	Attribute             string             // the attribute that can be used to configured propagation, e.g. propagate_tags
+	HasRequiredAttributes bool               // whether the resource has the required attributes to warrant propagating tags
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {
@@ -29,7 +48,7 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		RawValues:     rawValues,
 		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    nil,
-		pulumiUrn:     "",
+		PulumiUrn:     "",
 	}
 }
 
@@ -42,7 +61,7 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 		RawValues:     gjson.Result{},
 		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    cfResource,
-		pulumiUrn:     "",
+		PulumiUrn:     "",
 	}
 }
 
@@ -55,19 +74,19 @@ func NewPulumiResourceData(resourceType string, providerName string, address str
 		RawValues:     rawValues,
 		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    nil,
-		pulumiUrn:     pulumiURN,
+		PulumiUrn:     pulumiURN,
 	}
 }
 
 func (d *ResourceData) Get(key string) gjson.Result {
-	return d.RawValues.Get(key)
+	return gjson.Parse(strings.Clone(d.RawValues.Get(key).Raw))
 }
 
 // GetStringOrDefault returns the value of key within ResourceData as a string.
 // If the retrieved value is not set GetStringOrDefault will return def.
 func (d *ResourceData) GetStringOrDefault(key, def string) string {
 	if !d.IsEmpty(key) {
-		return d.RawValues.Get(key).String()
+		return strings.Clone(d.RawValues.Get(key).String())
 	}
 
 	return def
@@ -118,7 +137,10 @@ func (d *ResourceData) References(keys ...string) []*ResourceData {
 	return data
 }
 
-func (d *ResourceData) AddReference(key string, reference *ResourceData, reverseRefAttrs []string) {
+func (d *ResourceData) AddReference(k string, reference *ResourceData, reverseRefAttrs []string) {
+	// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+	// the entire underlying parsed json from being garbage collected.
+	key := strings.Clone(k)
 	if _, ok := d.ReferencesMap[key]; !ok {
 		d.ReferencesMap[key] = make([]*ResourceData, 0)
 	}

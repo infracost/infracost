@@ -3,11 +3,11 @@ package terraform
 import (
 	"os"
 
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
-
 	"github.com/pkg/errors"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type StateJSONProvider struct {
@@ -24,6 +24,20 @@ func NewStateJSONProvider(ctx *config.ProjectContext, includePastResources bool)
 	}
 }
 
+func (p *StateJSONProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *StateJSONProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *StateJSONProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
+func (p *StateJSONProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *StateJSONProvider) Type() string {
 	return "terraform_state_json"
 }
@@ -37,19 +51,14 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
-		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
-		NoColor:       p.ctx.RunContext.Config.NoColor,
-		Indent:        "  ",
-	})
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Extracting only cost-related params from terraform")
 
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name
@@ -60,6 +69,7 @@ func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proj
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
+	j, _ = StripSetupTerraformWrapper(j)
 	parsedConf, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform state JSON file")
@@ -70,6 +80,5 @@ func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proj
 	project.PartialPastResources = parsedConf.PastResources
 	project.PartialResources = parsedConf.CurrentResources
 
-	spinner.Success()
 	return []*schema.Project{project}, nil
 }

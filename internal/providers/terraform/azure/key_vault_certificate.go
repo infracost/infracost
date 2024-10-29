@@ -1,11 +1,11 @@
 package azure
 
 import (
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -16,11 +16,14 @@ func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"key_vault_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"key_vault_id"})
+		},
 	}
 }
 
 func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"key_vault_id"})
+	region := d.Region
 
 	var costComponents []*schema.CostComponent
 
@@ -29,7 +32,7 @@ func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) 
 	if len(keyVault) > 0 {
 		skuName = cases.Title(language.English).String(keyVault[0].Get("sku_name").String())
 	} else {
-		log.Warn().Msgf("Skipping resource %s. Could not find its 'key_vault_id.sku_name' property.", d.Address)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Could not find its 'key_vault_id.sku_name' property.", d.Address)
 		return nil
 	}
 

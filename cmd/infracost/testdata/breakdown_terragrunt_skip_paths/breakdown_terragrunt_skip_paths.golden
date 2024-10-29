@@ -1,77 +1,80 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/glob/test/shown
+Project: glob-test-shown
 Module path: glob/test/shown
 
- Name                                                         Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                    
- aws_instance.web_app                                                                                               
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47 
- ├─ root_block_device                                                                                               
- │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                             
-    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50 
-    └─ Provisioned IOPS                                               400  IOPS                              $26.00 
-                                                                                                                    
- aws_lambda_function.hello_world                                                                                    
- ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                    
- Project total                                                                                               $51.97 
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/glob/test2/shown
+Project: glob-test2-shown
 Module path: glob/test2/shown
 
- Name                                                         Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                    
- aws_instance.web_app                                                                                               
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47 
- ├─ root_block_device                                                                                               
- │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                             
-    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50 
-    └─ Provisioned IOPS                                               400  IOPS                              $26.00 
-                                                                                                                    
- aws_lambda_function.hello_world                                                                                    
- ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                    
- Project total                                                                                               $51.97 
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/shown
+Project: shown
 Module path: shown
 
- Name                                                         Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                    
- aws_instance.web_app                                                                                               
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47 
- ├─ root_block_device                                                                                               
- │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                             
-    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50 
-    └─ Provisioned IOPS                                               400  IOPS                              $26.00 
-                                                                                                                    
- aws_lambda_function.hello_world                                                                                    
- ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                    
- Project total                                                                                               $51.97 
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
 
- OVERALL TOTAL                                                                                              $155.90 
+ OVERALL TOTAL                                                                                             $155.90 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 6 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...unt_skip_paths/glob/test/shown ┃ $52          ┃
-┃ infracost/infracost/cmd/infraco...nt_skip_paths/glob/test2/shown ┃ $52          ┃
-┃ infracost/infracost/cmd/infraco...wn_terragrunt_skip_paths/shown ┃ $52          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ glob-test-shown                                    ┃           $52 ┃           - ┃        $52 ┃
+┃ glob-test2-shown                                   ┃           $52 ┃           - ┃        $52 ┃
+┃ shown                                              ┃           $52 ┃           - ┃        $52 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

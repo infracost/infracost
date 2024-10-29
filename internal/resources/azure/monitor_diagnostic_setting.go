@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // MonitorDiagnosticSetting struct represents an Azure Monitor Diagnostics Setting
@@ -76,5 +77,6 @@ func (r *MonitorDiagnosticSetting) platformLogComponent(q *int64) *schema.CostCo
 				{Key: "skuName", Value: strPtr("Platform Logs")},
 			},
 		},
+		UsageBased: true,
 	}
 }

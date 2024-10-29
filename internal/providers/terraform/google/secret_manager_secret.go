@@ -8,21 +8,21 @@ import (
 )
 
 func getSecretManagerSecretRegistryItem() *schema.RegistryItem {
-	rfunc := func(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-
-		r := newSecretManagerSecret(d)
-		r.PopulateUsage(u)
-
-		return r.BuildResource()
-	}
-
 	return &schema.RegistryItem{
-		Name:  "google_secret_manager_secret",
-		RFunc: rfunc,
+		Name:      "google_secret_manager_secret",
+		CoreRFunc: newSecretManagerSecret,
 	}
 }
 
-func newSecretManagerSecret(d *schema.ResourceData) *google.SecretManagerSecret {
+func newSecretManagerSecret(d *schema.ResourceData) schema.CoreResource {
+	return &google.SecretManagerSecret{
+		Address:              d.Address,
+		Region:               d.Get("region").String(),
+		ReplicationLocations: secretManagerSecretReplicasCount(d),
+	}
+}
+
+func secretManagerSecretReplicasCount(d *schema.ResourceData) int64 {
 	replicasCount := 1
 
 	replications := d.Get("replication.0.user_managed.0")
@@ -30,9 +30,5 @@ func newSecretManagerSecret(d *schema.ResourceData) *google.SecretManagerSecret 
 		replicasCount = len(replications.Get("replicas").Array())
 	}
 
-	return &google.SecretManagerSecret{
-		Address:              d.Address,
-		Region:               d.Get("region").String(),
-		ReplicationLocations: int64(replicasCount),
-	}
+	return int64(replicasCount)
 }

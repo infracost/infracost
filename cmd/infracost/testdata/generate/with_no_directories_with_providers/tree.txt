@@ -1,0 +1,8 @@
+.
+└── modules
+    ├── foo
+    │   └── test.tf
+    ├── bar
+    │   └── test.tf
+    └── baz
+        └── test.tf

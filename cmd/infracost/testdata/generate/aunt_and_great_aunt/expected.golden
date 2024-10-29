@@ -1,0 +1,116 @@
+version: 0.1
+
+projects:
+  - path: infra/apps/bar/us1
+    name: infra-apps-bar-us1-dev
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/dev.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/bar/us1/**
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/dev.tfvars
+      - infra/envs/default.tfvars
+      - infra/envs/dev.tfvars
+  - path: infra/apps/bar/us1
+    name: infra-apps-bar-us1-prod
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/prod.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/bar/us1/**
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/prod.tfvars
+      - infra/envs/default.tfvars
+      - infra/envs/prod.tfvars
+  - path: infra/apps/bar/us2
+    name: infra-apps-bar-us2-dev
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/dev.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/bar/us2/**
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/dev.tfvars
+      - infra/envs/default.tfvars
+      - infra/envs/dev.tfvars
+  - path: infra/apps/bar/us2
+    name: infra-apps-bar-us2-prod
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/prod.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/bar/us2/**
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/prod.tfvars
+      - infra/envs/default.tfvars
+      - infra/envs/prod.tfvars
+  - path: infra/apps/foo/us1
+    name: infra-apps-foo-us1-dev
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/dev.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/dev.tfvars
+      - infra/apps/foo/us1/**
+      - infra/envs/default.tfvars
+      - infra/envs/dev.tfvars
+  - path: infra/apps/foo/us1
+    name: infra-apps-foo-us1-prod
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/prod.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/prod.tfvars
+      - infra/apps/foo/us1/**
+      - infra/envs/default.tfvars
+      - infra/envs/prod.tfvars
+  - path: infra/apps/foo/us2
+    name: infra-apps-foo-us2-dev
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/dev.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/dev.tfvars
+      - infra/apps/foo/us2/**
+      - infra/envs/default.tfvars
+      - infra/envs/dev.tfvars
+  - path: infra/apps/foo/us2
+    name: infra-apps-foo-us2-prod
+    terraform_var_files:
+      - ../../../envs/default.tfvars
+      - ../../../envs/prod.tfvars
+      - ../../envs/default.tfvars
+      - ../../envs/prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/apps/envs/default.tfvars
+      - infra/apps/envs/prod.tfvars
+      - infra/apps/foo/us2/**
+      - infra/envs/default.tfvars
+      - infra/envs/prod.tfvars
+

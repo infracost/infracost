@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // LambdaProvisionedConcurrencyConfig initializes a requested number of execution environments so that
@@ -25,12 +26,18 @@ type LambdaProvisionedConcurrencyConfig struct {
 	MemoryMB             *int64  `infracost_usage:"memory_mb"`
 }
 
-var LambdaProvisionedConcurrencyConfigUsageSchema = []*schema.UsageItem{
-	{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 512},
-	{Key: "architecture", ValueType: schema.String, DefaultValue: "x86_64"},
-	{Key: "monthly_duration_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+func (r *LambdaProvisionedConcurrencyConfig) CoreType() string {
+	return "LambdaProvisionedConcurrencyConfig"
+}
+
+func (r *LambdaProvisionedConcurrencyConfig) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 512},
+		{Key: "architecture", ValueType: schema.String, DefaultValue: "x86_64"},
+		{Key: "monthly_duration_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *LambdaProvisionedConcurrencyConfig) PopulateUsage(u *schema.UsageData) {
@@ -93,6 +100,7 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/Request/")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "Provisioned Concurrency",
@@ -108,6 +116,7 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 					{Key: "group", Value: strPtr(concurrencyType)},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "Duration",
@@ -123,12 +132,13 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 					{Key: "group", Value: strPtr(durationType)},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    LambdaProvisionedConcurrencyConfigUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

@@ -3,6 +3,7 @@
   "metadata": {
     "infracostCommand": "diff",
     "vcsBranch": "stub-branch",
+    "vcsBaseCommitSha": "stub-sha",
     "vcsCommitSha": "stub-sha",
     "vcsCommitAuthorName": "stub-author",
     "vcsCommitAuthorEmail": "stub@stub.com",
@@ -13,13 +14,14 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_policy_data_upload",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/diff_with_policy_data_upload",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",
         "type": "terraform_dir",
         "policySha": "someshastring",
         "pastPolicySha": "someoldshastring",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_policy_data_upload",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload",
         "providers": [
           {
             "name": "aws",
@@ -27,7 +29,7 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "filename": "testdata/diff_with_policy_data_upload/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
             "startLine": 1,
             "endLine": 14
           }
@@ -49,13 +51,13 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 37,
-                  "filename": "testdata/diff_with_policy_data_upload/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
                   "startLine": 16
                 }
               ],
               "checksum": "3acb8d7106140c67676ef9dec839a0c530c96b1b14ebf4cc450e39b1a9d092cd",
               "endLine": 37,
-              "filename": "testdata/diff_with_policy_data_upload/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
               "startLine": 16
             },
             "hourlyCost": "0.33597260273972602",
@@ -68,7 +70,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.192",
                 "hourlyCost": "0.192",
-                "monthlyCost": "140.16"
+                "monthlyCost": "140.16",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -85,7 +88,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -102,7 +106,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -110,7 +115,8 @@
           }
         ],
         "totalHourlyCost": "0.33597260273972602",
-        "totalMonthlyCost": "245.26"
+        "totalMonthlyCost": "245.26",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -121,21 +127,29 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 37,
-                  "filename": "testdata/diff_with_policy_data_upload/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
                   "startLine": 16
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
               "endLine": 37,
-              "filename": "testdata/diff_with_policy_data_upload/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_policy_data_upload/main.tf",
               "startLine": 16
             },
             "hourlyCost": "0.91197260273972602",
@@ -148,7 +162,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -165,7 +180,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -182,7 +198,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -190,7 +207,8 @@
           }
         ],
         "totalHourlyCost": "0.91197260273972602",
-        "totalMonthlyCost": "665.74"
+        "totalMonthlyCost": "665.74",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [
@@ -201,11 +219,18 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
             },
             "metadata": {},
             "hourlyCost": "0.576",
             "monthlyCost": "420.48",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.xlarge → m5.4xlarge)",
@@ -214,13 +239,15 @@
                 "monthlyQuantity": "0",
                 "price": "0.576",
                 "hourlyCost": "0.576",
-                "monthlyCost": "420.48"
+                "monthlyCost": "420.48",
+                "priceNotFound": false
               }
             ]
           }
         ],
         "totalHourlyCost": "0.576",
-        "totalMonthlyCost": "420.48"
+        "totalMonthlyCost": "420.48",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 1,
@@ -235,10 +262,13 @@
   ],
   "totalHourlyCost": "0.91197260273972602",
   "totalMonthlyCost": "665.74",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "0.33597260273972602",
   "pastTotalMonthlyCost": "245.26",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0.576",
   "diffTotalMonthlyCost": "420.48",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 1,

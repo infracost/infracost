@@ -1,0 +1,14 @@
+.
+└── apps
+    ├── bar
+    │   └── main.tf
+    ├── foo
+    │   └── main.tf
+    ├── baz-custom-ext
+    ├── Jenkinsfile
+    ├── dev.tfvars
+    ├── common.tfvars.json
+    ├── empty-file
+    ├── prod-custom-ext
+    ├── prod.env.tfvars
+    └── default.tfvars

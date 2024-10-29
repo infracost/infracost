@@ -18,7 +18,13 @@ type AppServicePlan struct {
 	Region      string
 }
 
-var AppServicePlanUsageSchema = []*schema.UsageItem{}
+func (r *AppServicePlan) CoreType() string {
+	return "AppServicePlan"
+}
+
+func (r *AppServicePlan) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *AppServicePlan) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -38,7 +44,7 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			IsSkipped:   true,
 			NoPrice:     true,
-			UsageSchema: AppServicePlanUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -85,7 +91,7 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 				additionalAttributeFilters...,
 			),
 		},
-		UsageSchema: AppServicePlanUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 

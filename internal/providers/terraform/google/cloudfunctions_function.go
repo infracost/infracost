@@ -7,12 +7,12 @@ import (
 
 func getCloudFunctionsRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_cloudfunctions_function",
-		RFunc: NewCloudFunctionsFunction,
+		Name:      "google_cloudfunctions_function",
+		CoreRFunc: NewCloudFunctionsFunction,
 	}
 }
 
-func NewCloudFunctionsFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFunctionsFunction(d *schema.ResourceData) schema.CoreResource {
 	r := &google.CloudFunctionsFunction{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
@@ -22,6 +22,5 @@ func NewCloudFunctionsFunction(d *schema.ResourceData, u *schema.UsageData) *sch
 		r.AvailableMemoryMB = intPtr(d.Get("available_memory_mb").Int())
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

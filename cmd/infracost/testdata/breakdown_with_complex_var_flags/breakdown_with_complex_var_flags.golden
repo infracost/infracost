@@ -1,0 +1,33 @@
+Project: main
+
+ Name                                                 Monthly Qty  Unit         Monthly Cost    
+                                                                                                
+ aws_lambda_function.hello_world[1]                                                             
+ ├─ Requests                                                  100  1M requests        $20.00  * 
+ └─ Duration (first 6B)                                 6,250,000  GB-seconds        $104.17  * 
+                                                                                                
+ aws_lambda_function.hello_world[0]                                                             
+ ├─ Requests                                                  100  1M requests        $20.00  * 
+ └─ Duration (first 6B)                                 3,125,000  GB-seconds         $52.08  * 
+                                                                                                
+ aws_instance.web_app                                                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours               $8.47    
+ └─ root_block_device                                                                           
+    └─ Storage (general purpose SSD, gp2)                      20  GB                  $2.00    
+                                                                                                
+ OVERALL TOTAL                                                                       $206.72 
+
+*Usage costs were estimated using infracost-usage.yml, see docs for other options.
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $10 ┃        $196 ┃       $207 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+

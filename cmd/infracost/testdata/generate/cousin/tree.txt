@@ -1,0 +1,22 @@
+.
+└── infra
+    ├── components
+    │   └── foo
+    │       └── main.tf
+    ├── variables
+    │   └── envs
+    │       ├── dev
+    │       │   └── dev.tfvars
+    │       └── prod
+    │           └── prod.tfvars
+    └── nested
+        ├── components
+        │   └── baz
+        │       └── main.tf
+        └── variables
+            └── envs
+                ├── stag
+                │   └── stag.tfvars
+                ├── dev
+                │   └── dev.tfvars
+                └── defaults.tfvars

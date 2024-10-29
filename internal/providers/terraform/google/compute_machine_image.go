@@ -7,19 +7,17 @@ import (
 
 func getComputeMachineImageRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_compute_machine_image",
-		RFunc: newComputeMachineImage,
+		Name:      "google_compute_machine_image",
+		CoreRFunc: newComputeMachineImage,
 	}
 }
 
-func newComputeMachineImage(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeMachineImage(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	r := &google.ComputeMachineImage{
 		Address: d.Address,
 		Region:  region,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

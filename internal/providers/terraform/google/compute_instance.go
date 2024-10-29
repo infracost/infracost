@@ -1,15 +1,16 @@
 package google
 
 import (
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getComputeInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_compute_instance",
-		RFunc: newComputeInstance,
+		Name:      "google_compute_instance",
+		CoreRFunc: newComputeInstance,
 		ReferenceAttributes: []string{
 			"network_interface.0.access_config.0.nat_ip", // google_compute_address
 		},
@@ -19,19 +20,24 @@ func getComputeInstanceRegistryItem() *schema.RegistryItem {
 			"Custom machine types are not supported.",
 			"Sole-tenant VMs are not supported.",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			region := d.Get("region").String()
+
+			zone := d.Get("zone").String()
+			if zone != "" {
+				region = zoneToRegion(zone)
+			}
+
+			return region
+		},
 	}
 }
 
-func newComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeInstance(d *schema.ResourceData) schema.CoreResource {
 	machineType := d.Get("machine_type").String()
 
-	region := d.Get("region").String()
+	region := d.Region
 	size := int64(1)
-
-	zone := d.Get("zone").String()
-	if zone != "" {
-		region = zoneToRegion(zone)
-	}
 
 	purchaseOption := getComputePurchaseOption(d.RawValues)
 
@@ -62,9 +68,7 @@ func newComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		ScratchDisks:      scratchDisks,
 		GuestAccelerators: guestAccelerators,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 // getComputePurchaseOption determines the purchase option for Compute

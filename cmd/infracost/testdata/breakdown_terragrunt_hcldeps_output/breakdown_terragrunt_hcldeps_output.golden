@@ -1,89 +1,92 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/dev
+Project: dev
 Module path: dev
 
- Name                                                         Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                    
- aws_instance.web_app                                                                                               
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47 
- ├─ root_block_device                                                                                               
- │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                             
-    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50 
-    └─ Provisioned IOPS                                               600  IOPS                              $39.00 
-                                                                                                                    
- aws_lambda_function.hello_world                                                                                    
- ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                    
- Project total                                                                                               $64.97 
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               600  IOPS                              $39.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $64.97   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/prod
+Project: prod
 Module path: prod
 
- Name                                                           Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                      
- aws_instance.web_app                                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
- ├─ root_block_device                                                                                                 
- │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00 
- └─ ebs_block_device[0]                                                                                               
-    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
-    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
-                                                                                                                      
- aws_lambda_function.hello_world                                                                                      
- ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                      
- Project total                                                                                                $747.64 
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $747.64   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/prod2
+Project: prod2
 Module path: prod2
 
- Name                                                           Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                      
- aws_instance.web_app                                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
- ├─ root_block_device                                                                                                 
- │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00 
- └─ ebs_block_device[0]                                                                                               
-    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
-    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
-                                                                                                                      
- aws_lambda_function.hello_world                                                                                      
- ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                      
- Project total                                                                                                $747.64 
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $747.64   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/stag
+Project: stag
 Module path: stag
 
- Name           Monthly Qty  Unit  Monthly Cost 
-                                                
- Project total                            $0.00 
+ Name           Monthly Qty  Unit  Monthly Cost   
+                                                  
+ Project total                            $0.00   
 
- OVERALL TOTAL                        $1,560.25 
+ OVERALL TOTAL                       $1,560.25 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 6 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco..._terragrunt_hcldeps_output/dev ┃ $65          ┃
-┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/prod ┃ $748         ┃
-┃ infracost/infracost/cmd/infraco...erragrunt_hcldeps_output/prod2 ┃ $748         ┃
-┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/stag ┃ $0.00        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ dev                                                ┃           $65 ┃           - ┃        $65 ┃
+┃ prod                                               ┃          $748 ┃           - ┃       $748 ┃
+┃ prod2                                              ┃          $748 ┃           - ┃       $748 ┃
+┃ stag                                               ┃         $0.00 ┃           - ┃      $0.00 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 
 
 Logs:
-WRN Input values were not provided for following Terraform variables: "variable.unspecified_variable". Use --terraform-var-file or --terraform-var to specify them.
+WARN Input values were not provided for following Terraform variables: "variable.unspecified_variable". Use --terraform-var-file or --terraform-var to specify them.

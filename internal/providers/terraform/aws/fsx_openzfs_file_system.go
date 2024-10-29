@@ -7,12 +7,12 @@ import (
 
 func getFSxOpenZFSFSRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_fsx_openzfs_file_system",
-		Notes: []string{"Data deduplication is not supported by Terraform."},
-		RFunc: NewFSxOpenZFSFileSystem,
+		Name:      "aws_fsx_openzfs_file_system",
+		Notes:     []string{"Data deduplication is not supported by Terraform."},
+		CoreRFunc: NewFSxOpenZFSFileSystem,
 	}
 }
-func NewFSxOpenZFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewFSxOpenZFSFileSystem(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.FSxOpenZFSFileSystem{
 		Address:             d.Address,
 		Region:              d.Get("region").String(),
@@ -24,7 +24,5 @@ func NewFSxOpenZFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schem
 		ProvisionedIOPSMode: d.Get("disk_iops_configuration.0.mode").String(),
 		DataCompression:     d.Get("root_volume_configuration.0.data_compression_type").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

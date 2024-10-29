@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -160,7 +160,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			if err != nil {
 				msg = fmt.Sprintf("%s: %s", msg, err)
 			}
-			log.Debug().Msgf(msg)
+			logging.Logger.Debug().Msg(msg)
 		} else {
 			standardStorageClassUsage := u["standard"].(map[string]interface{})
 
@@ -216,5 +216,6 @@ func (a *S3Bucket) objectTagsCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr("/TagStorage-TagHrs/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

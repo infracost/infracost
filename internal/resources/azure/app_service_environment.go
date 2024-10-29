@@ -17,7 +17,13 @@ type AppServiceEnvironment struct {
 	OperatingSystem *string `infracost_usage:"operating_system"`
 }
 
-var AppServiceEnvironmentUsageSchema = []*schema.UsageItem{{Key: "operating_system", ValueType: schema.String, DefaultValue: "linux"}}
+func (r *AppServiceEnvironment) CoreType() string {
+	return "AppServiceEnvironment"
+}
+
+func (r *AppServiceEnvironment) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "operating_system", ValueType: schema.String, DefaultValue: "linux"}}
+}
 
 func (r *AppServiceEnvironment) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -46,7 +52,8 @@ func (r *AppServiceEnvironment) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AppServiceEnvironmentUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 func (r *AppServiceEnvironment) appIsolatedServicePlanCostComponentStampFee(productName string) *schema.CostComponent {

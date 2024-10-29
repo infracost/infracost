@@ -2,12 +2,14 @@ package azure
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/resources"
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"strings"
+
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 // SignalRService struct represents an Azure SignalR Service.
@@ -112,5 +114,6 @@ func (r *SignalRService) additionalMessagesCostComponent(sku string, quantity *i
 				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Message", sku))},
 			},
 		},
+		UsageBased: true,
 	}
 }

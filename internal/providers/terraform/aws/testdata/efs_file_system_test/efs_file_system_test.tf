@@ -29,3 +29,10 @@ resource "aws_efs_file_system" "provisioned" {
 resource "aws_efs_file_system" "no_usage" {
   availability_zone_name = "One Zone"
 }
+
+resource "aws_efs_file_system" "no_usage_with_lifecycle_policy" {
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  availability_zone_name = "One Zone"
+}

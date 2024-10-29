@@ -16,7 +16,13 @@ type AppServiceCustomHostnameBinding struct {
 	SSLState string
 }
 
-var AppServiceCustomHostnameBindingUsageSchema = []*schema.UsageItem{}
+func (r *AppServiceCustomHostnameBinding) CoreType() string {
+	return "AppServiceCustomHostnameBinding"
+}
+
+func (r *AppServiceCustomHostnameBinding) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *AppServiceCustomHostnameBinding) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -31,9 +37,10 @@ func (r *AppServiceCustomHostnameBinding) BuildResource() *schema.Resource {
 		sslType = "IP"
 	} else {
 		return &schema.Resource{
-			Name:      r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: AppServiceCustomHostnameBindingUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -62,6 +69,7 @@ func (r *AppServiceCustomHostnameBinding) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AppServiceCustomHostnameBindingUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

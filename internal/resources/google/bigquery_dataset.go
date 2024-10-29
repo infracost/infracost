@@ -15,8 +15,14 @@ type BigQueryDataset struct {
 	MonthlyQueriesTB *float64 `infracost_usage:"monthly_queries_tb"`
 }
 
-var BigQueryDatasetUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_queries_tb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *BigQueryDataset) CoreType() string {
+	return "BigQueryDataset"
+}
+
+func (r *BigQueryDataset) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_queries_tb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *BigQueryDataset) PopulateUsage(u *schema.UsageData) {
@@ -49,8 +55,9 @@ func (r *BigQueryDataset) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("1"),
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: BigQueryDatasetUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

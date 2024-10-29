@@ -1,42 +1,40 @@
 
- Name                                            Monthly Qty  Unit              Monthly Cost 
-                                                                                             
- azurerm_firewall.non_usage                                                                  
- ├─ Deployment (Standard)                                730  hours                  $912.50 
- └─ Data processed                            Monthly cost depends on usage: $0.016 per GB   
-                                                                                             
- azurerm_firewall.premium                                                                    
- ├─ Deployment (Premium)                                 730  hours                $1,277.50 
- └─ Data processed                                    10,000  GB                     $160.00 
-                                                                                             
- azurerm_firewall.premium_virtual_hub                                                        
- ├─ Deployment (Premium Secured Virtual Hub)             730  hours                $1,277.50 
- └─ Data processed                                    20,000  GB                     $320.00 
-                                                                                             
- azurerm_firewall.standard                                                                   
- ├─ Deployment (Standard)                                730  hours                  $912.50 
- └─ Data processed                                    10,000  GB                     $160.00 
-                                                                                             
- azurerm_firewall.standard_virtual_hub                                                       
- ├─ Deployment (Standard Secure Virtual Hub)             730  hours                  $912.50 
- └─ Data processed                                    20,000  GB                     $320.00 
-                                                                                             
- azurerm_public_ip.example                                                                   
- └─ IP address (static)                                  730  hours                    $3.65 
-                                                                                             
- OVERALL TOTAL                                                                     $6,256.15 
+ Name                                            Monthly Qty  Unit              Monthly Cost   
+                                                                                               
+ azurerm_firewall.premium_virtual_hub                                                          
+ ├─ Deployment (Premium Secured Virtual Hub)             730  hours                $1,277.50   
+ └─ Data processed                                    20,000  GB                     $320.00   
+                                                                                               
+ azurerm_firewall.premium                                                                      
+ ├─ Deployment (Premium)                                 730  hours                $1,277.50   
+ └─ Data processed                                    10,000  GB                     $160.00   
+                                                                                               
+ azurerm_firewall.standard_virtual_hub                                                         
+ ├─ Deployment (Standard Secure Virtual Hub)             730  hours                  $912.50   
+ └─ Data processed                                    20,000  GB                     $320.00   
+                                                                                               
+ azurerm_firewall.standard                                                                     
+ ├─ Deployment (Standard)                                730  hours                  $912.50   
+ └─ Data processed                                    10,000  GB                     $160.00   
+                                                                                               
+ azurerm_firewall.non_usage                                                                    
+ ├─ Deployment (Standard)                                730  hours                  $912.50   
+ └─ Data processed                            Monthly cost depends on usage: $0.016 per GB     
+                                                                                               
+ azurerm_public_ip.example                                                                     
+ └─ IP address (static, regional)                        730  hours                    $3.65   
+                                                                                               
+ OVERALL TOTAL                                                                    $6,256.15 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 11 cloud resources were detected:
-∙ 6 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 5 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_subnet
-  ∙ 1 x azurerm_virtual_hub
-  ∙ 1 x azurerm_virtual_network
-  ∙ 1 x azurerm_virtual_wan
+∙ 6 were estimated
+∙ 5 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMFirewall                                ┃ $6,256       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃        $6,256 ┃           - ┃     $6,256 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

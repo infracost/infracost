@@ -1,25 +1,25 @@
 
- Name                                                   Monthly Qty  Unit         Monthly Cost 
-                                                                                               
- azurerm_vpn_gateway.vpn_gateway                                                               
- └─ S2S scale units (500 Mbps)                                    1  scale units       $263.53 
-                                                                                               
- azurerm_vpn_gateway_connection.vpn_gateway_connection                                         
- └─ S2S Connections                                             730  hours              $36.50 
-                                                                                               
- OVERALL TOTAL                                                                         $300.03 
+ Name                                                   Monthly Qty  Unit         Monthly Cost   
+                                                                                                 
+ azurerm_vpn_gateway.vpn_gateway                                                                 
+ └─ S2S scale units (500 Mbps)                                    1  scale units       $263.53   
+                                                                                                 
+ azurerm_vpn_gateway_connection.vpn_gateway_connection                                           
+ └─ S2S Connections                                             730  hours              $36.50   
+                                                                                                 
+ OVERALL TOTAL                                                                        $300.03 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
-∙ 3 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_virtual_hub
-  ∙ 1 x azurerm_virtual_wan
+∙ 3 were free
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_vpn_site
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestVpnGatewayConnectionGoldenFile                 ┃ $300         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $300 ┃           - ┃       $300 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

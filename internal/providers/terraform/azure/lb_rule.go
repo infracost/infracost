@@ -1,10 +1,12 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMLoadBalancerRuleRegistryItem() *schema.RegistryItem {
@@ -14,11 +16,14 @@ func GetAzureRMLoadBalancerRuleRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"loadbalancer_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"loadbalancer_id"})
+		},
 	}
 }
 
 func NewAzureRMLoadBalancerRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"loadbalancer_id"})
+	region := d.Region
 	region = convertRegion(region)
 
 	lbSku := getParentLbSku(d.References("loadbalancer_id"))

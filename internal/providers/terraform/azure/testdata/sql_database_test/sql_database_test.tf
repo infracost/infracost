@@ -40,12 +40,30 @@ resource "azurerm_sql_database" "sql_database_with_edition_critical" {
   edition             = "BusinessCritical"
 }
 
+resource "azurerm_sql_database" "sql_database_with_edition_critical_zone_redundant" {
+  name                = "myexamplesqldatabase3"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = "eastus"
+  server_name         = azurerm_sql_server.example.name
+  edition             = "BusinessCritical"
+  zone_redundant      = true
+}
+
 resource "azurerm_sql_database" "sql_database_with_edition_gen" {
   name                = "myexamplesqldatabase4"
   resource_group_name = azurerm_resource_group.example.name
   location            = "eastus"
   server_name         = azurerm_sql_server.example.name
   edition             = "GeneralPurpose"
+}
+
+resource "azurerm_sql_database" "sql_database_with_edition_gen_zone_redundant" {
+  name                = "myexamplesqldatabase4"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = "eastus"
+  server_name         = azurerm_sql_server.example.name
+  edition             = "GeneralPurpose"
+  zone_redundant      = true
 }
 
 resource "azurerm_sql_database" "sql_database_with_edition_hyper" {

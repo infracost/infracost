@@ -48,6 +48,9 @@
         "include_all_paths": {
           "type": "boolean"
         },
+        "skip_autodetect": {
+          "type": "boolean"
+        },
         "name": {
           "type": "string"
         },
@@ -60,7 +63,7 @@
         "terraform_vars": {
           "patternProperties": {
             ".*": {
-              "type": "string"
+              "additionalProperties": true
             }
           },
           "type": "object"
@@ -80,10 +83,25 @@
         "terraform_workspace": {
           "type": "string"
         },
+        "terraform_cloud_workspace": {
+          "type": "string"
+        },
+        "terraform_cloud_org": {
+          "type": "string"
+        },
         "terraform_cloud_host": {
           "type": "string"
         },
         "terraform_cloud_token": {
+          "type": "string"
+        },
+        "spacelift_api_key_endpoint": {
+          "type": "string"
+        },
+        "spacelift_api_key_id": {
+          "type": "string"
+        },
+        "spacelift_api_key_secret": {
           "type": "string"
         },
         "terragrunt_flags": {
@@ -102,6 +120,9 @@
             }
           },
           "type": "object"
+        },
+        "yor_config_path": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

@@ -1,22 +1,25 @@
 
- Name                                           Monthly Qty  Unit  Monthly Cost 
-                                                                                
- google_compute_disk.default                                                    
- └─ Standard provisioned storage (pd-standard)          100  GB           $4.00 
-                                                                                
- google_compute_snapshot.snapshot                                               
- └─ Storage                                             100  GB           $2.60 
-                                                                                
- google_compute_snapshot.usage                                                  
- └─ Storage                                           1,000  GB          $26.00 
-                                                                                
+ Name                                           Monthly Qty  Unit  Monthly Cost    
+                                                                                   
+ google_compute_snapshot.usage                                                     
+ └─ Storage                                           1,000  GB          $26.00  * 
+                                                                                   
+ google_compute_disk.default                                                       
+ └─ Standard provisioned storage (pd-standard)          100  GB           $4.00    
+                                                                                   
+ google_compute_snapshot.snapshot                                                  
+ └─ Storage                                             100  GB           $2.60  * 
+                                                                                   
  OVERALL TOTAL                                                           $32.60 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, 2 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeSnapshotGoldenFile                      ┃ $33          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃            $4 ┃         $29 ┃        $33 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,0 +1,11 @@
+.
+└── apps
+    ├── bar
+    │   └── main.tf
+    ├── foo
+    │   └── main.tf
+    ├── .dev-custom-ext
+    ├── .prod-custom-ext
+    ├── .config.prod.env.tfvars
+    ├── .config.dev.env.tfvars
+    └── default.tfvars

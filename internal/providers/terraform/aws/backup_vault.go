@@ -7,13 +7,12 @@ import (
 
 func getBackupVaultRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_backup_vault",
-		RFunc: NewBackupVault,
-		Notes: []string{"AWS Storage Gateway Volume Backup prices could not be found in the AWS pricing data."},
+		Name:      "aws_backup_vault",
+		CoreRFunc: NewBackupVault,
+		Notes:     []string{"AWS Storage Gateway Volume Backup prices could not be found in the AWS pricing data."},
 	}
 }
-func NewBackupVault(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewBackupVault(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.BackupVault{Address: d.Address, Region: d.Get("region").String()}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

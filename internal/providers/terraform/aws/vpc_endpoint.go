@@ -7,15 +7,16 @@ import (
 
 func getVPCEndpointRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_vpc_endpoint",
-		RFunc: NewVPCEndpoint,
+		Name:      "aws_vpc_endpoint",
+		CoreRFunc: NewVPCEndpoint,
 		ReferenceAttributes: []string{
 			"subnet_ids",
+			"vpc_id",
 		},
 	}
 }
 
-func NewVPCEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewVPCEndpoint(d *schema.ResourceData) schema.CoreResource {
 	subnetIDs := len(d.Get("subnet_ids").Array())
 
 	// if the length of the subnet_ids attribute is zero this means that the attribute
@@ -37,7 +38,5 @@ func NewVPCEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		Interfaces: intPtr(interfaces),
 		Type:       d.Get("vpc_endpoint_type").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

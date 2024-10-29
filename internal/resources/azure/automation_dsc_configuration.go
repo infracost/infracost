@@ -15,7 +15,13 @@ type AutomationDSCConfiguration struct {
 	NonAzureConfigNodeCount *int64 `infracost_usage:"non_azure_config_node_count"`
 }
 
-var AutomationDSCConfigurationUsageSchema = []*schema.UsageItem{{Key: "non_azure_config_node_count", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *AutomationDSCConfiguration) CoreType() string {
+	return "AutomationDSCConfiguration"
+}
+
+func (r *AutomationDSCConfiguration) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "non_azure_config_node_count", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *AutomationDSCConfiguration) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -24,7 +30,8 @@ func (r *AutomationDSCConfiguration) PopulateUsage(u *schema.UsageData) {
 func (r *AutomationDSCConfiguration) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: automationDSCNodesCostComponent(&r.Region, r.NonAzureConfigNodeCount), UsageSchema: AutomationDSCConfigurationUsageSchema,
+		CostComponents: automationDSCNodesCostComponent(&r.Region, r.NonAzureConfigNodeCount),
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -62,5 +69,6 @@ func nonautomationDSCNodesCostComponent(location, startUsage, meterName, skuName
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

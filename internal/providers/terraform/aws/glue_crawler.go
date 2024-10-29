@@ -7,18 +7,17 @@ import (
 
 func getGlueCrawlerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_glue_crawler",
-		RFunc: newGlueCrawler,
+		Name:      "aws_glue_crawler",
+		CoreRFunc: newGlueCrawler,
 	}
 }
 
-func newGlueCrawler(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newGlueCrawler(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	r := &aws.GlueCrawler{
 		Address: d.Address,
 		Region:  region,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

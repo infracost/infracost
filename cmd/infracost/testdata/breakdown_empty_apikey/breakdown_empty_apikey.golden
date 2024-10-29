@@ -1,0 +1,5 @@
+
+Err:
+Error: INFRACOST_API_KEY is not set but is required, check your environment variable is named correctly or add your API key to your REPLACED_CREDENTIALS_PATH credentials file.
+If you recently regenerated your API key, you can retrieve it from https://dashboard.infracost.io.
+See https://infracost.io/support if you continue having issues.

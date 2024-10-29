@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  google_cloud_run_service.throttling_enabled:
+      monthly_requests:                         500000
+      average_request_duration_ms:              3600
+      concurrent_requests_per_instance:         1
+  google_cloud_run_service.throttling_disabled:
+      instance_hrs:                             730

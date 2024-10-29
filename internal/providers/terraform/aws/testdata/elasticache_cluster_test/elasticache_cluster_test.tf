@@ -66,3 +66,20 @@ resource "aws_elasticache_cluster" "redis_reserved_1yr_all_upfront" {
   num_cache_nodes      = 1
   parameter_group_name = "default.redis3.2"
 }
+
+resource "aws_elasticache_replication_group" "replication_group" {
+  description                = "This Replication Group"
+  replication_group_id       = "tf-rep-group-1"
+  automatic_failover_enabled = true
+  node_type                  = "cache.m4.large"
+
+  engine = "redis"
+
+  num_node_groups         = 4
+  replicas_per_node_group = 3
+}
+
+resource "aws_elasticache_cluster" "replication_group" {
+  cluster_id           = "cluster-example"
+  replication_group_id = aws_elasticache_replication_group.replication_group.id
+}

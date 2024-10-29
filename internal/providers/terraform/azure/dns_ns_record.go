@@ -7,15 +7,14 @@ import (
 
 func getDNSNSRecordRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_dns_ns_record",
-		RFunc: NewDNSNSRecord,
+		Name:      "azurerm_dns_ns_record",
+		CoreRFunc: NewDNSNSRecord,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewDNSNSRecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &azure.DNSNSRecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+func NewDNSNSRecord(d *schema.ResourceData) schema.CoreResource {
+	r := &azure.DNSNSRecord{Address: d.Address, Region: d.Region}
+	return r
 }

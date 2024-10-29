@@ -4,10 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +17,13 @@ type LightsailInstance struct {
 	BundleID string
 }
 
-var LightsailInstanceUsageSchema = []*schema.UsageItem{}
+func (r *LightsailInstance) CoreType() string {
+	return "LightsailInstance"
+}
+
+func (r *LightsailInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *LightsailInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -31,9 +36,9 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 	}
 
 	bundlePrefixMappings := map[string]bundleSpecs{
-		"nano":    {"1", "0.5GB"},
-		"micro":   {"1", "1GB"},
-		"small":   {"1", "2GB"},
+		"nano":    {"2", "0.5GB"},
+		"micro":   {"2", "1GB"},
+		"small":   {"2", "2GB"},
 		"medium":  {"2", "4GB"},
 		"large":   {"2", "8GB"},
 		"xlarge":  {"4", "16GB"},
@@ -52,7 +57,7 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 
 	specs, ok := bundlePrefixMappings[bundlePrefix]
 	if !ok {
-		log.Warn().Msgf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
 		return nil
 	}
 
@@ -80,6 +85,6 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: LightsailInstanceUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

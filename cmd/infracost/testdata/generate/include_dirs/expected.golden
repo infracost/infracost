@@ -1,0 +1,80 @@
+version: 0.1
+autodetect:
+  include_dirs:
+    - apps/bat
+    - apps/baz
+    - apps/.hidden
+    - apps/wildcard/**
+
+projects:
+  - path: apps/.hidden
+    name: apps-.hidden-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/.hidden
+    name: apps-.hidden-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+  - path: apps/bar
+    name: apps-bar-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/bar
+    name: apps-bar-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+  - path: apps/bat
+    name: apps-bat-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/bat
+    name: apps-bat-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+  - path: apps/baz
+    name: apps-baz-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/baz
+    name: apps-baz-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/foo
+    name: apps-foo-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+  - path: apps/wildcard/one
+    name: apps-wildcard-one-dev
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../dev.tfvars
+  - path: apps/wildcard/one
+    name: apps-wildcard-one-prod
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../prod.tfvars
+  - path: apps/wildcard/two
+    name: apps-wildcard-two-dev
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../dev.tfvars
+  - path: apps/wildcard/two
+    name: apps-wildcard-two-prod
+    terraform_var_files:
+      - ../../default.tfvars
+      - ../../prod.tfvars
+

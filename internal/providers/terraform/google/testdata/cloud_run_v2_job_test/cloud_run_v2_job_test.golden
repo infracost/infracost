@@ -1,0 +1,24 @@
+
+ Name                                       Monthly Qty  Unit                      Monthly Cost   
+                                                                                                  
+ google_cloud_run_v2_job.my_job                                                                   
+ ├─ CPU allocation time (tier 2)             30,000,000  vCPU-seconds                   $648.00   
+ └─ Memory allocation time (tier 2)          15,000,000  GiB-seconds                     $36.00   
+                                                                                                  
+ google_cloud_run_v2_job.no_usage                                                                 
+ ├─ CPU allocation time (tier 2)     Monthly cost depends on usage: $0.0000216 per vCPU-seconds   
+ └─ Memory allocation time (tier 2)  Monthly cost depends on usage: $0.0000024 per GiB-seconds    
+                                                                                                  
+ OVERALL TOTAL                                                                         $684.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $684 ┃           - ┃       $684 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

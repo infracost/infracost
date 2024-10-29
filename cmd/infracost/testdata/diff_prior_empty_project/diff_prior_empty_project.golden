@@ -1,0 +1,44 @@
+Key: * usage cost, ~ changed, + added, - removed
+
+──────────────────────────────────
+Project: main
+
++ aws_instance.web_app
+  +$743
+
+    + Instance usage (Linux/UNIX, on-demand, m5.4xlarge)
+      +$561
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          +$5
+
+    + ebs_block_device[0]
+    
+        + Storage (provisioned IOPS SSD, io1)
+          +$125
+    
+        + Provisioned IOPS
+          +$52
+
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_prior_empty_project
+Amount:  +$743 ($0.00 → $743)
+
+──────────────────────────────────
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+1 cloud resource was detected:
+∙ 1 was estimated
+
+Infracost estimate: Monthly estimate increased by $743 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...tdata/diff_prior_empty_project ┃         +$743 ┃           - ┃        +$743 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
+Err:
+

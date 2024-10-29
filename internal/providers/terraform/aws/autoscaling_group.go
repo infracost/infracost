@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/aws"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -15,8 +15,8 @@ import (
 
 func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_autoscaling_group",
-		RFunc: NewAutoscalingGroup,
+		Name:      "aws_autoscaling_group",
+		CoreRFunc: NewAutoscalingGroup,
 		ReferenceAttributes: []string{
 			"launch_configuration",
 			"launch_template.0.id",
@@ -27,7 +27,7 @@ func GetAutoscalingGroupRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutoscalingGroup(d *schema.ResourceData) schema.CoreResource {
 	a := &aws.AutoscalingGroup{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
@@ -41,7 +41,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	} else {
 		instanceCount = d.Get("min_size").Int()
 		if instanceCount == 0 {
-			log.Debug().Msgf("Using instance count 1 for %s since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.", a.Address)
+			logging.Logger.Debug().Msgf("Using instance count 1 for %s since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.", a.Address)
 			instanceCount = 1
 		}
 	}
@@ -60,7 +60,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 
 	if len(launchConfigurationRef) > 0 {
 		data := launchConfigurationRef[0]
-		a.LaunchConfiguration = newLaunchConfiguration(data, u, a.Region, instanceCount)
+		a.LaunchConfiguration = newLaunchConfiguration(data, a.Region, instanceCount)
 	} else if len(launchTemplateRef) > 0 {
 		data := launchTemplateRef[0]
 
@@ -72,15 +72,13 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		a.LaunchTemplate = newLaunchTemplate(data, a.Region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
 	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
 		data := mixedInstanceLaunchTemplateRef[0]
-		a.LaunchTemplate = newMixedInstancesLaunchTemplate(data, u, a.Region, instanceCount, d.Get("mixed_instances_policy.0"))
+		a.LaunchTemplate = newMixedInstancesLaunchTemplate(data, a.Region, instanceCount, d.Get("mixed_instances_policy.0"))
 	}
 
-	a.PopulateUsage(u)
-
-	return a.BuildResource()
+	return a
 }
 
-func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region string, instanceCount int64) *aws.LaunchConfiguration {
+func newLaunchConfiguration(d *schema.ResourceData, region string, instanceCount int64) *aws.LaunchConfiguration {
 	purchaseOption := "on_demand"
 	if d.Get("spot_price").String() != "" {
 		purchaseOption = "spot"
@@ -165,7 +163,7 @@ func newLaunchTemplate(d *schema.ResourceData, region string, instanceCount, onD
 	return a
 }
 
-func newMixedInstancesLaunchTemplate(d *schema.ResourceData, u *schema.UsageData, region string, capacity int64, mixedInstancePolicyData gjson.Result) *aws.LaunchTemplate {
+func newMixedInstancesLaunchTemplate(d *schema.ResourceData, region string, capacity int64, mixedInstancePolicyData gjson.Result) *aws.LaunchTemplate {
 	overrideInstanceType, instanceCount := getInstanceTypeAndCount(mixedInstancePolicyData, capacity)
 	if overrideInstanceType != "" {
 		d.Set("instance_type", overrideInstanceType)

@@ -7,12 +7,12 @@ import (
 
 func getLambdaProvisionedConcurrencyConfigRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_lambda_provisioned_concurrency_config",
-		RFunc: NewLambdaProvisionedConcurrencyConfig,
+		Name:      "aws_lambda_provisioned_concurrency_config",
+		CoreRFunc: NewLambdaProvisionedConcurrencyConfig,
 	}
 }
 
-func NewLambdaProvisionedConcurrencyConfig(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLambdaProvisionedConcurrencyConfig(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	name := d.Get("function_name").String()
 	provisionedConcurrentExecutions := d.Get("provisioned_concurrent_executions").Int()
@@ -23,7 +23,6 @@ func NewLambdaProvisionedConcurrencyConfig(d *schema.ResourceData, u *schema.Usa
 		Name:                            name,
 		ProvisionedConcurrentExecutions: provisionedConcurrentExecutions,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

@@ -11,6 +11,9 @@ func TestDataFactoryIntegrationRuntimeManaged(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
+	opts := tftest.DefaultGoldenFileOptions()
+	// Ignore the CLI because the resource has been removed from the provider
+	opts.IgnoreCLI = true
 
-	tftest.GoldenFileResourceTests(t, "data_factory_integration_runtime_managed_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "data_factory_integration_runtime_managed_test", opts)
 }

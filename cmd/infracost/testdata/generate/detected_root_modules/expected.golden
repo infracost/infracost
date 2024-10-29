@@ -1,0 +1,23 @@
+version: 0.1
+projects:
+  - path: apps/bar
+    name: apps-bar-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/bar
+    name: apps-bar-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../dev.tfvars
+  - path: apps/foo
+    name: apps-foo-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../prod.tfvars
+

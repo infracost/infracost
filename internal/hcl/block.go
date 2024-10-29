@@ -5,10 +5,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -17,6 +19,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
@@ -281,8 +284,10 @@ type Block struct {
 	// parent is the parent block if this is a child block.
 	parent *Block
 	// verbose determines whether the block uses verbose debug logging.
-	verbose    bool
-	logger     zerolog.Logger
+	verbose bool
+	logger  zerolog.Logger
+	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
+	isGraph    bool
 	newMock    func(attr *Attribute) cty.Value
 	attributes []*Attribute
 	reference  *Reference
@@ -298,12 +303,23 @@ type BlockBuilder struct {
 	SetAttributes []SetAttributesFunc
 	Logger        zerolog.Logger
 	HCLParser     *modules.SharedHCLParser
+	isGraph       bool
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
 func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, parent *Block, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
+	}
+
+	// if the filepath is absolute let's make it relative to the working directory so
+	// we trip any user/machine defined paths.
+	if filepath.IsAbs(filename) {
+		wd, _ := os.Getwd()
+		rel, err := filepath.Rel(wd, filename)
+		if err == nil {
+			filename = rel
+		}
 	}
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
@@ -319,6 +335,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			rootPath:    rootPath,
 			childBlocks: make(Blocks, len(body.Blocks)),
 			verbose:     isLoggingVerbose,
+			isGraph:     b.isGraph,
 			newMock:     b.MockFunc,
 			parent:      parent,
 		}
@@ -352,6 +369,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			moduleBlock: moduleBlock,
 			rootPath:    rootPath,
 			verbose:     isLoggingVerbose,
+			isGraph:     b.isGraph,
 			newMock:     b.MockFunc,
 		}
 		block.setLogger(b.Logger)
@@ -370,6 +388,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		rootPath:    rootPath,
 		childBlocks: make(Blocks, len(content.Blocks)),
 		verbose:     isLoggingVerbose,
+		isGraph:     b.isGraph,
 		newMock:     b.MockFunc,
 	}
 
@@ -742,6 +761,22 @@ func (b *Block) Provider() string {
 	return ""
 }
 
+// ProviderConfigKey looks up the key used to reference the provider in the "configuration.providers"
+// section of the terraform plan json.  This should be used to set the "provider_config_key "
+// of the resource in the "configuration.resources" section of plan json.
+func (b *Block) ProviderConfigKey() string {
+	provider := b.Provider()
+
+	v := getFromProvider(b, provider, "config_key")
+	var str string
+	err := gocty.FromCtyValue(v, &str)
+	if err != nil {
+		// fall back to using the provider name
+		return provider
+	}
+	return str
+}
+
 // GetChildBlock is a helper method around GetChildBlocks. It returns the first non nil child block matching name.
 func (b *Block) GetChildBlock(name string) *Block {
 	blocks := b.GetChildBlocks(name)
@@ -794,7 +829,17 @@ func (b *Block) Children() Blocks {
 		return nil
 	}
 
-	return b.childBlocks
+	var children Blocks
+	for _, child := range b.childBlocks {
+		// Skip lifecycle meta argument blocks since it never needs to be evaluated
+		if supportsLifecycle(child) && child.Type() == "lifecycle" {
+			continue
+		}
+
+		children = append(children, child)
+	}
+
+	return children
 }
 
 // GetAttributes returns a list of Attribute for this Block. Attributes are key value specification on a given
@@ -842,6 +887,7 @@ func (b *Block) GetAttributes() []*Attribute {
 				Logger: b.logger.With().Str(
 					"attribute_name", k,
 				).Logger(),
+				isGraph: b.isGraph,
 			})
 			continue
 		}
@@ -854,6 +900,7 @@ func (b *Block) GetAttributes() []*Attribute {
 			Logger: b.logger.With().Str(
 				"attribute_name", hclAttributes[k].Name,
 			).Logger(),
+			isGraph: b.isGraph,
 		})
 	}
 
@@ -911,6 +958,7 @@ func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
 		Logger: b.logger.With().Str(
 			"attribute_name", name,
 		).Logger(),
+		isGraph: b.isGraph,
 	}
 }
 
@@ -955,13 +1003,22 @@ func (b *Block) AttributesAsMap() map[string]*Attribute {
 }
 
 func (b *Block) getHCLAttributes() hcl.Attributes {
+	supportsDependsOn := supportsDependsOn(b)
+
 	switch body := b.HCLBlock.Body.(type) {
 	case *hclsyntax.Body:
 		attributes := make(hcl.Attributes)
 		for _, a := range body.Attributes {
-			if _, ok := b.UniqueAttrs[a.Name]; !ok {
-				attributes[a.Name] = a.AsHCLAttribute()
+			if _, ok := b.UniqueAttrs[a.Name]; ok {
+				continue
 			}
+
+			// Ignore the depends_on meta attribute since it never needs to be evaluated
+			if supportsDependsOn && a.Name == "depends_on" {
+				continue
+			}
+
+			attributes[a.Name] = a.AsHCLAttribute()
 		}
 		return attributes
 	default:
@@ -973,8 +1030,13 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 		if diag != nil {
 			return nil
 		}
-		for k, a := range attrs {
-			if _, ok := b.UniqueAttrs[a.Name]; !ok {
+		for k := range attrs {
+			if _, ok := b.UniqueAttrs[k]; ok {
+				delete(attrs, k)
+			}
+
+			// Ignore the depends_on meta attribute since it never needs to be evaluated
+			if supportsDependsOn && k == "depends_on" {
 				delete(attrs, k)
 			}
 		}
@@ -1004,6 +1066,24 @@ func (b *Block) Values() cty.Value {
 	return b.values()
 }
 
+type AttributeWithUnknownKeys struct {
+	Attribute        string   `json:"attribute"`
+	MissingVariables []string `json:"missingVariables"`
+}
+
+func (b *Block) AttributesWithUnknownKeys() []AttributeWithUnknownKeys {
+	var output []AttributeWithUnknownKeys
+	for _, attr := range b.attributes {
+		if causes := attr.ReferencesCausingUnknownKeys(); len(causes) > 0 {
+			output = append(output, AttributeWithUnknownKeys{
+				Attribute:        attr.Name(),
+				MissingVariables: causes,
+			})
+		}
+	}
+	return output
+}
+
 func (b *Block) values() cty.Value {
 	values := make(map[string]cty.Value)
 
@@ -1021,17 +1101,37 @@ func (b *Block) values() cty.Value {
 	if b.Type() == "provider" {
 		for _, child := range b.Children() {
 			key := child.Type()
-			if key == "dynamic" || key == "depends_on" {
+			if key == "dynamic" {
 				continue
 			}
 
 			if v, ok := values[key]; ok {
 				list := append(v.AsValueSlice(), child.values())
+				if !cty.CanListVal(list) {
+					b.logger.Debug().Msgf("ignoring child block %#v value with inconsistent list element types", key)
+					continue
+				}
 				values[key] = cty.ListVal(list)
 			} else {
 				values[key] = cty.ListVal([]cty.Value{child.values()})
 			}
 		}
+
+		// Add config_key as a value of the provider so resources can lookup the
+		// correct provider_config_key using `getFromProvider(provider, "config_key")`
+		configKey := b.Label()
+
+		var alias string
+		_ = gocty.FromCtyValue(values["alias"], &alias)
+		if alias != "" {
+			configKey = configKey + "." + alias
+		}
+
+		if b.ModuleAddress() != "" {
+			configKey = b.ModuleAddress() + ":" + configKey
+		}
+
+		values["config_key"] = cty.StringVal(configKey)
 	}
 
 	return cty.ObjectVal(values)
@@ -1046,7 +1146,21 @@ func (b *Block) Reference() *Reference {
 
 	var parts []string
 
-	if b.Type() != "resource" || b.parent != nil {
+	parent := b.parent
+	for parent != nil {
+		var parentParts []string
+
+		if parent.Type() != "resource" {
+			parentParts = append(parentParts, parent.Type())
+		}
+
+		parentParts = append(parentParts, parent.Labels()...)
+
+		parts = append(parentParts, parts...)
+		parent = parent.parent
+	}
+
+	if b.Type() != "resource" {
 		parts = append(parts, b.Type())
 	}
 
@@ -1132,6 +1246,10 @@ func (b *Block) FullName() string {
 }
 
 func (b *Block) Type() string {
+	if b == nil || b.HCLBlock == nil {
+		return ""
+	}
+
 	return b.HCLBlock.Type
 }
 
@@ -1141,6 +1259,10 @@ func (b *Block) SetType(t string) {
 }
 
 func (b *Block) Labels() []string {
+	if b == nil || b.HCLBlock == nil {
+		return nil
+	}
+
 	return b.HCLBlock.Labels
 }
 
@@ -1220,6 +1342,10 @@ func (b *Block) Key() *string {
 }
 
 func (b *Block) Label() string {
+	if b == nil || b.HCLBlock == nil {
+		return ""
+	}
+
 	return strings.Join(b.HCLBlock.Labels, ".")
 }
 
@@ -1252,13 +1378,71 @@ var (
 	defaultGCPRegion = "us-central1"
 
 	blockValueFuncs = map[string]BlockValueFunc{
-		"data.aws_availability_zones": awsAvailabilityZonesValues,
-		"data.google_compute_zones":   googleComputeZonesValues,
-		"data.aws_region":             awsCurrentRegion,
-		"data.aws_default_tags":       awsDefaultTagValues,
-		"resource.random_shuffle":     randomShuffleValues,
+		"data.aws_availability_zones":  awsAvailabilityZonesValues,
+		"data.google_compute_zones":    googleComputeZonesValues,
+		"data.aws_region":              awsCurrentRegion,
+		"data.aws_default_tags":        awsDefaultTagValues,
+		"data.aws_subnets":             awsSubnetsValues,
+		"resource.random_shuffle":      randomShuffleValues,
+		"resource.time_static":         timeStaticValues,
+		"resource.aws_launch_template": launchTemplateValues,
 	}
 )
+
+// launchTemplateValues returns the values for the launch template but if the
+// name attribute is not set it will generate a unique name based on the block
+// address. This is done to ensure that we can properly reference the launch
+// template, when users uses the name-prefix attribute to set a name.
+func launchTemplateValues(b *Block) cty.Value {
+	values := b.values()
+	launchTemplateData := values.AsValueMap()
+	v, ok := launchTemplateData["name"]
+
+	if !ok || v.IsNull() {
+		if launchTemplateData == nil {
+			launchTemplateData = make(map[string]cty.Value)
+		}
+
+		h := sha256.New()
+		h.Write([]byte(b.FullName()))
+		addressSha := hex.EncodeToString(h.Sum(nil))
+		launchTemplateData["name"] = cty.StringVal("hcl-" + addressSha)
+	}
+
+	return cty.ObjectVal(launchTemplateData)
+}
+
+// timeStaticValues mocks the values returned from resource.time_static which is
+// a resource that returns the attributes of the provided rfc3339 time. If none
+// is provided, it defaults to the current time.
+//
+// https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/static
+func timeStaticValues(b *Block) cty.Value {
+	now := time.Now()
+	var inputDateStr string
+	v := b.GetAttribute("rfc3339").Value()
+	_ = gocty.FromCtyValue(v, &inputDateStr)
+	if inputDateStr == "" {
+		inputDateStr = now.Format(time.RFC3339)
+	}
+
+	inputDate, err := time.Parse(time.RFC3339, inputDateStr)
+	if err != nil {
+		inputDate = now
+	}
+
+	return cty.ObjectVal(map[string]cty.Value{
+		"rfc3339": cty.StringVal(inputDateStr),
+		"day":     cty.NumberIntVal(int64(inputDate.Day())),
+		"hour":    cty.NumberIntVal(int64(inputDate.Hour())),
+		"id":      cty.StringVal(inputDate.Format(time.RFC3339)),
+		"minute":  cty.NumberIntVal(int64(inputDate.Minute())),
+		"month":   cty.NumberIntVal(int64(inputDate.Month())),
+		"second":  cty.NumberIntVal(int64(inputDate.Second())),
+		"unix":    cty.NumberIntVal(inputDate.Unix()),
+		"year":    cty.NumberIntVal(int64(inputDate.Year())),
+	})
+}
 
 func awsCurrentRegion(b *Block) cty.Value {
 	return cty.ObjectVal(map[string]cty.Value{
@@ -1279,6 +1463,23 @@ func awsDefaultTagValues(b *Block) cty.Value {
 
 	return cty.ObjectVal(map[string]cty.Value{
 		"tags": cty.ObjectVal(map[string]cty.Value{}),
+	})
+}
+
+// awsSubnetsValues mocks the values returned from data.aws_subnets. This data
+// source returns a list of subnet IDs.
+// https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets
+//
+// We return a list of 3 fake subnet IDs. Although the actual number of subnets
+// returned is based on the region and availability zones, we return a fixed
+// "sensible" number.
+func awsSubnetsValues(b *Block) cty.Value {
+	return cty.ObjectVal(map[string]cty.Value{
+		"ids": cty.ListVal([]cty.Value{
+			cty.StringVal(fmt.Sprintf("subnet-1-%s", mock.Identifier)),
+			cty.StringVal(fmt.Sprintf("subnet-2-%s", mock.Identifier)),
+			cty.StringVal(fmt.Sprintf("subnet-3-%s", mock.Identifier)),
+		}),
 	})
 }
 
@@ -1379,23 +1580,40 @@ func getRegionFromProvider(b *Block, provider string) string {
 	return str
 }
 
+// getFromProvider returns the value of the given key from provider the block is
+// associated with. This is either the default provider or the provider
+// explicitly set on the block (e.g. if a resource has a "provider" attribute).
 func getFromProvider(b *Block, provider, key string) cty.Value {
-	val := b.context.Get(provider, key)
-
 	attr := b.GetAttribute("provider")
 	if attr != nil {
 		v := attr.Value()
 		if v.Type().IsObjectType() {
 			m := v.AsValueMap()
 			if r, ok := m[key]; ok {
-				val = r
+				return r
 			}
 		}
 	}
 
-	return val
+	providerVal := b.Context().Get(provider)
+	if providerVal.Type().IsObjectType() {
+		m := providerVal.AsValueMap()
+		if r, ok := m[key]; ok {
+			return r
+		}
+	}
+
+	return cty.NilVal
 }
 
 func usesProviderConfiguration(b *Block) bool {
+	return b.Type() == "resource" || b.Type() == "data"
+}
+
+func supportsDependsOn(b *Block) bool {
+	return b.Type() == "resource" || b.Type() == "data" || b.Type() == "module"
+}
+
+func supportsLifecycle(b *Block) bool {
 	return b.Type() == "resource" || b.Type() == "data"
 }

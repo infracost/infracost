@@ -101,7 +101,7 @@ func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) ([]Actu
 
 	logging.Logger.Debug().Msgf("Getting actual costs from %s for %s", c.endpoint, vars.Address)
 
-	results, err := c.doQueries([]GraphQLQuery{query})
+	results, err := c.DoQueries([]GraphQLQuery{query})
 	if err != nil {
 		return nil, err
 	} else if len(results) > 0 && results[0].Get("errors").Exists() {
@@ -176,34 +176,49 @@ func (c *UsageAPIClient) buildActualCostsQuery(vars ActualCostsQueryVariables) G
 
 // ListUsageQuantities queries the Infracost Cloud Usage API to retrieve usage estimates
 // derived from cloud provider reported usage and costs.
-func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables) (map[string]gjson.Result, error) {
-	query := c.buildUsageQuantitiesQuery(vars)
+func (c *UsageAPIClient) ListUsageQuantities(vars []*UsageQuantitiesQueryVariables) ([]*schema.UsageData, error) {
+	var queries []GraphQLQuery
+	for _, v := range vars {
+		logging.Logger.Debug().Msgf("Getting usage quantities from %s for %s %s %v", c.endpoint, v.ResourceType, v.Address, v.UsageKeys)
+		queries = append(queries, c.buildUsageQuantitiesQuery(*v))
+	}
 
-	logging.Logger.Debug().Msgf("Getting usage quantities from %s for %s %s %v", c.endpoint, vars.ResourceType, vars.Address, vars.UsageKeys)
-
-	results, err := c.doQueries([]GraphQLQuery{query})
+	results, err := c.DoQueries(queries)
 	if err != nil {
 		return nil, err
 	} else if len(results) > 0 && results[0].Get("errors").Exists() {
 		return nil, fmt.Errorf("graphql error: %s", results[0].Get("errors").String())
 	}
 
-	attribs := make(map[string]interface{})
+	attribsByAddress := make(map[string]map[string]interface{})
 	for _, result := range results {
 		for _, q := range result.Get("data.usageQuantities").Array() {
+			address := q.Get("address").String()
+			if attribsByAddress[address] == nil {
+				attribsByAddress[address] = make(map[string]interface{})
+			}
+
 			usageKey := q.Get("usageKey").String()
-			unflattenUsageKey(attribs, usageKey, q.Get("monthlyQuantity").String())
+			unflattenUsageKey(attribsByAddress[address], usageKey, q.Get("monthlyQuantity").String())
 		}
 	}
 
-	// now that we have converted the attribs to account for any flattened keys, convert the
-	// structure to json so we can return it as the gjson.Result required by for UsageData.Attributes
-	attribsJson, err := json.Marshal(attribs)
-	if err != nil {
-		return nil, err
+	var ud = make([]*schema.UsageData, 0, len(attribsByAddress))
+	for address, attribs := range attribsByAddress {
+		// now that we have converted the attribs to account for any flattened keys, convert the
+		// structure to json so we can return it as the gjson.Result required by for UsageData.Attributes
+		attribsJson, err := json.Marshal(attribs)
+		if err != nil {
+			return nil, err
+		}
+
+		ud = append(ud, &schema.UsageData{
+			Address:    address,
+			Attributes: gjson.ParseBytes(attribsJson).Map(),
+		})
 	}
 
-	return gjson.ParseBytes(attribsJson).Map(), nil
+	return ud, nil
 }
 
 // unflattenUsageKey converts a "." separated usage key returned from the Usage API to the
@@ -306,7 +321,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 
 	logging.Logger.Debug().Msgf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
 
-	results, err := c.doQueries([]GraphQLQuery{query})
+	results, err := c.DoQueries([]GraphQLQuery{query})
 	if err != nil {
 		return err
 	} else if len(results) > 0 && results[0].Get("errors").Exists() {

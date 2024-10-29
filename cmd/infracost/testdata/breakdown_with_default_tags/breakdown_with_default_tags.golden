@@ -13,11 +13,12 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_default_tags",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_with_default_tags",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_with_default_tags",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags",
         "providers": [
           {
             "name": "aws",
@@ -29,7 +30,7 @@
               "SomeFloat": "1.1",
               "SomeNumber": "1"
             },
-            "filename": "testdata/breakdown_with_default_tags/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
             "startLine": 1,
             "endLine": 18
           }
@@ -48,18 +49,28 @@
               "SomeDynamicFloat": "1.1",
               "SomeDynamicNumber": "1"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
                   "endLine": 100,
-                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 75
                 }
               ],
               "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
               "endLine": 100,
-              "filename": "testdata/breakdown_with_default_tags/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
               "startLine": 75
             },
             "hourlyCost": "0.04557260273972602",
@@ -78,7 +89,8 @@
                     "monthlyQuantity": "730",
                     "price": "0.0416",
                     "hourlyCost": "0.0416",
-                    "monthlyCost": "30.368"
+                    "monthlyCost": "30.368",
+                    "priceNotFound": false
                   },
                   {
                     "name": "EC2 detailed monitoring",
@@ -87,7 +99,8 @@
                     "monthlyQuantity": "7",
                     "price": "0.3",
                     "hourlyCost": "0.00287671232876712",
-                    "monthlyCost": "2.1"
+                    "monthlyCost": "2.1",
+                    "priceNotFound": false
                   },
                   {
                     "name": "CPU credits",
@@ -96,7 +109,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.05",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "priceNotFound": false
                   }
                 ],
                 "subresources": [
@@ -113,7 +127,8 @@
                         "monthlyQuantity": "8",
                         "price": "0.1",
                         "hourlyCost": "0.0010958904109589",
-                        "monthlyCost": "0.8"
+                        "monthlyCost": "0.8",
+                        "priceNotFound": false
                       }
                     ]
                   }
@@ -133,19 +148,29 @@
               "SomeNumber": "1",
               "lambdaTag": "hello"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 32,
-                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 22
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
               "defaultTagsChecksum": "554cb5bc144f8c4690b6f71b48b5f746dc3141e609f7ab49fabb549fd5fee449",
               "endLine": 32,
-              "filename": "testdata/breakdown_with_default_tags/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
             },
             "costComponents": [
@@ -156,7 +181,9 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Ephemeral storage",
@@ -165,7 +192,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000000309",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "priceNotFound": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -174,13 +202,16 @@
                 "monthlyQuantity": null,
                 "price": "0.0000166667",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           }
         ],
         "totalHourlyCost": "0.04557260273972602",
-        "totalMonthlyCost": "33.268"
+        "totalMonthlyCost": "33.268",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -195,18 +226,28 @@
               "SomeDynamicFloat": "1.1",
               "SomeDynamicNumber": "1"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
                   "endLine": 100,
-                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 75
                 }
               ],
               "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
               "endLine": 100,
-              "filename": "testdata/breakdown_with_default_tags/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
               "startLine": 75
             },
             "hourlyCost": "0.04557260273972602",
@@ -225,7 +266,8 @@
                     "monthlyQuantity": "730",
                     "price": "0.0416",
                     "hourlyCost": "0.0416",
-                    "monthlyCost": "30.368"
+                    "monthlyCost": "30.368",
+                    "priceNotFound": false
                   },
                   {
                     "name": "EC2 detailed monitoring",
@@ -234,7 +276,8 @@
                     "monthlyQuantity": "7",
                     "price": "0.3",
                     "hourlyCost": "0.00287671232876712",
-                    "monthlyCost": "2.1"
+                    "monthlyCost": "2.1",
+                    "priceNotFound": false
                   },
                   {
                     "name": "CPU credits",
@@ -243,7 +286,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.05",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "priceNotFound": false
                   }
                 ],
                 "subresources": [
@@ -260,7 +304,8 @@
                         "monthlyQuantity": "8",
                         "price": "0.1",
                         "hourlyCost": "0.0010958904109589",
-                        "monthlyCost": "0.8"
+                        "monthlyCost": "0.8",
+                        "priceNotFound": false
                       }
                     ]
                   }
@@ -280,19 +325,29 @@
               "SomeNumber": "1",
               "lambdaTag": "hello"
             },
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 32,
-                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
                   "startLine": 22
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
               "defaultTagsChecksum": "554cb5bc144f8c4690b6f71b48b5f746dc3141e609f7ab49fabb549fd5fee449",
               "endLine": 32,
-              "filename": "testdata/breakdown_with_default_tags/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
             },
             "costComponents": [
@@ -303,7 +358,9 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Ephemeral storage",
@@ -312,7 +369,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000000309",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "priceNotFound": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -321,18 +379,22 @@
                 "monthlyQuantity": null,
                 "price": "0.0000166667",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           }
         ],
         "totalHourlyCost": "0.04557260273972602",
-        "totalMonthlyCost": "33.268"
+        "totalMonthlyCost": "33.268",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 3,
@@ -349,10 +411,13 @@
   ],
   "totalHourlyCost": "0.04557260273972602",
   "totalMonthlyCost": "33.268",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "0.04557260273972602",
   "pastTotalMonthlyCost": "33.268",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 3,

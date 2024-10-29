@@ -5,8 +5,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 // nameBracketReg matches the part of a cost component name before the brackets, and the part in the brackets
@@ -64,7 +65,7 @@ func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string
 	past, pastOk := pastResMap[resourceKey]
 	current, currentOk := currentResMap[resourceKey]
 	if current == nil && past == nil {
-		log.Debug().Msgf("diffResourcesByKey nil current and past with key %s", resourceKey)
+		logging.Logger.Debug().Msgf("diffResourcesByKey nil current and past with key %s", resourceKey)
 		return false, nil
 	}
 	baseResource := current
@@ -83,9 +84,11 @@ func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string
 		SkipMessage:  baseResource.SkipMessage,
 		ResourceType: baseResource.ResourceType,
 		Tags:         baseResource.Tags,
+		DefaultTags:  baseResource.DefaultTags,
 
-		HourlyCost:  diffDecimals(current.HourlyCost, past.HourlyCost),
-		MonthlyCost: diffDecimals(current.MonthlyCost, past.MonthlyCost),
+		HourlyCost:       diffDecimals(current.HourlyCost, past.HourlyCost),
+		MonthlyCost:      diffDecimals(current.MonthlyCost, past.MonthlyCost),
+		MonthlyUsageCost: diffDecimals(current.MonthlyUsageCost, past.MonthlyUsageCost),
 	}
 	for _, subResource := range past.SubResources {
 		subKey := fmt.Sprintf("%v.%v", resourceKey, subResource.Name)
@@ -186,6 +189,7 @@ func diffCostComponents(past *CostComponent, current *CostComponent) (bool, *Cos
 		ProductFilter:        baseCostComponent.ProductFilter,
 		PriceFilter:          baseCostComponent.PriceFilter,
 		priceHash:            baseCostComponent.priceHash,
+		UsageBased:           baseCostComponent.UsageBased,
 
 		HourlyQuantity:      diffDecimals(current.HourlyQuantity, past.HourlyQuantity),
 		MonthlyQuantity:     diffDecimals(current.MonthlyQuantity, past.MonthlyQuantity),

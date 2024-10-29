@@ -7,18 +7,16 @@ import (
 
 func getNewKMSKeyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_kms_key",
-		RFunc: NewKMSKey,
+		Name:      "aws_kms_key",
+		CoreRFunc: NewKMSKey,
 	}
 }
 
-func NewKMSKey(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKMSKey(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.KMSKey{
 		Address:               d.Address,
 		Region:                d.Get("region").String(),
 		CustomerMasterKeySpec: d.Get("customer_master_key_spec").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -77,6 +77,10 @@ func (u *UsageData) Merge(other *UsageData) *UsageData {
 }
 
 func (u *UsageData) Get(key string) gjson.Result {
+	if u == nil {
+		return gjson.Result{}
+	}
+
 	if u.Attributes[key].Type != gjson.Null {
 		return u.Attributes[key]
 	} else if strings.Contains(key, "[") && strings.Contains(key, "]") {

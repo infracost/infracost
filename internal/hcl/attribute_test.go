@@ -8,6 +8,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -148,7 +149,8 @@ locals {
 		Ctx: &Context{ctx: &hcl.EvalContext{
 			Variables: map[string]cty.Value{},
 		}},
-		Logger: discard,
+		Logger:  discard,
+		isGraph: true,
 	}
 
 	attr := Attribute{
@@ -169,10 +171,11 @@ locals {
 		},
 		Verbose: false,
 		Logger:  logger,
+		isGraph: true,
 	}
 
 	v := attr.Value()
-	assert.Equal(t, cty.DynamicVal, v)
+	assert.Equal(t, cty.StringVal(fmt.Sprintf("transformed_tags-%s", mock.Identifier)), v)
 
 	b, err := io.ReadAll(buf)
 	require.NoError(t, err)

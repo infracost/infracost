@@ -14,8 +14,14 @@ type DocDBCluster struct {
 	BackupStorageGB       *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var DocDBClusterUsageSchema = []*schema.UsageItem{
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *DocDBCluster) CoreType() string {
+	return "DocDBCluster"
+}
+
+func (r *DocDBCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *DocDBCluster) PopulateUsage(u *schema.UsageData) {
@@ -38,7 +44,7 @@ func (r *DocDBCluster) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    DocDBClusterUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -57,5 +63,6 @@ func (r *DocDBCluster) backupStorageCostComponent(backupStorage *decimal.Decimal
 				{Key: "usagetype", ValueRegex: regexPtr("(^|-)BackupUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

@@ -12,17 +12,24 @@ func getTrafficManagerExternalEndpointRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"profile_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			if len(d.References("profile_id")) > 0 {
+				profile := d.References("profile_id")[0]
+				return lookupRegion(profile, []string{"resource_group_name"})
+			}
+
+			return ""
+		},
 	}
 }
 
 func newTrafficManagerExternalEndpoint(d *schema.ResourceData) schema.CoreResource {
-	region := ""
+	region := d.Region
 	healthCheckInterval := int64(30)
 	profileEnabled := false
 
 	if len(d.References("profile_id")) > 0 {
 		profile := d.References("profile_id")[0]
-		region = lookupRegion(profile, []string{"resource_group_name"})
 		healthCheckInterval = profile.GetInt64OrDefault("monitor_config.0.interval_in_seconds", 30)
 		profileEnabled = trafficManagerProfileEnabled(profile)
 	}

@@ -1,8 +1,8 @@
 package config
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,6 +18,38 @@ import (
 )
 
 const InfracostDir = ".infracost"
+
+type AutodetectConfig struct {
+	// EnvNames is the list of environment names that we should use to group
+	// terraform var files.
+	EnvNames []string `yaml:"env_names,omitempty" ignored:"true"`
+	// ExcludeDirs is a list of directories that the autodetect should ignore.
+	ExcludeDirs []string `yaml:"exclude_dirs,omitempty" ignored:"true"`
+	// IncludeDirs is a list of directories that the autodetect should append
+	// to the already detected directories.
+	IncludeDirs []string `yaml:"include_dirs,omitempty" ignored:"true"`
+	// PathOverrides defines paths that should be overridden with specific
+	// environment variable grouping.
+	PathOverrides []PathOverride `yaml:"path_overrides,omitempty" ignored:"true"`
+	// MaxSearchDepth configures the number of folders that Infracost should
+	// traverse to detect projects.
+	MaxSearchDepth int `yaml:"max_search_depth,omitempty" ignored:"true"`
+	// ForceProjectType is used to force the project type to be a specific value.
+	// This is useful when autodetect collides with two project types, normally
+	// Terragrunt and Terraform and we want to force the project type to be one or
+	// the other.
+	ForceProjectType string `yaml:"force_project_type,omitempty" ignored:"true"`
+	// TerraformVarFileExtensions is a list of suffixes that should be used to group terraform
+	// var files. This is useful when there are non-standard terraform var file
+	// names which use different extensions.
+	TerraformVarFileExtensions []string `yaml:"terraform_var_file_extensions,omitempty" ignored:"true"`
+}
+
+type PathOverride struct {
+	Path    string   `yaml:"path"`
+	Exclude []string `yaml:"exclude"`
+	Only    []string `yaml:"only"`
+}
 
 // Project defines a specific terraform project config. This can be used
 // specify per folder/project configurations so that users don't have
@@ -36,12 +68,14 @@ type Project struct {
 	DependencyPaths []string `yaml:"dependency_paths,omitempty"`
 	// IncludeAllPaths tells autodetect to use all folders with valid project files.
 	IncludeAllPaths bool `yaml:"include_all_paths,omitempty" ignored:"true"`
+	// SkipAutodetect tells autodetect to skip this project.
+	SkipAutodetect bool `yaml:"skip_autodetect,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
 	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files,omitempty"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
-	TerraformVars map[string]string `yaml:"terraform_vars,omitempty"`
+	TerraformVars map[string]interface{} `yaml:"terraform_vars,omitempty"`
 	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
 	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
@@ -52,12 +86,24 @@ type Project struct {
 	TerraformBinary string `yaml:"terraform_binary,omitempty" envconfig:"TERRAFORM_BINARY"`
 	// TerraformWorkspace is an optional field used to set the Terraform workspace
 	TerraformWorkspace string `yaml:"terraform_workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
+	// TerraformCloudWorkspace is used to override the terraform configuration blocks workspace value.
+	TerraformCloudWorkspace string `yaml:"terraform_cloud_workspace,omitempty" envconfig:"TERRAFORM_CLOUD_WORKSPACE"`
+	// TerraformCloudOrg is used to override the terraform configuration blocks organization value.
+	TerraformCloudOrg string `yaml:"terraform_cloud_org,omitempty" envconfig:"TERRAFORM_CLOUD_ORG"`
 	// TerraformCloudHost is used to override the default app.terraform.io backend host. Only applicable for
 	// terraform cloud/enterprise users.
 	TerraformCloudHost string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
 	// TerraformCloudToken sets the Team API Token or User API Token so infracost can use it to access the plan.
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
+	// SpaceliftAPIKeyEndpoint is the endpoint that the spacelift API client will communicate with.
+	SpaceliftAPIKeyEndpoint string `yaml:"spacelift_api_key_endpoint,omitempty" envconfig:"SPACELIFT_API_KEY_ENDPOINT"`
+	// SpaceliftAPIKeyID is the spacelift API key ID. This is used in combination
+	// with the API key secret to generate a JWT token.
+	SpaceliftAPIKeyID string `yaml:"spacelift_api_key_id,omitempty" envconfig:"SPACELIFT_API_KEY_ID"`
+	// SpaceliftAPIKeySecret is the spacelift API key secret.This is used in combination
+	// with the API key id to generate a JWT token.
+	SpaceliftAPIKeySecret string `yaml:"spacelift_api_key_secret,omitempty" envconfig:"SPACELIFT_API_KEY_SECRET"`
 	// TerragruntFlags set additional flags that should be passed to terragrunt.
 	TerragruntFlags string `yaml:"terragrunt_flags,omitempty" envconfig:"TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
@@ -65,13 +111,17 @@ type Project struct {
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
 	TerraformUseState bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
 	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
+	// YorConfigPath is the path to a Yor config file, which we can extract default tags from
+	YorConfigPath string `yaml:"yor_config_path,omitempty" ignored:"true"`
 }
 
 type Config struct {
 	Credentials   Credentials
 	Configuration Configuration
 
-	Version         string `yaml:"version,omitempty" ignored:"true"`
+	Version    string           `yaml:"version,omitempty" ignored:"true"`
+	Autodetect AutodetectConfig `yaml:"autodetect,omitempty" ignored:"true"`
+
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
 	DebugReport     bool   `ignored:"true"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
@@ -94,6 +144,7 @@ type Config struct {
 	EnableCloud               *bool `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
 	EnableCloudUpload         *bool `yaml:"enable_cloud_upload,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
 	DisableHCLParsing         bool  `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
+	GraphEvaluator            bool  `yaml:"graph_evaluator,omitempty" envconfig:"GRAPH_EVALUATOR"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"TLS_CA_CERT_FILE"`
@@ -125,8 +176,10 @@ type Config struct {
 	RootPath string
 	// ConfigFilePath defines the raw value of the `--config-file` flag provided by the user
 	ConfigFilePath string
+	// UsageFilePath defines the raw value of the `--usage-file` flag provided by the user
+	UsageFilePath string
 
-	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
+	NoCache bool `yaml:"no_cache,omitempty" ignored:"true"`
 
 	SkipErrLine bool
 
@@ -139,7 +192,7 @@ type Config struct {
 func init() {
 	err := loadDotEnv()
 	if err != nil {
-		log.Fatal(err)
+		logging.Logger.Fatal().Msg(err.Error())
 	}
 }
 
@@ -163,10 +216,17 @@ func DefaultConfig() *Config {
 	}
 }
 
-// RepoPath returns the filepath to either the config-file location or initial path provided by the user.
-func (c *Config) RepoPath() string {
+// WorkingDirectory returns the filepath to either the directory specified by the --path
+// flag or the directory that the binary has been run from.
+func (c *Config) WorkingDirectory() string {
 	if c.ConfigFilePath != "" {
-		return strings.TrimRight(c.ConfigFilePath, filepath.Base(c.ConfigFilePath))
+		wd, err := os.Getwd()
+		if err != nil {
+			logging.Logger.Debug().Err(err).Msg("error getting working directory for repo path")
+			return ""
+		}
+
+		return wd
 	}
 
 	return c.RootPath
@@ -175,7 +235,7 @@ func (c *Config) RepoPath() string {
 // CachePath finds path which contains the .infracost directory. It traverses parent directories until a .infracost
 // folder is found. If no .infracost folders exist then CachePath uses the current wd.
 func (c *Config) CachePath() string {
-	dir := c.RepoPath()
+	dir := c.WorkingDirectory()
 
 	if s := c.cachePath(dir); s != "" {
 		return s
@@ -278,9 +338,45 @@ func (c *Config) SetLogWriter(w io.Writer) {
 // LogWriter returns the writer the Logger should use to write logs to.
 // In most cases this should be stderr, but it can also be a file.
 func (c *Config) LogWriter() io.Writer {
+	isCI := ciPlatform() != "" && !IsTest()
 	return zerolog.NewConsoleWriter(func(w *zerolog.ConsoleWriter) {
-		w.NoColor = true
-		w.TimeFormat = time.RFC3339
+		w.PartsExclude = []string{"time"}
+		w.FormatLevel = func(i interface{}) string {
+			if i == nil {
+				return ""
+			}
+
+			if isCI {
+				return strings.ToUpper(fmt.Sprintf("%s", i))
+			}
+
+			if ll, ok := i.(string); ok {
+				upper := strings.ToUpper(ll)
+
+				switch ll {
+				case zerolog.LevelTraceValue:
+					return color.CyanString("%s", upper)
+				case zerolog.LevelDebugValue:
+					return color.MagentaString("%s", upper)
+				case zerolog.LevelWarnValue:
+					return color.YellowString("%s", upper)
+				case zerolog.LevelErrorValue, zerolog.LevelFatalValue, zerolog.LevelPanicValue:
+					return color.RedString("%s", upper)
+				case zerolog.LevelInfoValue:
+					return color.GreenString("%s", upper)
+				default:
+				}
+			}
+
+			return strings.ToUpper(fmt.Sprintf("%s", i))
+		}
+
+		if isCI {
+			w.NoColor = true
+			w.TimeFormat = time.RFC3339
+			w.PartsExclude = nil
+		}
+
 		if c.logDisableTimestamps {
 			w.PartsExclude = []string{"time"}
 		}
@@ -357,10 +453,6 @@ func (c *Config) LoadGlobalFlags(cmd *cobra.Command) error {
 	return nil
 }
 
-func (c *Config) IsLogging() bool {
-	return c.LogLevel != ""
-}
-
 func (c *Config) IsSelfHosted() bool {
 	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
 }
@@ -394,4 +486,14 @@ func loadDotEnv() error {
 	}
 
 	return nil
+}
+
+func CleanProjectName(name string) string {
+	name = strings.TrimSuffix(name, "/")
+	name = strings.ReplaceAll(name, "/", "-")
+
+	if name == "." {
+		return "main"
+	}
+	return name
 }

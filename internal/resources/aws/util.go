@@ -116,6 +116,7 @@ var RegionMapping = map[string]string{
 	"us-west-2":       "US West (Oregon)",
 	"us-west-2-lax-1": "US West (Los Angeles)",
 	"ca-central-1":    "Canada (Central)",
+	"ca-west-1":       "Canada West (Calgary)",
 	"cn-north-1":      "China (Beijing)",
 	"cn-northwest-1":  "China (Ningxia)",
 	"eu-central-1":    "EU (Frankfurt)",
@@ -135,6 +136,7 @@ var RegionMapping = map[string]string{
 	"ap-southeast-2":  "Asia Pacific (Sydney)",
 	"ap-southeast-3":  "Asia Pacific (Jakarta)",
 	"ap-southeast-4":  "Asia Pacific (Melbourne)",
+	"ap-southeast-5":  "Asia Pacific (Malaysia)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
 	"ap-south-2":      "Asia Pacific (Hyderabad)",
 	"me-central-1":    "Middle East (UAE)",
@@ -173,6 +175,7 @@ type RegionsUsage struct {
 	USWest2      *float64 `infracost_usage:"us_west_2"`
 	USWest2Lax1  *float64 `infracost_usage:"us_west_2_lax_1"`
 	CACentral1   *float64 `infracost_usage:"ca_central_1"`
+	CAWest1      *float64 `infracost_usage:"ca_west_1"`
 	CNNorth1     *float64 `infracost_usage:"cn_north_1"`
 	CNNorthwest1 *float64 `infracost_usage:"cn_northwest_1"`
 	EUCentral1   *float64 `infracost_usage:"eu_central_1"`
@@ -181,6 +184,7 @@ type RegionsUsage struct {
 	EUSouth1     *float64 `infracost_usage:"eu_south_1"`
 	EUWest3      *float64 `infracost_usage:"eu_west_3"`
 	EUNorth1     *float64 `infracost_usage:"eu_north_1"`
+	ILCentral1   *float64 `infracost_usage:"il_central_1"`
 	APEast1      *float64 `infracost_usage:"ap_east_1"`
 	APNortheast1 *float64 `infracost_usage:"ap_northeast_1"`
 	APNortheast2 *float64 `infracost_usage:"ap_northeast_2"`
@@ -189,6 +193,7 @@ type RegionsUsage struct {
 	APSoutheast2 *float64 `infracost_usage:"ap_southeast_2"`
 	APSoutheast3 *float64 `infracost_usage:"ap_southeast_3"`
 	APSoutheast4 *float64 `infracost_usage:"ap_southeast_4"`
+	APSoutheast5 *float64 `infracost_usage:"ap_southeast_5"`
 	APSouth1     *float64 `infracost_usage:"ap_south_1"`
 	MESouth1     *float64 `infracost_usage:"me_south_1"`
 	SAEast1      *float64 `infracost_usage:"sa_east_1"`
@@ -746,4 +751,8 @@ func (r rdsReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 		TermLength:         strPtr(termLength),
 		TermPurchaseOption: strPtr(purchaseOption),
 	}, nil
+}
+
+func isAWSChina(region string) bool {
+	return strings.HasPrefix(region, "cn-")
 }

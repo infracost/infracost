@@ -1,20 +1,23 @@
 
- Name                             Monthly Qty  Unit   Monthly Cost 
-                                                                   
- aws_eks_cluster.example                                           
- └─ EKS cluster                           730  hours        $73.00 
-                                                                   
- aws_eks_fargate_profile.example                                   
- ├─ Per GB per hour                         1  GB            $3.24 
- └─ Per vCPU per hour                       1  CPU          $29.55 
-                                                                   
- OVERALL TOTAL                                             $105.80 
+ Name                             Monthly Qty  Unit   Monthly Cost   
+                                                                     
+ aws_eks_cluster.example                                             
+ └─ EKS cluster                           730  hours        $73.00   
+                                                                     
+ aws_eks_fargate_profile.example                                     
+ ├─ Per GB per hour                         1  GB            $3.24   
+ └─ Per vCPU per hour                       1  CPU          $29.55   
+                                                                     
+ OVERALL TOTAL                                            $105.80 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEKSFargateProfileGoldenFile                    ┃ $106         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $106 ┃           - ┃       $106 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

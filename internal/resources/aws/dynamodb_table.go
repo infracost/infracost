@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
-	"github.com/shopspring/decimal"
 )
 
 type DynamoDBTable struct {
@@ -22,7 +23,8 @@ type DynamoDBTable struct {
 	WriteCapacity *int64
 	ReadCapacity  *int64
 
-	AppAutoscalingTarget []*AppAutoscalingTarget
+	AppAutoscalingTarget       []*AppAutoscalingTarget
+	PointInTimeRecoveryEnabled bool
 
 	// "usage" args
 	MonthlyWriteRequestUnits       *int64 `infracost_usage:"monthly_write_request_units"`
@@ -100,7 +102,10 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	// Data storage
 	costComponents = append(costComponents, a.dataStorageCostComponent(a.Region, a.StorageGB))
 	// Continuous backups (PITR)
-	costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
+	if a.PointInTimeRecoveryEnabled {
+		costComponents = append(costComponents, a.continuousBackupCostComponent(a.Region, a.PitrBackupStorageGB))
+	}
+
 	// OnDemand backups
 	costComponents = append(costComponents, a.onDemandBackupCostComponent(a.Region, a.OnDemandBackupStorageGB))
 	// Restoring tables
@@ -169,8 +174,9 @@ func (a *DynamoDBTable) wcuCostComponent(region string, provisionedWCU *int64, a
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
-			DescriptionRegex: strPtr("/beyond the free tier/"),
+			DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 		},
+		UsageBased: autoscaling,
 	}
 }
 
@@ -200,8 +206,9 @@ func (a *DynamoDBTable) rcuCostComponent(region string, provisionedRCU *int64, a
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
-			DescriptionRegex: strPtr("/beyond the free tier/"),
+			DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 		},
+		UsageBased: autoscaling,
 	}
 }
 
@@ -246,7 +253,7 @@ func (a *DynamoDBTable) newProvisionedDynamoDBGlobalTable(name string, region st
 				},
 				PriceFilter: &schema.PriceFilter{
 					PurchaseOption:   strPtr("on_demand"),
-					DescriptionRegex: strPtr("/beyond the free tier/"),
+					DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 				},
 			},
 		},
@@ -303,6 +310,7 @@ func (a *DynamoDBTable) wruCostComponent(region string, monthlyWRU *int64) *sche
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -328,6 +336,7 @@ func (a *DynamoDBTable) rruCostComponent(region string, monthlyRRU *int64) *sche
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -352,8 +361,9 @@ func (a *DynamoDBTable) dataStorageCostComponent(region string, storageGB *int64
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("on_demand"),
-			DescriptionRegex: strPtr("/storage used beyond first/"),
+			DescriptionRegex: regexPtr("^(?!.*\\$0.00 per GB-Month).*$"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -376,6 +386,7 @@ func (a *DynamoDBTable) continuousBackupCostComponent(region string, pitrBackupS
 				{Key: "usagetype", ValueRegex: strPtr("/TimedPITRStorage-ByteHrs/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -395,6 +406,7 @@ func (a *DynamoDBTable) onDemandBackupCostComponent(region string, onDemandBacku
 			Service:       strPtr("AmazonDynamoDB"),
 			ProductFamily: strPtr("Amazon DynamoDB On-Demand Backup Storage"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -414,6 +426,7 @@ func (a *DynamoDBTable) restoreCostComponent(region string, monthlyDataRestoredG
 			Service:       strPtr("AmazonDynamoDB"),
 			ProductFamily: strPtr("Amazon DynamoDB Restore Data Size"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -437,7 +450,8 @@ func (a *DynamoDBTable) streamCostComponent(region string, monthlyStreamsRRU *in
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			DescriptionRegex: strPtr("/beyond free tier/"),
+			DescriptionRegex: regexPtr("^(?!.*\\(free tier\\)).*$"),
 		},
+		UsageBased: true,
 	}
 }

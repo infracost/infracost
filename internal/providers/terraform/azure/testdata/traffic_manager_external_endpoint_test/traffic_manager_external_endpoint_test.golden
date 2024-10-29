@@ -1,29 +1,31 @@
 
- Name                                                                   Monthly Qty  Unit   Monthly Cost 
-                                                                                                         
- azurerm_traffic_manager_external_endpoint.basic_healthcheck_example                                     
- └─ Basic health check (Global)                                                 730  hours         $0.54 
-                                                                                                         
- azurerm_traffic_manager_external_endpoint.default_healthcheck_example                                   
- └─ Basic health check (Global)                                                 730  hours         $0.54 
-                                                                                                         
- azurerm_traffic_manager_external_endpoint.fast_healthcheck_example                                      
- ├─ Basic health check (Global)                                                 730  hours         $0.54 
- └─ Fast interval health checks add-on (Global)                                 730  hours         $2.00 
-                                                                                                         
- azurerm_traffic_manager_external_endpoint.germany_example                                               
- ├─ Basic health check (Germany)                                                730  hours         $0.54 
- └─ Fast interval health checks add-on (Germany)                                730  hours         $2.54 
-                                                                                                         
- OVERALL TOTAL                                                                                     $6.70 
+ Name                                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                                           
+ azurerm_traffic_manager_external_endpoint.germany_example                                                 
+ ├─ Basic health check (Germany)                                                730  hours         $0.54   
+ └─ Fast interval health checks add-on (Germany)                                730  hours         $2.54   
+                                                                                                           
+ azurerm_traffic_manager_external_endpoint.fast_healthcheck_example                                        
+ ├─ Basic health check (Global)                                                 730  hours         $0.54   
+ └─ Fast interval health checks add-on (Global)                                 730  hours         $2.00   
+                                                                                                           
+ azurerm_traffic_manager_external_endpoint.basic_healthcheck_example                                       
+ └─ Basic health check (Global)                                                 730  hours         $0.54   
+                                                                                                           
+ azurerm_traffic_manager_external_endpoint.default_healthcheck_example                                     
+ └─ Basic health check (Global)                                                 730  hours         $0.54   
+                                                                                                           
+ OVERALL TOTAL                                                                                    $6.70 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 12 cloud resources were detected:
-∙ 10 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 2 x azurerm_resource_group
+∙ 10 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestTrafficManagerExternalEndpoint                 ┃ $7           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃            $7 ┃           - ┃         $7 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

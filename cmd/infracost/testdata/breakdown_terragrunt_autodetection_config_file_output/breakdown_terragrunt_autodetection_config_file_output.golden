@@ -1,0 +1,201 @@
+Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app1-dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/dev
+
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
+
+──────────────────────────────────
+Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app1-prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/prod
+
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $747.64   
+
+──────────────────────────────────
+Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app2-dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/dev
+
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
+
+──────────────────────────────────
+Project: testdata-breakdown_terragrunt_autodetection_config_file_output-app2-prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/prod
+
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $747.64   
+
+──────────────────────────────────
+Project: region1-override
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/dev
+
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
+
+──────────────────────────────────
+Project: region1-override
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/prod
+
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $747.64   
+
+──────────────────────────────────
+Project: region1-override
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/dev
+
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               400  IOPS                              $26.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ Project total                                                                                               $51.97   
+
+──────────────────────────────────
+Project: region1-override
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/prod
+
+ Name                                                           Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                        
+ aws_instance.web_app                                                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64   
+ ├─ root_block_device                                                                                                   
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00   
+ └─ ebs_block_device[0]                                                                                                 
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00   
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00   
+                                                                                                                        
+ aws_lambda_function.hello_world                                                                                        
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                        
+ Project total                                                                                                $747.64   
+
+ OVERALL TOTAL                                                                                             $3,198.43 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+16 cloud resources were detected:
+∙ 16 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ testdata-breakdown_terragrunt_a...on_config_file_output-app1-dev ┃           $52 ┃           - ┃        $52 ┃
+┃ testdata-breakdown_terragrunt_a...n_config_file_output-app1-prod ┃          $748 ┃           - ┃       $748 ┃
+┃ testdata-breakdown_terragrunt_a...on_config_file_output-app2-dev ┃           $52 ┃           - ┃        $52 ┃
+┃ testdata-breakdown_terragrunt_a...n_config_file_output-app2-prod ┃          $748 ┃           - ┃       $748 ┃
+┃ region1-override                                                 ┃           $52 ┃           - ┃        $52 ┃
+┃ region1-override                                                 ┃          $748 ┃           - ┃       $748 ┃
+┃ region1-override                                                 ┃           $52 ┃           - ┃        $52 ┃
+┃ region1-override                                                 ┃          $748 ┃           - ┃       $748 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+
+
+Logs:
+INFO Autodetected 8 Terragrunt projects from 3 paths in the config file
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app1-dev at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/dev
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app1-prod at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app1/prod
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app2-dev at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/dev
+INFO Found Terragrunt project testdata-breakdown_terragrunt_autodetection_config_file_output-app2-prod at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/app2/prod
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/dev
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app1/prod
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/dev
+INFO Found Terragrunt project region1-override at directory REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_autodetection_config_file_output/region1/app2/prod

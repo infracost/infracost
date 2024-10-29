@@ -1,0 +1,146 @@
+version: 0.1
+resource_usage:
+  azurerm_cognitive_account.with_usage[*]:
+    # SpeechServices
+    monthly_speech_to_text_standard_hrs: 20
+    monthly_speech_to_text_standard_batch_hrs: 56
+    monthly_speech_to_text_custom_hrs: 17
+    monthly_speech_to_text_custom_batch_hrs: 44
+    monthly_speech_to_text_custom_endpoint_hrs: 372
+    monthly_speech_to_text_custom_training_hrs: 2
+    monthly_speech_to_text_enhanced_add_ons_hrs: 67
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 9.5
+    monthly_text_to_speech_neural_chars: 1_333_333
+    monthly_text_to_speech_custom_neural_training_hrs: 0.4
+    monthly_text_to_speech_custom_neural_chars: 833_333
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 5
+    monthly_text_to_speech_long_audio_chars: 200_000
+    monthly_text_to_speech_personal_voice_profiles: 33
+    monthly_text_to_speech_personal_voice_chars: 833_333
+    monthly_speech_translation_hrs: 8
+    monthly_speaker_verification_transactions: 4_000
+    monthly_speaker_identification_transactions: 2_000
+    monthly_voice_profiles: 100_000
+    # LUIS
+    monthly_luis_text_requests: 13_333
+    monthly_luis_speech_requests: 3_636
+    # TextAnalytics
+    monthly_language_text_analytics_records: 20_000
+    monthly_language_summarization_records: 10_000
+    monthly_language_conversational_language_understanding_records: 10_000
+    monthly_language_conversational_language_understanding_advanced_training_hours: 6.7
+    monthly_language_customized_text_classification_records: 4_000
+    monthly_language_customized_summarization_records: 5_000
+    monthly_language_customized_question_answering_records: 13_333
+    monthly_language_customized_training_hours: 6.7
+    monthly_language_text_analytics_for_health_records: 5_800
+
+  azurerm_cognitive_account.speech_with_commitment["small"]:
+    monthly_commitment_speech_to_text_standard_hrs: 2000
+    monthly_commitment_speech_to_text_standard_overage_hrs: 100
+    monthly_commitment_speech_to_text_custom_hrs: 2000
+    monthly_commitment_speech_to_text_custom_overage_hrs: 100
+    monthly_commitment_speech_to_text_enhanced_add_ons_hrs: 2000
+    monthly_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    monthly_commitment_text_to_speech_neural_commitment_chars: 80_000_000
+    monthly_commitment_text_to_speech_neural_overage_chars: 1_000_000
+    monthly_connected_container_commitment_speech_to_text_standard_hrs: 2000
+    monthly_connected_container_commitment_speech_to_text_standard_overage_hrs: 100
+    monthly_connected_container_commitment_speech_to_text_custom_hrs: 2000
+    monthly_connected_container_commitment_speech_to_text_custom_overage_hrs: 100
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_hrs: 2000
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 80_000_000
+    monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000
+
+  azurerm_cognitive_account.speech_with_commitment["medium"]:
+    monthly_commitment_speech_to_text_standard_hrs: 10_000
+    monthly_commitment_speech_to_text_standard_overage_hrs: 100
+    monthly_commitment_speech_to_text_custom_hrs: 10_000
+    monthly_commitment_speech_to_text_custom_overage_hrs: 100
+    monthly_commitment_speech_to_text_enhanced_add_ons_hrs: 10_000
+    monthly_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    monthly_commitment_text_to_speech_neural_commitment_chars: 400_000_000
+    monthly_commitment_text_to_speech_neural_overage_chars: 1_000_000
+    monthly_connected_container_commitment_speech_to_text_standard_hrs: 10_000
+    monthly_connected_container_commitment_speech_to_text_standard_overage_hrs: 100
+    monthly_connected_container_commitment_speech_to_text_custom_hrs: 10_000
+    monthly_connected_container_commitment_speech_to_text_custom_overage_hrs: 100
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_hrs: 10_000
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 400_000_000
+    monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000
+
+  azurerm_cognitive_account.speech_with_commitment["large"]:
+    monthly_commitment_speech_to_text_standard_hrs: 50_000
+    monthly_commitment_speech_to_text_standard_overage_hrs: 100
+    monthly_commitment_speech_to_text_custom_hrs: 50_000
+    monthly_commitment_speech_to_text_custom_overage_hrs: 100
+    monthly_commitment_speech_to_text_enhanced_add_ons_hrs: 50_000
+    monthly_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    monthly_commitment_text_to_speech_neural_commitment_chars: 2_000_000_000
+    monthly_commitment_text_to_speech_neural_overage_chars: 1_000_000
+    monthly_connected_container_commitment_speech_to_text_standard_hrs: 50_000
+    monthly_connected_container_commitment_speech_to_text_standard_overage_hrs: 100
+    monthly_connected_container_commitment_speech_to_text_custom_hrs: 50_000
+    monthly_connected_container_commitment_speech_to_text_custom_overage_hrs: 100
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_hrs: 50_000
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 2_000_000_000
+    monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000
+
+  azurerm_cognitive_account.speech_with_commitment["invalid"]:
+    monthly_commitment_speech_to_text_standard_hrs: 100
+
+  azurerm_cognitive_account.luis_with_commitment["small"]:
+    monthly_commitment_luis_text_requests: 1_000_000
+    monthly_commitment_luis_text_overage_requests: 1_000
+
+  azurerm_cognitive_account.luis_with_commitment["medium"]:
+    monthly_commitment_luis_text_requests: 5_000_000
+    monthly_commitment_luis_text_overage_requests: 1_000
+
+  azurerm_cognitive_account.luis_with_commitment["large"]:
+    monthly_commitment_luis_text_requests: 25_000_000
+    monthly_commitment_luis_text_overage_requests: 1_000
+
+  azurerm_cognitive_account.luis_with_commitment["invalid"]:
+    monthly_commitment_luis_text_requests: 200
+
+  azurerm_cognitive_account.textanalytics_with_commitment["small"]:
+    monthly_commitment_language_text_analytics_records: 1_000_000
+    monthly_commitment_language_text_analytics_overage_records: 1_000
+    monthly_commitment_language_summarization_records: 1_000_000
+    monthly_commitment_language_summarization_overage_records: 1_000_000
+    # There's no 1M commitment for connected container
+
+  azurerm_cognitive_account.textanalytics_with_commitment["medium"]:
+    monthly_commitment_language_text_analytics_records: 3_000_000
+    monthly_commitment_language_text_analytics_overage_records: 1_000
+    monthly_commitment_language_summarization_records: 3_000_000
+    monthly_commitment_language_summarization_overage_records: 1_000
+    monthly_connected_container_commitment_language_text_analytics_records: 3_000_000
+    monthly_connected_container_commitment_language_text_analytics_overage_records: 1_000
+    monthly_connected_container_commitment_language_summarization_records: 3_000_000
+    monthly_connected_container_commitment_language_summarization_overage_records: 1_000
+
+  azurerm_cognitive_account.textanalytics_with_commitment["large"]:
+    monthly_commitment_language_text_analytics_records: 10_000_000
+    monthly_commitment_language_text_analytics_overage_records: 1_000
+    monthly_commitment_language_summarization_records: 10_000_000
+    monthly_commitment_language_summarization_overage_records: 1_000
+    monthly_connected_container_commitment_language_text_analytics_records: 10_000_000
+    monthly_connected_container_commitment_language_text_analytics_overage_records: 1_000
+    monthly_connected_container_commitment_language_summarization_records: 10_000_000
+    monthly_connected_container_commitment_language_summarization_overage_records: 1_000
+
+  azurerm_cognitive_account.textanalytics_with_commitment["invalid"]:
+    monthly_commitment_language_text_analytics_records: 200
+    monthly_commitment_language_summarization_records: 200
+    monthly_connected_container_commitment_language_text_analytics_records: 200
+    monthly_connected_container_commitment_language_summarization_records: 200
+
+  azurerm_cognitive_account.textanalytics_with_tiers:
+    monthly_language_text_analytics_records: 15_000_000
+    monthly_language_customized_question_answering_records: 3_000_000
+    monthly_language_text_analytics_for_health_records: 3_000_000

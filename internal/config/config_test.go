@@ -108,7 +108,7 @@ projects:
 		t.Run(tt.name, func(t *testing.T) {
 			c := Config{}
 			path := filepath.Join(tmp, fmt.Sprintf("conf-%d.yaml", i))
-			err := os.WriteFile(path, tt.contents, os.ModePerm)
+			err := os.WriteFile(path, tt.contents, os.ModePerm) // nolint: gosec
 			require.NoError(t, err)
 
 			// we need to remove INFRACOST_TERRAFORM_CLOUD_TOKEN value for these tests.

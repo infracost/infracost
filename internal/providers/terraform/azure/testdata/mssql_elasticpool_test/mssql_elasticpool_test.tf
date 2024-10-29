@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-resource "azurerm_sql_server" "example" {
+resource "azurerm_mssql_server" "example" {
   name                         = "myexamplesqlserver"
   resource_group_name          = azurerm_resource_group.example.name
   location                     = "eastus"
@@ -21,7 +21,7 @@ resource "azurerm_mssql_elasticpool" "gp_gen5" {
   name                = "gp-gen5"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   license_type        = "LicenseIncluded"
   max_size_gb         = 100
 
@@ -42,7 +42,7 @@ resource "azurerm_mssql_elasticpool" "gp_gen5_zone_redundant" {
   name                = "gp-gen5"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   license_type        = "LicenseIncluded"
   zone_redundant      = true
   max_size_gb         = 100
@@ -64,7 +64,7 @@ resource "azurerm_mssql_elasticpool" "gp_gen5_zone_no_license" {
   name                = "gp-gen5"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   license_type        = "BasePrice"
   max_size_gb         = 100
 
@@ -85,9 +85,31 @@ resource "azurerm_mssql_elasticpool" "bc_dc" {
   name                = "bc-dc"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   license_type        = "LicenseIncluded"
   max_size_gb         = 100
+
+  sku {
+    name     = "BC_DC"
+    tier     = "BusinessCritical"
+    family   = "DC"
+    capacity = 8
+  }
+
+  per_database_settings {
+    min_capacity = 0.25
+    max_capacity = 4
+  }
+}
+
+resource "azurerm_mssql_elasticpool" "bc_dc_zone_redundant" {
+  name                = "bc-dc-zone-redundant"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  server_name         = azurerm_mssql_server.example.name
+  license_type        = "LicenseIncluded"
+  max_size_gb         = 100
+  zone_redundant      = true
 
   sku {
     name     = "BC_DC"
@@ -106,7 +128,7 @@ resource "azurerm_mssql_elasticpool" "basic_100" {
   name                = "basic-100"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   max_size_gb         = 9.7656250
 
   sku {
@@ -125,7 +147,7 @@ resource "azurerm_mssql_elasticpool" "standard_200" {
   name                = "standard-200"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   max_size_gb         = 300 # 100 GB extra storage
 
   sku {
@@ -144,7 +166,7 @@ resource "azurerm_mssql_elasticpool" "premium_500" {
   name                = "premium-500"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
-  server_name         = azurerm_sql_server.example.name
+  server_name         = azurerm_mssql_server.example.name
   max_size_gb         = 1024 # 274 GB extra storage
 
   sku {

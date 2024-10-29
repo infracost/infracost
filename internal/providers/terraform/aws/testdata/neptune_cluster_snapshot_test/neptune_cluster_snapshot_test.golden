@@ -1,38 +1,40 @@
 
- Name                                                   Monthly Qty  Unit                  Monthly Cost 
-                                                                                                        
- aws_neptune_cluster.fiveDaysRetentionPeriod                                                            
- ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
- ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
- └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
-                                                                                                        
- aws_neptune_cluster.oneDayRetentionPeriod                                                              
- ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
- └─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
-                                                                                                        
- aws_neptune_cluster.withoutUsage                                                                       
- ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB          
- ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request  
- └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
-                                                                                                        
- aws_neptune_cluster_snapshot.fiveDaysRetenPeriod                                                       
- └─ Backup storage                                            1,000  GB                          $22.00 
-                                                                                                        
- aws_neptune_cluster_snapshot.inAnotherModule                                                           
- └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
-                                                                                                        
- aws_neptune_cluster_snapshot.withoutUsage                                                              
- └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB         
-                                                                                                        
+ Name                                                   Monthly Qty  Unit                  Monthly Cost    
+                                                                                                           
+ aws_neptune_cluster_snapshot.fiveDaysRetenPeriod                                                          
+ └─ Backup storage                                            1,000  GB                          $22.00  * 
+                                                                                                           
+ aws_neptune_cluster.fiveDaysRetentionPeriod                                                               
+ ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB             
+ ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request     
+ └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB            
+                                                                                                           
+ aws_neptune_cluster.oneDayRetentionPeriod                                                                 
+ ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB             
+ └─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request     
+                                                                                                           
+ aws_neptune_cluster.withoutUsage                                                                          
+ ├─ Storage                                        Monthly cost depends on usage: $0.12 per GB             
+ ├─ I/O requests                                   Monthly cost depends on usage: $0.23 per 1M request     
+ └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB            
+                                                                                                           
+ aws_neptune_cluster_snapshot.inAnotherModule                                                              
+ └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB            
+                                                                                                           
+ aws_neptune_cluster_snapshot.withoutUsage                                                                 
+ └─ Backup storage                                 Monthly cost depends on usage: $0.022 per GB            
+                                                                                                           
  OVERALL TOTAL                                                                                   $22.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 7 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x aws_neptune_cluster_snapshot
+∙ 6 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNeptuneClusterSnapshotGoldenFile               ┃ $22          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃         $22 ┃        $22 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

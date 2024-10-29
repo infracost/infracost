@@ -1,7 +1,7 @@
-# You can use this file to define resource usage estimates for Infracost to use when calculating
-# the cost of usage-based resource, such as AWS S3 or Lambda.
+# This is an example usage file. It tells Infracost what usage values
+# should be used when calculating usage costs for things like AWS S3 or Lambda.
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
-# See https://infracost.io/usage-file/ for docs
+# See docs: https://infracost.io/usage-file/
 version: 0.1
 resource_type_default_usage:
   aws_lambda_function:
@@ -324,10 +324,10 @@ resource_usage:
     meta_database_gb: 1000         # Total storage used for meta database
 
   aws_rds_cluster.my_cluster:
-    capacity_units_per_hr: 50          # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
+    capacity_units_per_hr: 50          # Number of Aurora Capacity Units per hour. Only used when engine_mode is "serverless". For Aurora Serverless V2, the capacity units are specified on the aws_rds_cluster_instance resource.
     storage_gb: 200                    # Storage amount in GB allocated to the aurora cluster.
-    write_requests_per_sec: 100        # Total number of reads per second for the cluster.
-    read_requests_per_sec: 100         # Total number of writes per second for the cluster.
+    write_requests_per_sec: 100        # Total number of writes per second for the cluster.
+    read_requests_per_sec: 100         # Total number of reads per second for the cluster.
     backup_snapshot_size_gb: 200       # Individual storage size for backup snapshots, used in conjunction with resource parameter "backup_retention_period".
     average_statements_per_hr: 10000   # Number of statements generated per hour when backtrack is enabled. Only available for MySQl-compatible Aurora
     change_records_per_statement: 0.38 # Records changed per statement executed.
@@ -335,11 +335,12 @@ resource_usage:
     snapshot_export_size_gb: 200       # Size of snapshot that's exported to s3 in parquet format.
 
   aws_rds_cluster_instance.my_cluster:
-    monthly_cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
-    vcpu_count: 2 # # (DEPRECATED this is now calculated automatically) Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
+    monthly_cpu_credit_hrs: 24                              # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
+    vcpu_count: 2                                           # (DEPRECATED this is now calculated automatically) Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
     monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
     reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances, can be: no_upfront (only for 1_year term), partial_upfront, all_upfront.
+    capacity_units_per_hr: 50                               # Number of Aurora Capacity Units per hour. Only used for Aurora Serverless V2 (when instance class is "db.serverless")
 
   aws_redshift_cluster.with_usage:
     managed_storage_gb: 10000
@@ -363,67 +364,6 @@ resource_usage:
 
   aws_s3_bucket_inventory.my_inventory:
     monthly_listed_objects: 100000000 # Monthly number of listed objects.
-
-  aws_s3_bucket_lifecycle_configuration.my_bucket_lifecycle_config:
-    object_tags: 10000000 # Total object tags.
-    standard: # Usages of S3 Standard:
-      storage_gb: 10000                     # Total storage in GB.
-      monthly_tier_1_requests: 1000000      # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 100000       # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_select_data_scanned_gb: 10000 # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 1000 # Monthly data returned by S3 Select in GB.
-    intelligent_tiering: # Usages of S3 Intelligent - Tiering:
-      frequent_access_storage_gb: 20000             # Total storage for Frequent Access Tier in GB.
-      infrequent_access_storage_gb: 20000           # Total storage for Infrequent Access Tier in GB.
-      monitored_objects: 2000                       # Total objects monitored by the Intelligent Tiering.
-      monthly_tier_1_requests: 2000000              # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 200000               # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 200000 # Monthly Lifecycle Transition requests.
-      monthly_select_data_scanned_gb: 20000         # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 2000         # Monthly data returned by S3 Select in GB.
-      early_delete_gb: 200000                       # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
-    standard_infrequent_access: # Usages of S3 Standard - Infrequent Access:
-      storage_gb: 30000                             # Total storage in GB.
-      monthly_tier_1_requests: 3000000              # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 300000               # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 300000 # Monthly Lifecycle Transition requests.
-      monthly_data_retrieval_gb: 30000              # Monthly data retrievals in GB
-      monthly_select_data_scanned_gb: 30000         # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 3000         # Monthly data returned by S3 Select in GB.
-    one_zone_infrequent_access: # Usages of S3 One Zone - Infrequent Access:
-      storage_gb: 40000                             # Total storage in GB.
-      monthly_tier_1_requests: 4000000              # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 400000               # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 400000 # Monthly Lifecycle Transition requests.
-      monthly_data_retrieval_gb: 40000              # Monthly data retrievals in GB
-      monthly_select_data_scanned_gb: 40000         # Monthly data scanned by S3 Select in GB.
-      monthly_select_data_returned_gb: 4000         # Monthly data returned by S3 Select in GB.
-    glacier_flexible_retrieval: # Usages of S3 Glacier Flexible Retrieval:
-      storage_gb: 50000                                 # Total storage in GB.
-      monthly_tier_1_requests: 5000000                  # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 500000                   # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 500000     # Monthly Lifecycle Transition requests.
-      monthly_standard_select_data_scanned_gb: 500000   # Monthly data scanned by S3 Select in GB (for standard level of S3 Glacier).
-      monthly_standard_select_data_returned_gb: 500000  # Monthly data returned by S3 Select in GB (for standard level of S3 Glacier).
-      monthly_bulk_select_data_scanned_gb: 500000       # Monthly data scanned by S3 Select in GB (for bulk level of S3 Glacier)
-      monthly_bulk_select_data_returned_gb: 500000      # Monthly data returned by S3 Select in GB (for bulk level of S3 Glacier)
-      monthly_expedited_select_data_scanned_gb: 500000  # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
-      monthly_expedited_select_data_returned_gb: 500000 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
-      monthly_standard_data_retrieval_requests: 500000  # Monthly data Retrieval requests (for standard level of S3 Glacier).
-      monthly_expedited_data_retrieval_requests: 500000 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
-      monthly_standard_data_retrieval_gb: 5000          # Monthly data retrievals in GB (for standard level of S3 Glacier).
-      monthly_expedited_data_retrieval_gb: 5000         # Monthly data retrievals in GB (for expedited level of S3 Glacier).
-      early_delete_gb: 500000                           # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
-    glacier_deep_archive: # Usages of S3 Glacier Deep Archive:
-      storage_gb: 60000                                # Total storage in GB.
-      monthly_tier_1_requests: 6000000                 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
-      monthly_tier_2_requests: 600000                  # Monthly GET, SELECT, and all other requests (Tier 2).
-      monthly_lifecycle_transition_requests: 600000    # Monthly Lifecycle Transition requests.
-      monthly_standard_data_retrieval_requests: 600000 # Monthly data Retrieval requests (for standard level of S3 Glacier).
-      monthly_bulk_data_retrieval_requests: 600000     # Monthly data Retrieval requests (for bulk level of S3 Glacier).
-      monthly_standard_data_retrieval_gb: 6000         # Monthly data retrievals in GB (for standard level of S3 Glacier).
-      monthly_bulk_data_retrieval_gb: 6000             # Monthly data retrievals in GB (for bulk level of S3 Glacier).
-      early_delete_gb: 600000                          # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
 
   aws_s3_bucket.my_bucket:
     object_tags: 10000000 # Total object tags. Only for AWS provider V3.
@@ -612,6 +552,26 @@ resource_usage:
     monthly_storage_write_api_gb: 1000 # Monthly number of storage write api in GB.
     monthly_storage_read_api_tb: 1000  # Monthly number of storage read api in TB.
 
+  google_cloud_run_service.throttling_enabled:
+    monthly_requests: 500000              # Monthly number of requests.
+    average_request_duration_ms: 3600     # Average duration of each request in milliseconds.
+    concurrent_requests_per_instance: 1   # Number of concurrent requests per instance.
+
+  google_cloud_run_service.throttling_disabled:
+    instance_hrs: 730                     # Number of instance hours used.
+
+  google_cloud_run_v2_service.throttling_enabled:
+    monthly_requests: 500000              # Monthly number of requests.
+    average_request_duration_ms: 3600     # Average duration of each request in milliseconds.
+    concurrent_requests_per_instance: 1   # Number of concurrent requests per instance.
+
+  google_cloud_run_v2_service.throttling_disabled:
+    instance_hrs: 730                     # Number of instance hours used.
+
+  google_cloud_run_v2_job.my_job:
+    monthly_job_executions: 50000         # Monthly number of job executions.
+    average_task_execution_mins: 10       # Average duration of each task execution in minutes.
+
   google_cloudfunctions_function.my_function:
     request_duration_ms: 300               # Average duration of each request in milliseconds.
     monthly_function_invocations: 10000000 # Monthly number of function invocations.
@@ -795,6 +755,9 @@ resource_usage:
   #
   # Terraform AzureRM resources
   #
+  azurerm_app_configuration.my_configuration:
+    monthly_additional_requests: 30000 # Monthly number of requests which are above the included 200,000 per day per replica.
+
   azurerm_api_management.my_api_management:
     monthly_api_calls: 10000000 # Monthly number of api calls (only for consumption tier).
     self_hosted_gateway_count: 5 # Number of self-hosted gateways (only for premium tier).
@@ -831,6 +794,10 @@ resource_usage:
     monthly_jobs_compute_dbu_hrs: 1000 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
     monthly_jobs_light_compute_dbu_hrs: 2000 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
 
+  azurerm_federated_identity_credential.my_credential:
+    monthly_active_p1_users: 50100 # Monthly number of active users if you are using the Premium P1 license.
+    monthly_active_p2_users: 50100 # Monthly number of active users if you are using the Premium P2 license.
+
   azurerm_function_app.my_functions:
     monthly_executions: 100000 # Monthly executions to the function. Only applicable for Consumption plan.
     execution_duration_ms: 500 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
@@ -840,6 +807,92 @@ resource_usage:
   azurerm_cdn_endpoint.my_endpoint:
     monthly_outbound_gb: 1000000 # Monthly number of outbound data transfers in GB.
     monthly_rules_engine_requests: 10000000 # Monthly number of rules engine requests.
+
+  azurerm_cognitive_account.my_cognitive_account:
+    ## SpeechServices
+    monthly_speech_to_text_standard_hrs: 100 # Monthly number of hours of Speech to Text audio hours
+    monthly_speech_to_text_standard_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for batch processing
+    monthly_speech_to_text_custom_hrs: 100  # Monthly number of hours of Speech to Text audio hours for Custom Speech Model
+    monthly_speech_to_text_custom_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model batch processing
+    monthly_speech_to_text_custom_endpoint_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model endpoint hosting
+    monthly_speech_to_text_custom_training_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model training
+    monthly_speech_to_text_enhanced_add_ons_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 100 # Monthly number of hours of Speech to Text audio hours for conversation transcription multi-channel audio
+    monthly_text_to_speech_neural_chars: 100_000 # Monthly number of characters for Text to Speech with neural voices
+    monthly_text_to_speech_custom_neural_training_hrs: 100 # Monthly number of hours of Text to Speech Customized Neural training
+    monthly_text_to_speech_custom_neural_chars: 100_000 # Monthly number of characters for Text to Speech with Custom Ceural Voices
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 100 # Monthly number of hours of Text to Speech Custom Neural Voice endpoint hosting
+    monthly_text_to_speech_long_audio_chars: 100_000 # Monthly number of characters for Text to Speech with Long Audio Creation
+    monthly_text_to_speech_personal_voice_profiles: 10 # Monthly number of personal voice profiles for Text to Speech
+    monthly_text_to_speech_personal_voice_chars: 100_000 # Monthly number of characters for Text to Speech with Personal Voice Profiles
+    monthly_speech_translation_hrs: 100 # Monthly number of hours of Speech Translation audio hours
+    monthly_speaker_verification_transactions: 1_000 # Monthly number of speaker verification transactions
+    monthly_speaker_identification_transactions: 1_000 # Monthly number of speaker identification transactions
+    monthly_voice_profiles: 1_000 # Monthly number of voice profiles
+    # Standard commitment
+    monthly_commitment_speech_to_text_standard_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_standard_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours over the committed amount
+    monthly_commitment_speech_to_text_custom_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for Custom Speech Model (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_custom_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model over the committed amount
+    monthly_commitment_speech_to_text_enhanced_add_ons_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for enhanced add-on features (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
+    monthly_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
+    monthly_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_speech_to_text_standard_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_standard_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours over the committed amount
+    monthly_connected_container_commitment_speech_to_text_custom_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for Custom Speech Model (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_custom_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model over the committed amount
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for enhanced add-on features (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
+    monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
+    monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amountinfracost-usage-example.yml
+    ## LUIS
+    monthly_luis_text_requests: 1_000 # Monthly number of text requests to LUIS
+    monthly_luis_speech_requests: 1_000 # Monthly number of speech requests to LUIS
+    # Standard commitment
+    monthly_commitment_luis_text_requests: 1_000_000 # Monthly number of committed text requests to LUIS (1M, 5M or 25M)
+    monthly_commitment_luis_text_overage_requests: 1_000 # Monthly number of text requests to LUIS over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_luis_text_requests: 1_000_000 # Monthly number of committed text requests to LUIS (1M, 5M or 25M)
+    monthly_connected_container_commitment_luis_text_overage_requests: 1_000 # Monthly number of text requests to LUIS over the committed amount
+    ## TextAnalytics / Language
+    monthly_language_text_analytics_records: 10_000 # Monthly number of Text Analytics records (Sentiment Analysis, Key Phrase Extraction, Language Detection, Named Entity Recognition, PII Detection)
+    monthly_language_summarization_records: 10_000 # Monthly number of summarization records
+    monthly_language_conversational_language_understanding_records: 10_000 # Monthly number of Conversational Language Understanding and Orchestration Workflow records.
+    monthly_language_conversational_language_understanding_advanced_training_hours: 10 # Monthly number of Conversational Language Understanding and Orchestration Workflow advanced training hours.
+    monthly_language_customized_text_classification_records: 10_000 # Monthly number of customized text classification records.
+    monthly_language_customized_summarization_records: 10_000 # Monthly number of customized summarization records.
+    monthly_language_customized_question_answering_records: 10_000 # Monthly number of customized question answering records.
+    monthly_language_customized_training_hours: 10 # Monthly number of customized training hours.
+    monthly_language_text_analytics_for_health_records: 10_000 # Monthly number of Text Analytics for health records.
+    # Standard commitment
+    monthly_commitment_language_text_analytics_records: 1_000_000 # Monthly number of committed Text Analytics records (1M, 3M or 10M)
+    monthly_commitment_language_text_analytics_overage_records: 10_000 # Monthly number of Text Analytics records over the committed amount
+    monthly_commitment_language_summarization_records: 3_000_000 # Monthly number of committed summarization records (3M or 10M)
+    monthly_commitment_language_summarization_overage_records: 10_000 # Monthly number of summarization records over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_language_text_analytics_records: 1_000_000 # Monthly number of committed Text Analytics records (1M, 3M or 10M)
+    monthly_connected_container_commitment_language_text_analytics_overage_records: 10_000 # Monthly number of Text Analytics records over the committed amount
+    monthly_connected_container_commitment_language_summarization_records: 3_000_000 # Monthly number of committed summarization records (3M or 10M)
+    monthly_connected_container_commitment_language_summarization_overage_records: 10_000  # Monthly number of summarization records over the committed amount
+
+  azurerm_cognitive_deployment.my_openai_deployment:
+    monthly_language_input_tokens: 10_000_000 # Monthly number of language input tokens.
+    monthly_language_output_tokens: 10_000_000 # Monthly number of language output tokens.
+    monthly_code_interpreter_sessions: 100 # Monthly number of code interpreter sessions.
+    monthly_base_model_tokens: 1000 # Monthly number of base model tokens.
+    monthly_fine_tuning_training_hours: 1 # Monthly number of fine-tuning training hours.
+    monthly_fine_tuning_hosting_hours: 10 # Monthly number of fine-tuning hosting hours.
+    monthly_fine_tuning_input_tokens: 10_000_000 # Monthly number of fine-tuning input tokens.
+    monthly_fine_tuning_output_tokens: 10_000_000 # Monthly number of fine-tuning output tokens.
+    monthly_standard_1024_1024_images: 100 # Monthly number of standard 1024x1024 (low res) images.
+    monthly_standard_1024_1792_images: 100 # Monthly number of standard 1024x1792 (high res) images.
+    monthly_hd_1024_1024_images: 100 # Monthly number of HD 1024x1024 (low res) images.
+    monthly_hd_1024_1792_images: 100 # Monthly number of HD 1024x1792 (high res) images.
+    monthly_text_embedding_tokens: 1_000_000_000 # Monthly number of text embedding tokens.
+    monthly_text_to_speech_characters: 10_000_000 # Monthly number of text to speech characters.
+    monthly_text_to_speech_hours: 100 # Monthly number of text to speech hours.
 
   azurerm_cosmosdb_cassandra_keyspace.my_cassandra_keyspace:
     storage_gb: 1000 # Total size of storage in GB.
@@ -1046,6 +1099,13 @@ resource_usage:
   azurerm_lb.my_lb:
     monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
 
+  azurerm_machine_learning_compute_cluster.my_cluster:
+    instances: 10    # Number of instances in the cluster.
+    monthly_hrs: 730 # Monthly number of hours each instance runs for.
+
+  azurerm_machine_learning_compute_instance.my_instances:
+    monthly_hrs: 730 # Monthly number of hours the instance runs for.
+
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
@@ -1079,6 +1139,9 @@ resource_usage:
 
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
+
+  azurerm_network_ddos_protection_plan.my_plan:
+    overage_amount: 5 # Monthly number of protected resources over the plan protection limit (100).
 
   azurerm_network_watcher.my_watcher:
     monthly_diagnostic_checks: 10000 # Monthly number of diagnostic API calls.
@@ -1137,11 +1200,11 @@ resource_usage:
   azurerm_security_center_subscription_pricing.my_subscription_pricing:
     cosmosdb_request_units: 100 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
     monthly_app_service_nodes: 10 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
-    monthly_arm_api_calls: 10000000 # Monthly number of API calls for Microsoft Defender for ARM. Applied when resource_type = Arm.
+    monthly_arm_subscriptions: 10000000 # Monthly number of subscriptions for Microsoft Defender for ARM. Applied when resource_type = Arm.
     monthly_container_registry_images: 10 # Monthly number of images for Microsoft Defender for Container Registries. Applied when resource_type = ContainerRegistry.
     monthly_containers_vcores: 20 # Monthly number of vCores for Microsoft Defender for Containers. Applied when resource_type = Containers.
     monthly_dns_queries: 10000000 # Monthly number of queries for Microsoft Defender for DNS. Applied when resource_type = Dns.
-    monthly_key_vault_transactions: 1000000 # Monthly number of transactions for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
+    monthly_key_vaults: 10 # Monthly number of key vaults for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
     monthly_kubernetes_cores: 10 # Monthly number of cores for Microsoft Defender for Kubernetes. Applied when resource_type = KubernetesService.
     monthly_mariadb_instances: 10 # Monthly number of instances for Microsoft Defender for MariaDB. Applied when resource_type = OpenSourceRelationalDatabases.
     monthly_mysql_instances: 10 # Monthly number of instances for Microsoft Defender for MySQL. Applied when resource_type = OpenSourceRelationalDatabases.

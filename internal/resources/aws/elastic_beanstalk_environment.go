@@ -25,34 +25,40 @@ type ElasticBeanstalkEnvironment struct {
 	LaunchConfiguration *LaunchConfiguration
 }
 
-// ElasticBeanstalkEnvironmentUsageSchema defines a list which represents the usage schema of ElasticBeanstalkEnvironment.
+func (r *ElasticBeanstalkEnvironment) CoreType() string {
+	return "ElasticBeanstalkEnvironment"
+}
+
+// UsageSchema defines a list which represents the usage schema of ElasticBeanstalkEnvironment.
 // Usage costs for Elastic Beanstalk come from sub resources as it is a wrapper for other AWS services.
-var ElasticBeanstalkEnvironmentUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "cloudwatch",
-		DefaultValue: &usage.ResourceUsage{Name: "cloudwatch", Items: CloudwatchLogGroupUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "lb",
-		DefaultValue: &usage.ResourceUsage{Name: "lb", Items: LBUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "elb",
-		DefaultValue: &usage.ResourceUsage{Name: "elb", Items: ELBUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "db",
-		DefaultValue: &usage.ResourceUsage{Name: "db", Items: DBInstanceUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "ec2",
-		DefaultValue: &usage.ResourceUsage{Name: "ec2", Items: LaunchConfigurationUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
+func (r *ElasticBeanstalkEnvironment) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "cloudwatch",
+			DefaultValue: &usage.ResourceUsage{Name: "cloudwatch", Items: CloudwatchLogGroupUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "lb",
+			DefaultValue: &usage.ResourceUsage{Name: "lb", Items: LBUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "elb",
+			DefaultValue: &usage.ResourceUsage{Name: "elb", Items: ELBUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "db",
+			DefaultValue: &usage.ResourceUsage{Name: "db", Items: DBInstanceUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "ec2",
+			DefaultValue: &usage.ResourceUsage{Name: "ec2", Items: LaunchConfigurationUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ElasticBeanstalkEnvironment.
@@ -87,7 +93,7 @@ func (r *ElasticBeanstalkEnvironment) PopulateUsage(u *schema.UsageData) {
 func (r *ElasticBeanstalkEnvironment) BuildResource() *schema.Resource {
 	a := &schema.Resource{
 		Name:        r.Address,
-		UsageSchema: ElasticBeanstalkEnvironmentUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 
 	a.SubResources = append(a.SubResources, r.LaunchConfiguration.BuildResource())

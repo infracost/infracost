@@ -7,16 +7,14 @@ import (
 
 func getConfigRuleItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_config_config_rule",
-		RFunc: NewConfigConfigRule,
+		Name:      "aws_config_config_rule",
+		CoreRFunc: NewConfigConfigRule,
 	}
 }
-func NewConfigConfigRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewConfigConfigRule(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.ConfigConfigRule{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

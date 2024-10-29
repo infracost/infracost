@@ -25,8 +25,14 @@ type FSxOpenZFSFileSystem struct {
 	BackupStorageGB           *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var FSxOpenZFSFileSystemUsageSchema = []*schema.UsageItem{
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *FSxOpenZFSFileSystem) CoreType() string {
+	return "FSxOpenZFSFileSystem"
+}
+
+func (r *FSxOpenZFSFileSystem) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *FSxOpenZFSFileSystem) PopulateUsage(u *schema.UsageData) {
@@ -42,7 +48,7 @@ func (r *FSxOpenZFSFileSystem) BuildResource() *schema.Resource {
 			r.storageCapacityCostComponent(),
 			r.backupGBCostComponent(),
 		},
-		UsageSchema: FSxOpenZFSFileSystemUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 
@@ -157,5 +163,6 @@ func (r *FSxOpenZFSFileSystem) backupGBCostComponent() *schema.CostComponent {
 			ProductFamily:    strPtr("Storage"),
 			AttributeFilters: filters,
 		},
+		UsageBased: true,
 	}
 }

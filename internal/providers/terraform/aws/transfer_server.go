@@ -9,12 +9,12 @@ import (
 
 func getTransferServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_transfer_server",
-		RFunc: newTransferServer,
+		Name:      "aws_transfer_server",
+		CoreRFunc: newTransferServer,
 	}
 }
 
-func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newTransferServer(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	protocols := []string{}
 
@@ -34,7 +34,6 @@ func newTransferServer(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		Region:    region,
 		Protocols: protocols,
 	}
-	t.PopulateUsage(u)
 
-	return t.BuildResource()
+	return t
 }

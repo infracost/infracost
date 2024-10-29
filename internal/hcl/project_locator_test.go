@@ -4,101 +4,96 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func TestProjectLocator_FindRootModules_WithSingleProject(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
-	p := "./testdata/project_locator/single_project"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 1)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "./testdata/project_locator/single_project", HasChanges: false})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProjectMixed(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
-	p := "./testdata/project_locator/multi_project_mixed"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 2)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_mixed/with_provider"})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_mixed/with_backend"})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProject(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
-	p := "./testdata/project_locator/multi_project_with_module"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 2)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/dev"})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/prod"})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProject_ExcludeDirs(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		ExcludedSubDirs: []string{"dev"},
-	})
-	p := "./testdata/project_locator/multi_project_with_module"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 1)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/prod"})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProject_WithObjectChanges(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		ChangedObjects: []string{
-			"./testdata/project_locator/multi_project_with_module/dev/main.tf",
+func TestEnvFileMatcher_EnvName(t *testing.T) {
+	type fields struct {
+		envNames []string
+	}
+	type args struct {
+		file string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+		{
+			name: "directly matches env name",
+			fields: fields{
+				envNames: []string{"dev", "prod"},
+			},
+			args: args{
+				file: "dev.tfvars",
+			},
+			want: "dev",
 		},
-	})
-	p := "./testdata/project_locator/multi_project_with_module"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 2)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/dev", HasChanges: true})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/prod", HasChanges: false})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProject_WithModuleObjectChanges(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		ChangedObjects: []string{
-			"./testdata/project_locator/multi_project_with_module/modules/example/main.tf",
+		{
+			name: "directly matches env which collides",
+			fields: fields{
+				envNames: []string{"dev", "dev-legacy", "prod"},
+			},
+			args: args{
+				file: "dev-legacy.tfvars",
+			},
+			want: "dev-legacy",
 		},
-	})
-	p := "./testdata/project_locator/multi_project_with_module"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 2)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/dev", HasChanges: false})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_with_module/prod", HasChanges: true})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		UseAllPaths: true,
-	})
-	p := "./testdata/project_locator/multi_project_without_provider_blocks"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 3)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_without_provider_blocks/dev"})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_without_provider_blocks/prod"})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_without_provider_blocks/modules/example"})
-}
-
-func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks_ExludePaths(t *testing.T) {
-	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		UseAllPaths: true,
-		ExcludedSubDirs: []string{
-			"modules/**",
+		{
+			name: "returns filename when no match",
+			fields: fields{
+				envNames: []string{"dev", "prod"},
+			},
+			args: args{
+				file: "foo.tfvars",
+			},
+			want: "foo",
 		},
-	})
-	p := "./testdata/project_locator/multi_project_without_provider_blocks"
-	mods := pl.FindRootModules(p)
-
-	require.Len(t, mods, 2)
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_without_provider_blocks/dev"})
-	assert.Contains(t, mods, RootPath{RepoPath: p, Path: "testdata/project_locator/multi_project_without_provider_blocks/prod"})
+		{
+			name: "returns prefix",
+			fields: fields{
+				envNames: []string{"dev", "prod"},
+			},
+			args: args{
+				file: "prod-defaults.tfvars",
+			},
+			want: "prod",
+		},
+		{
+			name: "returns longest prefix match",
+			fields: fields{
+				envNames: []string{"dev", "prod", "prod-legacy"},
+			},
+			args: args{
+				file: "prod-legacy-defaults.tfvars",
+			},
+			want: "prod-legacy",
+		},
+		{
+			name: "returns suffix",
+			fields: fields{
+				envNames: []string{"dev", "prod"},
+			},
+			args: args{
+				file: "defaults-prod.tfvars",
+			},
+			want: "prod",
+		},
+		{
+			name: "returns longest suffix match",
+			fields: fields{
+				envNames: []string{"dev", "prod", "legacy-prod"},
+			},
+			args: args{
+				file: "defaults-legacy-prod.tfvars",
+			},
+			want: "legacy-prod",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := CreateEnvFileMatcher(tt.fields.envNames, nil)
+			assert.Equalf(t, tt.want, e.EnvName(tt.args.file), "EnvName(%v)", tt.args.file)
+		})
+	}
 }

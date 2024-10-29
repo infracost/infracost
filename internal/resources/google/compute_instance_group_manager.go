@@ -20,8 +20,14 @@ type ComputeInstanceGroupManager struct {
 	GuestAccelerators []*ComputeGuestAccelerator
 }
 
-// ComputeInstanceGroupManagerUsageSchema defines a list which represents the usage schema of ComputeInstanceGroupManager.
-var ComputeInstanceGroupManagerUsageSchema = []*schema.UsageItem{}
+func (r *ComputeInstanceGroupManager) CoreType() string {
+	return "ComputeInstanceGroupManager"
+}
+
+// UsageSchema defines a list which represents the usage schema of ComputeInstanceGroupManager.
+func (r *ComputeInstanceGroupManager) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 // PopulateUsage parses the u schema.UsageData into the ComputeInstanceGroupManager.
 // It uses the `infracost_usage` struct tags to populate data into the ComputeInstanceGroupManager.
@@ -55,7 +61,7 @@ func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ComputeInstanceGroupManagerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

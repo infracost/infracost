@@ -19,6 +19,26 @@
               "type": "ipsec.1"
             },
             "infracost_metadata": {
+              "attributesWithUnknownKeys": [
+                {
+                  "attribute": "customer_gateway_id",
+                  "missingVariables": [
+                    "module.gateway.aws_customer_gateway_id"
+                  ]
+                },
+                {
+                  "attribute": "transit_gateway_id",
+                  "missingVariables": [
+                    "module.gateway.aws_ec2_transit_gateway_id"
+                  ]
+                },
+                {
+                  "attribute": "type",
+                  "missingVariables": [
+                    "module.gateway.aws_customer_gateway_type"
+                  ]
+                }
+              ],
               "calls": [
                 {
                   "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
@@ -126,6 +146,26 @@
             "type": "ipsec.1"
           },
           "infracost_metadata": {
+            "attributesWithUnknownKeys": [
+              {
+                "attribute": "customer_gateway_id",
+                "missingVariables": [
+                  "module.gateway.aws_customer_gateway_id"
+                ]
+              },
+              {
+                "attribute": "transit_gateway_id",
+                "missingVariables": [
+                  "module.gateway.aws_ec2_transit_gateway_id"
+                ]
+              },
+              {
+                "attribute": "type",
+                "missingVariables": [
+                  "module.gateway.aws_customer_gateway_type"
+                ]
+              }
+            ],
             "calls": [
               {
                 "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
@@ -269,7 +309,7 @@
                 "mode": "managed",
                 "type": "aws_customer_gateway",
                 "name": "example",
-                "provider_config_key": "gateway:aws",
+                "provider_config_key": "aws",
                 "schema_version": 0
               },
               {
@@ -277,7 +317,7 @@
                 "mode": "managed",
                 "type": "aws_ec2_transit_gateway",
                 "name": "example",
-                "provider_config_key": "gateway:aws",
+                "provider_config_key": "aws",
                 "schema_version": 0
               }
             ]
@@ -343,5 +383,8 @@
         }
       }
     }
-  ]
+  ],
+  "infracost_provider_constraints": {
+    "aws": ""
+  }
 }

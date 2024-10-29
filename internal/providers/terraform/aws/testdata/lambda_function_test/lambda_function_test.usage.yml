@@ -3,7 +3,7 @@ resource_usage:
   aws_lambda_function.lambda_withUsage:
     monthly_requests: 100000
     request_duration_ms: 350
-  
+
   aws_lambda_function.lambda_withUsage_arm:
     monthly_requests: 100000
     request_duration_ms: 350
@@ -11,7 +11,7 @@ resource_usage:
   aws_lambda_function.lambda_withUsage512Mem:
     monthly_requests: 100000
     request_duration_ms: 350
-  
+
   aws_lambda_function.lambda_withUsage512Mem_arm:
     monthly_requests: 100000
     request_duration_ms: 350
@@ -19,7 +19,7 @@ resource_usage:
   aws_lambda_function.lambda_duration_6B:
     monthly_requests: 6000000000
     request_duration_ms: 1024
-  
+
   aws_lambda_function.lambda_duration_75B_arm:
     monthly_requests: 7500000000
     request_duration_ms: 1024

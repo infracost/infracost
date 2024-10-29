@@ -2,15 +2,19 @@ package funcs
 
 import (
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 
+	"github.com/infracost/infracost/internal/hcl/mock"
+	"github.com/turbot/terraform-components/lang/marks"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/function"
 )
 
+// Adapted from https://github.com/zclconf/go-cty/blob/ea922e7a95ba2be57897697117f318670e066d22/cty/function/stdlib/conversion.go
+// to handle Infracost mock values.
+//
 // MakeToFunc constructs a "to..." function, like "tostring", which converts
 // its argument to a specific type or type kind.
 //
@@ -21,6 +25,7 @@ import (
 // a tuple.
 func MakeToFunc(wantTy cty.Type) function.Function {
 	return function.New(&function.Spec{
+		Description: fmt.Sprintf("Converts the given value to %s, or raises an error if that conversion is impossible.", wantTy.FriendlyName()),
 		Params: []function.Parameter{
 			{
 				Name: "v",
@@ -51,6 +56,13 @@ func MakeToFunc(wantTy cty.Type) function.Function {
 					return cty.NilType, function.NewArgErrorf(0, "incompatible tuple type for conversion: %s", convert.MismatchMessage(gotTy, wantTy))
 				case gotTy.IsObjectType() && wantTy.IsObjectType():
 					return cty.NilType, function.NewArgErrorf(0, "incompatible object type for conversion: %s", convert.MismatchMessage(gotTy, wantTy))
+				case gotTy == cty.String && wantTy.IsListType() || wantTy.IsTupleType() || wantTy.IsSetType() || wantTy.IsObjectType() || wantTy.IsMapType():
+					val, _ := args[0].UnmarkDeep()
+					strVal := val.AsString()
+					if strings.HasSuffix(strVal, "-mock") || strings.Contains(strVal, mock.Identifier) {
+						return wantTy, nil
+					}
+					return cty.NilType, function.NewArgErrorf(0, "cannot convert %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
 				default:
 					return cty.NilType, function.NewArgErrorf(0, "cannot convert %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
 				}
@@ -63,19 +75,16 @@ func MakeToFunc(wantTy cty.Type) function.Function {
 			// to be known here but may still be null.
 			ret, err := convert.Convert(args[0], retType)
 			if err != nil {
-				val, _ := args[0].UnmarkDeep()
 				// Because we used GetConversionUnsafe above, conversion can
 				// still potentially fail in here. For example, if the user
 				// asks to convert the string "a" to bool then we'll
 				// optimistically permit it during type checking but fail here
 				// once we note that the value isn't either "true" or "false".
+				val, _ := args[0].UnmarkDeep()
 				gotTy := val.Type()
 				switch {
-				case Contains(args[0], MarkedSensitive):
-					// Generic message so we won't inadvertently disclose
-					// information about sensitive values.
-					return cty.NilVal, function.NewArgErrorf(0, "cannot convert this sensitive %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
-
+				case marks.Contains(args[0], marks.Sensitive):
+					return cty.NilVal, function.NewArgErrorf(0, "cannot convert sensitive type %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
 				case gotTy == cty.String && wantTy == cty.Bool:
 					what := "string"
 					if !val.IsNull() {
@@ -88,6 +97,26 @@ func MakeToFunc(wantTy cty.Type) function.Function {
 						what = strconv.Quote(val.AsString())
 					}
 					return cty.NilVal, function.NewArgErrorf(0, `cannot convert %s to number; given string must be a decimal representation of a number`, what)
+				case gotTy == cty.String && wantTy.IsListType() || wantTy.IsTupleType() || wantTy.IsSetType() || wantTy.IsObjectType() || wantTy.IsMapType():
+					strVal := val.AsString()
+					if strings.HasSuffix(strVal, "-mock") || strings.Contains(strVal, mock.Identifier) {
+						switch {
+						case wantTy.IsListType():
+							return cty.ListVal([]cty.Value{val}), nil
+						case wantTy.IsTupleType():
+							return cty.TupleVal([]cty.Value{val}), nil
+						case wantTy.IsSetType():
+							return cty.SetVal([]cty.Value{val}), nil
+						case wantTy.IsObjectType():
+							return cty.ObjectVal(map[string]cty.Value{}), nil
+						case wantTy.IsMapType():
+							return cty.MapVal(map[string]cty.Value{}), nil
+						default:
+							return cty.NilVal, function.NewArgErrorf(0, "cannot convert %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
+						}
+					}
+
+					return cty.NilVal, function.NewArgErrorf(0, "cannot convert %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
 				default:
 					return cty.NilVal, function.NewArgErrorf(0, "cannot convert %s to %s", gotTy.FriendlyName(), wantTy.FriendlyNameForConstraint())
 				}
@@ -95,129 +124,4 @@ func MakeToFunc(wantTy cty.Type) function.Function {
 			return ret, nil
 		},
 	})
-}
-
-var TypeFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name:             "value",
-			Type:             cty.DynamicPseudoType,
-			AllowDynamicType: true,
-			AllowUnknown:     true,
-			AllowNull:        true,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		return cty.StringVal(TypeString(args[0].Type())).Mark(MarkedRaw), nil
-	},
-})
-
-// Modified copy of TypeString from go-cty:
-// https://github.com/zclconf/go-cty-debug/blob/master/ctydebug/type_string.go
-//
-// TypeString returns a string representation of a given type that is
-// reminiscent of Go syntax calling into the cty package but is mainly
-// intended for easy human inspection of values in tests, debug output, etc.
-//
-// The resulting string will include newlines and indentation in order to
-// increase the readability of complex structures. It always ends with a
-// newline, so you can print this result directly to your output.
-func TypeString(ty cty.Type) string {
-	var b strings.Builder
-	writeType(ty, &b, 0)
-	return b.String()
-}
-
-func writeType(ty cty.Type, b *strings.Builder, indent int) {
-	switch {
-	case ty == cty.NilType:
-		b.WriteString("nil")
-		return
-	case ty.IsObjectType():
-		atys := ty.AttributeTypes()
-		if len(atys) == 0 {
-			b.WriteString("object({})")
-			return
-		}
-		attrNames := make([]string, 0, len(atys))
-		for name := range atys {
-			attrNames = append(attrNames, name)
-		}
-		sort.Strings(attrNames)
-		b.WriteString("object({\n")
-		indent++
-		for _, name := range attrNames {
-			aty := atys[name]
-			b.WriteString(indentSpaces(indent))
-			fmt.Fprintf(b, "%s: ", name)
-			writeType(aty, b, indent)
-			b.WriteString(",\n")
-		}
-		indent--
-		b.WriteString(indentSpaces(indent))
-		b.WriteString("})")
-	case ty.IsTupleType():
-		etys := ty.TupleElementTypes()
-		if len(etys) == 0 {
-			b.WriteString("tuple([])")
-			return
-		}
-		b.WriteString("tuple([\n")
-		indent++
-		for _, ety := range etys {
-			b.WriteString(indentSpaces(indent))
-			writeType(ety, b, indent)
-			b.WriteString(",\n")
-		}
-		indent--
-		b.WriteString(indentSpaces(indent))
-		b.WriteString("])")
-	case ty.IsCollectionType():
-		ety := ty.ElementType()
-		switch {
-		case ty.IsListType():
-			b.WriteString("list(")
-		case ty.IsMapType():
-			b.WriteString("map(")
-		case ty.IsSetType():
-			b.WriteString("set(")
-		default:
-			// At the time of writing there are no other collection types,
-			// but we'll be robust here and just pass through the GoString
-			// of anything we don't recognize.
-			b.WriteString(ty.FriendlyName())
-			return
-		}
-		// Because object and tuple types render split over multiple
-		// lines, a collection type container around them can end up
-		// being hard to see when scanning, so we'll generate some extra
-		// indentation to make a collection of structural type more visually
-		// distinct from the structural type alone.
-		complexElem := ety.IsObjectType() || ety.IsTupleType()
-		if complexElem {
-			indent++
-			b.WriteString("\n")
-			b.WriteString(indentSpaces(indent))
-		}
-		writeType(ty.ElementType(), b, indent)
-		if complexElem {
-			indent--
-			b.WriteString(",\n")
-			b.WriteString(indentSpaces(indent))
-		}
-		b.WriteString(")")
-	default:
-		// For any other type we'll just use its GoString and assume it'll
-		// follow the usual GoString conventions.
-		b.WriteString(ty.FriendlyName())
-	}
-}
-
-func indentSpaces(level int) string {
-	return strings.Repeat("    ", level)
-}
-
-func Type(input []cty.Value) (cty.Value, error) {
-	return TypeFunc.Call(input)
 }

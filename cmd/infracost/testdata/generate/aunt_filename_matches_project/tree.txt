@@ -1,0 +1,18 @@
+.
+└── infra
+    ├── components
+    │   ├── foo
+    │   │   └── main.tf
+    │   ├── bar
+    │   │   └── main.tf
+    │   └── baz
+    │       └── main.tf
+    └── variables
+        └── env
+            ├── prod
+            │   ├── defaults.tfvars
+            │   ├── foo.tfvars
+            │   └── bar.tfvars
+            └── dev
+                ├── defaults.tfvars
+                └── bar.tfvars

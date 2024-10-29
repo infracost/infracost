@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/resources"
@@ -41,7 +40,13 @@ type MSSQLElasticPool struct {
 	ZoneRedundant bool
 }
 
-var MSSQLElasticPoolUsageSchema = []*schema.UsageItem{}
+func (r *MSSQLElasticPool) CoreType() string {
+	return "MSSQLElasticPool"
+}
+
+func (r *MSSQLElasticPool) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 // PopulateUsage parses the u schema.UsageData into the MSSQLElasticPool.
 func (r *MSSQLElasticPool) PopulateUsage(u *schema.UsageData) {
@@ -77,7 +82,7 @@ func (r *MSSQLElasticPool) PopulateUsage(u *schema.UsageData) {
 func (r *MSSQLElasticPool) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    MSSQLElasticPoolUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: r.costComponents(),
 	}
 }
@@ -163,8 +168,6 @@ func (r *MSSQLElasticPool) computeHoursCostComponents() []*schema.CostComponent 
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (%s, %d vCore)", r.SKU, cores)
 
-	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
-
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           name,
@@ -179,7 +182,8 @@ func (r *MSSQLElasticPool) computeHoursCostComponents() []*schema.CostComponent 
 		},
 	}
 
-	if r.ZoneRedundant {
+	// Zone redundancy is free for premium and business critical tiers
+	if strings.EqualFold(r.Tier, sqlGeneralPurposeTier) && r.ZoneRedundant {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Zone redundancy (%s, %d vCore)", r.SKU, cores),
 			Unit:           "hours",

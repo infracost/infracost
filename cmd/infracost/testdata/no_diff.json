@@ -1,0 +1,129 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "test",
+    "vcsCommitSha": "1234",
+    "vcsCommitAuthorName": "hugo",
+    "vcsCommitAuthorEmail": "hugo@test.com",
+    "vcsCommitTimestamp": "2021-10-11T22:41:00.144866-04:00",
+    "vcsCommitMessage": "mymessage",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "test",
+      "metadata": {
+        "path": "test",
+        "type": "terraform_dir",
+        "terraformModulePath": "test",
+        "vcsSubPath": "test",
+        "vcsCodeChanged": true,
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "test.tf",
+            "startLine": 18,
+            "endLine": 24
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 5,
+        "totalSupportedResources": 0,
+        "totalUnsupportedResources": 3,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 2,
+        "unsupportedResourceCounts": {
+          "aws_appstream_fleet": 1,
+          "aws_appstream_fleet_stack_association": 1,
+          "aws_appstream_stack": 1
+        },
+        "noPriceResourceCounts": {
+          "aws_ssm_parameter": 2
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "1.7438128767123286806",
+  "totalMonthlyCost": "1272.9834",
+  "pastTotalHourlyCost": "1.7438128767123286806",
+  "pastTotalMonthlyCost": "1272.9834",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2023-12-28T09:45:58.122974746Z",
+  "summary": {
+    "totalDetectedResources": 189,
+    "totalSupportedResources": 31,
+    "totalUnsupportedResources": 6,
+    "totalUsageBasedResources": 23,
+    "totalNoPriceResources": 152,
+    "unsupportedResourceCounts": {
+      "aws_ami_from_instance": 1,
+      "aws_appstream_fleet": 1,
+      "aws_appstream_fleet_stack_association": 1,
+      "aws_appstream_stack": 1,
+      "aws_lightsail_instance_public_ports": 1,
+      "aws_route53_vpc_association_authorization": 1
+    },
+    "noPriceResourceCounts": {
+      "aws_backup_plan": 2,
+      "aws_backup_selection": 2,
+      "aws_cloudwatch_event_rule": 1,
+      "aws_cloudwatch_event_target": 1,
+      "aws_db_subnet_group": 2,
+      "aws_dx_gateway_association_proposal": 2,
+      "aws_eip": 2,
+      "aws_iam_group": 1,
+      "aws_iam_group_membership": 1,
+      "aws_iam_group_policy_attachment": 1,
+      "aws_iam_instance_profile": 4,
+      "aws_iam_policy": 9,
+      "aws_iam_role": 9,
+      "aws_iam_role_policy_attachment": 5,
+      "aws_iam_user": 1,
+      "aws_internet_gateway": 2,
+      "aws_key_pair": 1,
+      "aws_kms_alias": 1,
+      "aws_lambda_permission": 1,
+      "aws_lightsail_static_ip": 1,
+      "aws_lightsail_static_ip_attachment": 1,
+      "aws_network_interface": 2,
+      "aws_route": 15,
+      "aws_route53_resolver_rule": 2,
+      "aws_route53_resolver_rule_association": 4,
+      "aws_route53_zone_association": 2,
+      "aws_route_table": 6,
+      "aws_route_table_association": 18,
+      "aws_s3_bucket_acl": 1,
+      "aws_s3_bucket_object": 4,
+      "aws_s3_bucket_public_access_block": 2,
+      "aws_s3_bucket_server_side_encryption_configuration": 1,
+      "aws_s3_bucket_versioning": 1,
+      "aws_secretsmanager_secret_version": 1,
+      "aws_security_group": 11,
+      "aws_ssm_parameter": 2,
+      "aws_subnet": 18,
+      "aws_vpc": 2,
+      "aws_vpc_endpoint": 4,
+      "aws_vpn_gateway": 2,
+      "aws_vpn_gateway_route_propagation": 4
+    }
+  }
+}

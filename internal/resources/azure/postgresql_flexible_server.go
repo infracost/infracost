@@ -27,9 +27,16 @@ type PostgreSQLFlexibleServer struct {
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
 }
 
-// PostgreSQLFlexibleServerUsageSchema defines a list which represents the usage schema of PostgreSQLFlexibleServer.
-var PostgreSQLFlexibleServerUsageSchema = []*schema.UsageItem{
-	{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+// CoreType returns the name of this resource type
+func (r *PostgreSQLFlexibleServer) CoreType() string {
+	return "PostgreSQLFlexibleServer"
+}
+
+// UsageSchema defines a list which represents the usage schema of PostgreSQLFlexibleServer.
+func (r *PostgreSQLFlexibleServer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the PostgreSQLFlexibleServer.
@@ -50,7 +57,7 @@ func (r *PostgreSQLFlexibleServer) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    PostgreSQLFlexibleServerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -70,7 +77,7 @@ func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent 
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^Azure Database for PostgreSQL Flexible Server %s %s/i", attrs.TierName, attrs.Series))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s %s (?:-\\s)?%s/i", attrs.ProductName, attrs.TierName, attrs.Series))},
 				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.SKUName))},
 				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.MeterName))},
 			},
@@ -129,16 +136,18 @@ func (r *PostgreSQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
 // flexibleServerFilterAttributes defines CPAPI filter attributes for compute
 // cost component derived from IaC provider's SKU.
 type flexibleServerFilterAttributes struct {
-	SKUName   string
-	TierName  string
-	MeterName string
-	Series    string
+	ProductName string
+	SKUName     string
+	TierName    string
+	MeterName   string
+	Series      string
 }
 
 // getFlexibleServerFilterAttributes returns a struct with CPAPI filter
@@ -152,8 +161,10 @@ func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion strin
 		"mo": "Memory Optimized",
 	}[tier]
 
+	productName := "Azure Database for PostgreSQL Flexible Server"
+
 	if tier == "b" {
-		meterName = instanceType
+		meterName = fmt.Sprintf("%s[ vcore]*", instanceType)
 		skuName = instanceType
 		series = "BS"
 	} else {
@@ -165,12 +176,17 @@ func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion strin
 		skuName = fmt.Sprintf("%s vCore", cores)
 
 		series = coreRegex.ReplaceAllString(instanceType, "") + instanceVersion
+
+		if series == "Esv3" {
+			productName = "Az DB for PGSQL Flexible Server"
+		}
 	}
 
 	return flexibleServerFilterAttributes{
-		SKUName:   skuName,
-		TierName:  tierName,
-		MeterName: meterName,
-		Series:    series,
+		ProductName: productName,
+		SKUName:     skuName,
+		TierName:    tierName,
+		MeterName:   meterName,
+		Series:      series,
 	}
 }

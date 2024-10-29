@@ -13,17 +13,18 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_google",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_format_json_with_tags_google",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_google",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google",
         "providers": [
           {
             "name": "google",
-            "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
             "startLine": 1,
-            "endLine": 5
+            "endLine": 8
           }
         ]
       },
@@ -33,21 +34,27 @@
             "name": "google_compute_disk.gcd1",
             "resourceType": "google_compute_disk",
             "tags": {
+              "DefaultLabel": "this is a default label",
               "GoogleLabel": "compute-disk-label"
             },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
-                  "endLine": 14,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 7
+                  "endLine": 17,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 10
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
-              "endLine": 14,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 7
+              "endLine": 17,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 10
             },
             "hourlyCost": "0.027397260273972604",
             "monthlyCost": "20",
@@ -59,27 +66,35 @@
                 "monthlyQuantity": "500",
                 "price": "0.04",
                 "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20"
+                "monthlyCost": "20",
+                "priceNotFound": false
               }
             ]
           },
           {
             "name": "google_compute_disk.gcd2",
             "resourceType": "google_compute_disk",
-            "tags": {},
+            "tags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
-                  "endLine": 19,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 16
+                  "endLine": 22,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 19
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
-              "endLine": 19,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 16
+              "endLine": 22,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 19
             },
             "hourlyCost": "0.02328767123287671",
             "monthlyCost": "17",
@@ -91,7 +106,8 @@
                 "monthlyQuantity": "100",
                 "price": "0.17",
                 "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17"
+                "monthlyCost": "17",
+                "priceNotFound": false
               }
             ]
           },
@@ -99,21 +115,27 @@
             "name": "google_sql_database_instance.gsdi",
             "resourceType": "google_sql_database_instance",
             "tags": {
+              "DefaultLabel": "this is a default label",
               "GoogleSettingsUserLabel": "sql-db-label"
             },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_sql_database_instance.gsdi",
-                  "endLine": 39,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 29
+                  "endLine": 42,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 32
                 }
               ],
               "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
-              "endLine": 39,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 29
+              "endLine": 42,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 32
             },
             "hourlyCost": "0.022828767123287671",
             "monthlyCost": "16.665",
@@ -125,7 +147,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.0105",
                 "hourlyCost": "0.0105",
-                "monthlyCost": "7.665"
+                "monthlyCost": "7.665",
+                "priceNotFound": false
               },
               {
                 "name": "Storage (SSD, zonal)",
@@ -134,7 +157,8 @@
                 "monthlyQuantity": "10",
                 "price": "0.17",
                 "hourlyCost": "0.002328767123287671",
-                "monthlyCost": "1.7"
+                "monthlyCost": "1.7",
+                "priceNotFound": false
               },
               {
                 "name": "Backups",
@@ -143,7 +167,9 @@
                 "monthlyQuantity": null,
                 "price": "0.08",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "IP address (if unused)",
@@ -152,7 +178,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.01",
                 "hourlyCost": "0.01",
-                "monthlyCost": "7.3"
+                "monthlyCost": "7.3",
+                "priceNotFound": false
               }
             ]
           }
@@ -162,26 +189,33 @@
             "name": "google_monitoring_custom_service.gmcs",
             "resourceType": "google_monitoring_custom_service",
             "tags": {
+              "DefaultLabel": "this is a default label",
               "GoogleUserLabel": "monitoring-custom-service-label"
             },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_monitoring_custom_service.gmcs",
-                  "endLine": 27,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 21
+                  "endLine": 30,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 24
                 }
               ],
               "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
-              "endLine": 27,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 21
+              "endLine": 30,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 24
             }
           }
         ],
         "totalHourlyCost": "0.073513698630136985",
-        "totalMonthlyCost": "53.665"
+        "totalMonthlyCost": "53.665",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -189,21 +223,27 @@
             "name": "google_compute_disk.gcd1",
             "resourceType": "google_compute_disk",
             "tags": {
+              "DefaultLabel": "this is a default label",
               "GoogleLabel": "compute-disk-label"
             },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
-                  "endLine": 14,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 7
+                  "endLine": 17,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 10
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
-              "endLine": 14,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 7
+              "endLine": 17,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 10
             },
             "hourlyCost": "0.027397260273972604",
             "monthlyCost": "20",
@@ -215,27 +255,35 @@
                 "monthlyQuantity": "500",
                 "price": "0.04",
                 "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20"
+                "monthlyCost": "20",
+                "priceNotFound": false
               }
             ]
           },
           {
             "name": "google_compute_disk.gcd2",
             "resourceType": "google_compute_disk",
-            "tags": {},
+            "tags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
-                  "endLine": 19,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 16
+                  "endLine": 22,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 19
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
-              "endLine": 19,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 16
+              "endLine": 22,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 19
             },
             "hourlyCost": "0.02328767123287671",
             "monthlyCost": "17",
@@ -247,7 +295,8 @@
                 "monthlyQuantity": "100",
                 "price": "0.17",
                 "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17"
+                "monthlyCost": "17",
+                "priceNotFound": false
               }
             ]
           },
@@ -255,21 +304,27 @@
             "name": "google_sql_database_instance.gsdi",
             "resourceType": "google_sql_database_instance",
             "tags": {
+              "DefaultLabel": "this is a default label",
               "GoogleSettingsUserLabel": "sql-db-label"
             },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_sql_database_instance.gsdi",
-                  "endLine": 39,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 29
+                  "endLine": 42,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 32
                 }
               ],
               "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
-              "endLine": 39,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 29
+              "endLine": 42,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 32
             },
             "hourlyCost": "0.022828767123287671",
             "monthlyCost": "16.665",
@@ -281,7 +336,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.0105",
                 "hourlyCost": "0.0105",
-                "monthlyCost": "7.665"
+                "monthlyCost": "7.665",
+                "priceNotFound": false
               },
               {
                 "name": "Storage (SSD, zonal)",
@@ -290,7 +346,8 @@
                 "monthlyQuantity": "10",
                 "price": "0.17",
                 "hourlyCost": "0.002328767123287671",
-                "monthlyCost": "1.7"
+                "monthlyCost": "1.7",
+                "priceNotFound": false
               },
               {
                 "name": "Backups",
@@ -299,7 +356,9 @@
                 "monthlyQuantity": null,
                 "price": "0.08",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "IP address (if unused)",
@@ -308,7 +367,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.01",
                 "hourlyCost": "0.01",
-                "monthlyCost": "7.3"
+                "monthlyCost": "7.3",
+                "priceNotFound": false
               }
             ]
           }
@@ -318,31 +378,39 @@
             "name": "google_monitoring_custom_service.gmcs",
             "resourceType": "google_monitoring_custom_service",
             "tags": {
+              "DefaultLabel": "this is a default label",
               "GoogleUserLabel": "monitoring-custom-service-label"
             },
+            "defaultTags": {
+              "DefaultLabel": "this is a default label"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "google_monitoring_custom_service.gmcs",
-                  "endLine": 27,
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 21
+                  "endLine": 30,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 24
                 }
               ],
               "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
-              "endLine": 27,
-              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 21
+              "endLine": 30,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 24
             }
           }
         ],
         "totalHourlyCost": "0.073513698630136985",
-        "totalMonthlyCost": "53.665"
+        "totalMonthlyCost": "53.665",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 4,
@@ -359,10 +427,13 @@
   ],
   "totalHourlyCost": "0.073513698630136985",
   "totalMonthlyCost": "53.665",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "0.073513698630136985",
   "pastTotalMonthlyCost": "53.665",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 4,

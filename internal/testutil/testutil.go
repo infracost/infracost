@@ -13,6 +13,7 @@ import (
 	"unicode"
 
 	"github.com/pmezard/go-difflib/difflib"
+	"github.com/rs/zerolog"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -154,7 +155,7 @@ func formatCost(d *decimal.Decimal) string {
 	return formatAmount(*d)
 }
 
-func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
+func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 	// Load the snapshot result
 	expected := []byte("")
 	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
@@ -163,7 +164,8 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 		assert.NoError(t, err)
 	}
 
-	if !bytes.Equal(expected, actual) {
+	equal := bytes.Equal(expected, actual)
+	if !equal {
 		if *update {
 			// create the golden file dir if needed
 			goldenFileDir := filepath.Dir(goldenFilePath)
@@ -175,8 +177,9 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 
 			err := os.WriteFile(goldenFilePath, actual, 0600)
 			assert.NoError(t, err)
-			t.Logf(fmt.Sprintf("Wrote golden file %s", goldenFilePath))
+			t.Logf("Wrote golden file %s", goldenFilePath)
 		} else {
+
 			// Generate the diff and error message.  We don't call assert.Equal because it escapes
 			// newlines (\n) and the output looks terrible.
 			diff, _ := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
@@ -189,9 +192,11 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 				Context:  1,
 			})
 
-			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
+			t.Errorf("\nOutput does not match golden file (%s):\n\n%s\n", goldenFilePath, diff)
 		}
 	}
+
+	return equal
 }
 
 type ErrorOnAnyWriter struct {
@@ -203,20 +208,11 @@ func (e ErrorOnAnyWriter) Write(data []byte) (n int, err error) {
 	return io.Discard.Write(data)
 }
 
-func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
-	runCtx.Config.LogLevel = "warn"
-	runCtx.Config.SetLogDisableTimestamps(true)
-	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t}))
-
-	err := logging.ConfigureBaseLogger(runCtx.Config)
-	require.Nil(t, err)
-}
-
-func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.Buffer {
+func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext, level string) *bytes.Buffer {
 	logBuf := bytes.NewBuffer([]byte{})
-	runCtx.Config.LogLevel = "warn"
+	runCtx.Config.LogLevel = level
 	runCtx.Config.SetLogDisableTimestamps(true)
-	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, logBuf))
+	runCtx.Config.SetLogWriter(zerolog.SyncWriter(io.MultiWriter(os.Stderr, logBuf)))
 
 	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)

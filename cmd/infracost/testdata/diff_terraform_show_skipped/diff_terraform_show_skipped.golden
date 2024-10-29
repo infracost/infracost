@@ -1,11 +1,7 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
-
-+ azurerm_express_route_connection.express_route_conn
-  +$37
-
-    + ER Connections
-      +$37
+Project: REPLACED_PROJECT_PATH/testdata/express_route_gateway_plan.json
 
 + azurerm_express_route_gateway.express_route
   +$307
@@ -13,29 +9,34 @@ Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.j
     + ER scale units (2 Gbps)
       +$307
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
++ azurerm_express_route_connection.express_route_conn
+  +$37
+
+    + ER Connections
+      +$37
+
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/express_route_gateway_plan.json
 Amount:  +$343 ($0.00 → $343)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 8 cloud resources were detected:
 ∙ 2 were estimated
-∙ 3 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_virtual_hub
-  ∙ 1 x azurerm_virtual_wan
+∙ 3 were free
 ∙ 3 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_express_route_circuit
   ∙ 1 x azurerm_express_route_circuit_peering
   ∙ 1 x azurerm_express_route_port
 
-Infracost estimate: Monthly cost will increase by $343 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...xpress_route_gateway_plan.json ┃       +$343 ┃ $343             ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $343 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...xpress_route_gateway_plan.json ┃         +$343 ┃           - ┃        +$343 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

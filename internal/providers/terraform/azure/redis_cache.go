@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMRedisCacheRegistryItem() *schema.RegistryItem {
@@ -17,7 +18,7 @@ func GetAzureRMRedisCacheRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
+	region := d.Region
 
 	skuName := d.Get("sku_name").String()
 	family := d.Get("family").String()
@@ -35,7 +36,9 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	shards := int64(1)
 
 	if strings.EqualFold(skuName, "premium") {
-		if d.Get("shard_count").Type != gjson.Null {
+		// If shards is set to 0 then we still want to calculate the cost for 1 shard
+		// since the cache will be in HA-mode not cluster mode.
+		if d.Get("shard_count").Int() > 0 {
 			shards = d.Get("shard_count").Int()
 		}
 
@@ -48,10 +51,24 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 
 	nodes := shards * nodesPerShard
 
-	// Standard and Premium caches are billed per 2 nodes
 	qty := decimal.NewFromInt(nodes)
 	mul := schema.HourToMonthUnitMultiplier
-	if strings.EqualFold(skuName, "standard") || strings.EqualFold(skuName, "premium") {
+	attributes := []*schema.AttributeFilter{
+		{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", productName))},
+		{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", sku))},
+	}
+
+	if strings.EqualFold(skuName, "premium") {
+		attributes = append(attributes,
+			&schema.AttributeFilter{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s Cache Instance$/i", sku))},
+		)
+	} else {
+		attributes = append(attributes,
+			&schema.AttributeFilter{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s Cache$/i", sku))},
+		)
+	}
+
+	if strings.EqualFold(skuName, "standard") {
 		qty = qty.Div(decimal.NewFromInt(2))
 		mul = mul.Div(decimal.NewFromInt(2))
 	}
@@ -65,15 +82,11 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 				UnitMultiplier: mul,
 				HourlyQuantity: decimalPtr(qty),
 				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("azure"),
-					Region:        strPtr(region),
-					Service:       strPtr("Redis Cache"),
-					ProductFamily: strPtr("Databases"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", productName))},
-						{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", sku))},
-						{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s Cache$/i", sku))},
-					},
+					VendorName:       strPtr("azure"),
+					Region:           strPtr(region),
+					Service:          strPtr("Redis Cache"),
+					ProductFamily:    strPtr("Databases"),
+					AttributeFilters: attributes,
 				},
 				PriceFilter: &schema.PriceFilter{
 					PurchaseOption: strPtr("Consumption"),

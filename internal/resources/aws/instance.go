@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
@@ -71,7 +71,7 @@ func (a *Instance) BuildResource() *schema.Resource {
 		if a.HasHost {
 			a.Tenancy = "Host"
 		} else {
-			log.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up", a.Address)
+			logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up", a.Address)
 			return nil
 		}
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
@@ -168,7 +168,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		osFilterVal = "SUSE"
 	default:
 		if strVal(a.OperatingSystem) != "linux" {
-			log.Warn().Msgf("Unrecognized operating system %s, defaulting to Linux/UNIX", strVal(a.OperatingSystem))
+			logging.Logger.Warn().Msgf("Unrecognized operating system %s, defaulting to Linux/UNIX", strVal(a.OperatingSystem))
 		}
 	}
 
@@ -184,7 +184,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		}
 		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 		} else {
 			priceFilter = reservedFilter
 		}
@@ -267,6 +267,9 @@ func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
 			Region:        strPtr(a.Region),
 			Service:       strPtr("AmazonCloudWatch"),
 			ProductFamily: strPtr("Metric"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("Metric")},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),

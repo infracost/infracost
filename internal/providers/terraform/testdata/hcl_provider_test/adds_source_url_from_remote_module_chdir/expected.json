@@ -1,0 +1,3115 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "child_modules": [
+          {
+            "resources": [
+              {
+                "address": "module.git_ssh.aws_s3_bucket.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "my-s3-bucket",
+                  "bucket_prefix": null,
+                  "force_destroy": false,
+                  "object_lock_enabled": false,
+                  "tags": {}
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh",
+                      "startLine": 38,
+                      "endLine": 50
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                      "blockName": "aws_s3_bucket.this",
+                      "startLine": 25,
+                      "endLine": 34
+                    }
+                  ],
+                  "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                  "endLine": 34,
+                  "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 25
+                }
+              },
+              {
+                "address": "module.git_ssh.aws_s3_bucket_acl.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "acl": "private",
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh",
+                      "startLine": 38,
+                      "endLine": 50
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                      "blockName": "aws_s3_bucket_acl.this",
+                      "startLine": 66,
+                      "endLine": 103
+                    }
+                  ],
+                  "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                  "endLine": 103,
+                  "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 66
+                }
+              },
+              {
+                "address": "module.git_ssh.aws_s3_bucket_ownership_controls.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "rule": [
+                    {
+                      "object_ownership": "ObjectWriter"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh",
+                      "startLine": 38,
+                      "endLine": 50
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                      "blockName": "aws_s3_bucket_ownership_controls.this",
+                      "startLine": 924,
+                      "endLine": 939
+                    }
+                  ],
+                  "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                  "endLine": 939,
+                  "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 924
+                }
+              },
+              {
+                "address": "module.git_ssh.aws_s3_bucket_public_access_block.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "block_public_acls": true,
+                  "block_public_policy": true,
+                  "bucket": "mocked-bucket",
+                  "ignore_public_acls": true,
+                  "restrict_public_buckets": true
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh",
+                      "startLine": 38,
+                      "endLine": 50
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                      "blockName": "aws_s3_bucket_public_access_block.this",
+                      "startLine": 913,
+                      "endLine": 922
+                    }
+                  ],
+                  "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                  "endLine": 922,
+                  "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 913
+                }
+              },
+              {
+                "address": "module.git_ssh.aws_s3_bucket_versioning.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null,
+                  "mfa": null,
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": null,
+                      "status": "Enabled"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh",
+                      "startLine": 38,
+                      "endLine": 50
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                      "blockName": "aws_s3_bucket_versioning.this",
+                      "startLine": 160,
+                      "endLine": 174
+                    }
+                  ],
+                  "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                  "endLine": 174,
+                  "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 160
+                }
+              }
+            ],
+            "address": "module.git_ssh"
+          },
+          {
+            "resources": [
+              {
+                "address": "module.git_ssh_version.aws_s3_bucket.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "my-s3-bucket",
+                  "bucket_prefix": null,
+                  "force_destroy": false,
+                  "object_lock_enabled": false,
+                  "tags": {}
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh_version",
+                      "startLine": 52,
+                      "endLine": 64
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                      "blockName": "aws_s3_bucket.this",
+                      "startLine": 25,
+                      "endLine": 34
+                    }
+                  ],
+                  "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                  "endLine": 34,
+                  "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                  "startLine": 25
+                }
+              },
+              {
+                "address": "module.git_ssh_version.aws_s3_bucket_acl.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "acl": "private",
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh_version",
+                      "startLine": 52,
+                      "endLine": 64
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                      "blockName": "aws_s3_bucket_acl.this",
+                      "startLine": 66,
+                      "endLine": 103
+                    }
+                  ],
+                  "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                  "endLine": 103,
+                  "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                  "startLine": 66
+                }
+              },
+              {
+                "address": "module.git_ssh_version.aws_s3_bucket_ownership_controls.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "rule": [
+                    {
+                      "object_ownership": "ObjectWriter"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh_version",
+                      "startLine": 52,
+                      "endLine": 64
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                      "blockName": "aws_s3_bucket_ownership_controls.this",
+                      "startLine": 924,
+                      "endLine": 939
+                    }
+                  ],
+                  "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                  "endLine": 939,
+                  "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                  "startLine": 924
+                }
+              },
+              {
+                "address": "module.git_ssh_version.aws_s3_bucket_public_access_block.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "block_public_acls": true,
+                  "block_public_policy": true,
+                  "bucket": "mocked-bucket",
+                  "ignore_public_acls": true,
+                  "restrict_public_buckets": true
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh_version",
+                      "startLine": 52,
+                      "endLine": 64
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                      "blockName": "aws_s3_bucket_public_access_block.this",
+                      "startLine": 913,
+                      "endLine": 922
+                    }
+                  ],
+                  "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                  "endLine": 922,
+                  "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                  "startLine": 913
+                }
+              },
+              {
+                "address": "module.git_ssh_version.aws_s3_bucket_versioning.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null,
+                  "mfa": null,
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": null,
+                      "status": "Enabled"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_ssh_version",
+                      "startLine": 52,
+                      "endLine": 64
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                      "blockName": "aws_s3_bucket_versioning.this",
+                      "startLine": 160,
+                      "endLine": 174
+                    }
+                  ],
+                  "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                  "endLine": 174,
+                  "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                  "startLine": 160
+                }
+              }
+            ],
+            "address": "module.git_ssh_version"
+          },
+          {
+            "resources": [
+              {
+                "address": "module.git_sub_module.aws_s3_object.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_object",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "acl": null,
+                  "bucket": "",
+                  "bucket_key_enabled": null,
+                  "cache_control": null,
+                  "content": null,
+                  "content_base64": null,
+                  "content_disposition": null,
+                  "content_encoding": null,
+                  "content_language": null,
+                  "content_type": null,
+                  "etag": null,
+                  "force_destroy": false,
+                  "key": "",
+                  "kms_key_id": null,
+                  "lifecycle": [
+                    {
+                      "ignore_changes": null
+                    }
+                  ],
+                  "metadata": {},
+                  "object_lock_legal_hold_status": null,
+                  "object_lock_mode": null,
+                  "object_lock_retain_until_date": null,
+                  "server_side_encryption": null,
+                  "source": null,
+                  "source_hash": null,
+                  "storage_class": null,
+                  "tags": {},
+                  "website_redirect": null
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.git_sub_module",
+                      "startLine": 66,
+                      "endLine": 68
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/modules/object/main.tf",
+                      "blockName": "aws_s3_object.this",
+                      "startLine": 1,
+                      "endLine": 49
+                    }
+                  ],
+                  "checksum": "7d7d3b0646238278e1fd846441968e096c746ea4eef58193bca649b0774188ac",
+                  "endLine": 49,
+                  "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/modules/object/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/modules/object/main.tf",
+                  "startLine": 1
+                }
+              }
+            ],
+            "address": "module.git_sub_module"
+          },
+          {
+            "resources": [
+              {
+                "address": "module.registry_shortname.aws_s3_bucket.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "my-s3-bucket",
+                  "bucket_prefix": null,
+                  "force_destroy": false,
+                  "object_lock_enabled": false,
+                  "tags": {}
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname",
+                      "startLine": 9,
+                      "endLine": 21
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                      "blockName": "aws_s3_bucket.this",
+                      "startLine": 25,
+                      "endLine": 34
+                    }
+                  ],
+                  "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                  "endLine": 34,
+                  "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 25
+                }
+              },
+              {
+                "address": "module.registry_shortname.aws_s3_bucket_acl.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "acl": "private",
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname",
+                      "startLine": 9,
+                      "endLine": 21
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                      "blockName": "aws_s3_bucket_acl.this",
+                      "startLine": 66,
+                      "endLine": 103
+                    }
+                  ],
+                  "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                  "endLine": 103,
+                  "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 66
+                }
+              },
+              {
+                "address": "module.registry_shortname.aws_s3_bucket_ownership_controls.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "rule": [
+                    {
+                      "object_ownership": "ObjectWriter"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname",
+                      "startLine": 9,
+                      "endLine": 21
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                      "blockName": "aws_s3_bucket_ownership_controls.this",
+                      "startLine": 924,
+                      "endLine": 939
+                    }
+                  ],
+                  "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                  "endLine": 939,
+                  "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 924
+                }
+              },
+              {
+                "address": "module.registry_shortname.aws_s3_bucket_public_access_block.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "block_public_acls": true,
+                  "block_public_policy": true,
+                  "bucket": "mocked-bucket",
+                  "ignore_public_acls": true,
+                  "restrict_public_buckets": true
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname",
+                      "startLine": 9,
+                      "endLine": 21
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                      "blockName": "aws_s3_bucket_public_access_block.this",
+                      "startLine": 913,
+                      "endLine": 922
+                    }
+                  ],
+                  "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                  "endLine": 922,
+                  "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 913
+                }
+              },
+              {
+                "address": "module.registry_shortname.aws_s3_bucket_versioning.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null,
+                  "mfa": null,
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": null,
+                      "status": "Enabled"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname",
+                      "startLine": 9,
+                      "endLine": 21
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                      "blockName": "aws_s3_bucket_versioning.this",
+                      "startLine": 160,
+                      "endLine": 174
+                    }
+                  ],
+                  "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                  "endLine": 174,
+                  "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 160
+                }
+              }
+            ],
+            "address": "module.registry_shortname"
+          },
+          {
+            "resources": [
+              {
+                "address": "module.registry_shortname_version.aws_s3_bucket.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "my-s3-bucket",
+                  "bucket_prefix": null,
+                  "force_destroy": false,
+                  "object_lock_enabled": false,
+                  "tags": {}
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname_version",
+                      "startLine": 23,
+                      "endLine": 36
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                      "blockName": "aws_s3_bucket.this",
+                      "startLine": 25,
+                      "endLine": 34
+                    }
+                  ],
+                  "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                  "endLine": 34,
+                  "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 25
+                }
+              },
+              {
+                "address": "module.registry_shortname_version.aws_s3_bucket_acl.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "acl": "private",
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname_version",
+                      "startLine": 23,
+                      "endLine": 36
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                      "blockName": "aws_s3_bucket_acl.this",
+                      "startLine": 66,
+                      "endLine": 103
+                    }
+                  ],
+                  "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                  "endLine": 103,
+                  "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 66
+                }
+              },
+              {
+                "address": "module.registry_shortname_version.aws_s3_bucket_ownership_controls.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "rule": [
+                    {
+                      "object_ownership": "ObjectWriter"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname_version",
+                      "startLine": 23,
+                      "endLine": 36
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                      "blockName": "aws_s3_bucket_ownership_controls.this",
+                      "startLine": 923,
+                      "endLine": 938
+                    }
+                  ],
+                  "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                  "endLine": 938,
+                  "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 923
+                }
+              },
+              {
+                "address": "module.registry_shortname_version.aws_s3_bucket_public_access_block.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "block_public_acls": true,
+                  "block_public_policy": true,
+                  "bucket": "mocked-bucket",
+                  "ignore_public_acls": true,
+                  "restrict_public_buckets": true
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname_version",
+                      "startLine": 23,
+                      "endLine": 36
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                      "blockName": "aws_s3_bucket_public_access_block.this",
+                      "startLine": 912,
+                      "endLine": 921
+                    }
+                  ],
+                  "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                  "endLine": 921,
+                  "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 912
+                }
+              },
+              {
+                "address": "module.registry_shortname_version.aws_s3_bucket_versioning.this[0]",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "bucket": "mocked-bucket",
+                  "expected_bucket_owner": null,
+                  "mfa": null,
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": null,
+                      "status": "Enabled"
+                    }
+                  ]
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "main.tf",
+                      "blockName": "module.registry_shortname_version",
+                      "startLine": 23,
+                      "endLine": 36
+                    },
+                    {
+                      "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                      "blockName": "aws_s3_bucket_versioning.this",
+                      "startLine": 160,
+                      "endLine": 174
+                    }
+                  ],
+                  "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                  "endLine": 174,
+                  "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                  "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                  "startLine": 160
+                }
+              }
+            ],
+            "address": "module.registry_shortname_version"
+          }
+        ]
+      }
+    }
+  },
+  "planned_values": {
+    "root_module": {
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.git_ssh.aws_s3_bucket.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "my-s3-bucket",
+                "bucket_prefix": null,
+                "force_destroy": false,
+                "object_lock_enabled": false,
+                "tags": {}
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh",
+                    "startLine": 38,
+                    "endLine": 50
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                    "blockName": "aws_s3_bucket.this",
+                    "startLine": 25,
+                    "endLine": 34
+                  }
+                ],
+                "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                "endLine": 34,
+                "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 25
+              }
+            },
+            {
+              "address": "module.git_ssh.aws_s3_bucket_acl.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_acl",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "acl": "private",
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh",
+                    "startLine": 38,
+                    "endLine": 50
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                    "blockName": "aws_s3_bucket_acl.this",
+                    "startLine": 66,
+                    "endLine": 103
+                  }
+                ],
+                "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                "endLine": 103,
+                "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 66
+              }
+            },
+            {
+              "address": "module.git_ssh.aws_s3_bucket_ownership_controls.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_ownership_controls",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "rule": [
+                  {
+                    "object_ownership": "ObjectWriter"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh",
+                    "startLine": 38,
+                    "endLine": 50
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                    "blockName": "aws_s3_bucket_ownership_controls.this",
+                    "startLine": 924,
+                    "endLine": 939
+                  }
+                ],
+                "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                "endLine": 939,
+                "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 924
+              }
+            },
+            {
+              "address": "module.git_ssh.aws_s3_bucket_public_access_block.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_public_access_block",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "block_public_acls": true,
+                "block_public_policy": true,
+                "bucket": "mocked-bucket",
+                "ignore_public_acls": true,
+                "restrict_public_buckets": true
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh",
+                    "startLine": 38,
+                    "endLine": 50
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                    "blockName": "aws_s3_bucket_public_access_block.this",
+                    "startLine": 913,
+                    "endLine": 922
+                  }
+                ],
+                "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                "endLine": 922,
+                "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 913
+              }
+            },
+            {
+              "address": "module.git_ssh.aws_s3_bucket_versioning.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_versioning",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null,
+                "mfa": null,
+                "versioning_configuration": [
+                  {
+                    "mfa_delete": null,
+                    "status": "Enabled"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh",
+                    "startLine": 38,
+                    "endLine": 50
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                    "blockName": "aws_s3_bucket_versioning.this",
+                    "startLine": 160,
+                    "endLine": 174
+                  }
+                ],
+                "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                "endLine": 174,
+                "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 160
+              }
+            }
+          ],
+          "address": "module.git_ssh"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.git_ssh_version.aws_s3_bucket.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "my-s3-bucket",
+                "bucket_prefix": null,
+                "force_destroy": false,
+                "object_lock_enabled": false,
+                "tags": {}
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh_version",
+                    "startLine": 52,
+                    "endLine": 64
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                    "blockName": "aws_s3_bucket.this",
+                    "startLine": 25,
+                    "endLine": 34
+                  }
+                ],
+                "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                "endLine": 34,
+                "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                "startLine": 25
+              }
+            },
+            {
+              "address": "module.git_ssh_version.aws_s3_bucket_acl.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_acl",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "acl": "private",
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh_version",
+                    "startLine": 52,
+                    "endLine": 64
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                    "blockName": "aws_s3_bucket_acl.this",
+                    "startLine": 66,
+                    "endLine": 103
+                  }
+                ],
+                "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                "endLine": 103,
+                "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                "startLine": 66
+              }
+            },
+            {
+              "address": "module.git_ssh_version.aws_s3_bucket_ownership_controls.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_ownership_controls",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "rule": [
+                  {
+                    "object_ownership": "ObjectWriter"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh_version",
+                    "startLine": 52,
+                    "endLine": 64
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                    "blockName": "aws_s3_bucket_ownership_controls.this",
+                    "startLine": 924,
+                    "endLine": 939
+                  }
+                ],
+                "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                "endLine": 939,
+                "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                "startLine": 924
+              }
+            },
+            {
+              "address": "module.git_ssh_version.aws_s3_bucket_public_access_block.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_public_access_block",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "block_public_acls": true,
+                "block_public_policy": true,
+                "bucket": "mocked-bucket",
+                "ignore_public_acls": true,
+                "restrict_public_buckets": true
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh_version",
+                    "startLine": 52,
+                    "endLine": 64
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                    "blockName": "aws_s3_bucket_public_access_block.this",
+                    "startLine": 913,
+                    "endLine": 922
+                  }
+                ],
+                "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                "endLine": 922,
+                "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                "startLine": 913
+              }
+            },
+            {
+              "address": "module.git_ssh_version.aws_s3_bucket_versioning.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_versioning",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null,
+                "mfa": null,
+                "versioning_configuration": [
+                  {
+                    "mfa_delete": null,
+                    "status": "Enabled"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_ssh_version",
+                    "startLine": 52,
+                    "endLine": 64
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                    "blockName": "aws_s3_bucket_versioning.this",
+                    "startLine": 160,
+                    "endLine": 174
+                  }
+                ],
+                "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                "endLine": 174,
+                "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
+                "startLine": 160
+              }
+            }
+          ],
+          "address": "module.git_ssh_version"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.git_sub_module.aws_s3_object.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_object",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "acl": null,
+                "bucket": "",
+                "bucket_key_enabled": null,
+                "cache_control": null,
+                "content": null,
+                "content_base64": null,
+                "content_disposition": null,
+                "content_encoding": null,
+                "content_language": null,
+                "content_type": null,
+                "etag": null,
+                "force_destroy": false,
+                "key": "",
+                "kms_key_id": null,
+                "lifecycle": [
+                  {
+                    "ignore_changes": null
+                  }
+                ],
+                "metadata": {},
+                "object_lock_legal_hold_status": null,
+                "object_lock_mode": null,
+                "object_lock_retain_until_date": null,
+                "server_side_encryption": null,
+                "source": null,
+                "source_hash": null,
+                "storage_class": null,
+                "tags": {},
+                "website_redirect": null
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.git_sub_module",
+                    "startLine": 66,
+                    "endLine": 68
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/modules/object/main.tf",
+                    "blockName": "aws_s3_object.this",
+                    "startLine": 1,
+                    "endLine": 49
+                  }
+                ],
+                "checksum": "7d7d3b0646238278e1fd846441968e096c746ea4eef58193bca649b0774188ac",
+                "endLine": 49,
+                "filename": ".infracost/terraform_modules/30b695ab2291e2ded2ac2e47e63b88e6/modules/object/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/modules/object/main.tf",
+                "startLine": 1
+              }
+            }
+          ],
+          "address": "module.git_sub_module"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.registry_shortname.aws_s3_bucket.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "my-s3-bucket",
+                "bucket_prefix": null,
+                "force_destroy": false,
+                "object_lock_enabled": false,
+                "tags": {}
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname",
+                    "startLine": 9,
+                    "endLine": 21
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                    "blockName": "aws_s3_bucket.this",
+                    "startLine": 25,
+                    "endLine": 34
+                  }
+                ],
+                "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                "endLine": 34,
+                "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 25
+              }
+            },
+            {
+              "address": "module.registry_shortname.aws_s3_bucket_acl.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_acl",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "acl": "private",
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname",
+                    "startLine": 9,
+                    "endLine": 21
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                    "blockName": "aws_s3_bucket_acl.this",
+                    "startLine": 66,
+                    "endLine": 103
+                  }
+                ],
+                "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                "endLine": 103,
+                "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 66
+              }
+            },
+            {
+              "address": "module.registry_shortname.aws_s3_bucket_ownership_controls.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_ownership_controls",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "rule": [
+                  {
+                    "object_ownership": "ObjectWriter"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname",
+                    "startLine": 9,
+                    "endLine": 21
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                    "blockName": "aws_s3_bucket_ownership_controls.this",
+                    "startLine": 924,
+                    "endLine": 939
+                  }
+                ],
+                "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                "endLine": 939,
+                "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 924
+              }
+            },
+            {
+              "address": "module.registry_shortname.aws_s3_bucket_public_access_block.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_public_access_block",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "block_public_acls": true,
+                "block_public_policy": true,
+                "bucket": "mocked-bucket",
+                "ignore_public_acls": true,
+                "restrict_public_buckets": true
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname",
+                    "startLine": 9,
+                    "endLine": 21
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                    "blockName": "aws_s3_bucket_public_access_block.this",
+                    "startLine": 913,
+                    "endLine": 922
+                  }
+                ],
+                "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                "endLine": 922,
+                "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 913
+              }
+            },
+            {
+              "address": "module.registry_shortname.aws_s3_bucket_versioning.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_versioning",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null,
+                "mfa": null,
+                "versioning_configuration": [
+                  {
+                    "mfa_delete": null,
+                    "status": "Enabled"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname",
+                    "startLine": 9,
+                    "endLine": 21
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                    "blockName": "aws_s3_bucket_versioning.this",
+                    "startLine": 160,
+                    "endLine": 174
+                  }
+                ],
+                "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                "endLine": 174,
+                "filename": ".infracost/terraform_modules/32fe3779b4dcd7ba3d9f5ca25112691d/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 160
+              }
+            }
+          ],
+          "address": "module.registry_shortname"
+        },
+        {
+          "resources": [
+            {
+              "address": "module.registry_shortname_version.aws_s3_bucket.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "my-s3-bucket",
+                "bucket_prefix": null,
+                "force_destroy": false,
+                "object_lock_enabled": false,
+                "tags": {}
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname_version",
+                    "startLine": 23,
+                    "endLine": 36
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                    "blockName": "aws_s3_bucket.this",
+                    "startLine": 25,
+                    "endLine": 34
+                  }
+                ],
+                "checksum": "ce9dead648c6c2606278d3bd12f177047dc757e08d9e01b1de980fe18c4cbc50",
+                "endLine": 34,
+                "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 25
+              }
+            },
+            {
+              "address": "module.registry_shortname_version.aws_s3_bucket_acl.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_acl",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "acl": "private",
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname_version",
+                    "startLine": 23,
+                    "endLine": 36
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                    "blockName": "aws_s3_bucket_acl.this",
+                    "startLine": 66,
+                    "endLine": 103
+                  }
+                ],
+                "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
+                "endLine": 103,
+                "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 66
+              }
+            },
+            {
+              "address": "module.registry_shortname_version.aws_s3_bucket_ownership_controls.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_ownership_controls",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "rule": [
+                  {
+                    "object_ownership": "ObjectWriter"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname_version",
+                    "startLine": 23,
+                    "endLine": 36
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                    "blockName": "aws_s3_bucket_ownership_controls.this",
+                    "startLine": 923,
+                    "endLine": 938
+                  }
+                ],
+                "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
+                "endLine": 938,
+                "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 923
+              }
+            },
+            {
+              "address": "module.registry_shortname_version.aws_s3_bucket_public_access_block.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_public_access_block",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "block_public_acls": true,
+                "block_public_policy": true,
+                "bucket": "mocked-bucket",
+                "ignore_public_acls": true,
+                "restrict_public_buckets": true
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname_version",
+                    "startLine": 23,
+                    "endLine": 36
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                    "blockName": "aws_s3_bucket_public_access_block.this",
+                    "startLine": 912,
+                    "endLine": 921
+                  }
+                ],
+                "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
+                "endLine": 921,
+                "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 912
+              }
+            },
+            {
+              "address": "module.registry_shortname_version.aws_s3_bucket_versioning.this[0]",
+              "mode": "managed",
+              "type": "aws_s3_bucket_versioning",
+              "name": "this",
+              "index": 0,
+              "schema_version": 0,
+              "values": {
+                "bucket": "mocked-bucket",
+                "expected_bucket_owner": null,
+                "mfa": null,
+                "versioning_configuration": [
+                  {
+                    "mfa_delete": null,
+                    "status": "Enabled"
+                  }
+                ]
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "main.tf",
+                    "blockName": "module.registry_shortname_version",
+                    "startLine": 23,
+                    "endLine": 36
+                  },
+                  {
+                    "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                    "blockName": "aws_s3_bucket_versioning.this",
+                    "startLine": 160,
+                    "endLine": 174
+                  }
+                ],
+                "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
+                "endLine": 174,
+                "filename": ".infracost/terraform_modules/e1b917e65e79c9459c6dd83960b817d5/main.tf",
+                "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/HEAD/main.tf",
+                "startLine": 160
+              }
+            }
+          ],
+          "address": "module.registry_shortname_version"
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        },
+        "infracost_metadata": {
+          "end_line": 7,
+          "filename": "main.tf",
+          "start_line": 1
+        }
+      }
+    },
+    "root_module": {
+      "module_calls": {
+        "git_ssh": {
+          "source": "git@github.com:terraform-aws-modules/terraform-aws-s3-bucket",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_s3_bucket.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "var.bucket"
+                    ]
+                  },
+                  "bucket_prefix": {
+                    "references": [
+                      "var.bucket_prefix"
+                    ]
+                  },
+                  "force_destroy": {
+                    "references": [
+                      "var.force_destroy"
+                    ]
+                  },
+                  "object_lock_enabled": {
+                    "references": [
+                      "var.object_lock_enabled"
+                    ]
+                  },
+                  "tags": {
+                    "references": [
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_acl.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "acl": {
+                    "references": [
+                      "var.acl",
+                      "var.acl"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "locals.create_bucket_acl"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_ownership_controls.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket_policy.this",
+                      "aws_s3_bucket.this",
+                      "locals.attach_policy"
+                    ]
+                  },
+                  "rule": [
+                    {
+                      "object_ownership": {
+                        "references": [
+                          "var.object_ownership"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.control_object_ownership"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_public_access_block.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "block_public_acls": {
+                    "references": [
+                      "var.block_public_acls"
+                    ]
+                  },
+                  "block_public_policy": {
+                    "references": [
+                      "var.block_public_policy"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "ignore_public_acls": {
+                    "references": [
+                      "var.ignore_public_acls"
+                    ]
+                  },
+                  "restrict_public_buckets": {
+                    "references": [
+                      "var.restrict_public_buckets"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.attach_public_policy"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_versioning.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  },
+                  "mfa": {
+                    "references": [
+                      "var.versioning"
+                    ]
+                  },
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      },
+                      "status": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.versioning"
+                  ]
+                }
+              }
+            ]
+          },
+          "sourceUrl": "git@github.com:terraform-aws-modules/terraform-aws-s3-bucket"
+        },
+        "git_ssh_version": {
+          "source": "git@github.com:terraform-aws-modules/terraform-aws-s3-bucket?ref=v4.1.1",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_s3_bucket.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "var.bucket"
+                    ]
+                  },
+                  "bucket_prefix": {
+                    "references": [
+                      "var.bucket_prefix"
+                    ]
+                  },
+                  "force_destroy": {
+                    "references": [
+                      "var.force_destroy"
+                    ]
+                  },
+                  "object_lock_enabled": {
+                    "references": [
+                      "var.object_lock_enabled"
+                    ]
+                  },
+                  "tags": {
+                    "references": [
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_acl.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "acl": {
+                    "references": [
+                      "var.acl",
+                      "var.acl"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "locals.create_bucket_acl"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_ownership_controls.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket_policy.this",
+                      "aws_s3_bucket.this",
+                      "locals.attach_policy"
+                    ]
+                  },
+                  "rule": [
+                    {
+                      "object_ownership": {
+                        "references": [
+                          "var.object_ownership"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.control_object_ownership"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_public_access_block.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "block_public_acls": {
+                    "references": [
+                      "var.block_public_acls"
+                    ]
+                  },
+                  "block_public_policy": {
+                    "references": [
+                      "var.block_public_policy"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "ignore_public_acls": {
+                    "references": [
+                      "var.ignore_public_acls"
+                    ]
+                  },
+                  "restrict_public_buckets": {
+                    "references": [
+                      "var.restrict_public_buckets"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.attach_public_policy"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_versioning.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  },
+                  "mfa": {
+                    "references": [
+                      "var.versioning"
+                    ]
+                  },
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      },
+                      "status": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.versioning"
+                  ]
+                }
+              }
+            ]
+          },
+          "sourceUrl": "git@github.com:terraform-aws-modules/terraform-aws-s3-bucket?ref=v4.1.1"
+        },
+        "git_sub_module": {
+          "source": "git@github.com:terraform-aws-modules/terraform-aws-s3-bucket//modules/object",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_s3_object.this",
+                "mode": "managed",
+                "type": "aws_s3_object",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "acl": {
+                    "references": [
+                      "var.acl"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "var.bucket"
+                    ]
+                  },
+                  "bucket_key_enabled": {
+                    "references": [
+                      "var.bucket_key_enabled"
+                    ]
+                  },
+                  "cache_control": {
+                    "references": [
+                      "var.cache_control"
+                    ]
+                  },
+                  "content": {
+                    "references": [
+                      "var.content"
+                    ]
+                  },
+                  "content_base64": {
+                    "references": [
+                      "var.content_base64"
+                    ]
+                  },
+                  "content_disposition": {
+                    "references": [
+                      "var.content_disposition"
+                    ]
+                  },
+                  "content_encoding": {
+                    "references": [
+                      "var.content_encoding"
+                    ]
+                  },
+                  "content_language": {
+                    "references": [
+                      "var.content_language"
+                    ]
+                  },
+                  "content_type": {
+                    "references": [
+                      "var.content_type"
+                    ]
+                  },
+                  "etag": {
+                    "references": [
+                      "var.etag"
+                    ]
+                  },
+                  "force_destroy": {
+                    "references": [
+                      "var.force_destroy"
+                    ]
+                  },
+                  "key": {
+                    "references": [
+                      "var.key"
+                    ]
+                  },
+                  "kms_key_id": {
+                    "references": [
+                      "var.kms_key_id"
+                    ]
+                  },
+                  "lifecycle": [
+                    {
+                      "ignore_changes": {
+                        "references": [
+                          "object_lock_retain_until_date."
+                        ]
+                      }
+                    }
+                  ],
+                  "metadata": {
+                    "references": [
+                      "var.metadata"
+                    ]
+                  },
+                  "object_lock_legal_hold_status": {
+                    "references": [
+                      "var.object_lock_legal_hold_status",
+                      "var.object_lock_legal_hold_status",
+                      "var.object_lock_legal_hold_status"
+                    ]
+                  },
+                  "object_lock_mode": {
+                    "references": [
+                      "var.object_lock_mode",
+                      "var.object_lock_mode"
+                    ]
+                  },
+                  "object_lock_retain_until_date": {
+                    "references": [
+                      "var.object_lock_retain_until_date"
+                    ]
+                  },
+                  "server_side_encryption": {
+                    "references": [
+                      "var.server_side_encryption"
+                    ]
+                  },
+                  "source": {
+                    "references": [
+                      "var.file_source"
+                    ]
+                  },
+                  "source_hash": {
+                    "references": [
+                      "var.source_hash"
+                    ]
+                  },
+                  "storage_class": {
+                    "references": [
+                      "var.storage_class",
+                      "var.storage_class"
+                    ]
+                  },
+                  "tags": {
+                    "references": [
+                      "var.tags"
+                    ]
+                  },
+                  "website_redirect": {
+                    "references": [
+                      "var.website_redirect"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.create"
+                  ]
+                }
+              }
+            ]
+          },
+          "sourceUrl": "git@github.com:terraform-aws-modules/terraform-aws-s3-bucket"
+        },
+        "registry_shortname": {
+          "source": "terraform-aws-modules/s3-bucket/aws",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_s3_bucket.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "var.bucket"
+                    ]
+                  },
+                  "bucket_prefix": {
+                    "references": [
+                      "var.bucket_prefix"
+                    ]
+                  },
+                  "force_destroy": {
+                    "references": [
+                      "var.force_destroy"
+                    ]
+                  },
+                  "object_lock_enabled": {
+                    "references": [
+                      "var.object_lock_enabled"
+                    ]
+                  },
+                  "tags": {
+                    "references": [
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_acl.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "acl": {
+                    "references": [
+                      "var.acl",
+                      "var.acl"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "locals.create_bucket_acl"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_ownership_controls.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket_policy.this",
+                      "aws_s3_bucket.this",
+                      "locals.attach_policy"
+                    ]
+                  },
+                  "rule": [
+                    {
+                      "object_ownership": {
+                        "references": [
+                          "var.object_ownership"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.control_object_ownership"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_public_access_block.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "block_public_acls": {
+                    "references": [
+                      "var.block_public_acls"
+                    ]
+                  },
+                  "block_public_policy": {
+                    "references": [
+                      "var.block_public_policy"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "ignore_public_acls": {
+                    "references": [
+                      "var.ignore_public_acls"
+                    ]
+                  },
+                  "restrict_public_buckets": {
+                    "references": [
+                      "var.restrict_public_buckets"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.attach_public_policy"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_versioning.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  },
+                  "mfa": {
+                    "references": [
+                      "var.versioning"
+                    ]
+                  },
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      },
+                      "status": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.versioning"
+                  ]
+                }
+              }
+            ]
+          },
+          "sourceUrl": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+        },
+        "registry_shortname_version": {
+          "source": "terraform-aws-modules/s3-bucket/aws",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_s3_bucket.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "var.bucket"
+                    ]
+                  },
+                  "bucket_prefix": {
+                    "references": [
+                      "var.bucket_prefix"
+                    ]
+                  },
+                  "force_destroy": {
+                    "references": [
+                      "var.force_destroy"
+                    ]
+                  },
+                  "object_lock_enabled": {
+                    "references": [
+                      "var.object_lock_enabled"
+                    ]
+                  },
+                  "tags": {
+                    "references": [
+                      "var.tags"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_acl.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_acl",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "acl": {
+                    "references": [
+                      "var.acl",
+                      "var.acl"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "locals.create_bucket_acl"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_ownership_controls.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_ownership_controls",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket_policy.this",
+                      "aws_s3_bucket.this",
+                      "locals.attach_policy"
+                    ]
+                  },
+                  "rule": [
+                    {
+                      "object_ownership": {
+                        "references": [
+                          "var.object_ownership"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.control_object_ownership"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_public_access_block.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_public_access_block",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "block_public_acls": {
+                    "references": [
+                      "var.block_public_acls"
+                    ]
+                  },
+                  "block_public_policy": {
+                    "references": [
+                      "var.block_public_policy"
+                    ]
+                  },
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "ignore_public_acls": {
+                    "references": [
+                      "var.ignore_public_acls"
+                    ]
+                  },
+                  "restrict_public_buckets": {
+                    "references": [
+                      "var.restrict_public_buckets"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.attach_public_policy"
+                  ]
+                }
+              },
+              {
+                "address": "aws_s3_bucket_versioning.this",
+                "mode": "managed",
+                "type": "aws_s3_bucket_versioning",
+                "name": "this",
+                "provider_config_key": "aws",
+                "expressions": {
+                  "bucket": {
+                    "references": [
+                      "aws_s3_bucket.this"
+                    ]
+                  },
+                  "expected_bucket_owner": {
+                    "references": [
+                      "var.expected_bucket_owner"
+                    ]
+                  },
+                  "mfa": {
+                    "references": [
+                      "var.versioning"
+                    ]
+                  },
+                  "versioning_configuration": [
+                    {
+                      "mfa_delete": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      },
+                      "status": {
+                        "references": [
+                          "var.versioning",
+                          "var.versioning",
+                          "var.versioning"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "locals.create_bucket",
+                    "var.versioning"
+                  ]
+                }
+              }
+            ]
+          },
+          "sourceUrl": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket"
+        }
+      }
+    }
+  },
+  "infracost_resource_changes": [
+    {
+      "address": "module.git_ssh.aws_s3_bucket.this[0]",
+      "module_address": "module.git_ssh",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "my-s3-bucket",
+          "bucket_prefix": null,
+          "force_destroy": false,
+          "object_lock_enabled": false,
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh.aws_s3_bucket_acl.this[0]",
+      "module_address": "module.git_ssh",
+      "mode": "managed",
+      "type": "aws_s3_bucket_acl",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "acl": "private",
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh.aws_s3_bucket_ownership_controls.this[0]",
+      "module_address": "module.git_ssh",
+      "mode": "managed",
+      "type": "aws_s3_bucket_ownership_controls",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "rule": [
+            {
+              "object_ownership": "ObjectWriter"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh.aws_s3_bucket_public_access_block.this[0]",
+      "module_address": "module.git_ssh",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "bucket": "mocked-bucket",
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh.aws_s3_bucket_versioning.this[0]",
+      "module_address": "module.git_ssh",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null,
+          "mfa": null,
+          "versioning_configuration": [
+            {
+              "mfa_delete": null,
+              "status": "Enabled"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh_version.aws_s3_bucket.this[0]",
+      "module_address": "module.git_ssh_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "my-s3-bucket",
+          "bucket_prefix": null,
+          "force_destroy": false,
+          "object_lock_enabled": false,
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh_version.aws_s3_bucket_acl.this[0]",
+      "module_address": "module.git_ssh_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_acl",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "acl": "private",
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh_version.aws_s3_bucket_ownership_controls.this[0]",
+      "module_address": "module.git_ssh_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_ownership_controls",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "rule": [
+            {
+              "object_ownership": "ObjectWriter"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh_version.aws_s3_bucket_public_access_block.this[0]",
+      "module_address": "module.git_ssh_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "bucket": "mocked-bucket",
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        }
+      }
+    },
+    {
+      "address": "module.git_ssh_version.aws_s3_bucket_versioning.this[0]",
+      "module_address": "module.git_ssh_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null,
+          "mfa": null,
+          "versioning_configuration": [
+            {
+              "mfa_delete": null,
+              "status": "Enabled"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.git_sub_module.aws_s3_object.this[0]",
+      "module_address": "module.git_sub_module",
+      "mode": "managed",
+      "type": "aws_s3_object",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "acl": null,
+          "bucket": "",
+          "bucket_key_enabled": null,
+          "cache_control": null,
+          "content": null,
+          "content_base64": null,
+          "content_disposition": null,
+          "content_encoding": null,
+          "content_language": null,
+          "content_type": null,
+          "etag": null,
+          "force_destroy": false,
+          "key": "",
+          "kms_key_id": null,
+          "lifecycle": [
+            {
+              "ignore_changes": null
+            }
+          ],
+          "metadata": {},
+          "object_lock_legal_hold_status": null,
+          "object_lock_mode": null,
+          "object_lock_retain_until_date": null,
+          "server_side_encryption": null,
+          "source": null,
+          "source_hash": null,
+          "storage_class": null,
+          "tags": {},
+          "website_redirect": null
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname.aws_s3_bucket.this[0]",
+      "module_address": "module.registry_shortname",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "my-s3-bucket",
+          "bucket_prefix": null,
+          "force_destroy": false,
+          "object_lock_enabled": false,
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname.aws_s3_bucket_acl.this[0]",
+      "module_address": "module.registry_shortname",
+      "mode": "managed",
+      "type": "aws_s3_bucket_acl",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "acl": "private",
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname.aws_s3_bucket_ownership_controls.this[0]",
+      "module_address": "module.registry_shortname",
+      "mode": "managed",
+      "type": "aws_s3_bucket_ownership_controls",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "rule": [
+            {
+              "object_ownership": "ObjectWriter"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname.aws_s3_bucket_public_access_block.this[0]",
+      "module_address": "module.registry_shortname",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "bucket": "mocked-bucket",
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname.aws_s3_bucket_versioning.this[0]",
+      "module_address": "module.registry_shortname",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null,
+          "mfa": null,
+          "versioning_configuration": [
+            {
+              "mfa_delete": null,
+              "status": "Enabled"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname_version.aws_s3_bucket.this[0]",
+      "module_address": "module.registry_shortname_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "my-s3-bucket",
+          "bucket_prefix": null,
+          "force_destroy": false,
+          "object_lock_enabled": false,
+          "tags": {}
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname_version.aws_s3_bucket_acl.this[0]",
+      "module_address": "module.registry_shortname_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_acl",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "acl": "private",
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname_version.aws_s3_bucket_ownership_controls.this[0]",
+      "module_address": "module.registry_shortname_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_ownership_controls",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "rule": [
+            {
+              "object_ownership": "ObjectWriter"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname_version.aws_s3_bucket_public_access_block.this[0]",
+      "module_address": "module.registry_shortname_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_public_access_block",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "block_public_acls": true,
+          "block_public_policy": true,
+          "bucket": "mocked-bucket",
+          "ignore_public_acls": true,
+          "restrict_public_buckets": true
+        }
+      }
+    },
+    {
+      "address": "module.registry_shortname_version.aws_s3_bucket_versioning.this[0]",
+      "module_address": "module.registry_shortname_version",
+      "mode": "managed",
+      "type": "aws_s3_bucket_versioning",
+      "name": "this",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bucket": "mocked-bucket",
+          "expected_bucket_owner": null,
+          "mfa": null,
+          "versioning_configuration": [
+            {
+              "mfa_delete": null,
+              "status": "Enabled"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "infracost_provider_constraints": {
+    "aws": ""
+  }
+}

@@ -1,0 +1,71 @@
+Project: testdata-breakdown_autodetection_config_file_output-dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/dev
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                           
+ aws_instance.web_app                                                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64   
+ ├─ root_block_device                                                                      
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                    
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00   
+    └─ Provisioned IOPS                                         800  IOPS         $52.00   
+                                                                                           
+ Project total                                                                   $742.64   
+
+──────────────────────────────────
+Project: testdata-breakdown_autodetection_config_file_output-prod-bar
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/bar
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                           
+ aws_instance.web_app                                                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64   
+ ├─ root_block_device                                                                      
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                    
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00   
+    └─ Provisioned IOPS                                         800  IOPS         $52.00   
+                                                                                           
+ Project total                                                                   $742.64   
+
+──────────────────────────────────
+Project: testdata-breakdown_autodetection_config_file_output-prod-foo
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/foo
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                           
+ aws_instance.web_app                                                                      
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64   
+ ├─ root_block_device                                                                      
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                    
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00   
+    └─ Provisioned IOPS                                         800  IOPS         $52.00   
+                                                                                           
+ Project total                                                                   $742.64   
+
+ OVERALL TOTAL                                                                $2,227.92 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                      ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ testdata-breakdown_autodetection_config_file_output-dev      ┃          $743 ┃           - ┃       $743 ┃
+┃ testdata-breakdown_autodetection_config_file_output-prod-bar ┃          $743 ┃           - ┃       $743 ┃
+┃ testdata-breakdown_autodetection_config_file_output-prod-foo ┃          $743 ┃           - ┃       $743 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+
+
+Logs:
+INFO Autodetected 3 Terraform projects from 2 paths in the config file
+INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-dev at directory REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/dev
+INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-prod-bar at directory REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/bar
+INFO Found Terraform project testdata-breakdown_autodetection_config_file_output-prod-foo at directory REPLACED_PROJECT_PATH/testdata/breakdown_autodetection_config_file_output/prod/foo

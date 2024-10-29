@@ -1098,7 +1098,7 @@ The following edge cases can be handled in the resource files:
 
   ```go
 	if d.Get("placement_tenancy").String() == "host" {
-		log.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
 	}
   ```
@@ -1202,7 +1202,7 @@ If the resource has a `zone` key, if they have a zone key, use this logic to get
 
 ### Azure zone mappings
 
-Unless the resource has global or zone-based pricing, the first line of the resource function should be `region := lookupRegion(d, []string{})` where the second parameter is an optional list of parent resources where the region can be found. See the following examples of how this method is used in other Azure resources.
+Unless the resource has global or zone-based pricing, you should add a custom GetRegion function to the RegistryItem. This should use the `lookupRegion` function that has the following signature: `lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string`. The second parameter for this function is an optional list of parent resources where the region can be found. See the following examples of how this method is used in other Azure resources.
 
   ```go
 	func getAppServiceCertificateBindingRegistryItem() *schema.RegistryItem {
@@ -1213,12 +1213,10 @@ Unless the resource has global or zone-based pricing, the first line of the reso
 				"certificate_id",
 				"resource_group_name",
 			},
+      GetRegion: func(d *schema.ResourceData) string {
+        return lookupRegion(d, []string{"certificate_id", "resource_group_name"})
+      },
 		}
-	}
-
-	func NewAzureRMAppServiceCertificateBinding(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-		region := lookupRegion(d, []string{"certificate_id", "resource_group_name"})
-		// ...
 	}
   ```
 

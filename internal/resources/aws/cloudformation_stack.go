@@ -18,9 +18,15 @@ type CloudFormationStack struct {
 	MonthlyDurationSecs      *int64 `infracost_usage:"monthly_duration_secs"`
 }
 
-var CloudFormationStackUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_handler_operations", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_duration_secs", ValueType: schema.Int64, DefaultValue: 0},
+func (r *CloudFormationStack) CoreType() string {
+	return "CloudFormationStack"
+}
+
+func (r *CloudFormationStack) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_handler_operations", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_duration_secs", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *CloudFormationStack) PopulateUsage(u *schema.UsageData) {
@@ -33,14 +39,14 @@ func (r *CloudFormationStack) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: CloudFormationStackUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: r.costComponents(),
-		UsageSchema:    CloudFormationStackUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -80,6 +86,7 @@ func (r *CloudFormationStack) cloudFormationCostComponent(name, unit, usagetype 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

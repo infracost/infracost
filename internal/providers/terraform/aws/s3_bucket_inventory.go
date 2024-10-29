@@ -7,17 +7,15 @@ import (
 
 func getS3BucketInventoryRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_s3_bucket_inventory",
-		RFunc: NewS3BucketInventory,
+		Name:      "aws_s3_bucket_inventory",
+		CoreRFunc: NewS3BucketInventory,
 	}
 }
 
-func NewS3BucketInventory(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewS3BucketInventory(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.S3BucketInventory{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

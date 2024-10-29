@@ -1,1 +1,51 @@
-{"attachments":[{"color":"#dcd8e1","blocks":[{"type":"section","text":{"type":"mrkdwn","text":"*Infracost output*\n```──────────────────────────────────\n```"}}]}],"blocks":[{"type":"section","text":{"type":"mrkdwn","text":"💰 Infracost estimate: *Monthly cost will not change*"}},{"type":"divider"},{"type":"section","fields":[{"type":"plain_text","text":"Project"},{"type":"plain_text","text":"Diff"},{"type":"plain_text","text":"infracost/infracost/..._nochange_plan.json"},{"type":"plain_text","text":"$0.00 ($41 → $41)"}]}],"replace_original":false,"delete_original":false}
+{
+  "attachments": [
+    {
+      "color": "#dcd8e1",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Infracost output*\n```──────────────────────────────────\n```"
+          }
+        }
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "💰 Infracost estimate: *Monthly estimate generated*"
+      }
+    },
+    {
+      "type": "divider"
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "plain_text",
+          "text": "Project"
+        },
+        {
+          "type": "plain_text",
+          "text": "Diff"
+        },
+        {
+          "type": "plain_text",
+          "text": "infracost/infracost/..._nochange_plan.json"
+        },
+        {
+          "type": "plain_text",
+          "text": "$0.00 ($41 → $41)"
+        }
+      ]
+    }
+  ],
+  "replace_original": false,
+  "delete_original": false
+}

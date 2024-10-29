@@ -13,12 +13,12 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/dev",
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/dev",
       "metadata": {
-        "path": "example/dev",
+        "path": "exp/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "dev",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/dev"
+        "terraformModulePath": "exp/dev",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/dev"
       },
       "pastBreakdown": {
         "resources": [
@@ -31,13 +31,13 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 40,
-                  "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
               "endLine": 40,
-              "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
               "startLine": 26
             },
             "hourlyCost": "0.0711890410958904115",
@@ -108,13 +108,13 @@
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 48,
-                  "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
                   "startLine": 42
                 }
               ],
               "checksum": "5b4d27384b5e9f180c9e4270fb612fe9ec2c0b34fd3aeb4ede827dbe21f4f142",
               "endLine": 48,
-              "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
               "startLine": 42
             },
             "costComponents": [
@@ -162,13 +162,13 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 40,
-                  "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
               "endLine": 40,
-              "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
               "startLine": 26
             },
             "hourlyCost": "0.0711890410958904115",
@@ -239,13 +239,13 @@
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 48,
-                  "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
                   "startLine": 42
                 }
               ],
               "checksum": "5b4d27384b5e9f180c9e4270fb612fe9ec2c0b34fd3aeb4ede827dbe21f4f142",
               "endLine": 48,
-              "filename": "example/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "filename": "exp/.infracost/.terragrunt-cache/tb4lvRRn_XDlkIdcOMXrVOpwyZM-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/exp/main.tf",
               "startLine": 42
             },
             "costComponents": [
@@ -298,12 +298,12 @@
       }
     },
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod",
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod",
       "metadata": {
-        "path": "example/prod",
+        "path": "exp/prod",
         "type": "terragrunt_dir",
-        "terraformModulePath": "prod",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod"
+        "terraformModulePath": "exp/prod",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod"
       },
       "pastBreakdown": {
         "resources": [
@@ -316,13 +316,13 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 40,
-                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
               "endLine": 40,
-              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
               "startLine": 26
             },
             "hourlyCost": "1.024164383561643829",
@@ -393,13 +393,13 @@
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 48,
-                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
                   "startLine": 42
                 }
               ],
               "checksum": "20f7d38c433778654686d7dfeba8bf2e446f110379bbe1adeb48f7ebe51b936e",
               "endLine": 48,
-              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
               "startLine": 42
             },
             "costComponents": [
@@ -447,13 +447,13 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 40,
-                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
               "endLine": 40,
-              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
               "startLine": 26
             },
             "hourlyCost": "1.024164383561643829",
@@ -524,13 +524,13 @@
                 {
                   "blockName": "aws_lambda_function.hello_world",
                   "endLine": 48,
-                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+                  "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
                   "startLine": 42
                 }
               ],
               "checksum": "20f7d38c433778654686d7dfeba8bf2e446f110379bbe1adeb48f7ebe51b936e",
               "endLine": 48,
-              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/example/prod/main.tf",
+              "filename": "/Users/hugorut/code/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_diff_project_error/exp/prod/main.tf",
               "startLine": 42
             },
             "costComponents": [

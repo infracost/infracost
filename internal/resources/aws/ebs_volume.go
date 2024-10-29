@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 var defaultVolumeSize = int64(8)
@@ -26,8 +27,14 @@ type EBSVolume struct {
 	MonthlyStandardIORequests *int64 `infracost_usage:"monthly_standard_io_requests"`
 }
 
-var EBSVolumeSchema = []*schema.UsageItem{
-	{Key: "monthly_standard_io_requests", DefaultValue: 0, ValueType: schema.Int64},
+func (a *EBSVolume) CoreType() string {
+	return "EBSVolume"
+}
+
+func (a *EBSVolume) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_standard_io_requests", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 func (a *EBSVolume) PopulateUsage(u *schema.UsageData) {
@@ -62,7 +69,7 @@ func (a *EBSVolume) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    InstanceUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   subResources,
 	}
@@ -88,8 +95,10 @@ func (a *EBSVolume) storageCostComponent() *schema.CostComponent {
 		name = "Storage (cold HDD, sc1)"
 	case "gp3":
 		name = "Storage (general purpose SSD, gp3)"
-	default:
+	case "gp2":
 		name = "Storage (general purpose SSD, gp2)"
+	default:
+		name = "Storage (unknown)"
 	}
 
 	return &schema.CostComponent{
@@ -149,6 +158,7 @@ func (a *EBSVolume) ioRequestsCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr("/EBS:VolumeIOUsage/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

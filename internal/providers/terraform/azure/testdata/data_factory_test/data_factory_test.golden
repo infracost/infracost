@@ -1,23 +1,25 @@
 
- Name                                   Monthly Qty  Unit                    Monthly Cost 
-                                                                                          
- azurerm_data_factory.example                                                             
- ├─ Read/Write operations         Monthly cost depends on usage: $0.50 per 50k entities   
- └─ Monitoring operations         Monthly cost depends on usage: $0.25 per 50k entities   
-                                                                                          
- azurerm_data_factory.with_usage                                                          
- ├─ Read/Write operations                         2  50k entities                   $1.00 
- └─ Monitoring operations                       0.5  50k entities                   $0.13 
-                                                                                          
+ Name                                   Monthly Qty  Unit                    Monthly Cost    
+                                                                                             
+ azurerm_data_factory.with_usage                                                             
+ ├─ Read/Write operations                         2  50k entities                   $1.00  * 
+ └─ Monitoring operations                       0.5  50k entities                   $0.13  * 
+                                                                                             
+ azurerm_data_factory.example                                                                
+ ├─ Read/Write operations         Monthly cost depends on usage: $0.50 per 50k entities      
+ └─ Monitoring operations         Monthly cost depends on usage: $0.25 per 50k entities      
+                                                                                             
  OVERALL TOTAL                                                                      $1.13 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 2 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDataFactory                                    ┃ $1           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃          $1 ┃         $1 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

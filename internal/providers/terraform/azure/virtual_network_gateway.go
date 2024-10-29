@@ -21,8 +21,8 @@ func GetAzureRMVirtualNetworkGatewayRegistryItem() *schema.RegistryItem {
 func NewAzureRMVirtualNetworkGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	var connection, dataTransfers *decimal.Decimal
 	sku := "Basic"
-	region := lookupRegion(d, []string{})
-	zone := regionToZone(region)
+	region := d.Region
+	zone := regionToVNETZone(region)
 
 	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()

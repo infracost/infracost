@@ -1,0 +1,27 @@
+
+<h4>💰 Infracost report</h4>
+<h4>Monthly estimate generated</h4>
+<details>
+
+<summary>Estimate details (includes details of unsupported resources)</summary>
+
+```
+──────────────────────────────────
+1 project has no cost estimate change.
+Run the following command to see its breakdown: infracost breakdown --path=/path/to/code
+
+──────────────────────────────────
+189 cloud resources were detected:
+∙ 31 were estimated
+∙ 152 were free
+∙ 6 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x aws_ami_from_instance
+  ∙ 1 x aws_appstream_fleet
+  ∙ 1 x aws_appstream_fleet_stack_association
+  ∙ 1 x aws_appstream_stack
+  ∙ 1 x aws_lightsail_instance_public_ports
+  ∙ 1 x aws_route53_vpc_association_authorization
+```
+</details>
+
+Comment not posted to GitHub (--dry-run was specified)

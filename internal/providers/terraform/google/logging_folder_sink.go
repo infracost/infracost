@@ -7,16 +7,15 @@ import (
 
 func getLoggingFolderSinkRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_logging_folder_sink",
-		RFunc: NewLoggingFolderSink,
+		Name:      "google_logging_folder_sink",
+		CoreRFunc: NewLoggingFolderSink,
 	}
 }
 
-func NewLoggingFolderSink(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLoggingFolderSink(d *schema.ResourceData) schema.CoreResource {
 	r := &google.Logging{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

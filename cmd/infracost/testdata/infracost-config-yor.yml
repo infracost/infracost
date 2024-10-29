@@ -1,0 +1,5 @@
+version: 0.1
+
+projects:
+  - path: "./testdata/yor-tag-override"
+    yor_config_path: "./testdata/yor.yml"

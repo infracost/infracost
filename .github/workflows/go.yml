@@ -12,20 +12,22 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go 1.x
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version-file: go.mod
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Check Terraform format
         run: make tf_fmt_check
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.7.0
+        uses: golangci/golangci-lint-action@v6.1.0
         with:
           version: latest
-          skip-pkg-cache: true
           args: --timeout 5m
 
       - name: Install Terragrunt v0.31.8
@@ -45,7 +47,7 @@ jobs:
         run: make parser_benchmarks
 
       - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: benchmarks
           path: |
@@ -57,7 +59,7 @@ jobs:
         run: |
           make run --silent ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
           [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
-          jq '' infracost-output.json
+          jq '.' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
@@ -66,7 +68,7 @@ jobs:
         run: |
           make run --silent ARGS="breakdown --config-file=infracost-example.yml"
           [ -s infracost-output.json ] || (echo "file is empty" && exit 1)
-          jq '' infracost-output.json
+          jq '.' infracost-output.json
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
@@ -76,11 +78,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version-file: go.mod
 
       - name: Test (AWS)
         run: make test_aws
@@ -93,11 +97,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version-file: go.mod
 
       - name: Test (Google)
         run: make test_google
@@ -110,11 +116,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version-file: go.mod
 
       - name: Test (Azure)
         run: make test_azure

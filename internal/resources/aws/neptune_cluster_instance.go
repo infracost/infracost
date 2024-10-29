@@ -2,21 +2,31 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type NeptuneClusterInstance struct {
 	Address             string
 	Region              string
 	InstanceClass       string
+	IOOptimized         bool
 	Count               *int64
 	MonthlyCPUCreditHrs *int64 `infracost_usage:"monthly_cpu_credit_hrs"`
 }
 
-var NeptuneClusterInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+func (r *NeptuneClusterInstance) CoreType() string {
+	return "NeptuneClusterInstance"
+}
+
+func (r *NeptuneClusterInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *NeptuneClusterInstance) PopulateUsage(u *schema.UsageData) {
@@ -45,11 +55,16 @@ func (r *NeptuneClusterInstance) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    NeptuneClusterInstanceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
 func (r *NeptuneClusterInstance) dbInstanceCostComponent(quantity int) *schema.CostComponent {
+	usageTypePrefix := "InstanceUsage:"
+	if r.IOOptimized {
+		usageTypePrefix = "InstanceUsageIOOptimized:"
+	}
+
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Database instance (on-demand, %s)", r.InstanceClass),
 		Unit:           "hours",
@@ -60,7 +75,8 @@ func (r *NeptuneClusterInstance) dbInstanceCostComponent(quantity int) *schema.C
 			Region:     strPtr(r.Region),
 			Service:    strPtr("AmazonNeptune"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "instanceType", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", r.InstanceClass))},
+				{Key: "instanceType", Value: strPtr(strings.ToLower(r.InstanceClass))},
+				{Key: "usagetype", ValueRegex: regexPtr(fmt.Sprintf("%s%s$", usageTypePrefix, strings.ToLower(r.InstanceClass)))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -87,5 +103,6 @@ func (r *NeptuneClusterInstance) cpuCreditsCostComponent(quantity *decimal.Decim
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

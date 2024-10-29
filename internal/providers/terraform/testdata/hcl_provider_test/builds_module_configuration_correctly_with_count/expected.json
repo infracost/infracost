@@ -159,7 +159,7 @@
                       "mode": "managed",
                       "type": "aws_customer_gateway",
                       "name": "example",
-                      "provider_config_key": "gateway_proxy[0]:aws",
+                      "provider_config_key": "aws",
                       "expressions": {
                         "tags": {
                           "references": [
@@ -201,5 +201,8 @@
         }
       }
     }
-  ]
+  ],
+  "infracost_provider_constraints": {
+    "aws": ""
+  }
 }

@@ -13,12 +13,19 @@ type ComputeExternalVPNGateway struct {
 	MonthlyEgressDataTransferGB *ComputeExternalVPNGatewayNetworkEgressUsage `infracost_usage:"monthly_egress_data_transfer_gb"`
 }
 
-var ComputeExternalVPNGatewayUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_egress_data_transfer_gb",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb", Items: ComputeExternalVPNGatewayNetworkEgressUsageSchema},
-	},
+func (r *ComputeExternalVPNGateway) CoreType() string {
+	return "ComputeExternalVPNGateway"
+}
+
+func (r *ComputeExternalVPNGateway) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:       "monthly_egress_data_transfer_gb",
+			ValueType: schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb",
+				Items: ComputeExternalVPNGatewayNetworkEgressUsageSchema},
+		},
+	}
 }
 
 func (r *ComputeExternalVPNGateway) PopulateUsage(u *schema.UsageData) {
@@ -37,6 +44,6 @@ func (r *ComputeExternalVPNGateway) BuildResource() *schema.Resource {
 		Name: r.Address,
 		SubResources: []*schema.Resource{
 			r.MonthlyEgressDataTransferGB.BuildResource(),
-		}, UsageSchema: ComputeExternalVPNGatewayUsageSchema,
+		}, UsageSchema: r.UsageSchema(),
 	}
 }

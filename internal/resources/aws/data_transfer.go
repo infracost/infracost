@@ -3,9 +3,9 @@ package aws
 import (
 	"fmt"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -25,12 +25,17 @@ type DataTransfer struct {
 	MonthlyOutboundOtherRegionsGB   *float64 `infracost_usage:"monthly_outbound_other_regions_gb"`
 }
 
-// DataTransferUsageSchema defines a list which represents the usage schema of DataTransfer.
-var DataTransferUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_intra_region_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_outbound_internet_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_outbound_us_east_to_us_east_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_outbound_other_regions_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *DataTransfer) CoreType() string {
+	return "DataTransfer"
+}
+
+func (r *DataTransfer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_intra_region_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_outbound_internet_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_outbound_us_east_to_us_east_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_outbound_other_regions_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataTransfer.
@@ -46,7 +51,7 @@ func (r *DataTransfer) BuildResource() *schema.Resource {
 	_, ok := RegionMapping[r.Region]
 
 	if !ok {
-		log.Warn().Msgf("Skipping resource %s. Could not find mapping for region %s", r.Address, r.Region)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Could not find mapping for region %s", r.Address, r.Region)
 		return nil
 	}
 
@@ -81,6 +86,7 @@ func (r *DataTransfer) intraRegionCostComponents() []*schema.CostComponent {
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(intraRegionGb.Mul(decimal.NewFromInt(2))),
 			ProductFilter:   r.buildProductFilter("IntraRegion", nil, "DataTransfer-Regional-Bytes"),
+			UsageBased:      true,
 		})
 	}
 
@@ -181,6 +187,7 @@ func (r *DataTransfer) buildOutboundInternetCostComponent(name string, networkUs
 		PriceFilter: &schema.PriceFilter{
 			EndUsageAmount: strPtr(endUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -205,6 +212,7 @@ func (r *DataTransfer) outboundUsEastCostComponents() []*schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundUsEastToUsEastGB)),
 		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
+		UsageBased:      true,
 	})
 
 	return costComponents
@@ -238,6 +246,7 @@ func (r *DataTransfer) outboundOtherRegionsCostComponents() []*schema.CostCompon
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundOtherRegionsGB)),
 		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
+		UsageBased:      true,
 	})
 
 	return costComponents

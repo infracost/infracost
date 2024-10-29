@@ -1,0 +1,1342 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39",
+      "displayName": "main",
+      "metadata": {
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39",
+        "type": "terraform_dir",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39",
+        "providers": [
+          {
+            "name": "aws",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+            "startLine": 1,
+            "endLine": 14
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.DefaultOverride": "volume_tag_overwritten",
+              "volume_tags.baz": "bat"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 98,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 76
+                }
+              ],
+              "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 98,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 76
+            },
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.web_app_block_tags",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "ebs_block_device[0].foo": "ebd",
+              "root_block_device.foo": "rbd"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app_block_tags",
+                  "endLine": 212,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 191
+                }
+              ],
+              "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 212,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 191
+            },
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_autoscaling_group.launch_template",
+            "resourceType": "aws_autoscaling_group",
+            "tags": {
+              "fizz": "buzz",
+              "foo": "bar"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_autoscaling_group.launch_template",
+                  "endLine": 189,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 165
+                }
+              ],
+              "checksum": "683ec0c113599563ccbf834223b61ffcc2abbd9ac8d6202036fc4fc6eb56a2d0",
+              "endLine": 189,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 165
+            },
+            "hourlyCost": "0.2303726027397260165",
+            "monthlyCost": "168.172",
+            "subresources": [
+              {
+                "name": "aws_launch_template.example",
+                "metadata": {},
+                "hourlyCost": "0.2303726027397260165",
+                "monthlyCost": "168.172",
+                "costComponents": [
+                  {
+                    "name": "Instance usage (Linux/UNIX, on-demand, t3.medium)",
+                    "unit": "hours",
+                    "hourlyQuantity": "4",
+                    "monthlyQuantity": "2920",
+                    "price": "0.0441",
+                    "hourlyCost": "0.1764",
+                    "monthlyCost": "128.772",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "EC2 detailed monitoring",
+                    "unit": "metrics",
+                    "hourlyQuantity": "0.0383561643835616",
+                    "monthlyQuantity": "28",
+                    "price": "0.3",
+                    "hourlyCost": "0.01150684931506848",
+                    "monthlyCost": "8.4",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "CPU credits",
+                    "unit": "vCPU-hours",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.05",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0",
+                    "priceNotFound": false
+                  }
+                ],
+                "subresources": [
+                  {
+                    "name": "block_device_mapping[0]",
+                    "metadata": {},
+                    "hourlyCost": "0.0424657534246575365",
+                    "monthlyCost": "31",
+                    "costComponents": [
+                      {
+                        "name": "Storage (provisioned IOPS SSD, io1)",
+                        "unit": "GB",
+                        "hourlyQuantity": "0.0547945205479452",
+                        "monthlyQuantity": "40",
+                        "price": "0.125",
+                        "hourlyCost": "0.00684931506849315",
+                        "monthlyCost": "5",
+                        "priceNotFound": false
+                      },
+                      {
+                        "name": "Provisioned IOPS",
+                        "unit": "IOPS",
+                        "hourlyQuantity": "0.5479452054794521",
+                        "monthlyQuantity": "400",
+                        "price": "0.065",
+                        "hourlyCost": "0.0356164383561643865",
+                        "monthlyCost": "26",
+                        "priceNotFound": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.launch_instance",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "bat": "ball",
+              "fizz": "buzz",
+              "volume_tags.flip": "flop"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.launch_instance",
+                  "endLine": 112,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 100
+                }
+              ],
+              "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 112,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 100
+            },
+            "hourlyCost": "0.0586890410958904025",
+            "monthlyCost": "42.843",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.medium)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0441",
+                "hourlyCost": "0.0441",
+                "monthlyCost": "32.193",
+                "priceNotFound": false
+              },
+              {
+                "name": "EC2 detailed monitoring",
+                "unit": "metrics",
+                "hourlyQuantity": "0.0095890410958904",
+                "monthlyQuantity": "7",
+                "price": "0.3",
+                "hourlyCost": "0.00287671232876712",
+                "monthlyCost": "2.1",
+                "priceNotFound": false
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.0106164383561643825",
+                "monthlyCost": "7.75",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0136986301369863",
+                    "monthlyQuantity": "10",
+                    "price": "0.125",
+                    "hourlyCost": "0.0017123287671232875",
+                    "monthlyCost": "1.25",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.065",
+                    "hourlyCost": "0.008904109589041095",
+                    "monthlyCost": "6.5",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_autoscaling_group.bar",
+            "resourceType": "aws_autoscaling_group",
+            "tags": {
+              "foo": "bar"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_autoscaling_group.bar",
+                  "endLine": 74,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 54
+                }
+              ],
+              "checksum": "78ad6fe00b08040616d8503e00877f13cab24fa8c7e6c6d1045d7d075e8b5940",
+              "endLine": 74,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 54
+            }
+          },
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_noTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
+                  "endLine": 29,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 25
+                }
+              ],
+              "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
+              "endLine": 29,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 25
+            },
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_withTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "tags": {
+              "DefaultOverride": "sns-def",
+              "ResourceTag": "sns-ghi"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
+                  "endLine": 39,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 31
+                }
+              ],
+              "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
+              "endLine": 39,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 31
+            },
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_noTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_noTags",
+                  "endLine": 43,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 41
+                }
+              ],
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 43,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 41
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_withTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_withTags",
+                  "endLine": 52,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 45
+                }
+              ],
+              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 52,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 45
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          }
+        ],
+        "freeResources": [
+          {
+            "name": "aws_launch_template.example",
+            "resourceType": "aws_launch_template",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "tag_specifications.fizz": "buzz",
+              "tag_specifications.flip": "flop",
+              "tag_specifications.no": "cap"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_launch_template.example",
+                  "endLine": 163,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 114
+                }
+              ],
+              "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 163,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 114
+            }
+          }
+        ],
+        "totalHourlyCost": "2.323691780821917777",
+        "totalMonthlyCost": "1696.295",
+        "totalMonthlyUsageCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.DefaultOverride": "volume_tag_overwritten",
+              "volume_tags.baz": "bat"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 98,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 76
+                }
+              ],
+              "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 98,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 76
+            },
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.web_app_block_tags",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "ebs_block_device[0].foo": "ebd",
+              "root_block_device.foo": "rbd"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app_block_tags",
+                  "endLine": 212,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 191
+                }
+              ],
+              "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 212,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 191
+            },
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_autoscaling_group.launch_template",
+            "resourceType": "aws_autoscaling_group",
+            "tags": {
+              "fizz": "buzz",
+              "foo": "bar"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_autoscaling_group.launch_template",
+                  "endLine": 189,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 165
+                }
+              ],
+              "checksum": "683ec0c113599563ccbf834223b61ffcc2abbd9ac8d6202036fc4fc6eb56a2d0",
+              "endLine": 189,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 165
+            },
+            "hourlyCost": "0.2303726027397260165",
+            "monthlyCost": "168.172",
+            "subresources": [
+              {
+                "name": "aws_launch_template.example",
+                "metadata": {},
+                "hourlyCost": "0.2303726027397260165",
+                "monthlyCost": "168.172",
+                "costComponents": [
+                  {
+                    "name": "Instance usage (Linux/UNIX, on-demand, t3.medium)",
+                    "unit": "hours",
+                    "hourlyQuantity": "4",
+                    "monthlyQuantity": "2920",
+                    "price": "0.0441",
+                    "hourlyCost": "0.1764",
+                    "monthlyCost": "128.772",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "EC2 detailed monitoring",
+                    "unit": "metrics",
+                    "hourlyQuantity": "0.0383561643835616",
+                    "monthlyQuantity": "28",
+                    "price": "0.3",
+                    "hourlyCost": "0.01150684931506848",
+                    "monthlyCost": "8.4",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "CPU credits",
+                    "unit": "vCPU-hours",
+                    "hourlyQuantity": "0",
+                    "monthlyQuantity": "0",
+                    "price": "0.05",
+                    "hourlyCost": "0",
+                    "monthlyCost": "0",
+                    "priceNotFound": false
+                  }
+                ],
+                "subresources": [
+                  {
+                    "name": "block_device_mapping[0]",
+                    "metadata": {},
+                    "hourlyCost": "0.0424657534246575365",
+                    "monthlyCost": "31",
+                    "costComponents": [
+                      {
+                        "name": "Storage (provisioned IOPS SSD, io1)",
+                        "unit": "GB",
+                        "hourlyQuantity": "0.0547945205479452",
+                        "monthlyQuantity": "40",
+                        "price": "0.125",
+                        "hourlyCost": "0.00684931506849315",
+                        "monthlyCost": "5",
+                        "priceNotFound": false
+                      },
+                      {
+                        "name": "Provisioned IOPS",
+                        "unit": "IOPS",
+                        "hourlyQuantity": "0.5479452054794521",
+                        "monthlyQuantity": "400",
+                        "price": "0.065",
+                        "hourlyCost": "0.0356164383561643865",
+                        "monthlyCost": "26",
+                        "priceNotFound": false
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.launch_instance",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "bat": "ball",
+              "fizz": "buzz",
+              "volume_tags.flip": "flop"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.launch_instance",
+                  "endLine": 112,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 100
+                }
+              ],
+              "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 112,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 100
+            },
+            "hourlyCost": "0.0586890410958904025",
+            "monthlyCost": "42.843",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.medium)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0441",
+                "hourlyCost": "0.0441",
+                "monthlyCost": "32.193",
+                "priceNotFound": false
+              },
+              {
+                "name": "EC2 detailed monitoring",
+                "unit": "metrics",
+                "hourlyQuantity": "0.0095890410958904",
+                "monthlyQuantity": "7",
+                "price": "0.3",
+                "hourlyCost": "0.00287671232876712",
+                "monthlyCost": "2.1",
+                "priceNotFound": false
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "priceNotFound": false
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8",
+                    "priceNotFound": false
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.0106164383561643825",
+                "monthlyCost": "7.75",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0136986301369863",
+                    "monthlyQuantity": "10",
+                    "price": "0.125",
+                    "hourlyCost": "0.0017123287671232875",
+                    "monthlyCost": "1.25",
+                    "priceNotFound": false
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.065",
+                    "hourlyCost": "0.008904109589041095",
+                    "monthlyCost": "6.5",
+                    "priceNotFound": false
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_autoscaling_group.bar",
+            "resourceType": "aws_autoscaling_group",
+            "tags": {
+              "foo": "bar"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_autoscaling_group.bar",
+                  "endLine": 74,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 54
+                }
+              ],
+              "checksum": "78ad6fe00b08040616d8503e00877f13cab24fa8c7e6c6d1045d7d075e8b5940",
+              "endLine": 74,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 54
+            }
+          },
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_noTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
+                  "endLine": 29,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 25
+                }
+              ],
+              "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
+              "endLine": 29,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 25
+            },
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_withTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "tags": {
+              "DefaultOverride": "sns-def",
+              "ResourceTag": "sns-ghi"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
+                  "endLine": 39,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 31
+                }
+              ],
+              "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
+              "endLine": 39,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 31
+            },
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_noTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_noTags",
+                  "endLine": 43,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 41
+                }
+              ],
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 43,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 41
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_withTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_withTags",
+                  "endLine": 52,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 45
+                }
+              ],
+              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 52,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 45
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          }
+        ],
+        "freeResources": [
+          {
+            "name": "aws_launch_template.example",
+            "resourceType": "aws_launch_template",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "tag_specifications.fizz": "buzz",
+              "tag_specifications.flip": "flop",
+              "tag_specifications.no": "cap"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_launch_template.example",
+                  "endLine": 163,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+                  "startLine": 114
+                }
+              ],
+              "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 163,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags_version_less_than5point39/main.tf",
+              "startLine": 114
+            }
+          }
+        ],
+        "totalHourlyCost": "2.323691780821917777",
+        "totalMonthlyCost": "1696.295",
+        "totalMonthlyUsageCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 10,
+        "totalSupportedResources": 9,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 9,
+        "totalNoPriceResources": 1,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {
+          "aws_launch_template": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "2.323691780821917777",
+  "totalMonthlyCost": "1696.295",
+  "totalMonthlyUsageCost": "0",
+  "pastTotalHourlyCost": "2.323691780821917777",
+  "pastTotalMonthlyCost": "1696.295",
+  "pastTotalMonthlyUsageCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
+  "timeGenerated": "REPLACED_TIME",
+  "summary": {
+    "totalDetectedResources": 10,
+    "totalSupportedResources": 9,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 9,
+    "totalNoPriceResources": 1,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {
+      "aws_launch_template": 1
+    }
+  }
+}
+
+Err:
+

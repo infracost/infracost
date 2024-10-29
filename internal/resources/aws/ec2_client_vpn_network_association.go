@@ -12,7 +12,13 @@ type EC2ClientVPNNetworkAssociation struct {
 	Region  string
 }
 
-var EC2ClientVPNNetworkAssociationUsageSchema = []*schema.UsageItem{}
+func (r *EC2ClientVPNNetworkAssociation) CoreType() string {
+	return "EC2ClientVPNNetworkAssociation"
+}
+
+func (r *EC2ClientVPNNetworkAssociation) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EC2ClientVPNNetworkAssociation) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -37,6 +43,6 @@ func (r *EC2ClientVPNNetworkAssociation) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: EC2ClientVPNNetworkAssociationUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

@@ -1,30 +1,33 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output_single_project/dev
+Project: main
 
- Name                                                         Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                    
- aws_instance.web_app                                                                                               
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47 
- ├─ root_block_device                                                                                               
- │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00 
- └─ ebs_block_device[0]                                                                                             
-    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50 
-    └─ Provisioned IOPS                                               600  IOPS                              $39.00 
-                                                                                                                    
- aws_lambda_function.hello_world                                                                                    
- ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                    
- OVERALL TOTAL                                                                                               $64.97 
+ Name                                                         Monthly Qty  Unit                        Monthly Cost   
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)                  730  hours                              $8.47   
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                              50  GB                                 $5.00   
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            100  GB                                $12.50   
+    └─ Provisioned IOPS                                               600  IOPS                              $39.00   
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests            
+ ├─ Ephemeral storage                                 Monthly cost depends on usage: $0.0000000309 per GB-seconds     
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds     
+                                                                                                                      
+ OVERALL TOTAL                                                                                              $64.97 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...deps_output_single_project/dev ┃ $65          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $65 ┃           - ┃        $65 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

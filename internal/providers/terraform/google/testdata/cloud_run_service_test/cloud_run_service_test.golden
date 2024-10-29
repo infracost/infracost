@@ -1,0 +1,30 @@
+
+ Name                                                 Monthly Qty  Unit                      Monthly Cost   
+                                                                                                            
+ google_cloud_run_service.throttling_enabled                                                                
+ ├─ CPU allocation time (tier 2)                        1,800,000  vCPU-seconds                    $60.48   
+ ├─ Memory allocation time (tier 2)                       900,000  GiB-seconds                      $3.15   
+ └─ Number of requests                                    500,000  requests                         $0.20   
+                                                                                                            
+ google_cloud_run_service.throttling_disabled                                                               
+ ├─ CPU allocation time (tier 2)                        1,314,000  vCPU-seconds                    $28.38   
+ └─ Memory allocation time (tier 2)                       657,000  GiB-seconds                      $1.58   
+                                                                                                            
+ google_cloud_run_service.no_usage                                                                          
+ ├─ CPU allocation time (tier 2)               Monthly cost depends on usage: $0.0000336 per vCPU-seconds   
+ ├─ Memory allocation time (tier 2)            Monthly cost depends on usage: $0.0000035 per GiB-seconds    
+ └─ Number of requests                         Monthly cost depends on usage: $0.0000004 per requests       
+                                                                                                            
+ OVERALL TOTAL                                                                                    $93.79 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $94 ┃           - ┃        $94 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

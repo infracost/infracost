@@ -5,10 +5,15 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"regexp"
+	"strings"
 
 	"github.com/maruel/panicparse/v2/stack"
-	"github.com/rs/zerolog/log"
+
+	"github.com/infracost/infracost/internal/logging"
 )
+
+var goroutineSuffixRegex = regexp.MustCompile(`(goroutine)\s*\d+$`)
 
 // SanitizedError allows errors to be wrapped with a sanitized message for sending upstream
 type SanitizedError interface {
@@ -66,7 +71,7 @@ func (p *PanicError) SanitizedStack() string {
 	sanitizedStack := p.stack
 	sanitizedStack, err := processStack(sanitizedStack)
 	if err != nil {
-		log.Debug().Msgf("Could not sanitize stack: %s", err)
+		logging.Logger.Debug().Msgf("Could not sanitize stack: %s", err)
 	}
 
 	return string(sanitizedStack)
@@ -93,7 +98,7 @@ func processStack(rawStack []byte) ([]byte, error) {
 	srcLen := 0
 	for _, bucket := range buckets {
 		for _, line := range bucket.Signature.Stack.Calls {
-			if l := len(fmt.Sprintf("%s:%d", line.ImportPath, line.Line)); l > srcLen {
+			if l := len(fmt.Sprintf("%s/%s:%d", stripInfracostImportPrefix(line.ImportPath), line.SrcName, line.Line)); l > srcLen {
 				srcLen = l
 			}
 		}
@@ -110,7 +115,10 @@ func processStack(rawStack []byte) ([]byte, error) {
 		}
 
 		if len(bucket.CreatedBy.Calls) != 0 {
-			extra += fmt.Sprintf(" [Created by %s.%s @ %s:%d]", bucket.CreatedBy.Calls[0].Func.DirName, bucket.CreatedBy.Calls[0].Func.Name, bucket.CreatedBy.Calls[0].SrcName, bucket.CreatedBy.Calls[0].Line)
+			// Goroutine number can be different across equivalent stacktraces so we remove it.
+			funcName := bucket.CreatedBy.Calls[0].Func.Name
+			funcName = goroutineSuffixRegex.ReplaceAllString(funcName, "$1")
+			extra += fmt.Sprintf(" [Created by %s.%s @ %s:%d]", bucket.CreatedBy.Calls[0].Func.DirName, funcName, bucket.CreatedBy.Calls[0].SrcName, bucket.CreatedBy.Calls[0].Line)
 		}
 		fmt.Fprintf(w, "%d: %s%s\n", len(bucket.IDs), bucket.State, extra)
 
@@ -119,7 +127,7 @@ func processStack(rawStack []byte) ([]byte, error) {
 			_, err := fmt.Fprintf(w,
 				"   %-*s %s()\n",
 				srcLen,
-				fmt.Sprintf("%s:%d", line.RelSrcPath, line.Line),
+				fmt.Sprintf("%s/%s:%d", stripInfracostImportPrefix(line.ImportPath), line.SrcName, line.Line),
 				line.Func.Name)
 			if err != nil {
 				return []byte{}, err
@@ -148,6 +156,10 @@ func processStack(rawStack []byte) ([]byte, error) {
 	w.Flush()
 
 	return buf.Bytes(), nil
+}
+
+func stripInfracostImportPrefix(s string) string {
+	return strings.TrimPrefix(s, "github.com/infracost/infracost/")
 }
 
 // WarningError is an error that adhears to the error interface but is used to convey

@@ -1,10 +1,11 @@
 package cloudformation
 
 import (
-	"github.com/awslabs/goformation/v4"
+	"github.com/awslabs/goformation/v7"
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -22,6 +23,16 @@ func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
+func (p *TemplateProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *TemplateProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *TemplateProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *TemplateProvider) Type() string {
 	return "cloudformation"
 }
@@ -34,13 +45,19 @@ func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 }
 
+func (p *TemplateProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
 func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	template, err := goformation.Open(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	logging.Logger.Debug().Msg("Extracting only cost-related params from cloudformation")
+
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name
@@ -49,17 +66,14 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 	}
 
 	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parseTemplate(template, usage)
+	parser := NewParser(p.ctx, p.includePastResources)
+	parsed := parser.parseTemplate(template, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing CloudFormation template file")
 	}
 
-	project.PastResources = pastResources
-	project.Resources = resources
-
-	if !p.includePastResources {
-		project.PastResources = nil
+	for _, item := range parsed {
+		project.PartialResources = append(project.PartialResources, item.PartialResource)
 	}
 
 	return []*schema.Project{project}, nil

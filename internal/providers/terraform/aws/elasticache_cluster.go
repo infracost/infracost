@@ -7,13 +7,20 @@ import (
 
 func getElastiCacheClusterItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:                "aws_elasticache_cluster",
-		RFunc:               NewElastiCacheCluster,
-		ReferenceAttributes: []string{"replication_group_id"},
+		Name:      "aws_elasticache_cluster",
+		CoreRFunc: NewElastiCacheCluster,
+		ReferenceAttributes: []string{
+			"replication_group_id",
+		},
 	}
 }
 
-func NewElastiCacheCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewElastiCacheCluster(d *schema.ResourceData) schema.CoreResource {
+	// If using Terraform plan, the replication_group_id attribute can be empty even if it has a reference
+	// so check if the references as well.
+	replicationGroupRefs := d.References("replication_group_id")
+	hasReplicationGroup := len(replicationGroupRefs) > 0 || !d.IsEmpty("replication_group_id")
+
 	r := &aws.ElastiCacheCluster{
 		Address:                d.Address,
 		Region:                 d.Get("region").String(),
@@ -21,8 +28,7 @@ func NewElastiCacheCluster(d *schema.ResourceData, u *schema.UsageData) *schema.
 		Engine:                 d.Get("engine").String(),
 		CacheNodes:             d.Get("num_cache_nodes").Int(),
 		SnapshotRetentionLimit: d.Get("snapshot_retention_limit").Int(),
+		HasReplicationGroup:    hasReplicationGroup,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

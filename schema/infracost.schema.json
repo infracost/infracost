@@ -30,11 +30,31 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "AttributeWithUnknownKeys": {
+      "required": [
+        "attribute",
+        "missingVariables"
+      ],
+      "properties": {
+        "attribute": {
+          "type": "string"
+        },
+        "missingVariables": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Breakdown": {
       "required": [
         "resources",
         "totalHourlyCost",
-        "totalMonthlyCost"
+        "totalMonthlyCost",
+        "totalMonthlyUsageCost"
       ],
       "properties": {
         "resources": {
@@ -55,6 +75,9 @@
         },
         "totalMonthlyCost": {
           "type": ["string", "null"]
+        },
+        "totalMonthlyUsageCost": {
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false,
@@ -68,7 +91,8 @@
         "monthlyQuantity",
         "price",
         "hourlyCost",
-        "monthlyCost"
+        "monthlyCost",
+        "priceNotFound"
       ],
       "properties": {
         "name": {
@@ -91,113 +115,12 @@
         },
         "monthlyCost": {
           "type": ["string", "null"]
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "FinOpsPolicy": {
-      "required": [
-        "name",
-        "policyId",
-        "message",
-        "prComment",
-        "blockPr",
-        "resources",
-        "totalApplicableResources"
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
         },
-        "policyId": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        },
-        "prComment": {
+        "usageBased": {
           "type": "boolean"
         },
-        "blockPr": {
+        "priceNotFound": {
           "type": "boolean"
-        },
-        "resources": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/FinOpsPolicyResource"
-          },
-          "type": "array"
-        },
-        "totalApplicableResources": {
-          "type": "integer"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "FinOpsPolicyResource": {
-      "required": [
-        "checksum",
-        "address",
-        "resourceType",
-        "path",
-        "startLine",
-        "endLine",
-        "projectName",
-        "issues"
-      ],
-      "properties": {
-        "checksum": {
-          "type": "string"
-        },
-        "address": {
-          "type": "string"
-        },
-        "resourceType": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "startLine": {
-          "type": "integer"
-        },
-        "endLine": {
-          "type": "integer"
-        },
-        "projectName": {
-          "type": "string"
-        },
-        "issues": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/FinOpsPolicyResourceIssue"
-          },
-          "type": "array"
-        },
-        "exclusionId": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "FinOpsPolicyResourceIssue": {
-      "required": [
-        "attribute",
-        "value",
-        "description"
-      ],
-      "properties": {
-        "attribute": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string"
-        },
-        "description": {
-          "type": "string"
         }
       },
       "additionalProperties": false,
@@ -218,6 +141,9 @@
           "type": "string"
         },
         "vcsBranch": {
+          "type": "string"
+        },
+        "vcsBaseCommitSha": {
           "type": "string"
         },
         "vcsCommitSha": {
@@ -265,6 +191,18 @@
         },
         "vcsPullRequestId": {
           "type": "string"
+        },
+        "usageApiEnabled": {
+          "type": "boolean"
+        },
+        "usageFilePath": {
+          "type": "string"
+        },
+        "configFilePath": {
+          "type": "string"
+        },
+        "configFileHasUsageFile": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -317,6 +255,7 @@
     "Project": {
       "required": [
         "name",
+        "displayName",
         "metadata",
         "pastBreakdown",
         "breakdown",
@@ -325,6 +264,9 @@
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "displayName": {
           "type": "string"
         },
         "metadata": {
@@ -353,7 +295,8 @@
       "required": [
         "code",
         "message",
-        "data"
+        "data",
+        "isError"
       ],
       "properties": {
         "code": {
@@ -364,6 +307,9 @@
         },
         "data": {
           "additionalProperties": true
+        },
+        "isError": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -460,6 +406,13 @@
         },
         "endLine": {
           "type": "integer"
+        },
+        "attributesWithUnknownKeys": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/AttributeWithUnknownKeys"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -485,6 +438,24 @@
           },
           "type": "object"
         },
+        "defaultTags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "tagPropagation": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/TagPropagation"
+        },
+        "providerSupportsDefaultTags": {
+          "type": "boolean"
+        },
+        "providerLink": {
+          "type": "string"
+        },
         "metadata": {
           "patternProperties": {
             ".*": {
@@ -497,6 +468,9 @@
           "type": ["string", "null"]
         },
         "monthlyCost": {
+          "type": ["string", "null"]
+        },
+        "monthlyUsageCost": {
           "type": ["string", "null"]
         },
         "costComponents": {
@@ -516,6 +490,18 @@
         "subresources": {
           "items": {
             "$ref": "#/definitions/Subresource"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownDefaultTagKeys": {
+          "items": {
+            "type": "string"
           },
           "type": "array"
         }
@@ -565,24 +551,13 @@
           },
           "type": "array"
         },
-        "tagPolicies": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/TagPolicy"
-          },
-          "type": "array"
-        },
-        "finOpsPolicies": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/FinOpsPolicy"
-          },
-          "type": "array"
-        },
         "totalHourlyCost": {
           "type": ["string", "null"]
         },
         "totalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "totalMonthlyUsageCost": {
           "type": ["string", "null"]
         },
         "pastTotalHourlyCost": {
@@ -591,10 +566,16 @@
         "pastTotalMonthlyCost": {
           "type": ["string", "null"]
         },
+        "pastTotalMonthlyUsageCost": {
+          "type": ["string", "null"]
+        },
         "diffTotalHourlyCost": {
           "type": ["string", "null"]
         },
         "diffTotalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "diffTotalMonthlyUsageCost": {
           "type": ["string", "null"]
         },
         "timeGenerated": {
@@ -628,6 +609,24 @@
           },
           "type": "object"
         },
+        "defaultTags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "tagPropagation": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/TagPropagation"
+        },
+        "providerSupportsDefaultTags": {
+          "type": "boolean"
+        },
+        "providerLink": {
+          "type": "string"
+        },
         "metadata": {
           "patternProperties": {
             ".*": {
@@ -640,6 +639,9 @@
           "type": ["string", "null"]
         },
         "monthlyCost": {
+          "type": ["string", "null"]
+        },
+        "monthlyUsageCost": {
           "type": ["string", "null"]
         },
         "costComponents": {
@@ -659,6 +661,18 @@
         "subresources": {
           "items": {
             "type": "object"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownTagKeys": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "missingVarsCausingUnknownDefaultTagKeys": {
+          "items": {
+            "type": "string"
           },
           "type": "array"
         }
@@ -714,118 +728,31 @@
       "additionalProperties": false,
       "type": "object"
     },
-    "TagPolicy": {
+    "TagPropagation": {
       "required": [
-        "name",
-        "tagPolicyId",
-        "message",
-        "prComment",
-        "blockPr",
-        "resources",
-        "totalDetectedResources",
-        "totalTaggableResources"
+        "to",
+        "attribute"
       ],
       "properties": {
-        "name": {
+        "to": {
           "type": "string"
         },
-        "tagPolicyId": {
+        "from": {
           "type": "string"
         },
-        "message": {
+        "tags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "attribute": {
           "type": "string"
         },
-        "prComment": {
+        "hasRequiredAttributes": {
           "type": "boolean"
-        },
-        "blockPr": {
-          "type": "boolean"
-        },
-        "resources": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/TagPolicyResource"
-          },
-          "type": "array"
-        },
-        "totalDetectedResources": {
-          "type": "integer"
-        },
-        "totalTaggableResources": {
-          "type": "integer"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "TagPolicyInvalidTag": {
-      "required": [
-        "key",
-        "value",
-        "validValues",
-        "validRegex"
-      ],
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string"
-        },
-        "validValues": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "validRegex": {
-          "type": "string"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "TagPolicyResource": {
-      "required": [
-        "address",
-        "resourceType",
-        "path",
-        "line",
-        "projectNames",
-        "missingMandatoryTags",
-        "invalidTags"
-      ],
-      "properties": {
-        "address": {
-          "type": "string"
-        },
-        "resourceType": {
-          "type": "string"
-        },
-        "path": {
-          "type": "string"
-        },
-        "line": {
-          "type": "integer"
-        },
-        "projectNames": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "missingMandatoryTags": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "invalidTags": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/TagPolicyInvalidTag"
-          },
-          "type": "array"
         }
       },
       "additionalProperties": false,

@@ -13,8 +13,14 @@ type S3BucketAnalyticsConfiguration struct {
 	MonthlyMonitoredObjects *int64 `infracost_usage:"monthly_monitored_objects"`
 }
 
-var S3BucketAnalyticsConfigurationUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_monitored_objects", ValueType: schema.Int64, DefaultValue: 0},
+func (r *S3BucketAnalyticsConfiguration) CoreType() string {
+	return "S3BucketAnalyticsConfiguration"
+}
+
+func (r *S3BucketAnalyticsConfiguration) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_monitored_objects", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *S3BucketAnalyticsConfiguration) PopulateUsage(u *schema.UsageData) {
@@ -43,8 +49,9 @@ func (r *S3BucketAnalyticsConfiguration) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/StorageAnalytics-ObjCount/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: S3BucketAnalyticsConfigurationUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

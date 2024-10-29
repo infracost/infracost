@@ -1,41 +1,44 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_optional_variables
+Project: main-dev
 
- Name                       Monthly Qty  Unit   Monthly Cost 
-                                                             
- aws_eip.test1[0]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test1[1]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test2[0]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test2[1]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test3[0]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test3[1]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test4[0]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- aws_eip.test4[1]                                            
- └─ IP address (if unused)          730  hours         $3.65 
-                                                             
- OVERALL TOTAL                                        $29.20 
+ Name                       Monthly Qty  Unit   Monthly Cost   
+                                                               
+ aws_eip.test1[0]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test1[1]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test2[0]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test2[1]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test3[0]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test3[1]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test4[0]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ aws_eip.test4[1]                                              
+ └─ IP address (if unused)          730  hours         $3.65   
+                                                               
+ OVERALL TOTAL                                       $29.20 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 8 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...akdown_with_optional_variables ┃ $29          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main-dev                                           ┃           $29 ┃           - ┃        $29 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

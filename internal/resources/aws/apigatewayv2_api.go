@@ -1,15 +1,15 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"fmt"
-
-	"strings"
+	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 type APIGatewayV2API struct {
@@ -23,12 +23,18 @@ type APIGatewayV2API struct {
 	MonthlyMessages       *int64 `infracost_usage:"monthly_messages"`
 }
 
-var APIGatewayV2APIUsageSchema = []*schema.UsageItem{
-	{Key: "message_size_kb", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_connection_mins", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_messages", ValueType: schema.Int64, DefaultValue: 0},
+func (r *APIGatewayV2API) CoreType() string {
+	return "APIGatewayV2API"
+}
+
+func (r *APIGatewayV2API) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "message_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_connection_mins", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_messages", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *APIGatewayV2API) PopulateUsage(u *schema.UsageData) {
@@ -49,7 +55,7 @@ func (r *APIGatewayV2API) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    APIGatewayV2APIUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -152,6 +158,7 @@ func (r *APIGatewayV2API) httpCostComponent(displayName string, usageTier string
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -173,5 +180,6 @@ func (r *APIGatewayV2API) websocketCostComponent(unit string, usageType string, 
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

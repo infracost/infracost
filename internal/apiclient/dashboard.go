@@ -5,12 +5,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	json "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -25,12 +26,13 @@ type CreateAPIKeyResponse struct {
 }
 
 type AddRunResponse struct {
-	RunID              string `json:"id"`
-	ShareURL           string `json:"shareUrl"`
-	CloudURL           string `json:"cloudUrl"`
-	GovernanceFailures output.GovernanceFailures
-	GovernanceComment  string             `json:"governanceComment"`
-	GovernanceResults  []GovernanceResult `json:"governanceResults"`
+	RunID              string                    `json:"id"`
+	ShareURL           string                    `json:"shareUrl"`
+	CloudURL           string                    `json:"cloudUrl"`
+	PullRequestURL     string                    `json:"pullRequestUrl"`
+	CommentMarkdown    string                    `json:"commentMarkdown"`
+	GovernanceFailures output.GovernanceFailures `json:"governanceFailures"`
+	GovernanceResults  []GovernanceResult        `json:"governanceResults"`
 }
 
 type GovernanceResult struct {
@@ -54,8 +56,6 @@ type runInput struct {
 	Currency       string                 `json:"currency"`
 	TimeGenerated  time.Time              `json:"timeGenerated"`
 	Metadata       map[string]interface{} `json:"metadata"`
-	TagPolicies    []output.TagPolicy     `json:"tagPolicies,omitempty"`
-	FinOpsPolicies []output.FinOpsPolicy  `json:"finopsPolicies,omitempty"`
 }
 
 type projectResultInput struct {
@@ -68,11 +68,15 @@ type projectResultInput struct {
 }
 
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
+	client := retryablehttp.NewClient()
+	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+
 	return &DashboardAPIClient{
 		APIClient: APIClient{
-			endpoint: ctx.Config.DashboardAPIEndpoint,
-			apiKey:   ctx.Config.APIKey,
-			uuid:     ctx.UUID(),
+			httpClient: client.StandardClient(),
+			endpoint:   ctx.Config.DashboardAPIEndpoint,
+			apiKey:     ctx.Config.APIKey,
+			uuid:       ctx.UUID(),
 		},
 	}
 }
@@ -113,19 +117,26 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		Currency:       out.Currency,
 		TimeGenerated:  out.TimeGenerated.UTC(),
 		Metadata:       ctxValues,
-		TagPolicies:    out.TagPolicies,
-		FinOpsPolicies: out.FinOpsPolicies,
 	}, nil
 }
 
-type CommentFormat string
+func (c *DashboardAPIClient) SavePostedPrComment(ctx *config.RunContext, runId, comment string) error {
+	q := `mutation SavePostedPrComment($runId: String!, $comment: String!) {
+			savePostedPrComment(runId: $runId, comment: $comment) 
+}`
+	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{"runId": runId, "comment": comment}}})
+	if err != nil {
+		return err
+	}
+	if len(results) > 0 {
+		if results[0].Get("errors").Exists() {
+			return errors.New(results[0].Get("errors").String())
+		}
+	}
+	return nil
+}
 
-var (
-	CommentFormatMarkdownHTML CommentFormat = "MARKDOWN_HTML"
-	CommentFormatMarkdown     CommentFormat = "MARKDOWN"
-)
-
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, commentFormat CommentFormat) (AddRunResponse, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
 	ri, err := newRunInput(ctx, out)
@@ -134,16 +145,17 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 	}
 
 	v := map[string]interface{}{
-		"run":           *ri,
-		"commentFormat": commentFormat,
+		"run": *ri,
 	}
 
 	q := `
-	mutation AddRun($run: RunInput!, $commentFormat: CommentFormat!) {
+	mutation AddRun($run: RunInput!) {
 			addRun(run: $run) {
 				id
 				shareUrl
 				cloudUrl
+				pullRequestUrl
+
 				organization {
 					id
 					name
@@ -157,11 +169,11 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 					unblocked
 				}
 
-				governanceComment(format: $commentFormat)
+				commentMarkdown
 			}
 		}
 	`
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return response, err
 	}
@@ -180,11 +192,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 		}
 		successMsg := fmt.Sprintf("Estimate uploaded to %sInfracost Cloud", orgMsg)
 
-		if ctx.Config.IsLogging() {
-			log.Info().Msg(successMsg)
-		} else {
-			fmt.Fprintf(ctx.ErrWriter, "%s\n", successMsg)
-		}
+		logging.Logger.Info().Msg(successMsg)
 
 		err = json.Unmarshal([]byte(cloudRun.Raw), &response)
 		if err != nil {
@@ -219,11 +227,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 }
 
 func outputGovernanceMessages(ctx *config.RunContext, msg string) {
-	if ctx.Config.IsLogging() {
-		log.Info().Msg(msg)
-	} else {
-		fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
-	}
+	logging.Logger.Info().Msg(msg)
 }
 
 func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error) {
@@ -240,7 +244,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
         	}
     	}
 	`
-	results, err := c.doQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
 	if err != nil {
 		return response, fmt.Errorf("query failed when requesting org settings %w", err)
 	}

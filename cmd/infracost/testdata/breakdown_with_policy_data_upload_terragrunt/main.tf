@@ -38,6 +38,10 @@ resource "aws_dynamodb_table" "autoscale_dynamodb_table" {
     name = "GameTitle"
     type = "S"
   }
+
+  point_in_time_recovery {
+    enabled = true
+  }
 }
 
 resource "aws_appautoscaling_target" "autoscale_dynamodb_table_write_target" {

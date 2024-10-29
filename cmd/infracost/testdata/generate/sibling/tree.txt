@@ -1,0 +1,10 @@
+.
+└── apps
+    ├── bar
+    │   └── main.tf
+    ├── foo
+    │   └── main.tf
+    └── envs
+        ├── prod.tfvars
+        ├── dev.tfvars
+        └── shared.tfvars

@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/tidwall/gjson"
+
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
@@ -21,21 +23,26 @@ import (
 var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
-	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
-	versionRegex     = regexp.MustCompile(`Infracost v.*`)
+	projectPathRegex = regexp.MustCompile(`(Project:) .*/(examples|cmd/infracost)/(.*)`)
+	versionRegex     = regexp.MustCompile(`Infracost (v|preview).*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
-	pathRegex        = regexp.MustCompile(`(/.*/)(infracost/infracost/cmd/infracost/testdata/.*)`)
+	pathRegex        = regexp.MustCompile(`(:\s*"|^|\s|')([a-zA-Z0-9-_/]+/)*(testdata/[^\s"']*)`)
+	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
 )
 
 type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
+	JSONInclude *regexp.Regexp
+	JSONExclude *regexp.Regexp
+	RegexFilter *regexp.Regexp
 	Env         map[string]string
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
-	// OnlyRunTerraformCLI sets the cmd test to only run cmd with --terraform-force-cli set and ignores the HCL parsing.
-	OnlyRunTerraformCLI bool
+	IgnoreNonGraph  bool
+	IgnoreLogs      bool
+	LogLevel        *string
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -47,13 +54,20 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
+	if testOptions == nil || !testOptions.IgnoreNonGraph {
 		t.Run("HCL", func(t *testing.T) {
 			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
 	}
 
-	if testOptions != nil && (testOptions.RunTerraformCLI || testOptions.OnlyRunTerraformCLI) {
+	t.Run("HCL Graph", func(t *testing.T) {
+		ctxOptions = append(ctxOptions, func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		})
+		goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
+	})
+
+	if testOptions != nil && (testOptions.RunTerraformCLI) {
 		t.Run("CLI", func(t *testing.T) {
 			tfCLIArgs := make([]string, len(args)+2)
 			copy(tfCLIArgs, args)
@@ -116,10 +130,13 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 		c.OutWriter = outBuf
 		c.Exit = func(code int) {}
 
-		if testOptions.CaptureLogs {
-			logBuf = testutil.ConfigureTestToCaptureLogs(t, c)
-		} else {
-			testutil.ConfigureTestToFailOnLogs(t, c)
+		level := "warn"
+		if testOptions.LogLevel != nil {
+			level = *testOptions.LogLevel
+		}
+
+		if !testOptions.IgnoreLogs {
+			logBuf = testutil.ConfigureTestToCaptureLogs(t, c, level)
 		}
 
 		for _, option := range ctxOptions {
@@ -128,8 +145,18 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	}, &args)
 
 	if testOptions.IsJSON {
+		outBytes := outBuf.Bytes()
+		if testOptions.JSONInclude != nil {
+			filtered := filterJSON(gjson.ParseBytes(outBytes), testOptions.JSONInclude, testOptions.JSONExclude)
+			var err error
+			outBytes, err = json.Marshal(filtered)
+			if err != nil {
+				outBytes = outBuf.Bytes()
+			}
+		}
+
 		prettyBuf := bytes.NewBuffer([]byte{})
-		err := json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
+		err := json.Indent(prettyBuf, outBytes, "", "  ")
 		if err != nil {
 			actual = outBuf.Bytes()
 		} else {
@@ -155,7 +182,56 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 		actual = append(actual, logBuf.Bytes()...)
 	}
 
+	if testOptions.RegexFilter != nil {
+		actual = testOptions.RegexFilter.ReplaceAll(actual, []byte("REGEX_FILTER"))
+
+	}
+
 	return stripDynamicValues(actual)
+}
+
+func filterJSON(r gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) map[string]interface{} {
+	values := make(map[string]interface{})
+	for k, v := range r.Map() {
+		if include.MatchString(k) {
+			values[k] = v.Value()
+			continue
+		}
+		if exclude.MatchString(k) {
+			continue
+		}
+
+		if v.IsObject() {
+			filteredV := filterJSON(v, include, exclude)
+			if len(filteredV) > 0 {
+				values[k] = filterJSON(v, include, exclude)
+			}
+		} else if v.IsArray() {
+			filteredV := filterJSONArray(v.Array(), include, exclude)
+			if len(filteredV) > 0 {
+				values[k] = filteredV
+			}
+		}
+	}
+	return values
+}
+
+func filterJSONArray(rArray []gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) []interface{} {
+	var values []interface{}
+	for _, el := range rArray {
+		if el.IsObject() {
+			filteredEl := filterJSON(el, include, exclude)
+			if len(filteredEl) > 0 {
+				values = append(values, filteredEl)
+			}
+		} else if el.IsArray() {
+			filteredEl := filterJSONArray(el.Array(), include, exclude)
+			if len(filteredEl) > 0 {
+				values = append(values, filteredEl)
+			}
+		}
+	}
+	return values
 }
 
 // stripDynamicValues strips out any values that change between test runs from the output,
@@ -163,10 +239,11 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 func stripDynamicValues(actual []byte) []byte {
 	actual = timestampRegex.ReplaceAll(actual, []byte("REPLACED_TIME"))
 	actual = urlRegex.ReplaceAll(actual, []byte("https://dashboard.infracost.io/share/REPLACED_SHARE_CODE"))
-	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH"))
+	actual = projectPathRegex.ReplaceAll(actual, []byte("$1 REPLACED_PROJECT_PATH/$3"))
 	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
 	actual = panicRegex.ReplaceAll(actual, []byte("runtime error: REPLACED ERROR\nEnvironment"))
-	actual = pathRegex.ReplaceAll(actual, []byte("REPLACED_PROJECT_PATH/$2"))
+	actual = pathRegex.ReplaceAll(actual, []byte("${1}REPLACED_PROJECT_PATH/$3"))
+	actual = credsRegex.ReplaceAll(actual, []byte("REPLACED_CREDENTIALS_PATH"))
 
 	return actual
 }
@@ -327,8 +404,8 @@ var policyResourceAllowlistGraphQLResponse = `[
   }
 ]`
 
-var storePolicyResourcesGraphQLResponse = `[{"data": 
-	{"storePolicyResources": 
+var storePolicyResourcesGraphQLResponse = `[{"data":
+	{"storePolicyResources":
 		{ "sha": "someshastring" }
 	}
 }]

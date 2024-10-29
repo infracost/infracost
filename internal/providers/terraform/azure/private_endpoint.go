@@ -20,7 +20,7 @@ func GetAzureRMPrivateEndpointRegistryItem() *schema.RegistryItem {
 }
 
 func NewAzureRMPrivateEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 	region = convertRegion(region)
 
 	costComponents := make([]*schema.CostComponent, 0)

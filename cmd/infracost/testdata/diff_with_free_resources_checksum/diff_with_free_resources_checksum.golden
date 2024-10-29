@@ -3,6 +3,7 @@
   "metadata": {
     "infracostCommand": "diff",
     "vcsBranch": "stub-branch",
+    "vcsBaseCommitSha": "stub-sha",
     "vcsCommitSha": "stub-sha",
     "vcsCommitAuthorName": "stub-author",
     "vcsCommitAuthorEmail": "stub@stub.com",
@@ -13,15 +14,16 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_free_resources_checksum",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/diff_with_free_resources_checksum",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_free_resources_checksum",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -37,12 +39,12 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf"
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -55,7 +57,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -72,7 +75,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -89,7 +93,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -98,7 +103,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -114,18 +120,19 @@
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
-                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf"
                 }
               ],
               "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
               "endLine": 53,
-              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 26
             }
           }
         ],
         "totalHourlyCost": "1.017315068493150679",
-        "totalMonthlyCost": "742.64"
+        "totalMonthlyCost": "742.64",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -133,18 +140,20 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -157,7 +166,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -174,7 +184,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -191,7 +202,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -200,7 +212,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -212,29 +225,33 @@
             "name": "aws_codepipeline.codepipeline",
             "resourceType": "aws_codepipeline",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
                   "endLine": 53,
-                  "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
                   "startLine": 26
                 }
               ],
               "checksum": "3f6fdddc5327be5b4c588323e2ddf30e5d6928af61d8893034acfc3bf3cc2a4d",
               "endLine": 53,
-              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_free_resources_checksum/main.tf",
               "startLine": 26
             }
           }
         ],
         "totalHourlyCost": "1.017315068493150679",
-        "totalMonthlyCost": "742.64"
+        "totalMonthlyCost": "742.64",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 3,
@@ -253,10 +270,13 @@
   ],
   "totalHourlyCost": "1.017315068493150679",
   "totalMonthlyCost": "742.64",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "1.017315068493150679",
   "pastTotalMonthlyCost": "742.64",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 3,

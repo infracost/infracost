@@ -2,11 +2,13 @@ package azure
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
-	"strings"
 )
 
 // TrafficManagerProfile struct represents an Azure Traffic Manager profile.
@@ -104,6 +106,7 @@ func (r *TrafficManagerProfile) dnsQueriesCostComponent(q *decimal.Decimal, tier
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -128,6 +131,7 @@ func (r *TrafficManagerProfile) trafficViewCostComponent() *schema.CostComponent
 				{Key: "meterName", Value: strPtr("Traffic View Data Points Processed")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

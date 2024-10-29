@@ -7,7 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getActiveDirectoryDomainServiceRegistryItem(),
 	getActiveDirectoryDomainServiceReplicaSetRegistryItem(),
 	getAPIManagementRegistryItem(),
-	GetAzureRMApplicationGatewayRegistryItem(),
+	getApplicationGatewayRegistryItem(),
 	getAppServiceEnvironmentRegistryItem(),
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	getFunctionAppRegistryItem(),
@@ -22,9 +22,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getAutomationDSCConfigurationRegistryItem(),
 	getAutomationDSCNodeConfigurationRegistryItem(),
 	getAutomationJobScheduleRegistryItem(),
-	GetAzureRMBastionHostRegistryItem(),
+	getBastionHostRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
 	getContainerRegistryRegistryItem(),
+	getCosmosDBAccountRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMCosmosdbCassandraTableRegistryItem(),
 	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
@@ -44,14 +45,16 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDNSPtrRecordRegistryItem(),
 	getDNSSrvRecordRegistryItem(),
 	getDNSTxtRecordRegistryItem(),
-	GetAzureRMDNSPrivateZoneRegistryItem(),
-	GetAzureRMDNSZoneRegistryItem(),
+	getDNSPrivateZoneRegistryItem(),
+	getDNSZoneRegistryItem(),
 	GetAzureRMEventHubsNamespaceRegistryItem(),
-	getAzureRMExpressRouteConnectionRegistryItem(),
-	getAzureRMExpressRouteGatewayRegistryItem(),
+	getExpressRouteConnectionRegistryItem(),
+	getExpressRouteGatewayRegistryItem(),
 	GetAzureRMFirewallRegistryItem(),
-	getAzureRMFrontdoorFirewallPolicyRegistryItem(),
-	getAzureRMFrontdoorRegistryItem(),
+	getAzureRMFirewallPolicyRegistryItem(),
+	getAzureRMFirewallPolicyRuleCollectionGroupRegistryItem(),
+	getFrontdoorFirewallPolicyRegistryItem(),
+	getFrontdoorRegistryItem(),
 	GetAzureRMHDInsightHadoopClusterRegistryItem(),
 	GetAzureRMHDInsightHBaseClusterRegistryItem(),
 	GetAzureRMHDInsightInteractiveQueryClusterRegistryItem(),
@@ -60,22 +63,22 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMKeyVaultCertificateRegistryItem(),
 	GetAzureRMKeyVaultKeyRegistryItem(),
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
-	GetAzureRMKubernetesClusterRegistryItem(),
-	GetAzureRMKubernetesClusterNodePoolRegistryItem(),
-	GetAzureRMLoadBalancerRegistryItem(),
+	getKubernetesClusterRegistryItem(),
+	getKubernetesClusterNodePoolRegistryItem(),
+	getLoadBalancerRegistryItem(),
 	GetAzureRMLoadBalancerRuleRegistryItem(),
 	GetAzureRMLoadBalancerOutboundRuleRegistryItem(),
 	getLinuxFunctionAppRegistryItem(),
-	GetAzureRMLinuxVirtualMachineRegistryItem(),
-	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
-	getAzureRMLogAnalyticsWorkspaceRegistryItem(),
-	GetAzureRMManagedDiskRegistryItem(),
+	getLinuxVirtualMachineRegistryItem(),
+	getLinuxVirtualMachineScaleSetRegistryItem(),
+	getLogAnalyticsWorkspaceRegistryItem(),
+	getManagedDiskRegistryItem(),
 	GetAzureRMMariaDBServerRegistryItem(),
-	getAzureRMMSSQLDatabaseRegistryItem(),
+	getMSSQLDatabaseRegistryItem(),
 	GetAzureRMMySQLServerRegistryItem(),
 	GetAzureRMNotificationHubNamespaceRegistryItem(),
-	getAzureRMPointToSiteVpnGatewayRegistryItem(),
-	getAzureRMPostgreSQLFlexibleServerRegistryItem(),
+	getPointToSiteVpnGatewayRegistryItem(),
+	getPostgreSQLFlexibleServerRegistryItem(),
 	GetAzureRMPostgreSQLServerRegistryItem(),
 	getPrivateDNSARecordRegistryItem(),
 	getPrivateDNSAAAARecordRegistryItem(),
@@ -89,22 +92,22 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMPublicIPPrefixRegistryItem(),
 	GetAzureRMSearchServiceRegistryItem(),
 	GetAzureRMRedisCacheRegistryItem(),
-	getAzureRMStorageAccountRegistryItem(),
-	getAzureRMSQLDatabaseRegistryItem(),
-	getAzureRMSQLManagedInstanceRegistryItem(),
 	getAzureRMMSSQLManagedInstanceRegistryItem(),
+	getStorageAccountRegistryItem(),
+	getSQLDatabaseRegistryItem(),
+	getSQLManagedInstanceRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
-	getAzureRMVirtualHubRegistryItem(),
-	GetAzureRMVirtualMachineScaleSetRegistryItem(),
-	GetAzureRMVirtualMachineRegistryItem(),
+	getVirtualHubRegistryItem(),
+	getVirtualMachineScaleSetRegistryItem(),
+	getVirtualMachineRegistryItem(),
 	GetAzureRMVirtualNetworkGatewayConnectionRegistryItem(),
 	GetAzureRMVirtualNetworkGatewayRegistryItem(),
-	GetAzureRMWindowsVirtualMachineRegistryItem(),
-	GetAzureRMWindowsVirtualMachineScaleSetRegistryItem(),
-	getAzureRMVPNGatewayRegistryItem(),
-	getAzureRMVPNGatewayConnectionRegistryItem(),
+	getWindowsVirtualMachineRegistryItem(),
+	getWindowsVirtualMachineScaleSetRegistryItem(),
+	getVPNGatewayRegistryItem(),
+	getVPNGatewayConnectionRegistryItem(),
 	getDataFactoryRegistryItem(),
 	getDataFactoryIntegrationRuntimeAzureRegistryItem(),
 	getDataFactoryIntegrationRuntimeAzureSSISRegistryItem(),
@@ -159,15 +162,28 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getPrivateDnsResolverInboundEndpointRegistryItem(),
 	getPrivateDnsResolverOutboundEndpointRegistryItem(),
 	getPrivateDnsResolverDnsForwardingRulesetRegistryItem(),
+	getMachineLearningComputeInstanceRegistryItem(),
+	getMachineLearningComputeClusterRegistryItem(),
+	getNetworkDdosProtectionPlanRegistryItem(),
+	getAppConfigurationRegistryItem(),
+	getFederatedIdentityCredentialRegistryItem(),
+	getCognitiveAccountRegistryItem(),
+	getCognitiveDeploymentRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// Azure App Configuration
+	"azurerm_app_configuration_feature",
+	"azurerm_app_configuration_key",
+	// Azure AI Services
+	"azurerm_cognitive_account_customer_managed_key",
 	// Azure Api Management
 	"azurerm_api_management_api",
 	"azurerm_api_management_api_diagnostic",
 	"azurerm_api_management_api_operation",
 	"azurerm_api_management_api_operation_policy",
+	"azurerm_api_management_api_operation_tag",
 	"azurerm_api_management_api_policy",
 	"azurerm_api_management_api_schema",
 	"azurerm_api_management_api_version_set",
@@ -252,18 +268,39 @@ var FreeResources = []string{
 	"azurerm_blueprint_assignment",
 
 	// Azure CDN
+	"azurerm_cdn_frontdoor_custom_domain_association",
 	"azurerm_cdn_profile",
 
+	// Azure Consumption
+	"azurerm_consumption_budget_management_group",
+	"azurerm_consumption_budget_resource_group",
+	"azurerm_consumption_budget_subscription",
+
 	// Azure CosmosDB
-	"azurerm_cosmosdb_account",
 	"azurerm_cosmosdb_notebook_workspace",
+	"azurerm_cosmosdb_sql_role_assignment",
+	"azurerm_cosmosdb_sql_role_definition",
 	"azurerm_cosmosdb_sql_stored_procedure",
 	"azurerm_cosmosdb_sql_trigger",
 	"azurerm_cosmosdb_sql_user_defined_function",
 
+	// Azure Cost Management
+	"azurerm_cost_anomaly_alert",
+	"azurerm_cost_management_scheduled_action",
+	"azurerm_resource_group_cost_management_export",
+	"azurerm_resource_group_cost_management_view",
+	"azurerm_subscription_cost_management_export",
+	"azurerm_subscription_cost_management_view",
+
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
 	"azurerm_private_dns_resolver",
+
+	// Azure Dev Test
+	"azurerm_dev_test_global_vm_shutdown_schedule",
+	"azurerm_dev_test_policy",
+	"azurerm_dev_test_schedule",
+	"azurerm_dev_test_lab",
 
 	// Azure Data Factory
 	"azurerm_data_factory_custom_dataset",
@@ -356,8 +393,6 @@ var FreeResources = []string{
 	"azurerm_firewall_application_rule_collection",
 	"azurerm_firewall_nat_rule_collection",
 	"azurerm_firewall_network_rule_collection",
-	"azurerm_firewall_policy",
-	"azurerm_firewall_policy_rule_collection_group",
 
 	// Azure Front Door
 	"azurerm_frontdoor_custom_https_configuration",
@@ -380,7 +415,7 @@ var FreeResources = []string{
 	"azurerm_iothub_route",
 	"azurerm_iothub_shared_access_policy",
 
-	// Azure Lighthouse (Delegated Resoure Management)
+	// Azure Lighthouse (Delegated Resource Management)
 	"azurerm_lighthouse_definition",
 	"azurerm_lighthouse_assignment",
 
@@ -407,10 +442,12 @@ var FreeResources = []string{
 	"azurerm_logic_app_trigger_recurrence",
 	"azurerm_logic_app_workflow",
 
+	// Azure Machine Learning
+	"azurerm_machine_learning_workspace",
+
 	// Azure Management
 	"azurerm_management_group",
 	"azurerm_management_group_subscription_association",
-	"azurerm_management_group_policy_assignment",
 	"azurerm_management_lock",
 
 	// Azure Managed Applications
@@ -489,6 +526,15 @@ var FreeResources = []string{
 	"azurerm_policy_definition",
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
+	"azurerm_subscription_policy_assignment",
+	"azurerm_subscription_policy_exemption",
+	"azurerm_subscription_policy_remediation",
+	"azurerm_resource_group_policy_assignment",
+	"azurerm_resource_group_policy_exemption",
+	"azurerm_resource_group_policy_remediation",
+	"azurerm_management_group_policy_exemption",
+	"azurerm_management_group_policy_assignment",
+	"azurerm_management_group_policy_remediation",
 
 	// Azure Portal
 	"azurerm_dashboard",
@@ -529,6 +575,9 @@ var FreeResources = []string{
 	// Azure SignalR
 	"azurerm_signalr_service_network_acl",
 	"azurerm_signalr_shared_private_link",
+
+	// Azure Site Recovery
+	"azurerm_site_recovery_protection_container_mapping",
 
 	// Azure SQL
 	"azurerm_sql_failover_group",
@@ -577,6 +626,7 @@ var FreeResources = []string{
 	"azurerm_virtual_desktop_workspace",
 	"azurerm_virtual_desktop_workspace_application_group_association",
 	"azurerm_virtual_desktop_host_pool",
+	"azurerm_virtual_desktop_host_pool_registration_info",
 
 	// Azure Service Plan
 	"azurerm_windows_web_app",
@@ -585,6 +635,10 @@ var FreeResources = []string{
 	// Azure Synapse Analytics
 	"azurerm_synapse_firewall_rule",
 	"azurerm_synapse_private_link_hub",
+
+	// Azure Virtual Hub
+	"azurerm_virtual_hub_route_table",
+	"azurerm_virtual_hub_route_table_route",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",

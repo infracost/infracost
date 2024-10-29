@@ -1,0 +1,20 @@
+version: 0.1
+
+projects:
+  - path: .
+    name: main-dev
+    terraform_var_files:
+      - dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - "**"
+      - dev.tfvars
+  - path: .
+    name: main-prod
+    terraform_var_files:
+      - prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - "**"
+      - prod.tfvars
+

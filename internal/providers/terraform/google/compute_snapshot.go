@@ -8,12 +8,12 @@ import (
 func getComputeSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_compute_snapshot",
-		RFunc:               newComputeSnapshot,
+		CoreRFunc:           newComputeSnapshot,
 		ReferenceAttributes: []string{"source_disk"},
 	}
 }
 
-func newComputeSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeSnapshot(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	size := computeSnapshotDiskSize(d)
@@ -23,7 +23,5 @@ func newComputeSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		Region:   region,
 		DiskSize: size,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

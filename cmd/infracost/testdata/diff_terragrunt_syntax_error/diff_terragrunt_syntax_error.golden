@@ -1,0 +1,17 @@
+──────────────────────────────────
+Project: dems-ag1
+Module path: REPLACED_PROJECT_PATH/testdata/diff_terragrunt_syntax_error/terragrunt/dev
+Errors:
+  Error processing module at 'REPLACED_PROJECT_PATH/testdata/diff_terragrunt_syntax_error/terragrunt/dev/terragrunt.hcl'. How this module was found:
+    Terragrunt config file found in a subdirectory of REPLACED_PROJECT_PATH/testdata/diff_terragrunt_syntax_error/terragrunt/dev. Underlying error:
+      REPLACED_PROJECT_PATH/testdata/diff_terragrunt_syntax_error/terragrunt/dev/terragrunt.hcl:16,1-1:
+        Missing expression; Expected the start of an expression, but found the end of the file.
+
+──────────────────────────────────
+
+2 cloud resources were detected:
+∙ 2 were estimated
+
+Err:
+
+

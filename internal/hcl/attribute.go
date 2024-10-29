@@ -1,12 +1,15 @@
 package hcl
 
 import (
+	"bytes"
 	"fmt"
 	"runtime/debug"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
@@ -17,6 +20,7 @@ var (
 	missingAttributeDiagnostic        = "Unsupported attribute"
 	valueIsNonIterableDiagnostic      = "Iteration over non-iterable value"
 	invalidFunctionArgumentDiagnostic = "Invalid function argument"
+	unknownVariableDiagnostic         = "Unknown variable"
 )
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
@@ -44,9 +48,12 @@ type Attribute struct {
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
 	Logger  zerolog.Logger
+	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
+	isGraph bool
 	// newMock generates a mock value for the attribute if it's value is missing.
-	newMock       func(attr *Attribute) cty.Value
-	previousValue cty.Value
+	newMock                func(attr *Attribute) cty.Value
+	previousValue          cty.Value
+	varsCausingUnknownKeys []string
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -126,11 +133,113 @@ func (attr *Attribute) Value() cty.Value {
 		return cty.DynamicVal
 	}
 
-	attr.Logger.Debug().Msg("fetching attribute value")
-	val := attr.value(0)
+	attr.Logger.Trace().Msg("fetching attribute value")
+	var val cty.Value
+	if attr.isGraph {
+		val = attr.graphValue()
+	} else {
+		val = attr.value(0)
+	}
 	attr.previousValue = val
 
 	return val
+}
+
+var missingVarPrefixes = []string{
+	"data",
+	"var",
+	"module",
+	"local",
+}
+
+// ReferencesCausingUnknownKeys returns a list of missing references if the attribute is an object without fully known keys.
+// For example, this will return []string{"var.default_tags"} if a value is set to the result of `merge({"x": "y"}, var.default_tags)`
+// where the value of `var.default_tags` is not known at evaluation time.
+func (attr *Attribute) ReferencesCausingUnknownKeys() []string {
+	if attr == nil {
+		return nil
+	}
+	_ = attr.value(0)
+	if len(attr.varsCausingUnknownKeys) == 0 {
+		return nil
+	}
+	unique := make(map[string]struct{})
+	for _, v := range attr.varsCausingUnknownKeys {
+		var valid bool
+		for _, prefix := range missingVarPrefixes {
+			if strings.HasPrefix(v, prefix+".") {
+				valid = true
+				break
+			}
+		}
+		if !valid {
+			continue
+		}
+		unique[v] = struct{}{}
+	}
+	attr.varsCausingUnknownKeys = nil
+	for k := range unique {
+		attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, k)
+	}
+	sort.Strings(attr.varsCausingUnknownKeys)
+	return attr.varsCausingUnknownKeys
+}
+
+// ProvidersValue retrieves the value of the attribute with special handling need for module.providers
+// blocks: Keys in the providers block are converted to literal values, then the attr.Value() is returned.
+func (attr *Attribute) ProvidersValue() cty.Value {
+	if origExpr, ok := attr.HCLAttr.Expr.(*hclsyntax.ObjectConsExpr); ok {
+		newExpr := &hclsyntax.ObjectConsExpr{}
+
+		for _, item := range origExpr.Items {
+			if origKeyExpr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr); ok {
+				key := traversalAsString(origKeyExpr.AsTraversal())
+
+				literalKey := &hclsyntax.LiteralValueExpr{
+					Val: cty.StringVal(key),
+				}
+
+				newExpr.Items = append(newExpr.Items, hclsyntax.ObjectConsItem{
+					KeyExpr:   literalKey,
+					ValueExpr: item.ValueExpr,
+				})
+			} else {
+				newExpr.Items = append(newExpr.Items, item)
+			}
+		}
+
+		attr.HCLAttr.Expr = newExpr
+	}
+
+	return attr.Value()
+}
+
+// DecodeProviders decodes the providers block into a map of provider names to provider aliases.
+// This is used by the graph evaluator to make sure the correct edges are created when providers are
+// inherited from parent modules.
+func (attr *Attribute) DecodeProviders() map[string]string {
+	providers := make(map[string]string)
+
+	if origExpr, ok := attr.HCLAttr.Expr.(*hclsyntax.ObjectConsExpr); ok {
+		for _, item := range origExpr.Items {
+			keyExpr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
+			if !ok {
+				continue
+			}
+
+			valExpr, ok := item.ValueExpr.(*hclsyntax.ScopeTraversalExpr)
+			if !ok {
+				continue
+			}
+
+			key := traversalAsString(keyExpr.AsTraversal())
+			val := traversalAsString(valExpr.AsTraversal())
+
+			providers[key] = val
+		}
+	}
+
+	return providers
 }
 
 // HasChanged returns if the Attribute Value has changed since Value was last called.
@@ -148,8 +257,25 @@ func (attr *Attribute) HasChanged() (change bool) {
 	}()
 
 	previous := attr.previousValue
-	current := attr.value(0)
+	var current cty.Value
+	if attr.isGraph {
+		current = attr.graphValue()
+	} else {
+		current = attr.value(0)
+	}
 	return !previous.RawEquals(current)
+}
+
+// designed only to work in situations where the expression may result in an object
+func extractTraversalStringsFromExpr(expr hcl.Expression) []string {
+	switch v := expr.(type) {
+	case *hclsyntax.ScopeTraversalExpr:
+		return []string{traversalAsString(v.AsTraversal())}
+	case *hclsyntax.IndexExpr:
+		return extractTraversalStringsFromExpr(v.Collection)
+	default:
+		return nil
+	}
 }
 
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
@@ -163,7 +289,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
-		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
+		mockedVal := cty.StringVal(fmt.Sprintf("%s-%s", attr.Name(), mock.Identifier))
 		if attr.newMock != nil {
 			mockedVal = attr.newMock(attr)
 		}
@@ -173,13 +299,26 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		ctx := attr.Ctx.Inner()
-		exp := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
+		exp, replaced := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
 		val, err := exp.Value(ctx)
 		if !err.HasErrors() {
+			attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, replaced...)
 			return val
+		} else if len(err) < len(diag) {
+			// handle cases where there is a further error inside a function param, e.g. merge({"x": var.undefined}, var.whatever)
+			attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, replaced...)
 		}
 
 		for _, d := range diag {
+
+			if d.Summary == unknownVariableDiagnostic && !ctyVal.IsKnown() {
+				missing := extractTraversalStringsFromExpr(d.Expression)
+				for _, m := range missing {
+					if !strings.HasSuffix(m, ".id") && !strings.HasSuffix(m, ".arn") {
+						attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, m)
+					}
+				}
+			}
 
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
@@ -260,7 +399,8 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 // the bad Expressions listed in the diagnostics. This function, currently, only traverses FunctionCallExpr and ObjectCallExpr.
 // More complex Expressions could be added in the future is we deem this a better way of mocking out values/expressions
 // that cause evaluation to fail.
-func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) (hclsyntax.Expression, []string) {
+	var replaced []string
 	switch t := expr.(type) {
 	case *hclsyntax.FunctionCallExpr:
 		newArgs := make([]hclsyntax.Expression, len(t.Args))
@@ -279,15 +419,218 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 					newArgs[i] = &hclsyntax.LiteralValueExpr{
 						Val: mockedVal,
 					}
-
+					replaced = append(replaced, extractTraversalStringsFromExpr(exp)...)
 					found = true
 					break
 				}
 			}
 
 			if !found {
-				newArgs[i] = mockFunctionCallArgs(exp, diagnostics, mockedVal)
+				var moreReplaced []string
+				newArgs[i], moreReplaced = mockFunctionCallArgs(exp, diagnostics, mockedVal)
+				replaced = append(replaced, moreReplaced...)
 			}
+		}
+
+		return &hclsyntax.FunctionCallExpr{
+			Name:            t.Name,
+			Args:            newArgs,
+			ExpandFinal:     t.ExpandFinal,
+			NameRange:       t.NameRange,
+			OpenParenRange:  t.OpenParenRange,
+			CloseParenRange: t.CloseParenRange,
+		}, replaced
+	case *hclsyntax.ObjectConsExpr:
+		newItems := make([]hclsyntax.ObjectConsItem, len(t.Items))
+		for i, item := range t.Items {
+			// we don't care about replacements here, because an ObjectConsExpr already has fully known keys
+			vExpr, _ := mockFunctionCallArgs(item.ValueExpr, diagnostics, mockedVal)
+			newItems[i] = hclsyntax.ObjectConsItem{
+				KeyExpr:   item.KeyExpr,
+				ValueExpr: vExpr,
+			}
+		}
+
+		return &hclsyntax.ObjectConsExpr{
+			Items:     newItems,
+			SrcRange:  t.SrcRange,
+			OpenRange: t.OpenRange,
+		}, replaced
+
+	}
+
+	if v, ok := expr.(hclsyntax.Expression); ok {
+		return v, replaced
+	}
+
+	replaced = append(replaced, extractTraversalStringsFromExpr(expr)...)
+
+	return &hclsyntax.LiteralValueExpr{
+		Val: mockedVal,
+	}, replaced
+}
+
+func (attr *Attribute) graphValue() (ctyVal cty.Value) {
+	defer func() {
+		if err := recover(); err != nil {
+			trace := debug.Stack()
+			attr.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
+		}
+	}()
+
+	var diag hcl.Diagnostics
+	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
+	if diag.HasErrors() {
+		if !ctyVal.IsKnown() {
+			for _, d := range diag {
+				if d.Summary == unknownVariableDiagnostic {
+					attr.varsCausingUnknownKeys = append(attr.varsCausingUnknownKeys, extractTraversalStringsFromExpr(d.Expression)...)
+					break
+				}
+			}
+		}
+		mockedVal := cty.StringVal(fmt.Sprintf("%s-%s", attr.Name(), mock.Identifier))
+		if attr.newMock != nil {
+			mockedVal = attr.newMock(attr)
+		}
+
+		ctx := attr.Ctx.Inner()
+		exp := attr.HCLAttr.Expr
+		var val cty.Value
+		// call the mock function in a loop to try and resolve all the bad expressions.
+		// This is done because one bad expression replacement could cause another
+		// expression to fail.
+		for i := 0; i < 3; i++ {
+			exp = mockExpressionCalls(exp, diag, mockedVal)
+			val, diag = exp.Value(ctx)
+			if !diag.HasErrors() {
+				return val
+			}
+		}
+	}
+
+	return ctyVal
+}
+
+// LiteralBoolValueExpression is a wrapper around any hcl.Expression that returns
+// a literal bool value. This is use to evaluate mocked expressions that are used
+// in conditional expressions. It turns any non bool literal value into a bool
+// false value.
+type LiteralBoolValueExpression struct {
+	// we embed the hclsyntax.LiteralValueExpr as the hcl.Expression interface
+	// has an unexported method that we need to implement.
+	*hclsyntax.LiteralValueExpr
+
+	Expression hcl.Expression
+}
+
+// Value returns the value of the expression. If the expression is not a literal
+// bool value, this returns false.
+func (e *LiteralBoolValueExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+	val, diag := e.Expression.Value(ctx)
+	if diag.HasErrors() {
+		return cty.BoolVal(false), nil
+	}
+
+	if val.Type() != cty.Bool {
+		return cty.BoolVal(false), nil
+	}
+
+	return val, nil
+}
+
+type LiteralValueCollectionExpression struct {
+	// we embed the hclsyntax.LiteralValueExpr as the hcl.Expression interface
+	// has an unexported method that we need to implement.
+	*hclsyntax.LiteralValueExpr
+	Expression  hcl.Expression
+	MockedValue cty.Value
+}
+
+func newLiteralValueCollectionExpression(mockedVal cty.Value, expr hclsyntax.Expression) *LiteralValueCollectionExpression {
+	return &LiteralValueCollectionExpression{
+		LiteralValueExpr: &hclsyntax.LiteralValueExpr{Val: cty.ListVal([]cty.Value{mockedVal})},
+		Expression:       expr,
+		MockedValue:      mockedVal,
+	}
+}
+
+func (e *LiteralValueCollectionExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+	val, diag := e.Expression.Value(ctx)
+	if diag.HasErrors() {
+		return cty.ListValEmpty(cty.String), nil
+	}
+
+	if !val.CanIterateElements() {
+		return cty.ListValEmpty(cty.String), nil
+	}
+
+	return val, nil
+}
+
+type LiteralValueIndexExpression struct {
+	// we embed the hclsyntax.LiteralValueExpr as the hcl.Expression interface
+	// has an unexported method that we need to implement.
+	*hclsyntax.LiteralValueExpr
+	Expression  *hclsyntax.IndexExpr
+	MockedValue cty.Value
+}
+
+func newLiteralValueIndexExpression(mockedVal cty.Value, expr *hclsyntax.IndexExpr) *LiteralValueIndexExpression {
+	return &LiteralValueIndexExpression{
+		LiteralValueExpr: &hclsyntax.LiteralValueExpr{Val: cty.ListValEmpty(cty.String)},
+		Expression:       expr,
+		MockedValue:      mockedVal,
+	}
+}
+
+func (e *LiteralValueIndexExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+	val, diag := e.Expression.Value(ctx)
+	for _, d := range diag {
+		// if the diagnostic is an invalid index, we should try and get the first element
+		// of the collection since it should at least have the same expected type
+		if d.Summary == "Invalid index" {
+			col, colDiag := e.Expression.Collection.Value(ctx)
+
+			if !colDiag.HasErrors() && col.CanIterateElements() {
+				it := col.ElementIterator()
+				if it.Next() {
+					_, v := it.Element()
+					return v, nil
+				}
+			}
+		}
+	}
+
+	// For other diagnostics we just return the mocked value
+	// as we can't determine the correct value.
+	if diag.HasErrors() {
+		return e.MockedValue, nil
+	}
+
+	return val, nil
+}
+
+// mockExpressionCalls attempts to resolve remove bad expressions for the given diagnostics.
+// This function will be called recursively, finding all Expressions and checking if
+// the expression matches the diagnostic. If the expression matches the diagnostic, we replace the expression with a mocked value.
+func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+	switch t := expr.(type) {
+	case nil:
+		return nil
+	case *hclsyntax.FunctionCallExpr:
+		// if the diagnostic is with the function call let's replace it with a completely mocked value.
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
+		newArgs := make([]hclsyntax.Expression, len(t.Args))
+		for i, exp := range t.Args {
+			newArgs[i] = mockExpressionCalls(exp, diagnostics, mockedVal)
 		}
 
 		return &hclsyntax.FunctionCallExpr{
@@ -302,8 +645,8 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 		newItems := make([]hclsyntax.ObjectConsItem, len(t.Items))
 		for i, item := range t.Items {
 			newItems[i] = hclsyntax.ObjectConsItem{
-				KeyExpr:   item.KeyExpr,
-				ValueExpr: mockFunctionCallArgs(item.ValueExpr, diagnostics, mockedVal),
+				KeyExpr:   mockExpressionCalls(item.KeyExpr, diagnostics, mockedVal),
+				ValueExpr: mockExpressionCalls(item.ValueExpr, diagnostics, mockedVal),
 			}
 		}
 
@@ -312,7 +655,161 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 			SrcRange:  t.SrcRange,
 			OpenRange: t.OpenRange,
 		}
+	case *hclsyntax.ConditionalExpr:
+		return &hclsyntax.ConditionalExpr{
+			Condition:   mockBoolExpressionCall(t.Condition, diagnostics, mockedVal),
+			TrueResult:  mockExpressionCalls(t.TrueResult, diagnostics, mockedVal),
+			FalseResult: mockExpressionCalls(t.FalseResult, diagnostics, mockedVal),
+			SrcRange:    t.SrcRange,
+		}
+	case *hclsyntax.TemplateWrapExpr:
+		return &hclsyntax.TemplateWrapExpr{
+			Wrapped:  mockExpressionCalls(t.Wrapped, diagnostics, mockedVal),
+			SrcRange: t.SrcRange,
+		}
+	case *hclsyntax.TemplateExpr:
+		newParts := make([]hclsyntax.Expression, len(t.Parts))
+		for i, part := range t.Parts {
+			newParts[i] = mockExpressionCalls(part, diagnostics, mockedVal)
+		}
 
+		return &hclsyntax.TemplateExpr{
+			Parts:    newParts,
+			SrcRange: t.SrcRange,
+		}
+	case *hclsyntax.TupleConsExpr:
+		newExprs := make([]hclsyntax.Expression, len(t.Exprs))
+		for i, exp := range t.Exprs {
+			newExprs[i] = mockExpressionCalls(exp, diagnostics, mockedVal)
+		}
+
+		return &hclsyntax.TupleConsExpr{
+			Exprs:     newExprs,
+			SrcRange:  t.SrcRange,
+			OpenRange: t.OpenRange,
+		}
+	case *hclsyntax.IndexExpr:
+		expr := &hclsyntax.IndexExpr{
+			Collection:   newLiteralValueCollectionExpression(mockedVal, mockExpressionCalls(t.Collection, diagnostics, mockedVal)),
+			Key:          mockExpressionCalls(t.Key, diagnostics, mockedVal),
+			SrcRange:     t.SrcRange,
+			OpenRange:    t.OpenRange,
+			BracketRange: t.BracketRange,
+		}
+		return newLiteralValueIndexExpression(mockedVal, expr)
+	case *hclsyntax.ForExpr:
+		return &hclsyntax.ForExpr{
+			KeyVar:     t.KeyVar,
+			ValVar:     t.ValVar,
+			CollExpr:   newLiteralValueCollectionExpression(mockedVal, mockExpressionCalls(t.CollExpr, diagnostics, mockedVal)),
+			KeyExpr:    mockExpressionCalls(t.KeyExpr, diagnostics, mockedVal),
+			ValExpr:    mockExpressionCalls(t.ValExpr, diagnostics, mockedVal),
+			CondExpr:   mockBoolExpressionCall(t.CondExpr, diagnostics, mockedVal),
+			Group:      t.Group,
+			SrcRange:   t.SrcRange,
+			OpenRange:  t.OpenRange,
+			CloseRange: t.CloseRange,
+		}
+	case *hclsyntax.ObjectConsKeyExpr:
+		return &hclsyntax.ObjectConsKeyExpr{
+			Wrapped:         mockExpressionCalls(t.Wrapped, diagnostics, mockedVal),
+			ForceNonLiteral: t.ForceNonLiteral,
+		}
+	case *hclsyntax.SplatExpr:
+		return &hclsyntax.SplatExpr{
+			Source:      mockExpressionCalls(t.Source, diagnostics, mockedVal),
+			Each:        mockExpressionCalls(t.Each, diagnostics, mockedVal),
+			Item:        t.Item,
+			SrcRange:    t.SrcRange,
+			MarkerRange: t.MarkerRange,
+		}
+	case *hclsyntax.BinaryOpExpr:
+		// Logical operators (|| and &&) expect bools on both sides, so we need to mock the expression
+		// with a bool value.
+		impl := t.Op.Impl
+		params := impl.Params()
+
+		var lhsVal hclsyntax.Expression
+		var rhsVal hclsyntax.Expression
+
+		if len(params) > 0 && params[0].Type == cty.Bool {
+			lhsVal = mockBoolExpressionCall(t.LHS, diagnostics, mockedVal)
+		} else {
+			lhsVal = mockExpressionCalls(t.LHS, diagnostics, mockedVal)
+		}
+
+		if len(params) > 1 && params[1].Type == cty.Bool {
+			rhsVal = mockBoolExpressionCall(t.RHS, diagnostics, mockedVal)
+		} else {
+			rhsVal = mockExpressionCalls(t.RHS, diagnostics, mockedVal)
+		}
+
+		return &hclsyntax.BinaryOpExpr{
+			LHS:      lhsVal,
+			Op:       t.Op,
+			RHS:      rhsVal,
+			SrcRange: t.SrcRange,
+		}
+	case *hclsyntax.UnaryOpExpr:
+		// The ! operator expects a bool on the right side, so we need to mock the expression
+		// with a bool value.
+		impl := t.Op.Impl
+		params := impl.Params()
+
+		var val hclsyntax.Expression
+		if len(params) > 0 && params[0].Type == cty.Bool {
+			val = mockBoolExpressionCall(t.Val, diagnostics, mockedVal)
+		} else {
+			val = mockExpressionCalls(t.Val, diagnostics, mockedVal)
+		}
+
+		return &hclsyntax.UnaryOpExpr{
+			Op:          t.Op,
+			Val:         val,
+			SrcRange:    t.SrcRange,
+			SymbolRange: t.SymbolRange,
+		}
+	case *hclsyntax.TemplateJoinExpr:
+		return &hclsyntax.TemplateJoinExpr{
+			Tuple: mockExpressionCalls(t.Tuple, diagnostics, mockedVal),
+		}
+	case *hclsyntax.ParenthesesExpr:
+		return &hclsyntax.ParenthesesExpr{
+			Expression: mockExpressionCalls(t.Expression, diagnostics, mockedVal),
+			SrcRange:   t.SrcRange,
+		}
+	case *hclsyntax.RelativeTraversalExpr:
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
+		return &hclsyntax.RelativeTraversalExpr{
+			Source:    mockExpressionCalls(t.Source, diagnostics, mockedVal),
+			Traversal: t.Traversal,
+			SrcRange:  t.SrcRange,
+		}
+	case *hclsyntax.AnonSymbolExpr:
+	case *hclsyntax.LiteralValueExpr:
+	case *hclsyntax.ScopeTraversalExpr:
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				if d.Summary == "Iteration over non-iterable value" {
+					return &hclsyntax.LiteralValueExpr{
+						Val: cty.ListValEmpty(cty.String),
+					}
+				}
+
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
+		return t
 	}
 
 	if v, ok := expr.(hclsyntax.Expression); ok {
@@ -322,6 +819,28 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 	return &hclsyntax.LiteralValueExpr{
 		Val: mockedVal,
 	}
+}
+
+func mockBoolExpressionCall(expression hclsyntax.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+	if expression == nil {
+		return nil
+	}
+
+	var condition hclsyntax.Expression
+	for _, d := range diagnostics {
+		if expression == d.Expression {
+			condition = &hclsyntax.LiteralValueExpr{
+				Val: cty.BoolVal(false),
+			}
+			break
+		}
+	}
+
+	if condition == nil {
+		condition = mockExpressionCalls(expression, diagnostics, mockedVal)
+	}
+
+	return &LiteralBoolValueExpression{Expression: condition, LiteralValueExpr: &hclsyntax.LiteralValueExpr{Val: cty.BoolVal(false)}}
 }
 
 // traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
@@ -530,7 +1049,7 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	case cty.Number:
 		var intVal int
 		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			attr.Logger.Warn().Err(err).Msg("could not unpack int from block index attr, returning 0")
+			attr.Logger.Debug().Err(err).Msg("could not unpack int from block index attr, returning 0")
 			return "0"
 		}
 
@@ -599,12 +1118,13 @@ func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
 	for _, ref := range attr.AllReferences() {
 		key := ref.String()
 
-		if shouldSkipRef(b, key) {
+		if shouldSkipRef(b, attr, key) {
 			continue
 		}
 
-		if usesProviderConfiguration(b) && attr.Name() == "provider" {
-			key = fmt.Sprintf("provider.%s", key)
+		isProviderReference := usesProviderConfiguration(b) && attr.Name() == "provider"
+		if isProviderReference {
+			key = fmt.Sprintf("provider.%s", strings.TrimSuffix(key, "."))
 		}
 
 		modAddr := b.ModuleAddress()
@@ -678,7 +1198,24 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		}
 		return refs
 	case *hclsyntax.ObjectConsKeyExpr:
-		refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		// If the traversal is of length one it is treated as a string by Terraform.
+		// Otherwise it could be a reference. For example:
+		//
+		// providers = {
+		//   aws = aws.alias
+		// }
+		//
+		// In this case the traversal of the key expression would be of length 1 and
+		// we would treat it as a string.
+		//
+		// TODO: Although this helps, I think we still need some way of totally ignoring keys for
+		// the providers attribute of module calls since they can contain a '.' and therefore have
+		// a traversal, but are a special case that should be treated as strings.
+		wrapped, ok := t.Wrapped.(*hclsyntax.ScopeTraversalExpr)
+		if ok && len(wrapped.Traversal) > 1 {
+			refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		}
+
 		return refs
 	case *hclsyntax.SplatExpr:
 		refs = append(refs, attr.referencesFromExpression(t.Source)...)
@@ -700,7 +1237,7 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.LiteralValueExpr:
-		attr.Logger.Debug().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
+		attr.Logger.Trace().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
 	default:
 		name := fmt.Sprintf("%T", t)
 		if strings.HasPrefix(name, "*hclsyntax") {
@@ -922,8 +1459,28 @@ func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
 	return ret
 }
 
-func shouldSkipRef(block *Block, key string) bool {
-	if key == "count.index" || key == "each.key" || key == "each.value" || strings.HasSuffix(key, ".") {
+func traversalAsString(traversal hcl.Traversal) string {
+	buf := bytes.Buffer{}
+	for _, tr := range traversal {
+		switch step := tr.(type) {
+		case hcl.TraverseRoot:
+			buf.WriteString(step.Name)
+		case hcl.TraverseAttr:
+			buf.WriteString(".")
+			buf.WriteString(step.Name)
+		}
+	}
+	return buf.String()
+}
+
+func shouldSkipRef(block *Block, attr *Attribute, key string) bool {
+	if key == "count.index" || key == "each.key" || key == "each.value" {
+		return true
+	}
+
+	// Provider references can come through as `aws.`
+	isProviderReference := usesProviderConfiguration(block) && attr.Name() == "provider"
+	if !isProviderReference && strings.HasSuffix(key, ".") {
 		return true
 	}
 

@@ -30,6 +30,16 @@ func formatCost(currency string, d *decimal.Decimal) string {
 	return formatRoundedDecimalCurrency(currency, *d)
 }
 
+func formatUsageCost(out Root, cost *decimal.Decimal) string {
+	hasUsageCosts := cost != nil && !cost.Equals(decimal.Zero)
+
+	if usageCostsEnabled(out) || hasUsageCosts {
+		return formatCost(out.Currency, cost)
+	} else {
+		return "-"
+	}
+}
+
 func FormatCost2DP(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return "-"
@@ -78,7 +88,7 @@ type scaledInt64 struct {
 // length of the fraction.
 func decimalToScaledInt(d decimal.Decimal, minFracLen, maxFracLen int) *scaledInt64 {
 	// round excess fraction part
-	d = d.Round(int32(maxFracLen))
+	d = d.Round(int32(maxFracLen)) // nolint:gosec
 
 	co := d.Coefficient().Int64()
 	ex := int(d.Exponent())
@@ -139,7 +149,7 @@ func truncateMiddle(s string, maxLen int, fill string) string {
 
 func showProject(p Project, opts Options, showError bool) bool {
 	if p.Metadata.HasErrors() && showError {
-		return false
+		return true
 	}
 
 	if opts.ShowOnlyChanges {
@@ -154,7 +164,7 @@ func showProject(p Project, opts Options, showError bool) bool {
 		return true
 	}
 
-	if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
+	if p.Diff == nil || !p.Diff.HasResources() {
 		return false
 	}
 

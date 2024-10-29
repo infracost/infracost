@@ -13,7 +13,13 @@ type ACMCertificate struct {
 	CertificateAuthorityARN string
 }
 
-var ACMCertificateUsageSchema = []*schema.UsageItem{}
+func (r *ACMCertificate) CoreType() string {
+	return "ACMCertificate"
+}
+
+func (r *ACMCertificate) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ACMCertificate) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -25,7 +31,7 @@ func (r *ACMCertificate) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: ACMCertificateUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -38,6 +44,6 @@ func (r *ACMCertificate) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: []*schema.CostComponent{certCostComponent},
-		UsageSchema:    ACMCertificateUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

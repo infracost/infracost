@@ -1,0 +1,10 @@
+version: 0.1
+
+projects:
+  - path: .infra/bat
+    name: .infra-bat
+    skip_autodetect: true
+  - path: .infra/baz
+    name: .infra-baz
+    skip_autodetect: true
+

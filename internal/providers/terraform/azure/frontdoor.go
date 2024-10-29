@@ -9,11 +9,11 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// getAzureRMFrontdoorRegistryItem returns a registry item for the resource
-func getAzureRMFrontdoorRegistryItem() *schema.RegistryItem {
+// getFrontdoorRegistryItem returns a registry item for the resource
+func getFrontdoorRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_frontdoor",
-		RFunc: newFrontdoor,
+		Name:      "azurerm_frontdoor",
+		CoreRFunc: newFrontdoor,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
@@ -21,13 +21,13 @@ func getAzureRMFrontdoorRegistryItem() *schema.RegistryItem {
 }
 
 // newFrontdoor parses Terraform's data and uses it to build a new resource
-func newFrontdoor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+func newFrontdoor(d *schema.ResourceData) schema.CoreResource {
+	region := d.Region
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"
 	} else {
-		region = regionToZone(region)
+		region = regionToCDNZone(region)
 	}
 
 	rulesCounter := 0
@@ -47,7 +47,5 @@ func newFrontdoor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		FrontendHosts: len(d.Get("frontend_endpoint").Array()),
 		RoutingRules:  rulesCounter,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

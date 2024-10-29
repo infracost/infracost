@@ -1,0 +1,58 @@
+version: 0.1
+
+projects:
+  - path: infra/components/bar
+    name: infra-components-bar-dev
+    terraform_var_files:
+      - ../../variables/env/dev/defaults.tfvars
+      - ../../variables/env/dev/bar.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/bar/**
+      - infra/variables/env/dev/bar.tfvars
+      - infra/variables/env/dev/defaults.tfvars
+  - path: infra/components/bar
+    name: infra-components-bar-prod
+    terraform_var_files:
+      - ../../variables/env/prod/defaults.tfvars
+      - ../../variables/env/prod/bar.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/bar/**
+      - infra/variables/env/prod/bar.tfvars
+      - infra/variables/env/prod/defaults.tfvars
+  - path: infra/components/baz
+    name: infra-components-baz-dev
+    terraform_var_files:
+      - ../../variables/env/dev/defaults.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/baz/**
+      - infra/variables/env/dev/defaults.tfvars
+  - path: infra/components/baz
+    name: infra-components-baz-prod
+    terraform_var_files:
+      - ../../variables/env/prod/defaults.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/baz/**
+      - infra/variables/env/prod/defaults.tfvars
+  - path: infra/components/foo
+    name: infra-components-foo-dev
+    terraform_var_files:
+      - ../../variables/env/dev/defaults.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/foo/**
+      - infra/variables/env/dev/defaults.tfvars
+  - path: infra/components/foo
+    name: infra-components-foo-prod
+    terraform_var_files:
+      - ../../variables/env/prod/foo.tfvars
+      - ../../variables/env/prod/defaults.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/components/foo/**
+      - infra/variables/env/prod/defaults.tfvars
+      - infra/variables/env/prod/foo.tfvars
+

@@ -11,7 +11,13 @@ type CloudwatchDashboard struct {
 	Address string
 }
 
-var CloudwatchDashboardUsageSchema = []*schema.UsageItem{}
+func (r *CloudwatchDashboard) CoreType() string {
+	return "CloudwatchDashboard"
+}
+
+func (r *CloudwatchDashboard) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *CloudwatchDashboard) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -36,6 +42,6 @@ func (r *CloudwatchDashboard) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: CloudwatchDashboardUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

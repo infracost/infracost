@@ -1,11 +1,5 @@
 
-Err:
-Error: Governance check failed:
-
- - tag policy check failed: should show as failing
-
-
 Logs:
-INF Estimate uploaded to Infracost Cloud
-INF 2 tag policies checked
-INF tag policy check failed: should show as failing
+INFO Estimate uploaded to Infracost Cloud
+INFO 2 tag policies checked
+INFO tag policy check failed: should show as failing

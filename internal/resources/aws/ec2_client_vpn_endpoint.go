@@ -12,7 +12,13 @@ type EC2ClientVPNEndpoint struct {
 	Region  string
 }
 
-var EC2ClientVPNEndpointUsageSchema = []*schema.UsageItem{}
+func (r *EC2ClientVPNEndpoint) CoreType() string {
+	return "EC2ClientVPNEndpoint"
+}
+
+func (r *EC2ClientVPNEndpoint) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EC2ClientVPNEndpoint) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -37,6 +43,6 @@ func (r *EC2ClientVPNEndpoint) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: EC2ClientVPNEndpointUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

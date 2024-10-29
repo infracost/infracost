@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // NetworkfirewallFirewall struct represents an AWS Network Firewall Firewall resource.
@@ -18,8 +19,14 @@ type NetworkfirewallFirewall struct {
 }
 
 // NetworkfirewallFirewallUsageSchema defines a list which represents the usage schema of NetworkfirewallFirewall.
-var NetworkfirewallFirewallUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *NetworkfirewallFirewall) CoreType() string {
+	return "NetworkfirewallFirewall"
+}
+
+func (r *NetworkfirewallFirewall) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the NetworkfirewallFirewall.
@@ -39,7 +46,7 @@ func (r *NetworkfirewallFirewall) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    NetworkfirewallFirewallUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -77,5 +84,6 @@ func (r *NetworkfirewallFirewall) dataProcessedCostComponent() *schema.CostCompo
 				{Key: "usagetype", ValueRegex: regexPtr("^[A-Z0-9]*-Traffic-GB-Processed$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

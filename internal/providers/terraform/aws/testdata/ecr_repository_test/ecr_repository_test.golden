@@ -1,19 +1,22 @@
 
- Name                        Monthly Qty  Unit            Monthly Cost 
-                                                                       
- aws_ecr_repository.repo                                               
- └─ Storage                            1  GB                     $0.10 
-                                                                       
- aws_ecr_repository.repo1                                              
- └─ Storage                Monthly cost depends on usage: $0.10 per GB 
-                                                                       
+ Name                        Monthly Qty  Unit            Monthly Cost    
+                                                                          
+ aws_ecr_repository.repo                                                  
+ └─ Storage                            1  GB                     $0.10  * 
+                                                                          
+ aws_ecr_repository.repo1                                                 
+ └─ Storage                Monthly cost depends on usage: $0.10 per GB    
+                                                                          
  OVERALL TOTAL                                                   $0.10 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEcrRepositoryGoldenFile                        ┃ $0.10        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃       $0.10 ┃      $0.10 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

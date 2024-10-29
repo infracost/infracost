@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"path"
 	"strings"
 	"testing"
 
@@ -44,34 +43,15 @@ func TestCommentGitHubShowChangedProjects(t *testing.T) {
 		nil)
 }
 
-func TestCommentGitHubWithMissingAdditionalCommentPath(t *testing.T) {
+func TestCommentGitHubNoDiff(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
-		[]string{
-			"comment",
-			"github",
-			"--github-token", "abc",
-			"--repo", "test/test",
-			"--commit", "5",
-			"--show-changed",
-			"--path", "./testdata/changes.json",
-			"--dry-run",
-			"--additional-comment-data-path", "./does/not/exist.md"},
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--path", "./testdata/no_diff.json", "--dry-run"},
 		nil)
 }
 
-func TestCommentGitHubWithAdditionalCommentPath(t *testing.T) {
-	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+func TestCommentGitHubCommentPath(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
-		[]string{
-			"comment",
-			"github",
-			"--github-token", "abc",
-			"--repo", "test/test",
-			"--commit", "5",
-			"--show-changed",
-			"--path", "./testdata/changes.json",
-			"--dry-run",
-			"--additional-comment-data-path", path.Join(dir, "./additional-comment.md")},
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--pull-request", "5", "--path", "./testdata/terraform_v0.14_breakdown.json", "--comment-path", "./testdata/comment.md", "--dry-run"},
 		nil)
 }
 
@@ -86,7 +66,7 @@ func TestCommentGitHubWithFinOpsPolicyChecks(t *testing.T) {
 	defer policyV2Api.Close()
 
 	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "❌ Finops policy failure",
+		CommentMarkdown: "❌ Finops policy failure",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "finops_policy",
 			Checked: 1,
@@ -139,7 +119,7 @@ func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
 	defer policyV2Api.Close()
 
 	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "❌ Tag policy failure",
+		CommentMarkdown: "❌ Tag policy failure",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "tag_policy",
 			Checked: 1,
@@ -182,7 +162,7 @@ func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
 }
 
 var ghZeroCommentsResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
-var ghOneMatchingCommentResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [ 
+var ghOneMatchingCommentResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [
             { "id": "123", "body": "infracomment body here, followed by tag: [//]: <> (infracost-comment)" }
           ], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
 
@@ -192,9 +172,10 @@ func TestCommentGitHubSkipNoDiffWithoutInitialComment(t *testing.T) {
 		ghZeroCommentsResponse,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -219,9 +200,10 @@ func TestCommentGitHubSkipNoDiffWithInitialComment(t *testing.T) {
 		`{}`,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -244,9 +226,10 @@ func TestCommentGitHubNewAndHideSkipNoDiffWithoutInitialComment(t *testing.T) {
 		ghZeroCommentsResponse,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -272,9 +255,10 @@ func TestCommentGitHubNewAndHideSkipNoDiffWithInitialComment(t *testing.T) {
 		`{}`, // empty json as response to the post comment mutation
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -298,9 +282,10 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithoutInitialComment(t *testing.T) 
 		ghZeroCommentsResponse,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -326,9 +311,10 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithInitialComment(t *testing.T) {
 		`{}`, // empty json as response to the post comment mutation
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -348,7 +334,7 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithInitialComment(t *testing.T) {
 
 func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 0,
@@ -361,7 +347,7 @@ func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 
 func TestCommentGitHubGuardrailSuccessWithoutComment(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 1,
@@ -374,7 +360,7 @@ func TestCommentGitHubGuardrailSuccessWithoutComment(t *testing.T) {
 
 func TestCommentGitHubGuardrailSuccessWithComment(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "<p><strong>✅ Guardrails passed</strong></p>",
+		CommentMarkdown: "<p><strong>✅ Guardrails passed</strong></p>",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 1,
@@ -387,9 +373,9 @@ func TestCommentGitHubGuardrailSuccessWithComment(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: `<details>
+		CommentMarkdown: `<details>
 <summary><strong>⚠️ Guardrails triggered</strong></summary>
-				
+
 > - <b>Warning</b>: Stand by your estimate
 </details>`,
 		GovernanceResults: []GovernanceResult{{
@@ -407,7 +393,7 @@ func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:      "guardrail",
 			Failures:  []string{"Stand by your estimate"},
@@ -423,10 +409,10 @@ func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithCommentAndBlock(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: `<details>
+		CommentMarkdown: `<details>
 <summary><strong>❌ Guardrails triggered (needs action)</strong></summary>
 This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
-				
+
 > - <b>Blocked</b>: Stand by your estimate
 </details>`,
 		GovernanceResults: []GovernanceResult{{
@@ -444,7 +430,7 @@ This change is blocked, either reduce the costs or wait for an admin to review a
 
 func TestCommentGitHubGuardrailFailureWithoutCommentOrBlock(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
-		GovernanceComment: "",
+		CommentMarkdown: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
 			Checked: 1,
@@ -484,7 +470,7 @@ func GuardrailGoldenFileTest(t *testing.T, testName, guardrailEndpointUrl string
 }
 
 type governanceAddRunResponse struct {
-	GovernanceComment string             `json:"governanceComment"`
+	CommentMarkdown   string             `json:"commentMarkdown"`
 	GovernanceResults []GovernanceResult `json:"governanceResults"`
 }
 
@@ -501,7 +487,9 @@ func governanceTestEndpoint(garr governanceAddRunResponse) *httptest.Server {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "mutation AddRun($run: RunInput!, $commentFormat: CommentFormat!)") {
+		if strings.Contains(graphqlQuery, "mutation SavePostedPrComment($runId: String!, $comment: String!)") {
+			fmt.Fprintf(w, `[{"data": {"savePostedPrComment": true}}]\n`)
+		} else if strings.Contains(graphqlQuery, "mutation AddRun($run: RunInput!)") {
 			guardrailJson, _ := json.Marshal(garr)
 
 			fmt.Fprintf(w, `[{"data": {"addRun":
@@ -523,8 +511,10 @@ func ghTestEndpoint() *httptest.Server {
 		// show zero comments in the response for findComments
 		ghZeroCommentsResponse, "{}", "{}",
 	}
+
+	i := 0
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 }

@@ -1,27 +1,27 @@
 
- Name                                              Monthly Qty  Unit   Monthly Cost 
-                                                                                    
- azurerm_integration_service_environment.example                                    
- ├─ Base units                                             730  hours     $4,847.20 
- └─ Scale units                                          2,190  hours     $7,270.80 
-                                                                                    
- azurerm_integration_service_environment.example1                                   
- └─ Base units                                             730  hours     $4,847.20 
-                                                                                    
- azurerm_integration_service_environment.example2                                   
- └─ Base units                                             730  hours       $749.71 
-                                                                                    
- OVERALL TOTAL                                                           $17,714.91 
+ Name                                              Monthly Qty  Unit   Monthly Cost   
+                                                                                      
+ azurerm_integration_service_environment.example                                      
+ ├─ Base units                                             730  hours     $4,847.20   
+ └─ Scale units                                          2,190  hours     $7,270.80   
+                                                                                      
+ azurerm_integration_service_environment.example1                                     
+ └─ Base units                                             730  hours     $4,847.20   
+                                                                                      
+ azurerm_integration_service_environment.example2                                     
+ └─ Base units                                             730  hours       $749.71   
+                                                                                      
+ OVERALL TOTAL                                                          $17,714.91 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 3 were estimated
-∙ 6 were free:
-  ∙ 4 x azurerm_subnet
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_virtual_network
+∙ 6 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMAIntegrationServiceEnvironment          ┃ $17,715      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃       $17,715 ┃           - ┃    $17,715 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

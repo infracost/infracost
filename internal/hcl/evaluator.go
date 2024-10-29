@@ -10,9 +10,15 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/hashicorp/go-cty-funcs/cidr"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
+	componentsFuncs "github.com/turbot/terraform-components/lang/funcs"
+
+	"github.com/hashicorp/go-cty-funcs/crypto"
+	"github.com/hashicorp/go-cty-funcs/encoding"
+	"github.com/hashicorp/go-cty-funcs/filesystem"
 	"github.com/rs/zerolog"
 	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
@@ -24,7 +30,7 @@ import (
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/ui"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 var (
@@ -92,8 +98,8 @@ type Evaluator struct {
 	workspace string
 	// blockBuilder handles generating blocks in the evaluation step.
 	blockBuilder   BlockBuilder
-	newSpinner     ui.SpinnerFunc
 	logger         zerolog.Logger
+	isGraph        bool
 	filteredBlocks []*Block
 }
 
@@ -108,13 +114,34 @@ func NewEvaluator(
 	visitedModules map[string]map[string]cty.Value,
 	workspace string,
 	blockBuilder BlockBuilder,
-	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
-	parentContext *Context,
+	isGraph bool,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
 		Functions: ExpFunctions(module.RootPath, logger),
-	}, parentContext, logger)
+	}, nil, logger)
+
+	// Add any provider references from blocks in this module.
+	// We do this here instead of loadModuleWithProviders to make sure
+	// this also works with the root module
+	if module.ProviderReferences == nil {
+		module.ProviderReferences = make(map[string]*Block)
+	}
+
+	providerBlocks := module.Blocks.OfType("provider")
+	for _, block := range providerBlocks {
+		k := block.Label()
+
+		alias := block.GetAttribute("alias")
+		if alias != nil {
+			k = k + "." + alias.AsString()
+		}
+		module.ProviderReferences[k] = block
+	}
+
+	for key, provider := range module.ProviderReferences {
+		ctx.Set(provider.Values(), key)
+	}
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
@@ -159,13 +186,9 @@ func NewEvaluator(
 		workspace:      workspace,
 		workingDir:     workingDir,
 		blockBuilder:   blockBuilder,
-		newSpinner:     spinFunc,
 		logger:         l,
+		isGraph:        isGraph,
 	}
-}
-
-func (e *Evaluator) isGraphEvaluator() bool {
-	return os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true"
 }
 
 func (e *Evaluator) AddFilteredBlocks(blocks ...*Block) {
@@ -215,11 +238,6 @@ func (e *Evaluator) MissingVars() []string {
 // parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
 // this Module.
 func (e *Evaluator) Run() (*Module, error) {
-	if e.newSpinner != nil {
-		spin := e.newSpinner("Evaluating Terraform directory")
-		defer spin.Success()
-	}
-
 	var lastContext hcl.EvalContext
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.logger.Debug().Msg("evaluating top level context")
@@ -246,10 +264,16 @@ func (e *Evaluator) collectModules() *Module {
 		root.Modules = append(root.Modules, definition.Module)
 	}
 
+	// Reload the provider references for this module instance
+	// We need to do this so when we call ProviderConfigKey() we get the fully
+	// resolved provider. We might be able to improve this by only evaluating the
+	// provider block when we need it.
+	for name, providerBlock := range root.ProviderReferences {
+		e.ctx.Set(providerBlock.Values(), name)
+	}
+
 	if v := e.MissingVars(); len(v) > 0 {
-		root.Warnings = []Warning{
-			NewMissingVarsWarning(v),
-		}
+		root.Warnings = append(root.Warnings, schema.NewDiagMissingVars(v...))
 	}
 
 	return &root
@@ -280,7 +304,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 	}
 
 	if i == maxContextIterations {
-		e.logger.Warn().Msgf("hit max context iterations evaluating module %s", e.module.Name)
+		e.logger.Debug().Msgf("hit max context iterations evaluating module %s", e.module.Name)
 	}
 
 }
@@ -326,28 +350,18 @@ func (e *Evaluator) evaluateModules() {
 
 		e.visitedModules[fullName] = vars
 
-		// create a parent context which will be passed to any submodules. This will only
-		// contain the context values for the provider block as this is the only context
-		// values that should be "inherited".
-		parentContext := NewContext(&hcl.EvalContext{
-			Functions: ExpFunctions(e.module.RootPath, e.logger),
-		}, nil, e.logger)
-		providers := e.getValuesByBlockType("provider")
-		for key, provider := range providers.AsValueMap() {
-			parentContext.Set(provider, key)
-		}
-
 		moduleEvaluator := NewEvaluator(
 			Module{
-				Name:       fullName,
-				Source:     moduleCall.Module.Source,
-				Blocks:     moduleCall.Module.RawBlocks,
-				RawBlocks:  moduleCall.Module.RawBlocks,
-				RootPath:   e.module.RootPath,
-				ModulePath: moduleCall.Path,
-				Modules:    nil,
-				Parent:     &e.module,
-				SourceURL:  moduleCall.Module.SourceURL,
+				Name:               fullName,
+				Source:             moduleCall.Module.Source,
+				Blocks:             moduleCall.Module.RawBlocks,
+				RawBlocks:          moduleCall.Module.RawBlocks,
+				RootPath:           e.module.RootPath,
+				ModulePath:         moduleCall.Path,
+				Modules:            nil,
+				Parent:             &e.module,
+				SourceURL:          moduleCall.Module.SourceURL,
+				ProviderReferences: moduleCall.Module.ProviderReferences,
 			},
 			e.workingDir,
 			vars,
@@ -355,9 +369,8 @@ func (e *Evaluator) evaluateModules() {
 			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
-			nil,
 			e.logger,
-			parentContext,
+			e.isGraph,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
@@ -399,7 +412,7 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 	}
 
 	if i == maxContextIterations {
-		e.logger.Warn().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
+		e.logger.Debug().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
 	}
 
 	return e.expandDynamicBlocks(expanded...)
@@ -436,7 +449,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
 		// for each expanded dynamic block add the generated "content" as a
 		// new child block into the parent block.
 		expanded := e.expandBlockForEaches([]*Block{child})
-		for _, ex := range expanded {
+		for i, ex := range expanded {
 			content := ex.GetChildBlock("content")
 			if content == nil {
 				continue
@@ -448,7 +461,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
 			content.SetType(blockName)
 
 			for attrName, attr := range content.AttributesAsMap() {
-				b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%s", b.Reference().String(), blockName, attrName))
+				b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%d.%s", b.Reference().String(), blockName, i, attrName))
 			}
 
 			newChildBlocks = append(newChildBlocks, content)
@@ -472,6 +485,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
 		parent:      b.parent,
 		verbose:     b.verbose,
 		logger:      b.logger,
+		isGraph:     b.isGraph,
 		newMock:     b.newMock,
 		attributes:  b.attributes,
 		reference:   b.reference,
@@ -531,7 +545,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 			continue
 		}
 
-		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
+		if !e.isGraph && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("for_each")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
@@ -594,7 +608,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 					if v, ok := e.moduleCalls[clone.FullName()]; ok {
 						v.Definition = clone
 					} else {
-						modCall, err := e.loadModule(clone)
+						modCall, err := e.loadModuleWithProviders(clone)
 						if err != nil {
 							e.logger.Debug().Err(err).Msgf("failed to create expanded module call, could not load module %s", clone.FullName())
 							return false
@@ -703,7 +717,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			continue
 		}
 
-		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
+		if !e.isGraph && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("count")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
@@ -718,7 +732,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		value := countAttr.Value()
 		if !value.IsNull() && value.IsKnown() {
 			v := countAttr.AsInt()
-			if v <= math.MaxInt32 {
+			if v >= 0 && v <= math.MaxInt32 {
 				count = int(v)
 			}
 		}
@@ -762,11 +776,19 @@ func (e *Evaluator) evaluateVariable(b *Block, inputVars map[string]cty.Value) (
 
 	attrType := attributes["type"]
 	if override, exists := inputVars[b.Label()]; exists {
-		return e.convertType(b, override, attrType)
+		val, err := e.convertType(b, override, attrType)
+		if err == nil {
+			return val, nil
+		}
+
+		return override, nil
 	}
 
 	if def, exists := attributes["default"]; exists {
-		return e.convertType(b, def.Value(), attrType)
+		val, err := e.convertType(b, def.Value(), attrType)
+		if err == nil {
+			return val, nil
+		}
 	}
 
 	c, err := e.convertType(b, cty.DynamicVal, attrType)
@@ -860,13 +882,17 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 			}
 
 			e.logger.Debug().Msgf("adding %s %s to the evaluation context", b.Type(), b.Label())
-			values[b.Labels()[0]] = e.evaluateResource(b, values)
+			values[b.Labels()[0]] = e.evaluateResourceOrData(b, values)
 		}
 
 	}
 
 	return cty.ObjectVal(values)
 }
+
+// evaluateProvider evaluates a provider block.
+// The values map is used to pass in the current context values. This is only needed
+// for the legacy evaluator and is not used for the graph evaluator.
 func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.Value {
 	provider := b.Label()
 	v, exists := values[provider]
@@ -900,11 +926,18 @@ func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.
 	return cty.ObjectVal(ob)
 }
 
-func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {
+// evaluateResourceOrData evaluates a resource or data block.
+// The values map is used to pass in the current context values. This is only needed
+// for the legacy evaluator and is not used for the graph evaluator.
+func (e *Evaluator) evaluateResourceOrData(b *Block, values map[string]cty.Value) cty.Value {
 	labels := b.Labels()
 
 	blockMap, ok := values[labels[0]]
 	if !ok {
+		if values == nil {
+			values = make(map[string]cty.Value)
+		}
+
 		values[labels[0]] = cty.ObjectVal(make(map[string]cty.Value))
 		blockMap = values[labels[0]]
 	}
@@ -982,6 +1015,37 @@ func (e *Evaluator) expandedEachBlockToValue(b *Block, existingValues map[string
 	return cty.ObjectVal(ob)
 }
 
+// loadModuleWithProviders takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
+// Additionally, it returns variables to add to ["module.x.*"] variables
+func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
+	modCall, err := e.loadModule(b)
+	if err != nil {
+		return modCall, err
+	}
+
+	// Pass any provider references that should be inherited by the module.
+	// This includes any implicit providers that are inherited from the parent
+	// module, as well as any explicit provider references that are passed in
+	// via the "providers" attribute.
+	providerRefs := map[string]*Block{}
+
+	for key, block := range e.module.ProviderReferences {
+		providerRefs[key] = block
+	}
+
+	providerAttr := b.GetAttribute("providers")
+	if providerAttr != nil {
+		decodedProviders := providerAttr.DecodeProviders()
+		for key, val := range decodedProviders {
+			providerRefs[key] = providerRefs[val]
+		}
+	}
+
+	modCall.Module.ProviderReferences = providerRefs
+
+	return modCall, nil
+}
+
 // loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
 // Additionally, it returns variables to add to ["module.x.*"] variables
 func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
@@ -994,7 +1058,6 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	for _, attr := range attrs {
 		if attr.Name() == "source" {
 			source = attr.AsString()
-			break
 		}
 	}
 
@@ -1077,7 +1140,7 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 			continue
 		}
 
-		moduleCall, err := e.loadModule(moduleBlock)
+		moduleCall, err := e.loadModuleWithProviders(moduleBlock)
 		if err != nil {
 			e.logger.Debug().Err(err).Msgf("failed to load module %s ignoring", moduleBlock.LocalName())
 			continue
@@ -1090,32 +1153,33 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 // ExpFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
 func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Function {
-	return map[string]function.Function{
+	fns := map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
-		"abspath":          funcs.AbsPathFunc,
-		"basename":         funcs.BasenameFunc,
-		"base64decode":     funcs.Base64DecodeFunc,
-		"base64encode":     funcs.Base64EncodeFunc,
-		"base64gzip":       funcs.Base64GzipFunc,
-		"base64sha256":     funcs.Base64Sha256Func,
-		"base64sha512":     funcs.Base64Sha512Func,
-		"bcrypt":           funcs.BcryptFunc,
+		"abspath":          filesystem.AbsPathFunc,
+		"basename":         filesystem.BasenameFunc,
+		"base64decode":     encoding.Base64DecodeFunc,
+		"base64encode":     encoding.Base64EncodeFunc,
+		"base64gzip":       componentsFuncs.Base64GzipFunc,
+		"base64sha256":     componentsFuncs.Base64Sha256Func,
+		"base64sha512":     componentsFuncs.Base64Sha512Func,
+		"bcrypt":           crypto.BcryptFunc,
 		"can":              tryfunc.CanFunc,
 		"ceil":             stdlib.CeilFunc,
 		"chomp":            stdlib.ChompFunc,
-		"cidrhost":         funcs.CidrHostFunc,
-		"cidrnetmask":      funcs.CidrNetmaskFunc,
-		"cidrsubnet":       funcs.CidrSubnetFunc,
-		"cidrsubnets":      funcs.CidrSubnetsFunc,
-		"coalesce":         funcs.CoalesceFunc,
+		"cidrhost":         componentsFuncs.CidrHostFunc,
+		"cidrnetmask":      cidr.NetmaskFunc,
+		"cidrsubnet":       componentsFuncs.CidrSubnetFunc,
+		"cidrsubnets":      cidr.SubnetsFunc,
+		"coalesce":         funcs.CoalesceFunc, // customized from stdlib
 		"coalescelist":     stdlib.CoalesceListFunc,
 		"compact":          stdlib.CompactFunc,
 		"concat":           stdlib.ConcatFunc,
 		"contains":         stdlib.ContainsFunc,
 		"csvdecode":        stdlib.CSVDecodeFunc,
-		"dirname":          funcs.DirnameFunc,
+		"dirname":          filesystem.DirnameFunc,
 		"distinct":         stdlib.DistinctFunc,
 		"element":          stdlib.ElementFunc,
+		"endswith":         componentsFuncs.EndsWithFunc,
 		"chunklist":        stdlib.ChunklistFunc,
 		"file":             funcs.MakeFileFunc(baseDir, false),
 		"fileexists":       funcs.MakeFileExistsFunc(baseDir),
@@ -1130,50 +1194,52 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"flatten":          stdlib.FlattenFunc,
 		"floor":            stdlib.FloorFunc,
 		"format":           stdlib.FormatFunc,
-		"formatdate":       stdlib.FormatDateFunc,
+		"formatdate":       funcs.FormatDateFunc, // wraps stdlib.FormatDateFunc
 		"formatlist":       stdlib.FormatListFunc,
 		"indent":           stdlib.IndentFunc,
-		"index":            funcs.IndexFunc, // stdlib.IndexFunc is not compatible
+		"index":            componentsFuncs.IndexFunc,
 		"join":             stdlib.JoinFunc,
-		"jsondecode":       funcs.JSONDecodeFunc,
+		"jsondecode":       funcs.JSONDecodeFunc, // customized from stdlib to handle mocks
 		"jsonencode":       stdlib.JSONEncodeFunc,
 		"keys":             stdlib.KeysFunc,
-		"length":           funcs.LengthFunc,
-		"list":             funcs.ListFunc,
+		"length":           componentsFuncs.LengthFunc,
+		"list":             componentsFuncs.ListFunc,
 		"log":              stdlib.LogFunc,
-		"lookup":           funcs.LookupFunc,
+		"lookup":           componentsFuncs.LookupFunc,
 		"lower":            stdlib.LowerFunc,
-		"map":              funcs.MapFunc,
-		"matchkeys":        funcs.MatchkeysFunc,
+		"map":              componentsFuncs.MapFunc,
+		"matchkeys":        componentsFuncs.MatchkeysFunc,
 		"max":              stdlib.MaxFunc,
-		"md5":              funcs.Md5Func,
-		"merge":            funcs.MergeFunc,
+		"md5":              crypto.Md5Func,
+		"merge":            funcs.MergeFunc, // customized from stdlib
 		"min":              stdlib.MinFunc,
 		"parseint":         stdlib.ParseIntFunc,
-		"pathexpand":       funcs.PathExpandFunc,
-		"infracostlog":     funcs.LogArgs(logger),
-		"infracostprint":   funcs.PrintArgs,
+		"pathexpand":       filesystem.PathExpandFunc,
+		"infracostlog":     funcs.LogArgs(logger), // custom
+		"infracostprint":   funcs.PrintArgs,       // custom
 		"pow":              stdlib.PowFunc,
 		"range":            stdlib.RangeFunc,
 		"regex":            stdlib.RegexFunc,
 		"regexall":         stdlib.RegexAllFunc,
-		"replace":          funcs.ReplaceFunc,
+		"replace":          componentsFuncs.ReplaceFunc,
 		"reverse":          stdlib.ReverseListFunc,
-		"rsadecrypt":       funcs.RsaDecryptFunc,
+		"rsadecrypt":       componentsFuncs.RsaDecryptFunc,
 		"setintersection":  stdlib.SetIntersectionFunc,
 		"setproduct":       stdlib.SetProductFunc,
 		"setsubtract":      stdlib.SetSubtractFunc,
 		"setunion":         stdlib.SetUnionFunc,
-		"sha1":             funcs.Sha1Func,
-		"sha256":           funcs.Sha256Func,
-		"sha512":           funcs.Sha512Func,
+		"sha1":             crypto.Sha1Func,
+		"sha256":           crypto.Sha256Func,
+		"sha512":           crypto.Sha512Func,
 		"signum":           stdlib.SignumFunc,
 		"slice":            stdlib.SliceFunc,
 		"sort":             stdlib.SortFunc,
 		"split":            stdlib.SplitFunc,
+		"startswith":       componentsFuncs.StartsWithFunc,
+		"strcontains":      componentsFuncs.StrContainsFunc,
 		"strrev":           stdlib.ReverseFunc,
 		"substr":           stdlib.SubstrFunc,
-		"timestamp":        funcs.MockTimestampFunc, // We want to return a deterministic value each time
+		"timestamp":        funcs.MockTimestampFunc, // custom. We want to return a deterministic value each time
 		"timeadd":          stdlib.TimeAddFunc,
 		"title":            stdlib.TitleFunc,
 		"tostring":         funcs.MakeToFunc(cty.String),
@@ -1182,20 +1248,25 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"toset":            funcs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),
 		"tolist":           funcs.MakeToFunc(cty.List(cty.DynamicPseudoType)),
 		"tomap":            funcs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),
-		"transpose":        funcs.TransposeFunc,
+		"transpose":        componentsFuncs.TransposeFunc,
 		"trim":             stdlib.TrimFunc,
 		"trimprefix":       stdlib.TrimPrefixFunc,
 		"trimspace":        stdlib.TrimSpaceFunc,
 		"trimsuffix":       stdlib.TrimSuffixFunc,
 		"try":              tryfunc.TryFunc,
 		"upper":            stdlib.UpperFunc,
-		"urlencode":        funcs.URLEncodeFunc,
-		"uuid":             funcs.UUIDFunc,
-		"uuidv5":           funcs.UUIDV5Func,
+		"urlencode":        encoding.URLEncodeFunc,
+		"uuid":             componentsFuncs.UUIDFunc,
+		"uuidv5":           componentsFuncs.UUIDV5Func,
 		"values":           stdlib.ValuesFunc,
-		"yamldecode":       funcs.YAMLDecodeFunc,
+		"yamldecode":       funcs.YAMLDecodeFunc, // customized yaml.YAMLDecodeFunc
 		"yamlencode":       yaml.YAMLEncodeFunc,
 		"zipmap":           stdlib.ZipmapFunc,
 	}
 
+	fns["templatefile"] = funcs.MakeTemplateFileFunc(baseDir, func() map[string]function.Function {
+		return fns
+	})
+
+	return fns
 }

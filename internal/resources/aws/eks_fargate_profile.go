@@ -12,7 +12,13 @@ type EKSFargateProfile struct {
 	Region  string
 }
 
-var EKSFargateProfileUsageSchema = []*schema.UsageItem{}
+func (r *EKSFargateProfile) CoreType() string {
+	return "EKSFargateProfile"
+}
+
+func (r *EKSFargateProfile) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EKSFargateProfile) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -26,7 +32,7 @@ func (r *EKSFargateProfile) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    EKSFargateProfileUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

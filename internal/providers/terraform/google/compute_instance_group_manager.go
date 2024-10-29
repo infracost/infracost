@@ -8,22 +8,26 @@ import (
 func getComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_compute_instance_group_manager",
-		RFunc:               newComputeInstanceGroupManager,
+		CoreRFunc:           newComputeInstanceGroupManager,
 		Notes:               []string{"Multiple versions are not supported."},
 		ReferenceAttributes: []string{"version.0.instance_template", "google_compute_per_instance_config.instance_group_manager"},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			return []string{d.Get("name").String()}
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			var region string
+
+			zone := d.Get("zone").String()
+			if zone != "" {
+				region = zoneToRegion(zone)
+			}
+
+			return region
+		},
 	}
 }
 
-func newComputeInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var region string
-	zone := d.Get("zone").String()
-	if zone != "" {
-		region = zoneToRegion(zone)
-	}
-
+func newComputeInstanceGroupManager(d *schema.ResourceData) schema.CoreResource {
 	targetSize := int64(1)
 	if d.Get("target_size").Exists() {
 		targetSize = d.Get("target_size").Int()
@@ -72,7 +76,7 @@ func newComputeInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData)
 
 	r := &google.ComputeInstanceGroupManager{
 		Address:           d.Address,
-		Region:            region,
+		Region:            d.Region,
 		MachineType:       machineType,
 		PurchaseOption:    purchaseOption,
 		TargetSize:        targetSize,
@@ -80,7 +84,5 @@ func newComputeInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData)
 		ScratchDisks:      scratchDisks,
 		GuestAccelerators: guestAccelerators,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

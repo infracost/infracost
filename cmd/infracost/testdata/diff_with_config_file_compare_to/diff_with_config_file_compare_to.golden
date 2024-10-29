@@ -1,6 +1,8 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev
-Module path: dev
+Project: testdata-diff_with_config_file_compare_to-dev
+Module path: REPLACED_PROJECT_PATH/testdata/diff_with_config_file_compare_to/dev
 
 ~ aws_instance.web_app
   -$210 ($462 → $252)
@@ -8,13 +10,13 @@ Module path: dev
     ~ Instance usage (Linux/UNIX, on-demand, m5.2xlarge → m5.large)
       -$210 ($280 → $70)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev (Module path: dev)
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_with_config_file_compare_to/dev (Module path: REPLACED_PROJECT_PATH/testdata/diff_with_config_file_compare_to/dev)
 Amount:  -$210 ($462 → $252)
 Percent: -45%
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod
-Module path: prod
+Project: testdata-diff_with_config_file_compare_to-prod
+Module path: REPLACED_PROJECT_PATH/testdata/diff_with_config_file_compare_to/prod
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -22,23 +24,25 @@ Module path: prod
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
       +$561 ($561 → $1,121)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod (Module path: prod)
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_with_config_file_compare_to/prod (Module path: REPLACED_PROJECT_PATH/testdata/diff_with_config_file_compare_to/prod)
 Amount:  +$561 ($743 → $1,303)
 Percent: +75%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-Infracost estimate: Monthly cost will increase by $350 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ith_config_file_compare_to/dev ┃ -$210 (-45%) ┃ $252             ┃
-┃ infracost/infracost/cmd/infraco...th_config_file_compare_to/prod ┃ +$561 (+75%) ┃ $1,303           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate increased by $350 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ith_config_file_compare_to/dev ┃         -$210 ┃           - ┃ -$210 (-45%) ┃
+┃ infracost/infracost/cmd/infraco...th_config_file_compare_to/prod ┃         +$561 ┃           - ┃ +$561 (+75%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // StorageShare struct represents an Azure Files Storage Shares
@@ -133,6 +134,7 @@ func (r *StorageShare) dataStorageCostComponent() *schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -168,6 +170,7 @@ func (r *StorageShare) snapshotCostComponents() []*schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}}
 }
 
@@ -203,6 +206,7 @@ func (r *StorageShare) metadataCostComponents() []*schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}}
 }
 
@@ -238,6 +242,7 @@ func (r *StorageShare) readOperationsCostComponents() []*schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}}
 }
 
@@ -273,6 +278,7 @@ func (r *StorageShare) writeOperationsCostComponents() []*schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}}
 }
 
@@ -309,6 +315,7 @@ func (r *StorageShare) listOperationsCostComponents() []*schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}}
 }
 
@@ -349,6 +356,7 @@ func (r *StorageShare) otherOperationsCostComponents() []*schema.CostComponent {
 				PurchaseOption:   strPtr("Consumption"),
 				StartUsageAmount: strPtr("0"),
 			},
+			UsageBased: true,
 		}}
 }
 
@@ -385,5 +393,6 @@ func (r *StorageShare) dataRetrievalCostComponents() []*schema.CostComponent {
 				PurchaseOption:   strPtr("Consumption"),
 				StartUsageAmount: strPtr("0"),
 			},
+			UsageBased: true,
 		}}
 }

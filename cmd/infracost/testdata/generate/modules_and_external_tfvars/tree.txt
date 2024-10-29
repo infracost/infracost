@@ -1,0 +1,13 @@
+.
+├── db/
+│   ├── modules/
+│   │   └── db_config/
+│   │       └── main.tf
+│   ├── dev/
+│   │   └── module-call|..-modules-db_config.tf
+│   └── prod/
+│       └── module-call|..-modules-db_config.tf
+├── envs/
+│   ├── dev.tfvars
+│   └── prod.tfvars
+└── default.tfvars

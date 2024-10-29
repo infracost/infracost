@@ -1,0 +1,83 @@
+{
+  "projects": [
+    {
+      "breakdown": {
+        "resources": [
+          {
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)"
+              }
+            ],
+            "name": "aws_instance.web_app",
+            "subresources": [
+              {
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)"
+                  }
+                ],
+                "name": "root_block_device"
+              },
+              {
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)"
+                  },
+                  {
+                    "name": "Provisioned IOPS"
+                  }
+                ],
+                "name": "ebs_block_device[0]"
+              }
+            ],
+            "tags": {
+              "A": "123456",
+              "B": "654321"
+            }
+          }
+        ]
+      },
+      "name": "REPLACED_PROJECT_PATH/testdata/yor-tag-override",
+      "pastBreakdown": {
+        "resources": [
+          {
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)"
+              }
+            ],
+            "name": "aws_instance.web_app",
+            "subresources": [
+              {
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)"
+                  }
+                ],
+                "name": "root_block_device"
+              },
+              {
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)"
+                  },
+                  {
+                    "name": "Provisioned IOPS"
+                  }
+                ],
+                "name": "ebs_block_device[0]"
+              }
+            ],
+            "tags": {
+              "A": "123456",
+              "B": "654321"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+Err:
+

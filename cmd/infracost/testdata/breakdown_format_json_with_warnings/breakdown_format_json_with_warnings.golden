@@ -13,24 +13,26 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_warnings",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_format_json_with_warnings",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_warnings",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings",
         "warnings": [
           {
-            "code": 1,
+            "code": 105,
             "message": "Missing Terraform vars",
             "data": [
               "variable.not_provided"
-            ]
+            ],
+            "isError": false
           }
         ],
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_format_json_with_warnings/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_warnings/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -39,17 +41,20 @@
       "pastBreakdown": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 0,
@@ -64,10 +69,13 @@
   ],
   "totalHourlyCost": "0",
   "totalMonthlyCost": "0",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "0",
   "pastTotalMonthlyCost": "0",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 0,
@@ -84,4 +92,4 @@ Err:
 
 
 Logs:
-WRN Input values were not provided for following Terraform variables: "variable.not_provided". Use --terraform-var-file or --terraform-var to specify them.
+WARN Input values were not provided for following Terraform variables: "variable.not_provided". Use --terraform-var-file or --terraform-var to specify them.

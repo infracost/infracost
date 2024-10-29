@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // LogicAppStandard struct represents Azure Logic App Standard.
@@ -100,6 +101,9 @@ func (r *LogicAppStandard) workflowVCoreCostComponent() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Standard vCPU Duration")},
 			},
 		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
 	}
 }
 
@@ -124,6 +128,9 @@ func (r *LogicAppStandard) workflowMemoryCostComponent() *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "meterName", Value: strPtr("Standard Memory Duration")},
 			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
 		},
 	}
 }
@@ -151,6 +158,7 @@ func (r *LogicAppStandard) standardConnectorCostComponent() *schema.CostComponen
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -177,6 +185,7 @@ func (r *LogicAppStandard) enterpriseConnectorCostComponent() *schema.CostCompon
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 

@@ -11,6 +11,7 @@ type Metadata struct {
 	InfracostCommand string `json:"infracostCommand"`
 
 	Branch            string    `json:"vcsBranch"`
+	BaseCommitSHA     string    `json:"vcsBaseCommitSha,omitempty"`
 	CommitSHA         string    `json:"vcsCommitSha"`
 	CommitAuthorName  string    `json:"vcsCommitAuthorName"`
 	CommitAuthorEmail string    `json:"vcsCommitAuthorEmail"`
@@ -26,6 +27,11 @@ type Metadata struct {
 	VCSPullRequestLabels []string `json:"vcsPullRequestLabels,omitempty"`
 	VCSPipelineRunID     string   `json:"vcsPipelineRunId,omitempty"`
 	VCSPullRequestID     string   `json:"vcsPullRequestId,omitempty"`
+
+	UsageApiEnabled        bool   `json:"usageApiEnabled,omitempty"`
+	UsageFilePath          string `json:"usageFilePath,omitempty"`
+	ConfigFilePath         string `json:"configFilePath,omitempty"`
+	ConfigFileHasUsageFile bool   `json:"configFileHasUsageFile,omitempty"`
 }
 
 // NewMetadata returns a Metadata struct filled with information built from the RunContext.
@@ -33,6 +39,7 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 	m := Metadata{
 		InfracostCommand:  ctx.CMD,
 		Branch:            ctx.VCSMetadata.Branch.Name,
+		BaseCommitSHA:     ctx.VCSMetadata.BaseCommit.SHA,
 		CommitSHA:         ctx.VCSMetadata.Commit.SHA,
 		CommitAuthorEmail: ctx.VCSMetadata.Commit.AuthorEmail,
 		CommitAuthorName:  ctx.VCSMetadata.Commit.AuthorName,
@@ -53,6 +60,22 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 
 	if ctx.VCSMetadata.Pipeline != nil {
 		m.VCSPipelineRunID = ctx.VCSMetadata.Pipeline.ID
+	}
+
+	if ctx.Config.UsageAPIEndpoint != "" {
+		m.UsageApiEnabled = true
+	}
+	if ctx.Config.UsageFilePath != "" {
+		m.UsageFilePath = ctx.Config.UsageFilePath
+	}
+	if ctx.Config.ConfigFilePath != "" {
+		m.ConfigFilePath = ctx.Config.ConfigFilePath
+		for _, p := range ctx.Config.Projects {
+			if p.UsageFile != "" {
+				m.ConfigFileHasUsageFile = true
+				break
+			}
+		}
 	}
 
 	return m

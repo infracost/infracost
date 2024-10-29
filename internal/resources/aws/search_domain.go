@@ -51,7 +51,13 @@ type SearchDomain struct {
 	ClusterWarmCount   *int64
 }
 
-var ElasticsearchDomainUsageSchema = []*schema.UsageItem{}
+func (r *SearchDomain) CoreType() string {
+	return "SearchDomain"
+}
+
+func (r *SearchDomain) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *SearchDomain) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -259,7 +265,7 @@ func (r *SearchDomain) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    ElasticsearchDomainUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

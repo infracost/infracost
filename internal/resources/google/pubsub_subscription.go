@@ -14,10 +14,16 @@ type PubSubSubscription struct {
 	SnapshotStorageGB    *float64 `infracost_usage:"snapshot_storage_gb"`
 }
 
-var PubSubSubscriptionUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_message_data_tb", ValueType: schema.Float64, DefaultValue: 0.0},
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "snapshot_storage_gb", ValueType: schema.Float64, DefaultValue: 0.0},
+func (r *PubSubSubscription) CoreType() string {
+	return "PubSubSubscription"
+}
+
+func (r *PubSubSubscription) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_message_data_tb", ValueType: schema.Float64, DefaultValue: 0.0},
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "snapshot_storage_gb", ValueType: schema.Float64, DefaultValue: 0.0},
+	}
 }
 
 func (r *PubSubSubscription) PopulateUsage(u *schema.UsageData) {
@@ -59,6 +65,7 @@ func (r *PubSubSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Retained acknowledged message storage",
@@ -77,6 +84,7 @@ func (r *PubSubSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Snapshot message backlog storage",
@@ -95,8 +103,9 @@ func (r *PubSubSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: PubSubSubscriptionUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

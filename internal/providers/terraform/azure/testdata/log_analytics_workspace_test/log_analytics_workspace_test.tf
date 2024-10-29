@@ -8,13 +8,6 @@ resource "azurerm_resource_group" "example" {
   location = "West Europe"
 }
 
-resource "azurerm_log_analytics_workspace" "free_workspace" {
-  name                = "acctest-free"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = "Free"
-}
-
 resource "azurerm_log_analytics_workspace" "per_gb_data_ingestion" {
   name                = "acctest-01"
   location            = azurerm_resource_group.example.location

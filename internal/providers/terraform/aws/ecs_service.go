@@ -14,12 +14,12 @@ import (
 func getECSServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_ecs_service",
-		RFunc:               NewECSService,
-		ReferenceAttributes: []string{"cluster", "task_definition"},
+		CoreRFunc:           NewECSService,
+		ReferenceAttributes: []string{"cluster", "task_definition", "aws_ecs_task_set.service"},
 	}
 }
 
-func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewECSService(d *schema.ResourceData) schema.CoreResource {
 	memoryGB := float64(0)
 	vcpu := float64(0)
 	inferenceAcceleratorDeviceType := ""
@@ -33,6 +33,16 @@ func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		if ref.Type == "aws_ecs_task_definition" {
 			taskDefinition = ref
 			break
+		}
+	}
+
+	for _, ref := range d.References("aws_ecs_task_set.service") {
+		for _, setRef := range ref.References("task_definition") {
+			if setRef.Type == "aws_ecs_task_definition" {
+				taskDefinition = setRef
+				break
+			}
+
 		}
 	}
 
@@ -51,9 +61,7 @@ func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		VCPU:                           vcpu,
 		InferenceAcceleratorDeviceType: inferenceAcceleratorDeviceType,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }
 
 // calcLaunchType determines the launch type for the resource using the following precedence:

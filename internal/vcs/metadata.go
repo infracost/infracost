@@ -682,7 +682,7 @@ type azurePullRequestResponse struct {
 	MergeId       string    `json:"mergeId"`
 }
 
-// getAzureRepoPRInfo attempts to get the azurePullRequestResponse using Azure DevOps Pipeline variables.
+// getAzureReposPRInfo attempts to get the azurePullRequestResponse using Azure DevOps Pipeline variables.
 // This method is expected to often fail as Azure DevOps requires users to explicitly pass System.AccessToken as
 // an env var on the job step.
 func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
@@ -760,6 +760,9 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget
 // on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
 	m.Branch.Name = strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+	if m.Branch.Name == "" {
+		m.Branch.Name = getEnv("BUILD_SOURCEBRANCHNAME")
+	}
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
 	if len(matches) <= 1 {
@@ -1053,6 +1056,7 @@ type Metadata struct {
 	Remote      Remote
 	Branch      Branch
 	Commit      Commit
+	BaseCommit  Commit
 	PullRequest *PullRequest
 	Pipeline    *Pipeline
 }

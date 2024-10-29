@@ -13,13 +13,14 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_hcl",
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl",
+      "displayName": "main",
       "metadata": {
-        "path": "testdata/breakdown_with_policy_data_upload_hcl",
+        "path": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl",
         "type": "terraform_dir",
         "policySha": "someshastring",
         "pastPolicySha": "someshastring",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_with_policy_data_upload_hcl",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl",
         "providers": [
           {
             "name": "aws",
@@ -27,7 +28,7 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
             "startLine": 1,
             "endLine": 14
           }
@@ -36,163 +37,35 @@
       "pastBreakdown": {
         "resources": [
           {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-            "resourceType": "aws_appautoscaling_target",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 72,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-                  "startLine": 66
-                }
-              ],
-              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 72,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-              "startLine": 66
-            }
-          },
-          {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-            "resourceType": "aws_appautoscaling_target",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 64,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-                  "startLine": 58
-                }
-              ],
-              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 64,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-              "startLine": 58
-            }
-          },
-          {
-            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
-            "resourceType": "aws_dynamodb_table",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
-                  "endLine": 56,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-                  "startLine": 39
-                }
-              ],
-              "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 56,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-              "startLine": 39
-            },
-            "hourlyCost": "0.0078",
-            "monthlyCost": "5.694",
-            "costComponents": [
-              {
-                "name": "Write capacity unit (WCU, autoscaling)",
-                "unit": "WCU",
-                "hourlyQuantity": "0.0082191780821918",
-                "monthlyQuantity": "6",
-                "price": "0.4745",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Read capacity unit (RCU)",
-                "unit": "RCU",
-                "hourlyQuantity": "0.0410958904109589",
-                "monthlyQuantity": "30",
-                "price": "0.0949",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Data storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.25",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Point-In-Time Recovery (PITR) backup storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.2",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "On-demand backup storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.1",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Table data restored",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.15",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Streams read request unit (sRRU)",
-                "unit": "sRRUs",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.0000002",
-                "hourlyCost": null,
-                "monthlyCost": null
-              }
-            ]
-          },
-          {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 37,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
                   "startLine": 16
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
               "endLine": 37,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 16
             },
             "hourlyCost": "0.91197260273972602",
@@ -205,7 +78,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -222,7 +96,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -239,176 +114,223 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
             ]
+          },
+          {
+            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
+            "resourceType": "aws_dynamodb_table",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "tagPropagation": {
+              "to": "replica",
+              "from": "",
+              "attribute": "replica.0.propagate_tags"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
+                  "endLine": 60,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "startLine": 39
+                }
+              ],
+              "checksum": "4cbbaf5c99cb877fda5defe78120dc37a0e59e1e3e48cfc8d624138e0cc90219",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 60,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "startLine": 39
+            },
+            "hourlyCost": "0.0078",
+            "monthlyCost": "5.694",
+            "monthlyUsageCost": "2.847",
+            "costComponents": [
+              {
+                "name": "Write capacity unit (WCU, autoscaling)",
+                "unit": "WCU",
+                "hourlyQuantity": "0.0082191780821918",
+                "monthlyQuantity": "6",
+                "price": "0.4745",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Read capacity unit (RCU)",
+                "unit": "RCU",
+                "hourlyQuantity": "0.0410958904109589",
+                "monthlyQuantity": "30",
+                "price": "0.0949",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "priceNotFound": false
+              },
+              {
+                "name": "Data storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.25",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Point-In-Time Recovery (PITR) backup storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "On-demand backup storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.1",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Table data restored",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.15",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Streams read request unit (sRRU)",
+                "unit": "sRRUs",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000002",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+            "resourceType": "aws_appautoscaling_target",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+                  "endLine": 76,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "startLine": 70
+                }
+              ],
+              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 76,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "startLine": 70
+            }
+          },
+          {
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+            "resourceType": "aws_appautoscaling_target",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+                  "endLine": 68,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "startLine": 62
+                }
+              ],
+              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 68,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "startLine": 62
+            }
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
-        "totalMonthlyCost": "671.434"
+        "totalMonthlyCost": "671.434",
+        "totalMonthlyUsageCost": "2.847"
       },
       "breakdown": {
         "resources": [
           {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-            "resourceType": "aws_appautoscaling_target",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 72,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-                  "startLine": 66
-                }
-              ],
-              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 72,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-              "startLine": 66
-            }
-          },
-          {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-            "resourceType": "aws_appautoscaling_target",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 64,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-                  "startLine": 58
-                }
-              ],
-              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 64,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-              "startLine": 58
-            }
-          },
-          {
-            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
-            "resourceType": "aws_dynamodb_table",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
-                  "endLine": 56,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-                  "startLine": 39
-                }
-              ],
-              "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 56,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
-              "startLine": 39
-            },
-            "hourlyCost": "0.0078",
-            "monthlyCost": "5.694",
-            "costComponents": [
-              {
-                "name": "Write capacity unit (WCU, autoscaling)",
-                "unit": "WCU",
-                "hourlyQuantity": "0.0082191780821918",
-                "monthlyQuantity": "6",
-                "price": "0.4745",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Read capacity unit (RCU)",
-                "unit": "RCU",
-                "hourlyQuantity": "0.0410958904109589",
-                "monthlyQuantity": "30",
-                "price": "0.0949",
-                "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
-              },
-              {
-                "name": "Data storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.25",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Point-In-Time Recovery (PITR) backup storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.2",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "On-demand backup storage",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.1",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Table data restored",
-                "unit": "GB",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.15",
-                "hourlyCost": null,
-                "monthlyCost": null
-              },
-              {
-                "name": "Streams read request unit (sRRU)",
-                "unit": "sRRUs",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
-                "price": "0.0000002",
-                "hourlyCost": null,
-                "monthlyCost": null
-              }
-            ]
-          },
-          {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
               "foo": "bar",
+              "volume_tags.DefaultNotOverride": "defaultnotoverride",
+              "volume_tags.DefaultOverride": "defaultoverride",
               "volume_tags.baz": "bat"
             },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 37,
-                  "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
                   "startLine": 16
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
               "endLine": 37,
-              "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 16
             },
             "hourlyCost": "0.91197260273972602",
@@ -421,7 +343,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -438,7 +361,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -455,20 +379,196 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
             ]
+          },
+          {
+            "name": "aws_dynamodb_table.autoscale_dynamodb_table",
+            "resourceType": "aws_dynamodb_table",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "tagPropagation": {
+              "to": "replica",
+              "from": "",
+              "attribute": "replica.0.propagate_tags"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
+                  "endLine": 60,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "startLine": 39
+                }
+              ],
+              "checksum": "4cbbaf5c99cb877fda5defe78120dc37a0e59e1e3e48cfc8d624138e0cc90219",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 60,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "startLine": 39
+            },
+            "hourlyCost": "0.0078",
+            "monthlyCost": "5.694",
+            "monthlyUsageCost": "2.847",
+            "costComponents": [
+              {
+                "name": "Write capacity unit (WCU, autoscaling)",
+                "unit": "WCU",
+                "hourlyQuantity": "0.0082191780821918",
+                "monthlyQuantity": "6",
+                "price": "0.4745",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Read capacity unit (RCU)",
+                "unit": "RCU",
+                "hourlyQuantity": "0.0410958904109589",
+                "monthlyQuantity": "30",
+                "price": "0.0949",
+                "hourlyCost": "0.0039",
+                "monthlyCost": "2.847",
+                "priceNotFound": false
+              },
+              {
+                "name": "Data storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.25",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Point-In-Time Recovery (PITR) backup storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "On-demand backup storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.1",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Table data restored",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.15",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              },
+              {
+                "name": "Streams read request unit (sRRU)",
+                "unit": "sRRUs",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000002",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          },
+          {
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+            "resourceType": "aws_appautoscaling_target",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+                  "endLine": 76,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "startLine": 70
+                }
+              ],
+              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 76,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "startLine": 70
+            }
+          },
+          {
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+            "resourceType": "aws_appautoscaling_target",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf:1",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+                  "endLine": 68,
+                  "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                  "startLine": 62
+                }
+              ],
+              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 68,
+              "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+              "startLine": 62
+            }
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
-        "totalMonthlyCost": "671.434"
+        "totalMonthlyCost": "671.434",
+        "totalMonthlyUsageCost": "2.847"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 4,
@@ -483,10 +583,13 @@
   ],
   "totalHourlyCost": "0.91977260273972602",
   "totalMonthlyCost": "671.434",
+  "totalMonthlyUsageCost": "2.847",
   "pastTotalHourlyCost": "0.91977260273972602",
   "pastTotalMonthlyCost": "671.434",
+  "pastTotalMonthlyUsageCost": "2.847",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 4,

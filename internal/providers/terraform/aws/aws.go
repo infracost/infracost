@@ -3,9 +3,7 @@ package aws
 import (
 	"strings"
 
-	"github.com/rs/zerolog/log"
-	"github.com/tidwall/gjson"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -70,14 +68,16 @@ func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	return specialContexts
 }
 
-func GetResourceRegion(resourceType string, v gjson.Result) string {
+func GetResourceRegion(d *schema.ResourceData) string {
+	v := d.RawValues
+
 	// If a region key exists in the values use that
 	if v.Get("region").Exists() && v.Get("region").String() != "" {
 		return v.Get("region").String()
 	}
 
 	// Otherwise try and parse the ARN from the values
-	arnAttr, ok := arnAttributeMap[resourceType]
+	arnAttr, ok := arnAttributeMap[d.Type]
 	if !ok {
 		arnAttr = "arn"
 	}
@@ -89,7 +89,7 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	arn := v.Get(arnAttr).String()
 	p := strings.Split(arn, ":")
 	if len(p) < 4 {
-		log.Debug().Msgf("Unexpected ARN format for %s", arn)
+		logging.Logger.Debug().Msgf("Unexpected ARN format for %s", arn)
 		return ""
 	}
 

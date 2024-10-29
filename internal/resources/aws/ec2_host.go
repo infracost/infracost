@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// Ec2Host defines an AWS EC2 dedicated host. It suppports multiple instance families & allows
+// EC2Host defines an AWS EC2 dedicated host. It supports multiple instance families & allows
 // you to run workloads on a physical server dedicated for your use. You can use on-demand or
 // reservation pricing.
 //
@@ -27,9 +27,15 @@ type EC2Host struct {
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
 }
 
-var EC2HostUsageSchema = []*schema.UsageItem{
-	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+func (r *EC2Host) CoreType() string {
+	return "EC2Host"
+}
+
+func (r *EC2Host) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+		{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	}
 }
 
 func (r *EC2Host) PopulateUsage(u *schema.UsageData) {
@@ -52,7 +58,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 		priceFilter, err = resolver.PriceFilter()
 
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 		}
 
 		purchaseOptionLabel = "reserved"
@@ -74,7 +80,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 	}
 
 	hostAttributeFilters := []*schema.AttributeFilter{
-		{Key: "usagetype", Value: strPtr(fmt.Sprintf("%s:%s", hostPurchaseType, instanceFamily))},
+		{Key: "usagetype", ValueRegex: regexPtr(fmt.Sprintf("%s:%s$", hostPurchaseType, instanceFamily))},
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -96,7 +102,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    EC2HostUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

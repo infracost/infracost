@@ -1,5 +1,9 @@
 package schema
 
+import (
+	"github.com/tidwall/gjson"
+)
+
 type CoreResourceFunc func(*ResourceData) CoreResource
 
 // CoreResource is the new/preferred way to represent provider-agnostic resources that
@@ -47,7 +51,17 @@ type CoreResourceWithUsageParams interface {
 // top level functions that can supply additional provider-agnostic information
 // (such as Infracost Cloud usage estimates) before the resource is built.
 type PartialResource struct {
-	ResourceData *ResourceData
+	Type                                    string
+	Address                                 string
+	Tags                                    *map[string]string
+	DefaultTags                             *map[string]string
+	ProviderSupportsDefaultTags             bool
+	ProviderLink                            string
+	TagPropagation                          *TagPropagation
+	UsageData                               *UsageData
+	Metadata                                map[string]gjson.Result
+	MissingVarsCausingUnknownTagKeys        []string
+	MissingVarsCausingUnknownDefaultTagKeys []string
 
 	// CoreResource is the new/preferred struct for providing an intermediate-object
 	// that contains all provider-derived information, but has not yet been built into
@@ -63,12 +77,31 @@ type PartialResource struct {
 	CloudResourceIDs []string
 }
 
+func NewPartialResource(d *ResourceData, r *Resource, cr CoreResource, cloudResourceIds []string) *PartialResource {
+	return &PartialResource{
+		Type:                                    d.Type,
+		Address:                                 d.Address,
+		Tags:                                    d.Tags,
+		DefaultTags:                             d.DefaultTags,
+		ProviderSupportsDefaultTags:             d.ProviderSupportsDefaultTags,
+		ProviderLink:                            d.ProviderLink,
+		TagPropagation:                          d.TagPropagation,
+		UsageData:                               d.UsageData,
+		Metadata:                                d.Metadata,
+		CoreResource:                            cr,
+		Resource:                                r,
+		CloudResourceIDs:                        cloudResourceIds,
+		MissingVarsCausingUnknownTagKeys:        d.MissingVarsCausingUnknownTagKeys,
+		MissingVarsCausingUnknownDefaultTagKeys: d.MissingVarsCausingUnknownDefaultTagKeys,
+	}
+}
+
 // BuildResource create a new Resource from the CoreResource, or (for backward compatibility) returns
 // a previously built Resource
 func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource {
 	var res *Resource
 	if partial.CoreResource != nil {
-		u := partial.ResourceData.UsageData
+		u := partial.UsageData
 		u = u.Merge(fetchedUsage)
 
 		partial.CoreResource.PopulateUsage(u)
@@ -79,16 +112,22 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 
 	if res == nil {
 		return &Resource{
-			Name:         partial.ResourceData.Address,
-			ResourceType: partial.ResourceData.Type,
+			Name:         partial.Address,
+			ResourceType: partial.Type,
 			IsSkipped:    true,
 			SkipMessage:  "This resource is not currently supported",
 		}
 	}
 
-	res.ResourceType = partial.ResourceData.Type
-	res.Tags = partial.ResourceData.Tags
-	res.Metadata = partial.ResourceData.Metadata
+	res.ResourceType = partial.Type
+	res.Tags = partial.Tags
+	res.DefaultTags = partial.DefaultTags
+	res.ProviderSupportsDefaultTags = partial.ProviderSupportsDefaultTags
+	res.ProviderLink = partial.ProviderLink
+	res.TagPropagation = partial.TagPropagation
+	res.Metadata = partial.Metadata
+	res.MissingVarsCausingUnknownTagKeys = partial.MissingVarsCausingUnknownTagKeys
+	res.MissingVarsCausingUnknownDefaultTagKeys = partial.MissingVarsCausingUnknownDefaultTagKeys
 	return res
 }
 

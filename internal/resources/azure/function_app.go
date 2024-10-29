@@ -195,6 +195,7 @@ func (r *FunctionApp) appFunctionConsumptionExecutionTimeCostComponent() *schema
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("400000"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -225,6 +226,7 @@ func (r *FunctionApp) appFunctionConsumptionExecutionsCostComponent() *schema.Co
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("100000"),
 		},
+		UsageBased: true,
 	}
 }
 

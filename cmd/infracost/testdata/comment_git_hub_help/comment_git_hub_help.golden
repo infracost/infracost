@@ -20,6 +20,7 @@ FLAGS
                                             delete-and-new    Delete previous matching comments and create a new comment (default "update")
       --commit string                     Commit SHA to post comment on, mutually exclusive with pull-request
       --dry-run                           Generate comment without actually posting to GitHub
+      --format string                     Output format: json
       --github-api-url string             GitHub API URL (default "https://api.github.com")
       --github-tls-cert-file string       Path to optional client certificate file when communicating with GitHub Enterprise API
       --github-tls-insecure-skip-verify   Skip TLS certificate checks for GitHub Enterprise API
@@ -31,7 +32,7 @@ FLAGS
       --pull-request int                  Pull request number to post comment on, mutually exclusive with commit
       --repo string                       Repository in format owner/repo
       --show-all-projects                 Show all projects in the table of the comment output
-      --show-skipped                      List unsupported and free resources
+      --show-skipped                      List unsupported resources (default true)
       --tag string                        Customize hidden markdown tag used to detect comments posted by Infracost
 
 GLOBAL FLAGS

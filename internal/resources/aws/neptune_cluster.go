@@ -18,10 +18,16 @@ type NeptuneCluster struct {
 	BackupStorageGB       *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var NeptuneClusterUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_io_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *NeptuneCluster) CoreType() string {
+	return "NeptuneCluster"
+}
+
+func (r *NeptuneCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_io_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *NeptuneCluster) PopulateUsage(u *schema.UsageData) {
@@ -41,7 +47,7 @@ func (r *NeptuneCluster) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    NeptuneClusterUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -61,12 +67,13 @@ func (r *NeptuneCluster) storageCostComponent() *schema.CostComponent {
 			Region:     strPtr(r.Region),
 			Service:    strPtr("AmazonNeptune"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s$/i", "StorageUsage"))},
+				{Key: "usagetype", ValueRegex: regexPtr("^([A-Z]{3}\\d-|Global-|EU-)?StorageUsage$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -92,6 +99,7 @@ func (r *NeptuneCluster) ioRequestsCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -117,5 +125,6 @@ func (r *NeptuneCluster) backupStorageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

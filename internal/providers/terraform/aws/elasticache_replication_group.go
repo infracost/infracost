@@ -8,7 +8,7 @@ import (
 func getElastiCacheReplicationGroupItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_elasticache_replication_group",
-		RFunc:               NewElastiCacheReplicationGroup,
+		CoreRFunc:           NewElastiCacheReplicationGroup,
 		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			// returns a name that will match the custom format used by aws_appautoscaling_target.resource_id
@@ -20,7 +20,7 @@ func getElastiCacheReplicationGroupItem() *schema.RegistryItem {
 		},
 	}
 }
-func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewElastiCacheReplicationGroup(d *schema.ResourceData) schema.CoreResource {
 	cacheClusters := d.GetInt64OrDefault("num_cache_clusters", 1)
 	if d.IsEmpty("num_cache_clusters") && !d.IsEmpty("number_cache_clusters") {
 		// check for deprecated attribute
@@ -55,7 +55,5 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData, u *schema.UsageData)
 		SnapshotRetentionLimit:      d.Get("snapshot_retention_limit").Int(),
 		AppAutoscalingTarget:        targets,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -17,6 +17,14 @@ var ELBUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
 }
 
+func (r *ELB) CoreType() string {
+	return "ELB"
+}
+
+func (r *ELB) UsageSchema() []*schema.UsageItem {
+	return ELBUsageSchema
+}
+
 func (r *ELB) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
@@ -33,7 +41,7 @@ func (r *ELB) BuildResource() *schema.Resource {
 			r.lbCostComponent(),
 			r.dataProcessedCostComponent(dataProcessed),
 		},
-		UsageSchema: ELBUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 
@@ -71,5 +79,6 @@ func (r *ELB) dataProcessedCostComponent(dataProcessed *decimal.Decimal) *schema
 				{Key: "usagetype", ValueRegex: strPtr("/DataProcessing-Bytes/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

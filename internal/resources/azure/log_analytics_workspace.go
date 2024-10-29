@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -187,7 +187,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 	}
 
 	if _, ok := unsupportedLegacySkus[strings.ToLower(r.SKU)]; ok {
-		log.Warn().Msgf("skipping %s as it uses legacy pricing options", r.Address)
+		logging.Logger.Warn().Msgf("skipping %s as it uses legacy pricing options", r.Address)
 
 		return &schema.Resource{
 			Name:        r.Address,
@@ -298,6 +298,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("5"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -323,6 +324,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -348,6 +350,7 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -372,6 +375,7 @@ func (r *LogAnalyticsWorkspace) basicLogIngestion() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Basic Logs Data Ingestion")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -396,6 +400,7 @@ func (r *LogAnalyticsWorkspace) basicLogSearch() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Search Queries Scanned")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -420,6 +425,7 @@ func (r *LogAnalyticsWorkspace) archiveData() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Data Archive")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -444,6 +450,7 @@ func (r *LogAnalyticsWorkspace) archiveDataRestore() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Data Restore")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -468,5 +475,6 @@ func (r *LogAnalyticsWorkspace) archiveDataSearch() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Search Jobs Scanned")},
 			},
 		},
+		UsageBased: true,
 	}
 }

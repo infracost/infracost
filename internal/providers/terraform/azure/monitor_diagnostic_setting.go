@@ -12,14 +12,16 @@ func getMonitorDiagnosticSettingRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"target_resource_id",
 		},
+		GetRegion: func(defaultRegion string, d *schema.ResourceData) string {
+			return lookupRegion(d, []string{"target_resource_id"})
+		},
 	}
 }
 
 func newMonitorDiagnosticSetting(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"target_resource_id"})
 	return &azure.MonitorDiagnosticSetting{
 		Address: d.Address,
-		Region:  region,
+		Region:  d.Region,
 
 		EventHubTarget:        !d.IsEmpty("eventhub_authorization_rule_id"),
 		PartnerSolutionTarget: !d.IsEmpty("partner_solution_id"),

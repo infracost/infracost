@@ -13,6 +13,8 @@ import (
 	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -23,13 +25,22 @@ type DetectedProject struct {
 	Name              string
 	Path              string
 	TerraformVarFiles []string
+	DependencyPaths   []string
+	Env               string
+}
+
+type DetectedRooModule struct {
+	Path     string
+	Projects []DetectedProject
 }
 
 // Variables hold the global variables that are passed into any template that the Parser evaluates.
 type Variables struct {
-	Branch           string
-	BaseBranch       string
-	DetectedProjects []DetectedProject
+	RepoName            string
+	Branch              string
+	BaseBranch          string
+	DetectedProjects    []DetectedProject
+	DetectedRootModules []DetectedRooModule
 }
 
 // Parser is the representation of an initialized Infracost template parser.
@@ -54,6 +65,11 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"startsWith": p.startsWith,
 		"endsWith":   p.endsWith,
 		"contains":   p.contains,
+		"trimPrefix": p.trimPrefix,
+		"trimSuffix": p.trimSuffix,
+		"replace":    p.replace,
+		"quote":      p.quote,
+		"squote":     p.squote,
 		"pathExists": p.pathExists,
 		"matchPaths": p.matchPaths,
 		"list":       p.list,
@@ -144,6 +160,45 @@ func (p *Parser) contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
 
+// trimPrefix returns s without the provided prefix string.
+func (p *Parser) trimPrefix(s, prefix string) string {
+	return strings.TrimPrefix(s, prefix)
+}
+
+// trimSuffix returns s without the provided suffix string.
+func (p *Parser) trimSuffix(s, suffix string) string {
+	return strings.TrimSuffix(s, suffix)
+}
+
+// replace returns s with all instances of old replaced by new.
+func (p *Parser) replace(old, new, s string) string {
+	return strings.ReplaceAll(s, old, new)
+}
+
+// quote wraps the provided strings in double quotes.
+// Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L83
+func (p *Parser) quote(str ...interface{}) string {
+	out := make([]string, 0, len(str))
+	for _, s := range str {
+		if s != nil {
+			out = append(out, fmt.Sprintf("%q", strval(s)))
+		}
+	}
+	return strings.Join(out, " ")
+}
+
+// squote wraps the provided strings in single quotes.
+// Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L93C1-L101C2
+func (p *Parser) squote(str ...interface{}) string {
+	out := make([]string, 0, len(str))
+	for _, s := range str {
+		if s != nil {
+			out = append(out, fmt.Sprintf("'%v'", s))
+		}
+	}
+	return strings.Join(out, " ")
+}
+
 // pathExists reports whether path is a subpath within base.
 func (p *Parser) pathExists(base, path string) bool {
 	if !filepath.IsAbs(base) {
@@ -205,19 +260,20 @@ func (p *Parser) pathExists(base, path string) bool {
 //		- { _path: environment/prod/terraform.tfvars, _dir: environment/prod, env: prod }
 func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 	match := pathToRegexp.MustMatch(pattern, nil)
+	var parserVariables map[string]interface{}
+	b, _ := jsoniter.Marshal(p.variables)
+	_ = jsoniter.Unmarshal(b, &parserVariables)
 
 	var matches []map[interface{}]interface{}
 	_ = filepath.WalkDir(p.repoDir, func(path string, d fs.DirEntry, err error) error {
 		rel, _ := filepath.Rel(p.repoDir, path)
 		res, _ := match(rel)
 		if res != nil {
-			var out map[string]interface{}
-			params := make(map[interface{}]interface{})
+			// create a map of only the size of the parser variables and the special params
+			// from the match (_path and _dir).
+			params := make(map[interface{}]interface{}, len(parserVariables)+2)
 
-			b, _ := jsoniter.Marshal(p.variables)
-			_ = jsoniter.Unmarshal(b, &out)
-
-			for k, v := range out {
+			for k, v := range parserVariables {
 				params[k] = v
 			}
 			for k, v := range res.Params {
@@ -288,11 +344,12 @@ func (p *Parser) readFile(path string) string {
 
 // parseYaml decodes provided yaml contents and assigns decoded values into a
 // generic out value. This can be used as a simple object in the templates.
+// This returns an empty map if the yaml is invalid.
 func (p *Parser) parseYaml(contents string) map[string]interface{} {
 	var out map[string]interface{}
 	err := yaml.Unmarshal([]byte(contents), &out)
 	if err != nil {
-		panic(err)
+		logging.Logger.Error().Err(err).Msg("failed to unmarshal yaml when calling parseYaml in the config template")
 	}
 
 	return out
@@ -300,11 +357,12 @@ func (p *Parser) parseYaml(contents string) map[string]interface{} {
 
 // parseJson decodes the provided json contents and assigns decoded values into a
 // generic out value. This can be used as a simple object in the templates.
+// This returns an empty map if the json is invalid.
 func (p *Parser) parseJson(contents string) map[string]interface{} {
 	var out map[string]interface{}
 	err := jsoniter.Unmarshal([]byte(contents), &out)
 	if err != nil {
-		panic(err)
+		logging.Logger.Error().Err(err).Msg("failed to unmarshal json when calling parseJson in the config template")
 	}
 
 	return out
@@ -333,4 +391,21 @@ func isSubdirectory(base, target string) bool {
 	}
 
 	return !strings.HasPrefix(relPath, "..") && fileInfo.Mode()&os.ModeSymlink == 0
+}
+
+// strval returns the string representation of v.
+// Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L174
+func strval(v interface{}) string {
+	switch v := v.(type) {
+	case string:
+		return v
+	case []byte:
+		return string(v)
+	case error:
+		return v.Error()
+	case fmt.Stringer:
+		return v.String()
+	default:
+		return fmt.Sprintf("%v", v)
+	}
 }

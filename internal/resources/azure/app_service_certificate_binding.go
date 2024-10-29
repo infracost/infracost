@@ -16,7 +16,13 @@ type AppServiceCertificateBinding struct {
 	SSLState string
 }
 
-var AppServiceCertificateBindingUsageSchema = []*schema.UsageItem{}
+func (r *AppServiceCertificateBinding) CoreType() string {
+	return "AppServiceCertificateBinding"
+}
+
+func (r *AppServiceCertificateBinding) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *AppServiceCertificateBinding) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -34,9 +40,10 @@ func (r *AppServiceCertificateBinding) BuildResource() *schema.Resource {
 	} else {
 
 		return &schema.Resource{
-			Name:      r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: AppServiceCertificateBindingUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -65,6 +72,7 @@ func (r *AppServiceCertificateBinding) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AppServiceCertificateBindingUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

@@ -16,7 +16,7 @@ func getLogicAppIntegrationAccountRegistryItem() *schema.RegistryItem {
 }
 
 func newLogicAppIntegrationAccount(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
+	region := d.Region
 
 	return azure.NewLogicAppIntegrationAccount(d.Address, region, d.GetStringOrDefault("sku_name", "free"))
 }

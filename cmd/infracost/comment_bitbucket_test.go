@@ -28,3 +28,9 @@ func TestCommentBitbucketExcludeDetails(t *testing.T) {
 		[]string{"comment", "bitbucket", "--bitbucket-token", "abc", "--repo", "test/test", "--pull-request", "5", "--path", "./testdata/terraform_v0.14_breakdown.json", "--exclude-cli-output", "--dry-run"},
 		nil)
 }
+
+func TestCommentBitbucketCommentPath(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment", "bitbucket", "--bitbucket-token", "abc", "--repo", "test/test", "--pull-request", "5", "--path", "./testdata/terraform_v0.14_breakdown.json", "--comment-path", "./testdata/comment.md", "--dry-run"},
+		nil)
+}

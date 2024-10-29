@@ -7,16 +7,16 @@ import (
 
 func getGlobalAcceleratorRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_globalaccelerator_accelerator",
-		RFunc: newGlobalAccelerator,
+		Name:      "aws_globalaccelerator_accelerator",
+		CoreRFunc: newGlobalAccelerator,
 	}
 }
 
-func newGlobalAccelerator(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newGlobalAccelerator(d *schema.ResourceData) schema.CoreResource {
 
 	r := &aws.GlobalAccelerator{
 		Address: d.Address,
 	}
 
-	return r.BuildResource()
+	return r
 }

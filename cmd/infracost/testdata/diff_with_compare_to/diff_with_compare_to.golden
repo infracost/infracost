@@ -1,5 +1,7 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/diff_with_compare_to
+Project: main
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -26,22 +28,24 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_compare_to
         - Provisioned IOPS
           -$52
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_compare_to
+Monthly cost change for REPLACED_PROJECT_PATH/testdata/diff_with_compare_to
 Amount:  -$743 ($2,046 → $1,303)
 Percent: -36%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 1 cloud resource was detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 was estimated
 
-Infracost estimate: Monthly cost will decrease by $743 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                         ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/diff_with_compare_to ┃ -$743 (-36%) ┃ $1,303           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+Infracost estimate: Monthly estimate decreased by $743 ↓
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                 ┃ Baseline cost ┃ Usage cost* ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ REPLACED_PROJECT_PATH/testdata/diff_with_compare_to ┃         -$743 ┃           - ┃ -$743 (-36%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

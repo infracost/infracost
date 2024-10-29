@@ -3,6 +3,7 @@
   "metadata": {
     "infracostCommand": "diff",
     "vcsBranch": "stub-branch",
+    "vcsBaseCommitSha": "stub-sha",
     "vcsCommitSha": "stub-sha",
     "vcsCommitAuthorName": "stub-author",
     "vcsCommitAuthorEmail": "stub@stub.com",
@@ -13,23 +14,25 @@
   "currency": "USD",
   "projects": [
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/dev",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/dev",
+      "displayName": "dev",
       "metadata": {
-        "path": "testdata/diff_with_compare_to_with_past_project_error/dev",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/dev",
         "type": "terraform_dir",
         "terraformModulePath": "dev",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/dev",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/dev",
         "errors": [
           {
-            "code": 2,
+            "code": 102,
             "message": "Diff baseline error: Error loading Terraform modules: failed to inspect module path dev diag: Invalid block definition: Either a quoted string block label or an opening brace (\"{\") is expected here. (and 1 other messages)",
-            "data": null
+            "data": null,
+            "isError": false
           }
         ],
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_compare_to_with_past_project_error/dev/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/dev/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -39,7 +42,8 @@
       "breakdown": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": null,
       "summary": {
@@ -53,16 +57,17 @@
       }
     },
     {
-      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/prod",
+      "name": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod",
+      "displayName": "prod",
       "metadata": {
-        "path": "testdata/diff_with_compare_to_with_past_project_error/prod",
+        "path": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod",
         "type": "terraform_dir",
         "terraformModulePath": "prod",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/prod",
+        "vcsSubPath": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
             "startLine": 1,
             "endLine": 7
           }
@@ -92,7 +97,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -109,7 +115,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -126,7 +133,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -135,7 +143,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -143,7 +152,8 @@
           }
         ],
         "totalHourlyCost": "1.017315068493150679",
-        "totalMonthlyCost": "742.64"
+        "totalMonthlyCost": "742.64",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -151,18 +161,20 @@
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "tags": {},
+            "providerSupportsDefaultTags": true,
+            "providerLink": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod/main.tf:1",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 23,
-                  "filename": "testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
+                  "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
                   "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "endLine": 23,
-              "filename": "testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
+              "filename": "REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
               "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
@@ -175,7 +187,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -192,7 +205,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -209,7 +223,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -218,7 +233,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -226,12 +242,14 @@
           }
         ],
         "totalHourlyCost": "1.017315068493150679",
-        "totalMonthlyCost": "742.64"
+        "totalMonthlyCost": "742.64",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 1,
@@ -246,10 +264,13 @@
   ],
   "totalHourlyCost": "1.017315068493150679",
   "totalMonthlyCost": "742.64",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "1.017315068493150679",
   "pastTotalMonthlyCost": "742.64",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 2,

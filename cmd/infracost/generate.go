@@ -1,10 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"sort"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -13,12 +16,13 @@ import (
 	"github.com/infracost/infracost/internal/config/template"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/providers"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
 )
 
 type generateConfigCommand struct {
-	repoPath     string
+	wd           string
 	templatePath string
 	template     string
 	outFile      string
@@ -40,7 +44,7 @@ func newGenerateConfigCommand() *cobra.Command {
 		RunE:      gen.run,
 	}
 
-	cmd.Flags().StringVar(&gen.repoPath, "repo-path", ".", "Path to the Terraform repo or directory you want to run the template file on")
+	cmd.Flags().StringVar(&gen.wd, "repo-path", ".", "Path to the Terraform repo or directory you want to run the template file on")
 	cmd.Flags().StringVar(&gen.template, "template", "", "Infracost template string that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.templatePath, "template-path", "", "Path to the Infracost template file that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.outFile, "out-file", "", "Save output to a file")
@@ -55,50 +59,103 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	repoPath, _ := os.Getwd()
-	if g.repoPath != "." && g.repoPath != "" {
-		repoPath = g.repoPath
+	wd, _ := os.Getwd()
+	if g.wd != "." && g.wd != "" {
+		wd = g.wd
 	}
 
 	var buf bytes.Buffer
 
-	parsers, err := hcl.LoadParsers(
-		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
-		repoPath,
-		nil,
-		&hcl.ProjectLocatorConfig{},
-		logging.Logger,
-	)
+	ctx := config.EmptyRunContext()
 	hasTemplate := g.template != "" || g.templatePath != ""
-
-	if err != nil && !hasTemplate {
-		return err
-	}
-
+	var definedProjects bool
 	if hasTemplate {
-		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
-		if err != nil {
-			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+		var reader io.ReadSeeker
+		if g.templatePath != "" {
+			file, err := os.Open(g.templatePath)
+			if err != nil {
+				return fmt.Errorf("failed to open file: %w", err)
+			}
+			defer file.Close()
+			reader = file
+		} else {
+			reader = strings.NewReader(g.template)
 		}
 
-		detectedProjects := make([]template.DetectedProject, len(parsers))
-		for i, p := range parsers {
+		partialConfig, err := unmarshalAutoDetectSection(reader)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal autodetect section: %w", err)
+		}
+
+		ctx.Config.Autodetect = partialConfig.Autodetect
+
+		_, _ = reader.Seek(0, io.SeekStart)
+		definedProjects = hasLineStartingWith(reader, "projects:")
+	}
+
+	var autoProjects []hcl.DetectedProject
+	detectionOutput, err := providers.Detect(ctx, &config.Project{Path: wd}, false)
+	if err != nil {
+		if definedProjects {
+			logging.Logger.Debug().Err(err).Msg("could not detect providers")
+		} else {
+			return fmt.Errorf("could not detect providers %w", err)
+		}
+	}
+
+	for _, provider := range detectionOutput.Providers {
+		if v, ok := provider.(hcl.DetectedProject); ok {
+			autoProjects = append(autoProjects, v)
+		}
+	}
+
+	if definedProjects {
+		m, err := vcs.MetadataFetcher.Get(wd, nil)
+		if err != nil {
+			logging.Logger.Warn().Msgf("could not fetch git metadata err: %s, default template variables will be blank", err)
+		}
+
+		detectedProjects := make([]template.DetectedProject, len(autoProjects))
+		detectedPaths := map[string][]template.DetectedProject{}
+		for i, p := range autoProjects {
 			detectedProjects[i] = template.DetectedProject{
 				Name:              p.ProjectName(),
 				Path:              p.RelativePath(),
-				TerraformVarFiles: p.TerraformVarFiles(),
+				Env:               p.EnvName(),
+				TerraformVarFiles: p.VarFiles(),
+				DependencyPaths:   p.DependencyPaths(),
+			}
+
+			if v, ok := detectedPaths[p.RelativePath()]; ok {
+				detectedPaths[p.RelativePath()] = append(v, detectedProjects[i])
+			} else {
+				detectedPaths[p.RelativePath()] = []template.DetectedProject{detectedProjects[i]}
 			}
 		}
 
+		var detectedRootModules []template.DetectedRooModule
+		for path, projects := range detectedPaths {
+			detectedRootModules = append(detectedRootModules, template.DetectedRooModule{
+				Path:     path,
+				Projects: projects,
+			})
+		}
+
+		sort.Slice(detectedRootModules, func(i, j int) bool {
+			return detectedRootModules[i].Path < detectedRootModules[j].Path
+		})
+
 		variables := template.Variables{
-			Branch:           m.Branch.Name,
-			DetectedProjects: detectedProjects,
+			RepoName:            m.Remote.Name,
+			Branch:              m.Branch.Name,
+			DetectedProjects:    detectedProjects,
+			DetectedRootModules: detectedRootModules,
 		}
 		if m.PullRequest != nil {
 			variables.BaseBranch = m.PullRequest.BaseBranch
 		}
 
-		parser := template.NewParser(repoPath, variables)
+		parser := template.NewParser(wd, variables)
 		if g.template != "" {
 			err := parser.Compile(g.template, &buf)
 			if err != nil {
@@ -112,7 +169,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	} else {
 		buf.WriteString("version: 0.1\n\nprojects:\n")
-		for _, p := range parsers {
+		for _, p := range autoProjects {
 			buf.WriteString(p.YAML())
 		}
 	}
@@ -178,4 +235,65 @@ func newGenerateCommand() *cobra.Command {
 	cmd.AddCommand(newGenerateConfigCommand())
 
 	return cmd
+}
+
+// hasLineStartingWith checks if a file contains a line starting with a specified prefix.
+func hasLineStartingWith(reader io.Reader, prefix string) bool {
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		if strings.HasPrefix(strings.TrimSpace(scanner.Text()), prefix) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// unmarshalAutoDetectSection unmarshals the autodetect section of a template
+// file. This is required because config templates are not valid YAML and thus
+// the native yaml.Unmarshal function cannot be used as it throws an error. To
+// get around this we seek the file and read the autodetect section into partial
+// config which can be unmarshalled.
+func unmarshalAutoDetectSection(reader io.Reader) (*config.Config, error) {
+	r := bufio.NewReader(reader)
+	var autodetectSection bytes.Buffer
+	var recording bool
+	var autodetectIndentation int
+	for {
+		line, err := r.ReadString('\n')
+		if err != nil && err != io.EOF {
+			return nil, fmt.Errorf("failed to read file: %w", err)
+		}
+
+		if line == "autodetect:\n" {
+			recording = true
+			autodetectIndentation = getIndentation(line)
+		} else if recording && getIndentation(line) <= autodetectIndentation && line != "\n" {
+			break
+		}
+
+		if recording {
+			autodetectSection.WriteString(line)
+		}
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	var partial config.Config
+	if err := yaml.Unmarshal(autodetectSection.Bytes(), &partial); err != nil {
+		return nil, fmt.Errorf("yaml unmarshal failed: %w", err)
+	}
+
+	return &partial, nil
+}
+
+func getIndentation(s string) int {
+	for i, c := range s {
+		if c != ' ' {
+			return i
+		}
+	}
+	return len(s)
 }

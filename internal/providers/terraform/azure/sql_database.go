@@ -1,8 +1,7 @@
 package azure
 
 import (
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -46,14 +45,14 @@ var (
 	}
 )
 
-func getAzureRMSQLDatabaseRegistryItem() *schema.RegistryItem {
+func getSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_sql_database",
-		RFunc: newSQLDatabase,
+		Name:      "azurerm_sql_database",
+		CoreRFunc: newSQLDatabase,
 	}
 }
 
-func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("location").String()
 
 	config := skuConfig{
@@ -79,7 +78,7 @@ func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		var err error
 		config, err = parseSKU(d.Address, sku)
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msg(err.Error())
 			return nil
 		}
 	}
@@ -109,9 +108,7 @@ func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		ZoneRedundant:     d.Get("zone_redundant").Bool(),
 		BackupStorageType: "Geo",
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func parseSKU(address, sku string) (skuConfig, error) {

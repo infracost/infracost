@@ -19,6 +19,14 @@ type VPNGatewayConnection struct {
 	Region string
 }
 
+func (r *VPNGatewayConnection) CoreType() string {
+	return "VPNGatewayConnection"
+}
+
+func (r *VPNGatewayConnection) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
+
 // PopulateUsage parses the u schema.UsageData into the VPNGatewayConnection.
 // It uses the `infracost_usage` struct tags to populate data into the VPNGatewayConnection.
 func (v *VPNGatewayConnection) PopulateUsage(u *schema.UsageData) {
@@ -33,7 +41,8 @@ func (v *VPNGatewayConnection) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (v *VPNGatewayConnection) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: v.Address,
+		Name:        v.Address,
+		UsageSchema: v.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "S2S Connections",

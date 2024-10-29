@@ -9,11 +9,11 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_cosmosdb_account" "with_blank_geo_location" {
-  name                            = "tfex-cosmosdb-account"
-  resource_group_name             = azurerm_resource_group.example.name
-  location                        = azurerm_resource_group.example.location
-  offer_type                      = "Standard"
-  enable_multiple_write_locations = true
+  name                = "tfex-cosmosdb-account"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  offer_type          = "Standard"
+
 
   consistency_policy {
     consistency_level = "Strong"

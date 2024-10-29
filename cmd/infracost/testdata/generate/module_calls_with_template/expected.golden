@@ -1,0 +1,21 @@
+version: 0.1
+
+projects:
+  - path: infra/dev
+    name: infra-dev
+    terraform_var_files:
+    dependency_paths:
+      - infra/dev/**
+      - infra/modules/is_also_called/**
+      - infra/modules/is_called/**
+  - path: infra/modules/is_a_project
+    name: infra-modules-is_a_project
+    terraform_var_files:
+    dependency_paths:
+  - path: infra/prod
+    name: infra-prod
+    terraform_var_files:
+    dependency_paths:
+      - infra/modules/is_called/**
+      - infra/prod/**
+
