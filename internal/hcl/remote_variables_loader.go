@@ -418,12 +418,12 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 	}
 
 	if len(stacks) == 0 {
-		logging.Logger.Debug().Msg("no stack found, skipping Spacelift remote variable loading")
+		logging.Logger.Debug().Msgf("no stack found for environment %s, skipping Spacelift remote variable loading", options.EnvName)
 		return nil, nil
 	}
 
 	if len(stacks) > 1 {
-		logging.Logger.Debug().Msg("more than one stack found, skipping Spacelift remote variable loading")
+		logging.Logger.Debug().Msgf("more than one stack found for environment %s, stacks %v, skipping Spacelift remote variable loading", options.EnvName, stacks)
 		return nil, nil
 	}
 
@@ -431,7 +431,7 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 	stackEnvs := stacks[0].Config
 
 	if len(stackEnvs) == 0 {
-		logging.Logger.Debug().Msg("no stack environment variables found, skipping Spacelift remote variable loading")
+		logging.Logger.Debug().Msgf("no stack environment variables found for environment %s, skipping Spacelift remote variable loading", options.EnvName)
 		return nil, nil
 	}
 
