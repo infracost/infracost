@@ -1,0 +1,43 @@
+<conventions>
+    <purpose>
+        The purpose of this document is to describe the required casing paradigm needed for this
+        project. We require camelCase for indexes to particular get operations.
+    </purpose>
+    <instructions>
+        <instruction>
+            look for all instances of .Get() on a `schema.ResourceData` object.
+            they will generally be in the form of `d.Get("some_key")`...
+        </instruction>
+        <instruction>
+            if the key is a compound word, the key should be in camelCase.
+        </instruction>
+    </instructions>
+    <examples>
+        <example>
+            <before>
+                <![CDATA[
+            func NewACMCertificate(d *schema.ResourceData) schema.CoreResource {
+                r := &aws.ACMCertificate{
+                    Address:                 d.Address,
+                    Region:                  d.Get("region").String(),
+                    CertificateAuthorityARN: d.Get("certificate_authority_arn").String(),
+                }
+                return r
+            }
+            ]]>
+            </before>
+            <after>
+                <![CDATA[
+            func NewACMCertificate(d *schema.ResourceData) schema.CoreResource {
+                r := &aws.ACMCertificate{
+                    Address:                 d.Address,
+                    Region:                  d.Get("region").String(),
+                    CertificateAuthorityARN: d.Get("certificateAuthorityArn").String(),
+                }
+                return r
+            }
+            ]]>
+            </after>
+        </example>
+    </examples>
+</conventions>
