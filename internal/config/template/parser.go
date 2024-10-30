@@ -65,6 +65,7 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"startsWith": p.startsWith,
 		"endsWith":   p.endsWith,
 		"contains":   p.contains,
+		"splitList":  p.splitList,
 		"trimPrefix": p.trimPrefix,
 		"trimSuffix": p.trimSuffix,
 		"replace":    p.replace,
@@ -158,6 +159,11 @@ func (p *Parser) endsWith(s, suffix string) bool {
 // contains reports whether substr is within s.
 func (p *Parser) contains(s, substr string) bool {
 	return strings.Contains(s, substr)
+}
+
+// splitList splits the string s into a slice of substrings separated by sep.
+func (p *Parser) splitList(sep, s string) []string {
+	return strings.Split(s, sep)
 }
 
 // trimPrefix returns s without the provided prefix string.
