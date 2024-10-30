@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aider",
     "websockets>=13.1",
     "python-dotenv>=1.0.1",
     "openai>=1.51.0",
