@@ -275,6 +275,14 @@ func OptionGraphEvaluator() Option {
 	}
 }
 
+// OptionWithProjectName sets the project name for the parser.
+// This is used if the project name has been explicitly set by the user or the autodetection
+func OptionWithProjectName(name string) Option {
+	return func(p *Parser) {
+		p.projectName = name
+	}
+}
+
 type DetectedProject interface {
 	ProjectName() string
 	EnvName() string
@@ -288,6 +296,7 @@ type DetectedProject interface {
 type Parser struct {
 	startingPath          string
 	detectedProjectPath   string
+	projectName           string
 	tfEnvVars             map[string]cty.Value
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
@@ -553,10 +562,16 @@ func (p *Parser) RelativePath() string {
 // ProjectName generates a name for the project that can be used
 // in the Infracost config file.
 func (p *Parser) ProjectName() string {
+	if p.projectName != "" {
+		return p.projectName
+	}
+
 	name := config.CleanProjectName(p.RelativePath())
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
+	} else if p.workspaceName != "" && p.workspaceName != defaultTerraformWorkspaceName {
+		name = fmt.Sprintf("%s-%s", name, p.workspaceName)
 	}
 
 	return name
@@ -568,7 +583,7 @@ func (p *Parser) EnvName() string {
 		return p.moduleSuffix
 	}
 
-	return p.ProjectName()
+	return p.envMatcher.EnvName(p.ProjectName())
 }
 
 // TerraformVarFiles returns the list of terraform var files that the parser
@@ -626,8 +641,9 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 	if p.remoteVariableLoaders != nil {
 		for _, loader := range p.remoteVariableLoaders {
 			remoteVars, err := loader.Load(RemoteVarLoaderOptions{
-				Blocks:  blocks,
-				EnvName: p.EnvName(),
+				Blocks:      blocks,
+				ModulePath:  p.RelativePath(),
+				Environment: p.EnvName(),
 			})
 			if err != nil {
 				p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
