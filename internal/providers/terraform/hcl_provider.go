@@ -174,9 +174,15 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		options = append(options, hcl.OptionGraphEvaluator())
 	}
 
+	if ctx.ProjectConfig.Name != "" {
+		options = append(options, hcl.OptionWithProjectName(ctx.ProjectConfig.Name))
+	}
+
+	envMatcher := hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions)
+
 	return &HCLProvider{
 		policyClient:   policyClient,
-		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions), loader, logger, options...),
+		Parser:         hcl.NewParser(rootPath, envMatcher, loader, logger, options...),
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
@@ -186,14 +192,6 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 func (p *HCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *HCLProvider) ProjectName() string {
-	if p.ctx.ProjectConfig.Name != "" {
-		return p.ctx.ProjectConfig.Name
-	}
-
-	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
-		return p.Parser.ProjectName() + "-" + p.ctx.ProjectConfig.TerraformWorkspace
-	}
-
 	return p.Parser.ProjectName()
 }
 
