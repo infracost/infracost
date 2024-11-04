@@ -1,0 +1,41 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.5/.schema/devbox.schema.json",
+  "packages": [
+    "path:./devbox.d/pulumi_flake#default",
+    "python@3.12",
+    "bat@latest",
+    "mypy@latest",
+    "oh-my-zsh@latest",
+    "pyright@latest",
+    "starship@latest",
+    "zsh@latest",
+    "coreutils@latest",
+    "yq@latest",
+    "gomplate@latest",
+    "portaudio@latest",
+    "ffmpeg@latest",
+    "uv@latest",
+    "git@latest"
+  ],
+  "env": {
+    "VENV_DIR":                ".venv",
+    "VIRTUAL_ENV":             ".venv",
+    "UV_PYTHON":               "$DEVBOX_PROJECT_ROOT/.venv/bin/python",
+    "PATH":                    "$VENV_DIR/bin:$PATH:$PWD/bin:$DEVBOX_PROJECT_ROOT/result/bin",
+    "PYTHONPATH":              "$PYTHONPATH:$DEVBOX_PROJECT_ROOT",
+    "PYTHON_INTERPRETER_PATH": "$VENV_DIR/bin/python",
+    "PIPENV_PIPFILE":          "$DEVBOX_PROJECT_ROOT/Pipfile",
+    "OPENAI_API_TYPE":         "openai"
+  },
+  "shell": {
+    "init_hook": [
+      "uv venv",
+      ". $VENV_DIR/bin/activate",
+      "uv sync",
+      "source $DEVBOX_PROJECT_ROOT/devbox.d/envs.sh",
+      "$DEVBOX_PROJECT_ROOT/devbox.d/startup.sh",
+      "uv pip install -r pyproject.toml"
+    ],
+    "scripts": {}
+  }
+}

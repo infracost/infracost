@@ -28,6 +28,7 @@ type ResourceData struct {
 	// use this value instead of the deprecated d.Get("region").String() or
 	// lookupRegion method.
 	Region string
+	PulumiUrn     string
 }
 
 type TagPropagation struct {
@@ -47,6 +48,7 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		RawValues:     rawValues,
 		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    nil,
+		PulumiUrn:     "",
 	}
 }
 
@@ -59,6 +61,20 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 		RawValues:     gjson.Result{},
 		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    cfResource,
+		PulumiUrn:     "",
+	}
+}
+
+func NewPulumiResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result, pulumiURN string) *ResourceData {
+	return &ResourceData{
+		Type:          resourceType,
+		ProviderName:  providerName,
+		Address:       address,
+		Tags:          tags,
+		RawValues:     rawValues,
+		ReferencesMap: make(map[string][]*ResourceData),
+		CFResource:    nil,
+		PulumiUrn:     pulumiURN,
 	}
 }
 
@@ -128,6 +144,7 @@ func (d *ResourceData) AddReference(k string, reference *ResourceData, reverseRe
 	if _, ok := d.ReferencesMap[key]; !ok {
 		d.ReferencesMap[key] = make([]*ResourceData, 0)
 	}
+
 	d.ReferencesMap[key] = append(d.ReferencesMap[key], reference)
 
 	// add any reverse references

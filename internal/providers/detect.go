@@ -14,8 +14,10 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
+	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/pulumi/pulumi/pkg/v3/display"
 )
 
 type DetectionOutput struct {
@@ -221,6 +223,10 @@ func DetectProjectType(path string, forceCLI bool) ProjectType {
 		return ProjectTypeTerraformPlanBinary
 	}
 
+	if isPulumiPreviewJSON(path) {
+		return pulumi.NewPreviewJSONProvider(ctx, includePastResources), nil
+	}
+
 	if forceCLI {
 		if isTerragruntNestedDir(path, 5) {
 			return ProjectTypeTerragruntCLI
@@ -328,6 +334,18 @@ func isTerragruntNestedDir(path string, maxDepth int) bool {
 		}
 	}
 	return false
+}
+
+func isPulumiPreviewJSON(path string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat display.PreviewDigest
+
+	err = json.Unmarshal(b, &jsonFormat)
+	return err == nil
 }
 
 // goformation lib is not threadsafe, so we run this check synchronously
