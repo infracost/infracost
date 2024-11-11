@@ -160,7 +160,25 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		}
 	}
 
-	loader := modules.NewModuleLoader(ctx.RunContext.Config.CachePath(), modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
+	var remoteCache modules.RemoteCache
+	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
+		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix)
+		if err != nil {
+			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
+		} else {
+			remoteCache = s3ModuleCache
+		}
+	}
+
+	loader := modules.NewModuleLoader(modules.ModuleLoaderOptions{
+		CachePath:         runCtx.Config.CachePath(),
+		HCLParser:         modules.NewSharedHCLParser(),
+		CredentialsSource: credsSource,
+		SourceMap:         runCtx.Config.TerraformSourceMap,
+		Logger:            logger,
+		ModuleSync:        runCtx.ModuleMutex,
+		RemoteCache:       remoteCache,
+	})
 	cachePath := ctx.RunContext.Config.CachePath()
 	initialPath := rootPath.DetectedPath
 	rootPath.DetectedPath = initialPath

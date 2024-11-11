@@ -8,8 +8,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rs/zerolog"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/credentials"
@@ -30,7 +31,14 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 
 	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, opts.SourceMap, logger, &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath:         path,
+		HCLParser:         NewSharedHCLParser(),
+		CredentialsSource: &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
+		SourceMap:         opts.SourceMap,
+		Logger:            logger,
+		ModuleSync:        &sync2.KeyMutex{},
+	})
 
 	manifest, err := moduleLoader.Load(path)
 	if !assert.NoError(t, err) {
@@ -256,7 +264,14 @@ func TestMultiProject(t *testing.T) {
 
 	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath:         path,
+		HCLParser:         NewSharedHCLParser(),
+		CredentialsSource: &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
+		SourceMap:         config.TerraformSourceMap{},
+		Logger:            logger,
+		ModuleSync:        &sync2.KeyMutex{},
+	})
 
 	wg := &sync.WaitGroup{}
 	wg.Add(3)

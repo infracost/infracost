@@ -43,6 +43,13 @@ var (
 	maxSparseCheckoutDepth = 1
 )
 
+// RemoteCache is an interface that defines the methods for a remote cache, i.e. an S3 bucket.
+type RemoteCache interface {
+	Exists(key string) (bool, error)
+	Get(key string, dest string) error
+	Put(key string, src string) error
+}
+
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
 //
 // The path should be the root directory of the Terraform project. We use a distinct module loader per Terraform project,
@@ -69,24 +76,33 @@ type SourceMapResult struct {
 	Version  string
 	RawQuery string
 }
+type ModuleLoaderOptions struct {
+	CachePath         string
+	HCLParser         *SharedHCLParser
+	CredentialsSource *CredentialsSource
+	SourceMap         config.TerraformSourceMap
+	Logger            zerolog.Logger
+	ModuleSync        *intSync.KeyMutex
+	RemoteCache       RemoteCache
+}
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(cachePath string, hclParser *SharedHCLParser, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger zerolog.Logger, moduleSync *intSync.KeyMutex) *ModuleLoader {
-	fetcher := NewPackageFetcher(logger)
+func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
+	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger)
 	// we need to have a disco for each project that has defined credentials
-	d := NewDisco(credentialsSource, logger)
+	d := NewDisco(opts.CredentialsSource, opts.Logger)
 
 	m := &ModuleLoader{
-		cachePath:      cachePath,
-		cache:          NewCache(d, logger),
-		hclParser:      hclParser,
-		sourceMap:      sourceMap,
+		cachePath:      opts.CachePath,
+		cache:          NewCache(d, opts.Logger),
+		hclParser:      opts.HCLParser,
+		sourceMap:      opts.SourceMap,
 		packageFetcher: fetcher,
-		logger:         logger,
-		sync:           moduleSync,
+		logger:         opts.Logger,
+		sync:           opts.ModuleSync,
 	}
 
-	m.registryLoader = NewRegistryLoader(fetcher, d, logger)
+	m.registryLoader = NewRegistryLoader(fetcher, d, opts.Logger)
 
 	return m
 }
