@@ -226,7 +226,14 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			parser := hcl.NewParser(
 				mods[0],
 				hcl.CreateEnvFileMatcher([]string{}, nil),
-				modules.NewModuleLoader(startingPath, moduleParser, &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
+				modules.NewModuleLoader(modules.ModuleLoaderOptions{
+					CachePath:         startingPath,
+					HCLParser:         moduleParser,
+					CredentialsSource: &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
+					SourceMap:         config.TerraformSourceMap{},
+					Logger:            logger,
+					ModuleSync:        &sync.KeyMutex{},
+				}),
 				logger,
 				options...,
 			)
