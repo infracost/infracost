@@ -3,7 +3,8 @@
                                                                                          
  google_compute_instance_group_manager.default                                           
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)          730  hours         $3.88   
- └─ SSD provisioned storage (pd-ssd)                          375  GB           $63.75   
+ └─ disk[0]                                                                              
+    └─ SSD provisioned storage (pd-ssd)                       375  GB           $63.75   
                                                                                          
  OVERALL TOTAL                                                                 $67.63 
 
