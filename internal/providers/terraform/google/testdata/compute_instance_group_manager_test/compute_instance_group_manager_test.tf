@@ -46,3 +46,42 @@ resource "google_compute_instance_group_manager" "default" {
 
   target_size = 4
 }
+
+resource "google_compute_instance_template" "two_disks" {
+  name = "two-disks-template"
+
+  machine_type = "f1-micro"
+
+  scheduling {
+    automatic_restart   = true
+    on_host_maintenance = "MIGRATE"
+  }
+
+  disk {
+    disk_type    = "pd-ssd"
+    disk_size_gb = "10"
+  }
+
+  disk {
+    disk_type    = "pd-ssd"
+    disk_size_gb = "50"
+  }
+
+  guest_accelerator {
+    type  = "nvidia-tesla-k80"
+    count = 2
+  }
+}
+
+resource "google_compute_instance_group_manager" "two_disks" {
+  name = "two_disks"
+
+  base_instance_name = "app"
+  zone               = "us-central1-a"
+
+  version {
+    instance_template = google_compute_instance_template.two_disks.id
+  }
+
+  target_size = 4
+}

@@ -7,10 +7,11 @@ import (
 
 // ComputeDisk struct represents Compute Disk resource.
 type ComputeDisk struct {
-	Address string
-	Region  string
-	Type    string
-	Size    float64
+	Address       string
+	Region        string
+	Type          string
+	Size          float64
+	InstanceCount *int64
 
 	// applicable for pd-extreme and hyperdisk-extreme
 	IOPS int64
@@ -35,8 +36,13 @@ func (r *ComputeDisk) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ComputeDisk) BuildResource() *schema.Resource {
+	count := int64(1)
+	if r.InstanceCount != nil {
+		count = *r.InstanceCount
+	}
+
 	costComponents := []*schema.CostComponent{
-		computeDiskCostComponent(r.Region, r.Type, r.Size, 1),
+		computeDiskCostComponent(r.Region, r.Type, r.Size, count),
 	}
 
 	if r.Type == "pd-extreme" || r.Type == "hyperdisk-extreme" {
