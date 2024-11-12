@@ -160,6 +160,7 @@ func autodetectedRootToProviders(projectContext *config.ProjectContext, rootPath
 					options,
 					hcl.OptionWithTFVarsPaths(append(autoVarFiles.ToPaths(), env.TerraformVarFiles.ToPaths()...), true),
 					hcl.OptionWithModuleSuffix(env.Name),
+					hcl.OptionWithProjectEnv(rootPath.DetectedPath, env.Name),
 				)...)
 			if err != nil {
 				logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)

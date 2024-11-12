@@ -16,3 +16,4 @@ projects:
     terraform_var_files:
       - ../../variables/defaults.tfvars
       - ../../variables/prod/foo-prod.tfvars
+

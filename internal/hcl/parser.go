@@ -115,6 +115,19 @@ func OptionWithModuleSuffix(suffix string) Option {
 	}
 }
 
+// OptionWithProjectEnv unsets an optional module suffix when such suffix is already part of the project name.
+func OptionWithProjectEnv(rootPath, suffix string) Option {
+	return func(p *Parser) {
+		pathEnv := ""
+		if p.envMatcher != nil {
+			pathEnv = p.envMatcher.PathEnv(rootPath)
+		}
+		if pathEnv != "" && suffix != "" && pathEnv == suffix {
+			p.moduleSuffix = ""
+		}
+	}
+}
+
 // OptionWithTFEnvVars takes any TF_ENV_xxx=yyy from the environment and converts them to cty.Value
 // It then sets these as the Parser starting tfEnvVars which are used at the root module evaluation.
 func OptionWithTFEnvVars(projectEnv map[string]string) Option {
