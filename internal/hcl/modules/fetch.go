@@ -45,7 +45,6 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
 	if fetched {
 		p.logger.Trace().Msgf("cache hit (local): %s", moduleAddr)
-		p.logger.Info().Msgf("cache hit (local): %s", moduleAddr)
 		return nil
 	}
 
@@ -65,7 +64,6 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	}
 
 	p.logger.Trace().Msgf("cache miss: %s", moduleAddr)
-	p.logger.Info().Msgf("cache miss: %s", moduleAddr)
 
 	_, err = p.fetchFromRemote(moduleAddr, dest)
 	if err != nil {
