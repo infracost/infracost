@@ -19,6 +19,7 @@ import (
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 
@@ -364,7 +365,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 }
 
 // checkoutPathIfRequired checks if the given directories are in the sparse-checkout file list and adds them if not.
-func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) error {
+func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error {
 	// Lock the git repo root so we don't have multiple calls trying to read and update the sparse-checkout file list.
 	unlock := m.sync.Lock(repoRoot)
 	defer unlock()
@@ -384,22 +385,22 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) erro
 	m.logger.Trace().Msgf("getting sparse checkout directories for path %s", repoRoot)
 	existingDirs, err := getSparseCheckoutDirs(repoRoot)
 	if err != nil {
-		// If the error indicates that sparse checkout is not enabled, just return nil
-		if err.Error() == "sparse-checkout not enabled" {
-			m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
-			return nil
-		}
+		return err
+	}
+
+	sourceURL, err := getGitURL(repoRoot)
+	if err != nil {
 		return err
 	}
 
 	mu := &sync.Mutex{}
 
-	return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, []string{dirs}, mu, m.logger, 0)
+	return RecursivelyAddDirsToSparseCheckout(repoRoot, sourceURL, m.packageFetcher, existingDirs, []string{dir}, mu, m.logger, 0)
 }
 
 // RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
 // It then checks any symlinks within the directories and adds them to the sparse-checkout file list as well.
-func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
+func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packageFetcher *PackageFetcher, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
 	var newDirs []string
 
 	// Sort the existing directories and dirs to be added by length
@@ -424,12 +425,56 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 		return nil
 	}
 
-	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
-	mu.Lock()
-	err := setSparseCheckoutDirs(repoRoot, existingDirs)
-	mu.Unlock()
+	parsedSourceURL, err := url.Parse(sourceURL)
 	if err != nil {
 		return err
+	}
+
+	// Create a temporary directory for this fetch
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "infracost-sparse-checkout")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tmpDir)
+
+	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
+	for _, dir := range newDirs {
+		q := parsedSourceURL.Query()
+		q.Set("subdir", dir)
+		parsedSourceURL.RawQuery = q.Encode()
+		s := parsedSourceURL.String()
+
+		// Load the package either from the cache or by pulling from the remote.
+		// We load it into a temporary directory so we can then merge it into the repo root.
+		// If we load it into the repo root then the fetcher will try and cache
+		// the entire repo root which we don't want.
+		dirTmpDir := filepath.Join(tmpDir, "fetch-"+filepath.Base(dir))
+		err := packageFetcher.Fetch(s, dirTmpDir)
+		if err != nil {
+			return err
+		}
+
+		mu.Lock()
+		// Copy the downloaded package into the repo root
+		opt := copy.Options{
+			OnSymlink: func(src string) copy.SymlinkAction {
+				return copy.Shallow
+			},
+		}
+		err = copy.Copy(dirTmpDir, repoRoot, opt)
+		if err != nil {
+			return err
+		}
+
+		// After we've fetched the package we need to update the sparse checkout list
+		// because the package fetcher retrieved it from the remote cache this won't
+		// have been done and future calls to download other subdirs won't work
+		err = setSparseCheckoutDirs(repoRoot, existingDirs)
+		mu.Unlock()
+
+		if err != nil {
+			return err
+		}
 	}
 
 	if depth >= maxSparseCheckoutDepth {
@@ -452,7 +497,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 
 	if len(additionalDirs) > 0 {
 		logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", repoRoot, additionalDirs)
-		return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, additionalDirs, mu, logger, depth+1)
+		return RecursivelyAddDirsToSparseCheckout(repoRoot, sourceURL, packageFetcher, existingDirs, additionalDirs, mu, logger, depth+1)
 	}
 
 	return nil
@@ -478,6 +523,31 @@ func findGitRepoRoot(startPath string) (string, error) {
 		return "", fmt.Errorf("not a git repository")
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+// getGitURL gets the Git URL for the given path
+func getGitURL(path string) (string, error) {
+	// Get remote
+	cmd := exec.Command("git", "config", "--get", "remote.origin.url")
+	cmd.Dir = path
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error getting git URL: %w", err)
+	}
+
+	remote := strings.TrimSpace(string(output))
+
+	// Get commit
+	cmd = exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = path
+	output, err = cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error getting git commit: %w", err)
+	}
+
+	commit := strings.TrimSpace(string(output))
+
+	return fmt.Sprintf("git::%s?ref=%s", remote, commit), nil
 }
 
 // isSparseCheckoutEnabled checks if sparse-checkout is enabled in the repository
@@ -723,7 +793,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 		return manifestModule, nil
 	}
 
-	err = m.packageFetcher.fetch(moduleAddr, dest)
+	err = m.packageFetcher.Fetch(moduleAddr, dest)
 	if err != nil {
 		return nil, schema.NewFailedDownloadDiagnostic(source, err)
 	}
