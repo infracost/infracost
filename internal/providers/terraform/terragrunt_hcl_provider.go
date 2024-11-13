@@ -700,6 +700,7 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 	// host machine, rather than requiring an SSH key is added.
 	failedHttpsDownload := !forceHttpsDownload(sourceURL, opts, terragruntConfig)
 	if failedHttpsDownload {
+		logger.Info().Msgf("Downloading Terraform Source %s", sourceURL)
 		_, err = tgcliterraform.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
 		if err != nil {
 			return "", err
