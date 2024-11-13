@@ -111,7 +111,7 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 
 			fetcher := NewPackageFetcher(mock, logger)
 
-			err = fetcher.fetch("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", filepath.Join(tmpDir, "module"))
+			err = fetcher.Fetch("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", filepath.Join(tmpDir, "module"))
 			if tt.expectedError {
 				assert.Error(t, err)
 				return

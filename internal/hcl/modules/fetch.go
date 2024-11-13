@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	tgterraform "github.com/gruntwork-io/terragrunt/terraform"
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
@@ -29,19 +28,50 @@ type PackageFetcher struct {
 	localCache  sync.Map
 	remoteCache RemoteCache
 	logger      zerolog.Logger
+	getters     map[string]getter.Getter
 }
 
+type PackageFetcherOpts func(*PackageFetcher)
+
 // NewPackageFetcher constructs a new package fetcher
-func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger) *PackageFetcher {
-	return &PackageFetcher{
+func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...PackageFetcherOpts) *PackageFetcher {
+	getters := make(map[string]getter.Getter, len(getter.Getters))
+	for k, g := range getter.Getters {
+		getters[k] = g
+	}
+	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
+
+	p := &PackageFetcher{
 		remoteCache: remoteCache,
 		logger:      logger,
+		getters:     getters,
+	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
+}
+
+func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
+	return func(p *PackageFetcher) {
+		for k, g := range getters {
+			p.getters[k] = g
+		}
 	}
 }
 
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
 func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
+	if strings.HasPrefix(moduleAddr, "file://") {
+		// Skip to the remote getter so it just copies this instead of
+		// looking up the cache
+		_, err := p.fetchFromRemote(moduleAddr, dest)
+		return err
+	}
+
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
 	if fetched {
 		p.logger.Trace().Msgf("cache hit (local): %s", moduleAddr)
@@ -153,23 +183,13 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	// I'm not sure if we really need it, but added it just in case/
 	decompressors["tar.tbz2"] = new(getter.TarBzip2Decompressor)
 
-	getters := make(map[string]getter.Getter, len(getter.Getters))
-	for k, g := range getter.Getters {
-		getters[k] = g
-	}
-
-	// This is a custom getter used by Terragrunt
-	getters["tfr"] = &tgterraform.RegistryGetter{}
-
-	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
-
 	client := getter.Client{
 		Src:           moduleAddr,
 		Dst:           dest,
 		Pwd:           dest,
-		Mode:          getter.ClientModeDir,
+		Mode:          getter.ClientModeAny,
 		Decompressors: decompressors,
-		Getters:       getters,
+		Getters:       p.getters,
 	}
 
 	err := client.Get()
