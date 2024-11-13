@@ -288,7 +288,7 @@ func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest
 	// Deliberately not logging the download URL since it contains a token
 	r.logger.Debug().Msgf("Downloading module %s", lookupResult.ModuleURL.RawSource)
 
-	return r.packageFetcher.fetch(downloadURL, dest)
+	return r.packageFetcher.Fetch(downloadURL, dest)
 }
 
 func (r *RegistryLoader) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
