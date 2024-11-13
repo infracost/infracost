@@ -377,15 +377,18 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error
 
 	if !enabled {
 		m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
+		m.logger.Info().Msgf("sparse-checkout not enabled for path %s", repoRoot)
 		return nil
 	}
 
 	// Get the list of sparse checkout directories (and assume sparse checkout is enabled if this succeeds)
 	m.logger.Trace().Msgf("getting sparse checkout directories for path %s", repoRoot)
+	m.logger.Info().Msgf("getting sparse checkout directories for path %s", repoRoot)
 	existingDirs, err := getSparseCheckoutDirs(repoRoot)
 	if err != nil {
 		return err
 	}
+	m.logger.Info().Msgf("Sparse checkout directories for path %s: %v", repoRoot, existingDirs)
 
 	sourceURL, err := getGitURL(repoRoot)
 	if err != nil {
