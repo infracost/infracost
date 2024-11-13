@@ -82,6 +82,24 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 	return nil, errors.New("source has changed")
 }
 
+func (c *Cache) lookupModuleByDir(dir string) (*ManifestModule, error) {
+	var foundModule *ManifestModule
+	c.keyMap.Range(func(key, value interface{}) bool {
+		module, _ := value.(*ManifestModule)
+		if module.Dir == dir {
+			foundModule = module
+			return false
+		}
+		return true
+	})
+
+	if foundModule == nil {
+		return nil, errors.New("not in cache")
+	}
+
+	return foundModule, nil
+}
+
 func checkVersion(moduleCall *tfconfig.ModuleCall, manifestModule *ManifestModule) (*ManifestModule, error) {
 	if moduleCall.Version != "" && manifestModule.Version != "" {
 		constraints, err := goversion.NewConstraint(moduleCall.Version)
