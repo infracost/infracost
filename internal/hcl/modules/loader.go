@@ -387,16 +387,19 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error
 		return err
 	}
 
-	manifestMod, err := m.cache.lookupModuleByDir(repoRoot)
-	source := manifestMod.Source
-	sourceURL, err := url.Parse(source)
+	sourceURL, err := getGitURL(repoRoot)
+	if err != nil {
+		return err
+	}
+
+	parsedSourceURL, err := url.Parse(sourceURL)
 	if err != nil {
 		return err
 	}
 
 	mu := &sync.Mutex{}
 
-	return RecursivelyAddDirsToSparseCheckout(repoRoot, sourceURL, m.packageFetcher, existingDirs, []string{dir}, mu, m.logger, 0)
+	return RecursivelyAddDirsToSparseCheckout(repoRoot, parsedSourceURL, m.packageFetcher, existingDirs, []string{dir}, mu, m.logger, 0)
 }
 
 // RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
@@ -485,6 +488,31 @@ func findGitRepoRoot(startPath string) (string, error) {
 		return "", fmt.Errorf("not a git repository")
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+// getGitURL gets the Git URL for the given path
+func getGitURL(path string) (string, error) {
+	// Get remote
+	cmd := exec.Command("git", "config", "--get", "remote.origin.url")
+	cmd.Dir = path
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error getting git URL: %w", err)
+	}
+
+	remote := strings.TrimSpace(string(output))
+
+	// Get commit
+	cmd = exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = path
+	output, err = cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error getting git commit: %w", err)
+	}
+
+	commit := strings.TrimSpace(string(output))
+
+	return fmt.Sprintf("git::%s?ref=%s", remote, commit), nil
 }
 
 // isSparseCheckoutEnabled checks if sparse-checkout is enabled in the repository
