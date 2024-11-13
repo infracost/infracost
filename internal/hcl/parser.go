@@ -108,22 +108,16 @@ func makePathsRelativeToInitial(paths []string, initialPath string) []string {
 }
 
 // OptionWithModuleSuffix sets an optional module suffix which will be added to the Module after it has finished parsing
-// this can be used to augment auto-detected project path names and metadata.
-func OptionWithModuleSuffix(suffix string) Option {
-	return func(p *Parser) {
-		p.moduleSuffix = suffix
-	}
-}
-
-// OptionWithProjectEnv unsets an optional module suffix when such suffix is already part of the project name.
-func OptionWithProjectEnv(rootPath, suffix string) Option {
+// this can be used to augment auto-detected project path names and metadata. If the suffix is already part of the project name - ignore it.
+func OptionWithModuleSuffix(rootPath, suffix string) Option {
 	return func(p *Parser) {
 		pathEnv := ""
 		if p.envMatcher != nil {
 			pathEnv = p.envMatcher.PathEnv(rootPath)
 		}
-		if pathEnv != "" && suffix != "" && pathEnv == suffix {
-			p.moduleSuffix = ""
+
+		if pathEnv == "" || (suffix != "" && pathEnv != suffix) {
+			p.moduleSuffix = suffix
 		}
 	}
 }
