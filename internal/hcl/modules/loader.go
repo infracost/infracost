@@ -439,6 +439,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL *url.URL, pac
 
 		mu.Lock()
 		err := packageFetcher.Fetch(sourceURL.String(), repoRoot)
+		setSparseCheckoutDirs(repoRoot, existingDirs)
 		mu.Unlock()
 
 		if err != nil {
@@ -560,6 +561,18 @@ func getSparseCheckoutDirs(repoRoot string) ([]string, error) {
 	}
 
 	return strings.Split(output, "\n"), nil
+}
+
+// setSparseCheckoutDirs sets the sparse-checkout list to include the given directories
+func setSparseCheckoutDirs(repoRoot string, dirs []string) error {
+	cmd := exec.Command("git", "sparse-checkout", "set")
+	cmd.Dir = repoRoot
+	cmd.Args = append(cmd.Args, dirs...)
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("error setting sparse-checkout list: %w", err)
+	}
+
+	return nil
 }
 
 // ResolveSymLinkedDirs traverses the directory to find symlinks and resolve their destinations

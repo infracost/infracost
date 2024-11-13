@@ -96,6 +96,10 @@ func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, err
 
 	prevDest, _ := v.(string)
 
+	if dest == prevDest {
+		return true, nil
+	}
+
 	p.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
 
 	err := os.Mkdir(dest, os.ModePerm)
