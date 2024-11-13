@@ -107,6 +107,7 @@ type TerragruntHCLProvider struct {
 	excludedPaths []string
 	env           map[string]string
 	sourceCache   map[string]string
+	remoteCache   modules.RemoteCache
 	logger        zerolog.Logger
 }
 
@@ -117,12 +118,24 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 		"provider", "terragrunt_dir",
 	).Logger()
 
+	var remoteCache modules.RemoteCache
+	runCtx := ctx.RunContext
+	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
+		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix)
+		if err != nil {
+			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
+		} else {
+			remoteCache = s3ModuleCache
+		}
+	}
+
 	return &TerragruntHCLProvider{
 		ctx:           ctx,
 		Path:          rootPath,
 		excludedPaths: ctx.ProjectConfig.ExcludePaths,
 		env:           getEnvVars(ctx),
 		sourceCache:   map[string]string{},
+		remoteCache:   remoteCache,
 		logger:        logger,
 	}
 }
@@ -564,7 +577,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
-		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig, p.logger)
+		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig, p.remoteCache, p.logger)
 
 		if err != nil {
 			info.error = err
@@ -644,8 +657,13 @@ func splitModuleSubDir(moduleSource string) (string, string, error) {
 }
 
 // downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
-func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig, logger zerolog.Logger) (string, error) {
+func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig, remoteCache modules.RemoteCache, logger zerolog.Logger) (string, error) {
 	_, modAddr, err := splitModuleSubDir(sourceURL)
+	if err != nil {
+		return "", err
+	}
+
+	parsedSourceURL, err := url.Parse(sourceURL)
 	if err != nil {
 		return "", err
 	}
@@ -653,14 +671,10 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 	// If sparse checkout is enabled add the subdir to the Source URL as a query param
 	// so go-getter only downloads the required directory.
 	if os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true" {
-		u, err := url.Parse(sourceURL)
-		if err != nil {
-			return "", err
-		}
-		q := u.Query()
+		q := parsedSourceURL.Query()
 		q.Set("subdir", modAddr)
-		u.RawQuery = q.Encode()
-		sourceURL = u.String()
+		parsedSourceURL.RawQuery = q.Encode()
+		sourceURL = parsedSourceURL.String()
 	}
 
 	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
@@ -703,7 +717,8 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 			logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", dir, symlinkedDirs)
 			// Using a depth of 1 here since the submodule directory is already downloaded, so only need
 			// to add the symlinked directories to the sparse-checkout.
-			err := modules.RecursivelyAddDirsToSparseCheckout(dir, []string{modAddr}, symlinkedDirs, mu, logger, 1)
+			packageFetcher := modules.NewPackageFetcher(remoteCache, logger)
+			err := modules.RecursivelyAddDirsToSparseCheckout(dir, parsedSourceURL, packageFetcher, []string{modAddr}, symlinkedDirs, mu, logger, 1)
 			if err != nil {
 				return "", err
 			}

@@ -114,6 +114,7 @@ func (cache *S3Cache) Get(key, destPath string) error {
 
 	// Extract using archiver
 	tgz := archiver.NewTarGz()
+	tgz.OverwriteExisting = true
 	if err := tgz.Unarchive(tmpFile.Name(), destPath); err != nil {
 		return fmt.Errorf("failed to extract archive: %w", err)
 	}

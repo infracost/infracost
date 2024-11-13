@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	tgterraform "github.com/gruntwork-io/terragrunt/terraform"
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
@@ -40,29 +41,31 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger) *PackageF
 
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
-func (p *PackageFetcher) fetch(moduleAddr string, dest string) error {
+func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
 	if fetched {
-		p.logger.Debug().Msgf("fetched module %s from local cache", moduleAddr)
+		p.logger.Trace().Msgf("cache hit (local): %s", moduleAddr)
+		p.logger.Info().Msgf("cache hit (local): %s", moduleAddr)
 		return nil
 	}
 
 	if err != nil {
-		p.logger.Warn().Msgf("error fetching module %s from local cache, trying to fetch from elsewhere: %s", moduleAddr, err)
+		p.logger.Warn().Msgf("error fetching module %s from local cache: %s", moduleAddr, err)
 	}
 
-	if p.remoteCache != nil {
-		fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
-		if fetched {
-			p.logger.Debug().Msgf("fetched module %s from remote cache", moduleAddr)
-			p.localCache.Store(moduleAddr, dest)
-			return nil
-		}
-
-		if err != nil {
-			p.logger.Warn().Msgf("error fetching module %s from remote cache, trying to fetch from elsewhere: %s", moduleAddr, err)
-		}
+	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
+	if fetched {
+		p.logger.Trace().Msgf("cache hit (remote): %s", moduleAddr)
+		p.localCache.Store(moduleAddr, dest)
+		return nil
 	}
+
+	if err != nil {
+		p.logger.Warn().Msgf("error fetching module %s from remote cache: %s", moduleAddr, err)
+	}
+
+	p.logger.Trace().Msgf("cache miss: %s", moduleAddr)
+	p.logger.Info().Msgf("cache miss: %s", moduleAddr)
 
 	_, err = p.fetchFromRemote(moduleAddr, dest)
 	if err != nil {
@@ -91,6 +94,10 @@ func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, err
 
 	prevDest, _ := v.(string)
 
+	if prevDest == dest {
+		return true, nil
+	}
+
 	p.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
 
 	err := os.Mkdir(dest, os.ModePerm)
@@ -117,6 +124,10 @@ func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, err
 }
 
 func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string) (bool, error) {
+	if p.remoteCache == nil {
+		return false, nil
+	}
+
 	ok, err := p.remoteCache.Exists(moduleAddr)
 	if err != nil {
 		return false, err
@@ -148,6 +159,9 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	for k, g := range getter.Getters {
 		getters[k] = g
 	}
+
+	// This is a custom getter used by Terragrunt
+	getters["tfr"] = &tgterraform.RegistryGetter{}
 
 	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
 
