@@ -438,7 +438,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL *url.URL, pac
 		sourceURL.Query().Set("subdir", dir)
 
 		mu.Lock()
-		err := packageFetcher.fetch(sourceURL.String(), repoRoot)
+		err := packageFetcher.Fetch(sourceURL.String(), repoRoot)
 		mu.Unlock()
 
 		if err != nil {
@@ -750,7 +750,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 		return manifestModule, nil
 	}
 
-	err = m.packageFetcher.fetch(moduleAddr, dest)
+	err = m.packageFetcher.Fetch(moduleAddr, dest)
 	if err != nil {
 		return nil, schema.NewFailedDownloadDiagnostic(source, err)
 	}

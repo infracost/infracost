@@ -101,14 +101,14 @@ func (o *TerragruntOutputCache) Set(key string, getVal func() (cty.Value, error)
 }
 
 type TerragruntHCLProvider struct {
-	ctx           *config.ProjectContext
-	Path          hcl.RootPath
-	stack         *tgconfigstack.Stack
-	excludedPaths []string
-	env           map[string]string
-	sourceCache   map[string]string
-	remoteCache   modules.RemoteCache
-	logger        zerolog.Logger
+	ctx            *config.ProjectContext
+	Path           hcl.RootPath
+	stack          *tgconfigstack.Stack
+	excludedPaths  []string
+	env            map[string]string
+	sourceCache    map[string]string
+	packageFetcher *modules.PackageFetcher
+	logger         zerolog.Logger
 }
 
 // NewTerragruntHCLProvider creates a new provider initialized with the configured project path (usually the terragrunt
@@ -129,14 +129,16 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 		}
 	}
 
+	fetcher := modules.NewPackageFetcher(remoteCache, logger)
+
 	return &TerragruntHCLProvider{
-		ctx:           ctx,
-		Path:          rootPath,
-		excludedPaths: ctx.ProjectConfig.ExcludePaths,
-		env:           getEnvVars(ctx),
-		sourceCache:   map[string]string{},
-		remoteCache:   remoteCache,
-		logger:        logger,
+		ctx:            ctx,
+		Path:           rootPath,
+		excludedPaths:  ctx.ProjectConfig.ExcludePaths,
+		env:            getEnvVars(ctx),
+		sourceCache:    map[string]string{},
+		packageFetcher: fetcher,
+		logger:         logger,
 	}
 }
 
@@ -439,6 +441,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
 		SourceMap:                  p.ctx.RunContext.Config.TerraformSourceMap,
+		DownloadSource:             p.downloadSource,
 		UsePartialParseConfigCache: true,
 		RunTerragrunt: func(opts *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
@@ -577,7 +580,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
-		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig, p.remoteCache, p.logger)
+		updatedWorkingDir, err := loadSourceOnce(sourceURL, opts, terragruntConfig, p.packageFetcher, p.logger)
 
 		if err != nil {
 			info.error = err
@@ -647,6 +650,11 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	return info
 }
 
+// downloadSource
+func (p *TerragruntHCLProvider) downloadSource(downloadDir string, sourceURL string, opts *tgoptions.TerragruntOptions) error {
+	return p.packageFetcher.Fetch(sourceURL, downloadDir)
+}
+
 func splitModuleSubDir(moduleSource string) (string, string, error) {
 	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleSource)
 	if strings.HasPrefix(submodulePath, "../") {
@@ -656,8 +664,9 @@ func splitModuleSubDir(moduleSource string) (string, string, error) {
 	return moduleAddr, submodulePath, nil
 }
 
-// downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
-func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig, remoteCache modules.RemoteCache, logger zerolog.Logger) (string, error) {
+// loadSourceOnce thread-safely makes sure the sourceURL is only downloaded once.
+// It calls the internal Terragrunt functionality to download the source.
+func loadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig, packageFetcher *modules.PackageFetcher, logger zerolog.Logger) (string, error) {
 	_, modAddr, err := splitModuleSubDir(sourceURL)
 	if err != nil {
 		return "", err
@@ -718,7 +727,6 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 			logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", dir, symlinkedDirs)
 			// Using a depth of 1 here since the submodule directory is already downloaded, so only need
 			// to add the symlinked directories to the sparse-checkout.
-			packageFetcher := modules.NewPackageFetcher(remoteCache, logger)
 			err := modules.RecursivelyAddDirsToSparseCheckout(dir, parsedSourceURL, packageFetcher, []string{modAddr}, symlinkedDirs, mu, logger, 1)
 			if err != nil {
 				return "", err
