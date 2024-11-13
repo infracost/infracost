@@ -251,6 +251,18 @@ func (e *EnvFileMatcher) EnvName(file string) string {
 	return clean
 }
 
+// PathEnv returns the env name detected in file path when it matches defined envs. Otherwise returns an empty string.
+func (e *EnvFileMatcher) PathEnv(file string) string {
+	env := e.EnvName(file)
+
+	_, ok := e.envLookup[env]
+	if ok {
+		return env
+	}
+
+	return ""
+}
+
 func (e *EnvFileMatcher) hasEnvPrefix(clean string, name string) bool {
 	return strings.HasPrefix(clean, name+"-") || strings.HasPrefix(clean, name+"_") || strings.HasPrefix(clean, name+".")
 }
@@ -961,8 +973,8 @@ func (t *TreeNode) CollectRootPaths(e *EnvFileMatcher) []RootPath {
 
 	found := make(map[string]bool)
 	for _, root := range projects {
+		base := filepath.Base(root.DetectedPath)
 		for _, varFile := range root.TerraformVarFiles {
-			base := filepath.Base(root.DetectedPath)
 			name := e.clean(varFile.Name)
 			if base == name {
 				found[varFile.FullPath] = true
@@ -975,10 +987,11 @@ func (t *TreeNode) CollectRootPaths(e *EnvFileMatcher) []RootPath {
 	// terraform var files that are scoped to a specific project
 	// are not added to another project.
 	for i, root := range projects {
+		base := filepath.Base(root.DetectedPath)
+
 		var filtered RootPathVarFiles
 		for _, varFile := range root.TerraformVarFiles {
 			name := e.clean(varFile.Name)
-			base := filepath.Base(root.DetectedPath)
 			if found[varFile.FullPath] && base != name {
 				continue
 			}
@@ -1081,6 +1094,7 @@ func (r *RootPath) EnvGroupings() []VarFileGrouping {
 		}
 	}
 
+	pathEnv := r.Matcher.PathEnv(r.DetectedPath)
 	hasChildVarFileEnvs := len(varFileGrouping) > 0
 
 	for _, varFile := range varFiles {
@@ -1090,6 +1104,11 @@ func (r *RootPath) EnvGroupings() []VarFileGrouping {
 
 		env := r.Matcher.EnvName(varFile.EnvName)
 		_, exists := varFileGrouping[env]
+
+		// When env is a part of the project name, we should ignore any other detected envs
+		if pathEnv != "" && env != pathEnv {
+			continue
+		}
 		// only add the non child env var files if there are no envs defined that are
 		// closer to the project, or if the env matches one defined as a child var file.
 		if !hasChildVarFileEnvs || (hasChildVarFileEnvs && exists) {
