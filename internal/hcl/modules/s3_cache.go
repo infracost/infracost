@@ -63,7 +63,7 @@ func (cache *S3Cache) Exists(key string) (bool, error) {
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			switch awsErr.Code() {
-			case s3.ErrCodeNoSuchKey, "NotFound":
+			case s3.ErrCodeNoSuchKey, "NotFound", "Forbidden":
 				return false, nil
 			}
 		}
