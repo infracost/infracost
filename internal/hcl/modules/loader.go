@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
@@ -47,7 +48,7 @@ var (
 type RemoteCache interface {
 	Exists(key string) (bool, error)
 	Get(key string, dest string) error
-	Put(key string, src string) error
+	Put(key string, src string, ttl time.Duration) error
 }
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.

@@ -5,8 +5,10 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
@@ -14,6 +16,11 @@ import (
 
 	"github.com/infracost/infracost/internal/logging"
 )
+
+var tagRegex = regexp.MustCompile(`^v?\d+\.\d+\.\d+`)
+var commitRegex = regexp.MustCompile(`^([0-9a-f]{40})|([0-9a-f]{7})$`)
+var defaultTTL = 24 * time.Hour
+var tagCommitTTL = 30 * 24 * time.Hour
 
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
@@ -65,8 +72,9 @@ func (p *PackageFetcher) fetch(moduleAddr string, dest string) error {
 	p.localCache.Store(moduleAddr, dest)
 
 	if p.remoteCache != nil {
-		p.logger.Debug().Msgf("putting module %s into remote cache", moduleAddr)
-		err = p.remoteCache.Put(moduleAddr, dest)
+		ttl := determineTTL(moduleAddr)
+		p.logger.Debug().Msgf("putting module %s into remote cache with ttl %s", moduleAddr, ttl)
+		err = p.remoteCache.Put(moduleAddr, dest, ttl)
 		if err != nil {
 			p.logger.Warn().Msgf("error putting module %s into remote cache: %s", moduleAddr, err)
 		}
@@ -158,6 +166,29 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	}
 
 	return true, nil
+}
+
+func determineTTL(moduleAddr string) time.Duration {
+	u, err := url.Parse(moduleAddr)
+	if err != nil {
+		return defaultTTL
+	}
+
+	// Get the ref parameter
+	ref := u.Query().Get("ref")
+	if ref == "" {
+		return defaultTTL
+	}
+
+	// Check if ref looks like a git tag or a commit
+	isTag := tagRegex.MatchString(ref)
+	isCommit := commitRegex.MatchString(ref)
+
+	if isTag || isCommit {
+		return tagCommitTTL
+	}
+
+	return defaultTTL
 }
 
 // CustomGitGetter extends the standard GitGetter transforming SSH sources to

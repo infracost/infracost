@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/rs/zerolog"
@@ -40,7 +41,7 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 
 	logger := zerolog.New(io.Discard)
 	mock := &mockRemoteCache{
-		cache: make(map[string]string),
+		cache: make(map[string]mockCacheEntry),
 	}
 
 	tests := []struct {
@@ -62,7 +63,7 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 					}
 				`), 0600))
 				// Store the module directory path in the cache
-				require.NoError(t, c.Put("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", moduleDir))
+				require.NoError(t, c.Put("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", moduleDir, 24*time.Hour))
 			},
 			expectedCalls: map[string]int{
 				"Exists": 1,
@@ -124,8 +125,13 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 	}
 }
 
+type mockCacheEntry struct {
+	path      string
+	expiresAt time.Time
+}
+
 type mockRemoteCache struct {
-	cache       map[string]string
+	cache       map[string]mockCacheEntry
 	existsCalls int
 	getCalls    int
 	putCalls    int
@@ -142,7 +148,14 @@ func (m *mockRemoteCache) Exists(key string) (bool, error) {
 		return false, fmt.Errorf("mock remote cache error")
 	}
 
-	_, exists := m.cache[key]
+	entry, exists := m.cache[key]
+
+	// Check if the entry has expired
+	if time.Now().After(entry.expiresAt) {
+		delete(m.cache, key)
+		return false, nil
+	}
+
 	return exists, nil
 }
 
@@ -155,14 +168,14 @@ func (m *mockRemoteCache) Get(key string, dest string) error {
 		return fmt.Errorf("mock remote cache error")
 	}
 
-	srcDir, exists := m.cache[key]
+	entry, exists := m.cache[key]
 	if !exists {
 		return fmt.Errorf("key not found: %s", key)
 	}
 
 	// Use go-getter to copy the directory
 	client := &getter.Client{
-		Src:  fmt.Sprintf("file://%s", srcDir),
+		Src:  fmt.Sprintf("file://%s", entry.path),
 		Dst:  dest,
 		Mode: getter.ClientModeDir,
 	}
@@ -170,7 +183,7 @@ func (m *mockRemoteCache) Get(key string, dest string) error {
 	return client.Get()
 }
 
-func (m *mockRemoteCache) Put(key string, src string) error {
+func (m *mockRemoteCache) Put(key string, src string, ttl time.Duration) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.putCalls++
@@ -179,14 +192,17 @@ func (m *mockRemoteCache) Put(key string, src string) error {
 		return fmt.Errorf("mock remote cache error")
 	}
 
-	m.cache[key] = src
+	m.cache[key] = mockCacheEntry{
+		path:      src,
+		expiresAt: time.Now().Add(ttl),
+	}
 	return nil
 }
 
 func (m *mockRemoteCache) ResetCache() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	m.cache = make(map[string]string)
+	m.cache = make(map[string]mockCacheEntry)
 }
 
 func (m *mockRemoteCache) ResetCounters() {

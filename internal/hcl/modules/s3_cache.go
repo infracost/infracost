@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -55,7 +56,7 @@ func (cache *S3Cache) applyPrefix(key string) string {
 // Exists checks if the key exists in the S3 bucket
 func (cache *S3Cache) Exists(key string) (bool, error) {
 	prefixedKey := cache.applyPrefix(key)
-	_, err := cache.s3Client.HeadObject(&s3.HeadObjectInput{
+	headObj, err := cache.s3Client.HeadObject(&s3.HeadObjectInput{
 		Bucket: aws.String(cache.bucketName),
 		Key:    aws.String(prefixedKey),
 	})
@@ -68,6 +69,19 @@ func (cache *S3Cache) Exists(key string) (bool, error) {
 		}
 		return false, err
 	}
+
+	// Check expiration based on x-amz-meta-expires-at
+	if expiresAtStr, ok := headObj.Metadata["x-amz-meta-expires-at"]; ok {
+		expirationTime, err := time.Parse(time.RFC3339, *expiresAtStr)
+		if err != nil {
+			return false, fmt.Errorf("failed to parse expiration metadata: %w", err)
+		}
+
+		if time.Now().After(expirationTime) {
+			return false, nil // Object is expired
+		}
+	}
+
 	return true, nil
 }
 
@@ -108,7 +122,7 @@ func (cache *S3Cache) Get(key, destPath string) error {
 }
 
 // Put uploads the srcPath to the S3 bucket with the key
-func (cache *S3Cache) Put(key, srcPath string) error {
+func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration) error {
 	prefixedKey := cache.applyPrefix(key)
 
 	// Generate a temporary file path without creating the file
@@ -139,10 +153,17 @@ func (cache *S3Cache) Put(key, srcPath string) error {
 	}
 	defer file.Close()
 
+	// Calculate expiration time and set it as metadata
+	expirationTime := time.Now().Add(ttl).Format(time.RFC3339)
+	metadata := map[string]*string{
+		"x-amz-meta-expires-at": aws.String(expirationTime),
+	}
+
 	_, err = cache.s3Client.PutObject(&s3.PutObjectInput{
-		Bucket: aws.String(cache.bucketName),
-		Key:    aws.String(prefixedKey),
-		Body:   file,
+		Bucket:   aws.String(cache.bucketName),
+		Key:      aws.String(prefixedKey),
+		Body:     file,
+		Metadata: metadata,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to upload to S3: %w", err)
