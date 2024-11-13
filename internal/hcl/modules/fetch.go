@@ -41,6 +41,8 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger) *PackageF
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
 func (p *PackageFetcher) fetch(moduleAddr string, dest string) error {
+	p.logger.Info().Msgf("Fetching module %s to %s", moduleAddr, dest)
+
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
 	if fetched {
 		p.logger.Debug().Msgf("fetched module %s from local cache", moduleAddr)
