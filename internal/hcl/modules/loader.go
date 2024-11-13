@@ -430,6 +430,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL *url.URL, pac
 	}
 
 	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
+	logger.Info().Msgf("Adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
 	for _, dir := range newDirs {
 		sourceURL.Query().Set("subdir", dir)
 
