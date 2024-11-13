@@ -652,6 +652,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 // downloadSource
 func (p *TerragruntHCLProvider) downloadSource(downloadDir string, sourceURL string, opts *tgoptions.TerragruntOptions) error {
+	fmt.Println("HERE")
 	return p.packageFetcher.Fetch(sourceURL, downloadDir)
 }
 
