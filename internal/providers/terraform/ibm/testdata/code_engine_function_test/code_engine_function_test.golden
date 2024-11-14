@@ -1,0 +1,18 @@
+
+ Name                                   Monthly Qty  Unit  Monthly Cost 
+                                                                        
+ ibm_code_engine_function.ce_function                                   
+ ├─ Virtual Processor Cores                    0.01  vCPU         $0.12 
+ └─ RAM                                        0.04  GB           $0.05 
+                                                                        
+ ibm_code_engine_function.ce_function1                                  
+ ├─ Virtual Processor Cores                   0.005  vCPU         $0.06 
+ └─ RAM                                        0.02  GB           $0.03 
+                                                                        
+ OVERALL TOTAL                                                    $0.26 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 2 were estimated
+∙ 2 were free:
+  ∙ 1 x ibm_code_engine_project
+  ∙ 1 x ibm_resource_group

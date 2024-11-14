@@ -1,0 +1,30 @@
+
+ Name                                              Monthly Qty  Unit  Monthly Cost 
+                                                                                   
+ ibm_code_engine_app.ce_app                                                        
+ ├─ Virtual Processor Cores (2 initial instances)         0.02  vCPU         $0.25 
+ └─ RAM (2 initial instances)                             0.08  GB           $0.10 
+                                                                                   
+ ibm_code_engine_app.ce_app2                                                       
+ ├─ Virtual Processor Cores (1 initial instances)         0.01  vCPU         $0.12 
+ └─ RAM (1 initial instances)                             0.04  GB           $0.05 
+                                                                                   
+ ibm_code_engine_app.ce_app3                                                       
+ ├─ Virtual Processor Cores (1 initial instances)         0.01  vCPU         $0.12 
+ └─ RAM (1 initial instances)                             0.02  GB           $0.03 
+                                                                                   
+ ibm_code_engine_app.ce_app4                                                       
+ ├─ Virtual Processor Cores (2 initial instances)         0.02  vCPU         $0.25 
+ └─ RAM (2 initial instances)                             0.04  GB           $0.05 
+                                                                                   
+ ibm_code_engine_app.ce_app5                                                       
+ ├─ Virtual Processor Cores (1 initial instances)         0.01  vCPU         $0.12 
+ └─ RAM (1 initial instances)                           0.0195  GB           $0.03 
+                                                                                   
+ OVERALL TOTAL                                                               $1.12 
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 5 were estimated
+∙ 2 were free:
+  ∙ 1 x ibm_code_engine_project
+  ∙ 1 x ibm_resource_group

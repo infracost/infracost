@@ -19,6 +19,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsLbRegistryItem(),
 	getIsPublicGatewayRegistryItem(),
 	getIbmPiVolumeRegistryItem(),
+	getCodeEngineAppRegistryItem(),
+	getCodeEngineFunctionRegistryItem(),
+	getCodeEngineJobRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -75,6 +78,11 @@ var FreeResources = []string{
 	"ibm_cd_toolchain_tool_securitycompliance",
 	"ibm_cd_toolchain_tool_slack",
 	"ibm_cd_toolchain_tool_sonarqube",
+	"ibm_code_engine_binding",
+	"ibm_code_engine_config_map",
+	"ibm_code_engine_domain_mapping",
+	"ibm_code_engine_project",
+	"ibm_code_engine_secret",
 	"ibm_iam_access_group",
 	"ibm_iam_access_group_dynamic_rule",
 	"ibm_iam_access_group_members",

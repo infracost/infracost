@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  ibm_code_engine_app.ce_function:
+    http_request_calls: 100
+    instance_hours: 1
+  ibm_code_engine_app.ce_function2:
+    http_request_calls: 600
+    instance_hours: 1
