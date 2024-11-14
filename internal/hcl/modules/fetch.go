@@ -14,6 +14,7 @@ import (
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 
+	tgterraform "github.com/gruntwork-io/terragrunt/terraform"
 	"github.com/infracost/infracost/internal/logging"
 )
 
@@ -45,8 +46,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
 	if fetched {
-		p.logger.Debug().Msgf("fetched module %s from local cache", moduleAddr)
-		p.logger.Info().Msgf("Local cache hit: %s", moduleAddr)
+		p.logger.Trace().Msgf("cache hit (local): %s", moduleAddr)
 		return nil
 	}
 
@@ -57,8 +57,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	if p.remoteCache != nil {
 		fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
 		if fetched {
-			p.logger.Debug().Msgf("fetched module %s from remote cache", moduleAddr)
-			p.logger.Info().Msgf("Remote cache hit: %s", moduleAddr)
+			p.logger.Trace().Msgf("cache hit (remote): %s", moduleAddr)
 			p.localCache.Store(moduleAddr, dest)
 			return nil
 		}
@@ -72,7 +71,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	if err != nil {
 		return fmt.Errorf("error fetching module %s from remote: %w", moduleAddr, err)
 	}
-	p.logger.Info().Msgf("Cache miss: %s", moduleAddr)
+	p.logger.Trace().Msgf("cache miss: %s", moduleAddr)
 
 	p.localCache.Store(moduleAddr, dest)
 
@@ -157,6 +156,8 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	for k, g := range getter.Getters {
 		getters[k] = g
 	}
+	// Terragrunt custom registry getter
+	getters["tfr"] = &tgterraform.RegistryGetter{}
 
 	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
 

@@ -377,18 +377,15 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error
 
 	if !enabled {
 		m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
-		m.logger.Info().Msgf("sparse-checkout not enabled for path %s", repoRoot)
 		return nil
 	}
 
 	// Get the list of sparse checkout directories (and assume sparse checkout is enabled if this succeeds)
 	m.logger.Trace().Msgf("getting sparse checkout directories for path %s", repoRoot)
-	m.logger.Info().Msgf("getting sparse checkout directories for path %s", repoRoot)
 	existingDirs, err := getSparseCheckoutDirs(repoRoot)
 	if err != nil {
 		return err
 	}
-	m.logger.Info().Msgf("Sparse checkout directories for path %s: %v", repoRoot, existingDirs)
 
 	sourceURL, err := getGitURL(repoRoot)
 	if err != nil {
@@ -433,12 +430,15 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL *url.URL, pac
 	}
 
 	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
-	logger.Info().Msgf("Adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
 	for _, dir := range newDirs {
 		sourceURL.Query().Set("subdir", dir)
 
 		mu.Lock()
 		err := packageFetcher.Fetch(sourceURL.String(), repoRoot)
+
+		// After we've fetched the package we need to update the sparse checkout list
+		// because the package fetcher retrieved it from the remote cache this won't
+		// have been done and future calls to download other subdirs won't work
 		setSparseCheckoutDirs(repoRoot, existingDirs)
 		mu.Unlock()
 
