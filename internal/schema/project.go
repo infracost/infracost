@@ -197,7 +197,9 @@ type ProjectMetadata struct {
 	TerraformWorkspace  string             `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string             `json:"vcsSubPath,omitempty"`
 	VCSCodeChanged      *bool              `json:"vcsCodeChanged,omitempty"`
-	Errors              []*ProjectDiag     `json:"errors,omitempty"`
+	Errors              []*ProjectDiag     `json:"errors,omitempty"` // contains merged current and past errors
+	CurrentErrors       []*ProjectDiag     `json:"currentErrors,omitempty"`
+	PastErrors          []*ProjectDiag     `json:"pastErrors,omitempty"`
 	Warnings            []*ProjectDiag     `json:"warnings,omitempty"`
 	Policies            Policies           `json:"policies,omitempty"`
 	Providers           []ProviderMetadata `json:"providers,omitempty"`

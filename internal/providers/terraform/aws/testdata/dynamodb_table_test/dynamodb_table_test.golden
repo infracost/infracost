@@ -2,17 +2,17 @@
  Name                                                            Monthly Qty  Unit                  Monthly Cost    
                                                                                                                     
  aws_dynamodb_table.my_dynamodb_table_usage                                                                         
- ├─ Write request unit (WRU)                                       3,000,000  WRUs                         $3.75  * 
- ├─ Read request unit (RRU)                                        8,000,000  RRUs                         $2.00  * 
+ ├─ Write request unit (WRU)                                       3,000,000  WRUs                         $1.88  * 
+ ├─ Read request unit (RRU)                                        8,000,000  RRUs                         $1.00  * 
  ├─ Data storage                                                         230  GB                          $57.50  * 
  ├─ Point-In-Time Recovery (PITR) backup storage                       2,300  GB                         $460.00  * 
  ├─ On-demand backup storage                                             460  GB                          $46.00  * 
  ├─ Table data restored                                                  230  GB                          $34.50  * 
  ├─ Streams read request unit (sRRU)                               2,000,000  sRRUs                        $0.40  * 
  ├─ Global table (us-east-2)                                                                                        
- │  └─ Replicated write request unit (rWRU)                       4,109.5890  rWRU                         $5.63    
+ │  └─ Replicated write request unit (rWRU)                       4,109.5890  rWRU                         $1.88    
  └─ Global table (us-west-1)                                                                                        
-    └─ Replicated write request unit (rWRU)                       4,109.5890  rWRU                         $6.27    
+    └─ Replicated write request unit (rWRU)                       4,109.5890  rWRU                         $2.09    
                                                                                                                     
  aws_dynamodb_table.autoscale_dynamodb_table_usage                                                                  
  ├─ Write capacity unit (WCU, autoscaling)                                77  WCU                         $36.54  * 
@@ -32,9 +32,9 @@
  ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB             
  ├─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs     
  ├─ Global table (us-east-2)                                                                                        
- │  └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $14.24    
+ │  └─ Replicated write capacity unit (rWCU)                              20  rWCU                         $9.49    
  └─ Global table (us-west-1)                                                                                        
-    └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $15.88    
+    └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $10.59    
                                                                                                                     
  aws_dynamodb_table.my_dynamodb_table_with_no_billing_mode                                                          
  ├─ Write capacity unit (WCU)                                             20  WCU                          $9.49    
@@ -45,9 +45,9 @@
  ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB             
  ├─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs     
  ├─ Global table (us-east-2)                                                                                        
- │  └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $14.24    
+ │  └─ Replicated write capacity unit (rWCU)                              20  rWCU                         $9.49    
  └─ Global table (us-west-1)                                                                                        
-    └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $15.88    
+    └─ Replicated write capacity unit (rWCU)                              20  rWCU                        $10.59    
                                                                                                                     
  aws_dynamodb_table.autoscale_dynamodb_table_literal_ref                                                            
  ├─ Write capacity unit (WCU)                                             20  WCU                          $9.49    
@@ -67,7 +67,7 @@
  ├─ Table data restored                                     Monthly cost depends on usage: $0.15 per GB             
  └─ Streams read request unit (sRRU)                        Monthly cost depends on usage: $0.0000002 per sRRUs     
                                                                                                                     
- OVERALL TOTAL                                                                                           $762.82 
+ OVERALL TOTAL                                                                                           $731.93 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -78,5 +78,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $106 ┃        $657 ┃       $763 ┃
+┃ main                                               ┃           $78 ┃        $654 ┃       $732 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -355,6 +355,18 @@
           },
           "type": "array"
         },
+        "currentErrors": {
+          "items": {
+            "$ref": "#/definitions/ProjectDiag"
+          },
+          "type": "array"
+        },
+        "pastErrors": {
+          "items": {
+            "$ref": "#/definitions/ProjectDiag"
+          },
+          "type": "array"
+        },
         "warnings": {
           "items": {
             "$ref": "#/definitions/ProjectDiag"
