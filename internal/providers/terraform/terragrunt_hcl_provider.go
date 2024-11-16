@@ -682,9 +682,11 @@ func loadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragr
 		return "", err
 	}
 
+	sparseCheckoutEnabled := os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true"
+
 	// If sparse checkout is enabled add the subdir to the Source URL as a query param
 	// so go-getter only downloads the required directory.
-	if os.Getenv("INFRACOST_SPARSE_CHECKOUT") == "true" {
+	if sparseCheckoutEnabled {
 		q := parsedSourceURL.Query()
 		q.Set("subdir", modAddr)
 		parsedSourceURL.RawQuery = q.Encode()
@@ -720,7 +722,7 @@ func loadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragr
 		}
 	}
 
-	if modAddr != "" && isGitDir(dir) {
+	if sparseCheckoutEnabled && modAddr != "" && isGitDir(dir) {
 		symlinkedDirs, err := modules.ResolveSymLinkedDirs(dir, modAddr)
 		if err != nil {
 			return "", err
