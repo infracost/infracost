@@ -801,6 +801,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 
 	err = m.packageFetcher.Fetch(moduleAddr, dest)
 	if err != nil {
+		_ = os.RemoveAll(dest)
 		return nil, schema.NewFailedDownloadDiagnostic(source, err)
 	}
 
