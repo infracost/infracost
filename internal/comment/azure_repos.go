@@ -66,7 +66,8 @@ type AzureReposExtra struct {
 	// Token is the Azure DevOps access token.
 	Token string
 	// Tag is used to identify the Infracost comment.
-	Tag string
+	Tag        string
+	InitActive bool
 }
 
 // azureAPIComment represents API response structure of Azure Repos comment.
@@ -134,9 +135,10 @@ func buildAzureAPIURL(repoURL string) (string, error) {
 // implements the PlatformHandler interface and contains the functions
 // for finding, creating, updating, deleting comments on Azure Repos pull requests.
 type azureReposPRHandler struct {
-	httpClient *http.Client
-	repoAPIURL string
-	prNumber   int
+	httpClient   *http.Client
+	repoAPIURL   string
+	prNumber     int
+	initAsActive bool
 }
 
 // NewAzureReposPRHandler creates a new PlatformHandler for Azure Repos pull requests.
@@ -157,9 +159,10 @@ func NewAzureReposPRHandler(ctx context.Context, repoURL string, targetRef strin
 	}
 
 	h := &azureReposPRHandler{
-		httpClient: httpClient,
-		repoAPIURL: apiURL,
-		prNumber:   prNumber,
+		httpClient:   httpClient,
+		repoAPIURL:   apiURL,
+		prNumber:     prNumber,
+		initAsActive: extra.InitActive,
 	}
 
 	return NewCommentHandler(ctx, h, extra.Tag), nil
@@ -236,6 +239,10 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 // CallCreateComment calls the Azure Repos API to create a new comment on the pull request.
 func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
+	status := "closed"
+	if h.initAsActive {
+		status = "active"
+	}
 	reqData, err := json.Marshal(map[string]interface{}{
 		"comments": []map[string]interface{}{
 			{
@@ -244,7 +251,7 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 				"commentType":     1,
 			},
 		},
-		"status": 4,
+		"status": status,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Error marshaling comment body")
