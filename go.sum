@@ -1163,6 +1163,8 @@ github.com/vmihailenco/msgpack/v5 v5.3.5/go.mod h1:7xyJ9e+0+9SaZT0Wt1RGleJXzli6Q
 github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgqMEUPoW2WPyhdI=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
+github.com/whilp/git-urls v1.0.0 h1:95f6UMWN5FKW71ECsXRUd3FVYiXdrE7aX4NZKcPmIjU=
+github.com/whilp/git-urls v1.0.0/go.mod h1:J16SAmobsqc3Qcy98brfl5f5+e0clUvg1krgwk/qCfE=
 github.com/withfig/autocomplete-tools/packages/cobra v1.2.0 h1:MzD3XeOOSO3mAjOPpF07jFteSKZxsRHvlIcAR9RQzKM=
 github.com/withfig/autocomplete-tools/packages/cobra v1.2.0/go.mod h1:RoXh7+7qknOXL65uTzdzE1mPxqcPwS7FLCE9K5GfmKo=
 github.com/xanzy/go-gitlab v0.86.0 h1:jR8V9cK9jXRQDb46KOB20NCF3ksY09luaG0IfXE6p7w=

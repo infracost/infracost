@@ -21,6 +21,7 @@ import (
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
+	giturls "github.com/whilp/git-urls"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/config"
@@ -929,12 +930,20 @@ func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapRes
 	// Merge the query params from the source and dest URLs
 	parsedSourceURL, err := url.Parse(moduleAddr)
 	if err != nil {
-		return SourceMapResult{}, err
+		// Try parsing it as a git URL
+		parsedSourceURL, err = giturls.Parse(moduleAddr)
+		if err != nil {
+			return SourceMapResult{}, err
+		}
 	}
 
 	parsedDestURL, err := url.Parse(destSource)
 	if err != nil {
-		return SourceMapResult{}, err
+		// Try parsing it as a git URL
+		parsedDestURL, err = giturls.Parse(destSource)
+		if err != nil {
+			return SourceMapResult{}, err
+		}
 	}
 
 	sourceQuery := parsedSourceURL.Query()
