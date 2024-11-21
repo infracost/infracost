@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -10,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	getter "github.com/hashicorp/go-getter"
+	"github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 
@@ -22,6 +23,8 @@ var commitRegex = regexp.MustCompile(`^([0-9a-f]{40})|([0-9a-f]{7})$`)
 var defaultTTL = 24 * time.Hour
 var tagCommitTTL = 30 * 24 * time.Hour
 
+const defaultModuleRetrieveTimeout = 3 * time.Minute
+
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
@@ -29,6 +32,7 @@ type PackageFetcher struct {
 	remoteCache RemoteCache
 	logger      zerolog.Logger
 	getters     map[string]getter.Getter
+	timeout     time.Duration
 }
 
 type PackageFetcherOpts func(*PackageFetcher)
@@ -45,6 +49,7 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 		remoteCache: remoteCache,
 		logger:      logger,
 		getters:     getters,
+		timeout:     defaultModuleRetrieveTimeout,
 	}
 
 	for _, opt := range opts {
@@ -59,6 +64,12 @@ func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
 		for k, g := range getters {
 			p.getters[k] = g
 		}
+	}
+}
+
+var WithTimeout = func(d time.Duration) PackageFetcherOpts {
+	return func(p *PackageFetcher) {
+		p.timeout = d
 	}
 }
 
@@ -183,7 +194,15 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	// I'm not sure if we really need it, but added it just in case/
 	decompressors["tar.tbz2"] = new(getter.TarBzip2Decompressor)
 
+	ctx := context.Background()
+	if p.timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, p.timeout)
+		defer cancel()
+	}
+
 	client := getter.Client{
+		Ctx:           ctx,
 		Src:           moduleAddr,
 		Dst:           dest,
 		Pwd:           dest,
