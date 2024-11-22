@@ -821,12 +821,14 @@ var (
 	// - values(dependency.foo.bar).*[0]["qux"]
 	// - values(dependency.foo.bar).*.baz[0]
 	// - values(dependency.foo.bar).*.baz["qux"]
+	// - dependency.foo.bar["${var.baz}"]
+	// - values(dependency.foo.bar).*.baz["${var.qux}"]
 	//
 	// The regex will also match any trailing braces so we have to strip them later on.
 	// There's no easy way to avoid this since golang regex doesn't support lookbehinds.
-	depRegexp   = regexp.MustCompile(`(?:\w+\()?dependency\.[\w\-.\[\]"]+(?:\)[\w\*\-.\[\]"]+)?(?:\))?`)
+	depRegexp   = regexp.MustCompile(`(?:\${)?(?:\w+\()?dependency\.[\w\-\${}.\[\]"]+(?:\)[\w\*\-\${}.\[\]"]+)?(?:\))?`)
 	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
-	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
+	mapRegexp   = regexp.MustCompile(`\[\\?"([^[\[\]|\d]+)\\?"]`)
 )
 
 func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) cty.Value {
@@ -874,8 +876,11 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 	valueMap := moduleOutputs.AsValueMap()
 
 	for _, match := range matches {
-		stripped := stripTrailingBraces(stripFunctionCalls(match))
-		pieces := strings.Split(stripped, ".")
+		stripped := stripTrailingChars(stripFunctionCalls(stripStringInterpolation(match)))
+
+		// Split on dots but preserve nested bracket expressions
+		pieces := splitPreservingBrackets(stripped)
+
 		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
 	}
 
@@ -883,14 +888,57 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 }
 
 func stripFunctionCalls(input string) string {
-	re := regexp.MustCompile(`\w+\(([^)]+)\)`)
-	stripped := re.ReplaceAllString(input, "$1")
-
-	return stripped
+	re := regexp.MustCompile(`\$\{([^)]+)\}`)
+	return re.ReplaceAllString(input, "$1")
 }
 
-func stripTrailingBraces(input string) string {
-	return strings.TrimSuffix(input, ")")
+func stripStringInterpolation(input string) string {
+	// Handles nested interpolations by stripping ${...} recursively
+	re := regexp.MustCompile(`\$\{([^\}]+)\}`)
+	for re.MatchString(input) {
+		input = re.ReplaceAllString(input, "$1")
+	}
+	return input
+}
+
+func stripTrailingChars(input string) string {
+	// Strip any trailing ) } and " chars
+	re := regexp.MustCompile(`[\)\}\"]+$`)
+	return re.ReplaceAllString(input, "")
+}
+
+func splitPreservingBrackets(input string) []string {
+	var parts []string
+	var currentPart strings.Builder
+	openBrackets := 0
+
+	for _, char := range input {
+		switch char {
+		case '.':
+			if openBrackets == 0 {
+				// Split when not inside brackets
+				parts = append(parts, currentPart.String())
+				currentPart.Reset()
+			} else {
+				currentPart.WriteRune(char)
+			}
+		case '[', '{':
+			openBrackets++
+			currentPart.WriteRune(char)
+		case ']', '}':
+			openBrackets--
+			currentPart.WriteRune(char)
+		default:
+			currentPart.WriteRune(char)
+		}
+	}
+
+	// Append the last part
+	if currentPart.Len() > 0 {
+		parts = append(parts, currentPart.String())
+	}
+
+	return parts
 }
 
 func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
