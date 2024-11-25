@@ -347,11 +347,16 @@ func (p *HCLProvider) LoadPlanJSON() HCLProject {
 	module := p.Module()
 	if module.Error == nil {
 		module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
-
 		if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
 			targetPath := fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-"))
-			if os.Getenv("INFRACOST_JSON_DUMP_PATH") != "" {
-				targetPath = filepath.Join(os.Getenv("INFRACOST_JSON_DUMP_PATH"), targetPath)
+			targetDir, ok := os.LookupEnv("INFRACOST_JSON_DUMP_PATH")
+			if ok {
+				targetPath = filepath.Join(targetDir, targetPath)
+				if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+					p.logger.Debug().Err(err).Msg("failed to create directory for json dump")
+					// use the default
+					targetPath = fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-"))
+				}
 			}
 			err := os.WriteFile(targetPath, module.JSON, os.ModePerm) // nolint: gosec
 			if err != nil {
