@@ -25,13 +25,13 @@
  └─ IP address (standard VM)                                        730  hours         $3.65   
                                                                                                
  google_compute_instance.preemptible_instance_with_ip                                          
- ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)              730  hours         $2.56   
+ ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)              730  hours         $2.22   
  └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40   
                                                                                                
  google_compute_address.preemptible_static                                                     
  └─ IP address (preemptible VM)                                     730  hours         $1.83   
                                                                                                
- OVERALL TOTAL                                                                       $47.66 
+ OVERALL TOTAL                                                                       $47.32 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -43,5 +43,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃           $48 ┃           - ┃        $48 ┃
+┃ main                                               ┃           $47 ┃           - ┃        $47 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
