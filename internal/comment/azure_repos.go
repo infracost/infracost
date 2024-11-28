@@ -267,11 +267,16 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 
 	res, err := h.httpClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error creating comment")
+		return nil, fmt.Errorf("Error creating comment: %w", err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("Error creating comment: %s", res.Status)
+		resBody, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, fmt.Errorf("Error reading response body: %w", err)
+		}
+
+		return nil, fmt.Errorf("Error creating comment: %s\n%s", res.Status, string(resBody))
 	}
 
 	if res.Body != nil {
