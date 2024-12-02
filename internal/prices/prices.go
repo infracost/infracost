@@ -17,7 +17,6 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 
 	"github.com/shopspring/decimal"
-	"github.com/tidwall/gjson"
 )
 
 var (
@@ -256,10 +255,14 @@ func (p *PriceFetcher) getPrices(req apiclient.BatchRequest) error {
 	return nil
 }
 
+type productPrice struct {
+	Hash  string
+	Price decimal.Decimal
+}
+
 func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) {
 	currency := p.client.Currency
 
-	var pp decimal.Decimal
 	if result.CostComponent.CustomPrice() != nil {
 		logging.Logger.Debug().Msgf("Using user-defined custom price %v for %s %s.", *result.CostComponent.CustomPrice(), result.Resource.Name, result.CostComponent.Name)
 		result.CostComponent.SetPrice(*result.CostComponent.CustomPrice())
@@ -284,17 +287,56 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 
 	// Some resources may have identical records in CPAPI for the same product
 	// filters, several products are always returned and they can only be
-	// distinguished by their prices. However if we pick the first product it may not
+	// distinguished by their prices. However, if we pick the first product it may not
 	// have the price due to price filter and the lookup fails. Filtering the
-	// products with prices helps to solve that.
-	var productsWithPrices []gjson.Result
+	// products with prices helps to solve that. To make sure we get a consistent price
+	// between runs, we sort any multiple prices so we always pick the smallest non-zero
+	// price first.
+	var productPrices [][]productPrice
 	for _, product := range products {
-		if len(product.Get("prices").Array()) > 0 {
-			productsWithPrices = append(productsWithPrices, product)
+		pricesResults := product.Get("prices").Array()
+		if len(pricesResults) > 0 {
+			// map pricesResults to decimals
+			var prices []productPrice
+			for _, price := range pricesResults {
+				p, err := decimal.NewFromString(price.Get(currency).String())
+				if err != nil {
+					logging.Logger.Warn().Msgf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, price.Get(currency).String(), err.Error())
+					prices = append(prices, productPrice{Hash: price.Get("priceHash").String(), Price: decimal.Zero})
+					continue
+				}
+				prices = append(prices, productPrice{Hash: price.Get("priceHash").String(), Price: p})
+			}
+
+			// sort prices with the smallest non-zero price first
+			sort.Slice(prices, func(i, j int) bool {
+				if prices[i].Price.IsZero() {
+					return false // Treat zero as larger, so it goes to the end
+				}
+				if prices[j].Price.IsZero() {
+					return true // Non-zero should come before zero
+				}
+				// Both prices are non-zero, sort in ascending order
+				return prices[i].Price.LessThan(prices[j].Price)
+			})
+
+			productPrices = append(productPrices, prices)
 		}
 	}
 
-	if len(productsWithPrices) == 0 {
+	// sort productPrices with the smallest non-zero price first
+	sort.Slice(productPrices, func(i, j int) bool {
+		if productPrices[i][0].Price.IsZero() {
+			return false // Treat zero as larger, so it goes to the end
+		}
+		if productPrices[j][0].Price.IsZero() {
+			return true // Non-zero should come before zero
+		}
+		// Both prices are non-zero, sort in ascending order
+		return productPrices[i][0].Price.LessThan(productPrices[j][0].Price)
+	})
+
+	if len(productPrices) == 0 {
 		if result.CostComponent.IgnoreIfMissingPrice {
 			logging.Logger.Debug().Msgf("No prices found for %s %s, ignoring since IgnoreIfMissingPrice is set.", result.Resource.Name, result.CostComponent.Name)
 			result.Resource.RemoveCostComponent(result.CostComponent)
@@ -305,23 +347,14 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 		return
 	}
 
-	if len(productsWithPrices) > 1 {
-		logging.Logger.Debug().Msgf("Multiple products with prices found for %s %s, using the first product", result.Resource.Name, result.CostComponent.Name)
+	if len(productPrices) > 1 {
+		logging.Logger.Debug().Msgf("Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
 	}
 
-	prices := productsWithPrices[0].Get("prices").Array()
-	if len(prices) > 1 {
-		logging.Logger.Debug().Msgf("Multiple prices found for %s %s, using the first price", result.Resource.Name, result.CostComponent.Name)
+	if len(productPrices[0]) > 1 {
+		logging.Logger.Debug().Msgf("Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
 	}
 
-	var err error
-	pp, err = decimal.NewFromString(prices[0].Get(currency).String())
-	if err != nil {
-		logging.Logger.Warn().Msgf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
-		result.CostComponent.SetPrice(decimal.Zero)
-		return
-	}
-
-	result.CostComponent.SetPrice(pp)
-	result.CostComponent.SetPriceHash(prices[0].Get("priceHash").String())
+	result.CostComponent.SetPrice(productPrices[0][0].Price)
+	result.CostComponent.SetPriceHash(productPrices[0][0].Hash)
 }
