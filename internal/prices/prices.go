@@ -34,20 +34,22 @@ type notFoundData struct {
 // data. This is used to provide a summary of missing prices at the end of a run.
 // It should be used as a singleton which is shared across the application.
 type PriceFetcher struct {
-	resources  map[string]*notFoundData
-	components map[string]int
-	mux        *sync.RWMutex
-	client     *apiclient.PricingAPIClient
-	runCtx     *config.RunContext
+	resources         map[string]*notFoundData
+	components        map[string]int
+	mux               *sync.RWMutex
+	client            *apiclient.PricingAPIClient
+	runCtx            *config.RunContext
+	warnOnPriceErrors bool
 }
 
-func NewPriceFetcher(ctx *config.RunContext) *PriceFetcher {
+func NewPriceFetcher(ctx *config.RunContext, warnOnPriceErrors bool) *PriceFetcher {
 	return &PriceFetcher{
-		resources:  make(map[string]*notFoundData),
-		components: make(map[string]int),
-		mux:        &sync.RWMutex{},
-		runCtx:     ctx,
-		client:     apiclient.NewPricingAPIClient(ctx),
+		resources:         make(map[string]*notFoundData),
+		components:        make(map[string]int),
+		mux:               &sync.RWMutex{},
+		runCtx:            ctx,
+		client:            apiclient.NewPricingAPIClient(ctx),
+		warnOnPriceErrors: warnOnPriceErrors,
 	}
 }
 
@@ -255,6 +257,14 @@ func (p *PriceFetcher) getPrices(req apiclient.BatchRequest) error {
 	return nil
 }
 
+func (p *PriceFetcher) logPriceLookupErr(format string, v ...interface{}) {
+	if p.warnOnPriceErrors {
+		logging.Logger.Warn().Msgf(format, v...)
+	} else {
+		logging.Logger.Debug().Msgf(format, v...)
+	}
+}
+
 type productPrice struct {
 	Hash  string
 	Price decimal.Decimal
@@ -348,11 +358,11 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 	}
 
 	if len(productPrices) > 1 {
-		logging.Logger.Debug().Msgf("Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		p.logPriceLookupErr("Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
 	}
 
 	if len(productPrices[0]) > 1 {
-		logging.Logger.Debug().Msgf("Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		p.logPriceLookupErr("Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
 	}
 
 	result.CostComponent.SetPrice(productPrices[0][0].Price)
