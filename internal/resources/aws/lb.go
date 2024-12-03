@@ -145,7 +145,7 @@ func (r *LB) capacityUnitsCostComponent(productFamily string, maxLCU *decimal.De
 			ProductFamily: strPtr(productFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "locationType", Value: strPtr("AWS Region")},
-				{Key: "usagetype", ValueRegex: strPtr("/^LCUUsage/")},
+				{Key: "usagetype", ValueRegex: strPtr("/^([A-Z]{3}\\d-|Global-|EU-)?LCUUsage/")},
 			},
 		},
 		UsageBased: true,
