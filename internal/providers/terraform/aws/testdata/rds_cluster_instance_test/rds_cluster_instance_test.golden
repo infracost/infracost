@@ -14,6 +14,14 @@
  aws_rds_cluster_instance.aurora_serverless_v2_with_usage                                                                                    
  └─ Aurora serverless v2                                                                  3,650  ACU-hours                        $438.00  * 
                                                                                                                                              
+ aws_rds_cluster_instance.extended_support["aurora-mysql-5.7"]                                                                               
+ ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
+ └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00    
+                                                                                                                                             
+ aws_rds_cluster_instance.extended_support["aurora-mysql-5.7.44"]                                                                            
+ ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
+ └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00    
+                                                                                                                                             
  aws_rds_cluster_instance.extended_support["aurora-postgresql-11"]                                                                           
  ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
  └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00    
@@ -33,12 +41,6 @@
  ├─ CPU credits                                                                              60  vCPU-hours                         $5.40  * 
  ├─ Performance Insights Long Term Retention (db.t3.large)                                    2  vCPU-month                         $5.90    
  └─ Performance Insights API                                                             12.345  1000 requests                      $0.12  * 
-                                                                                                                                             
- aws_rds_cluster_instance.extended_support["aurora-mysql-5.7"]                                                                               
- └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
-                                                                                                                                             
- aws_rds_cluster_instance.extended_support["aurora-mysql-5.7.44"]                                                                            
- └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
                                                                                                                                              
  aws_rds_cluster_instance.extended_support["aurora-mysql-8.0"]                                                                               
  └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
@@ -105,7 +107,7 @@
  ├─ Aurora serverless v2                                                    Monthly cost depends on usage: $0.12 per ACU-hours               
  └─ Performance Insights API                                                Monthly cost depends on usage: $0.01 per 1000 requests           
                                                                                                                                              
- OVERALL TOTAL                                                                                                                  $6,695.11 
+ OVERALL TOTAL                                                                                                                  $6,987.11 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -116,7 +118,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $5,809 ┃        $886 ┃     $6,695 ┃
+┃ main                                               ┃        $6,101 ┃        $886 ┃     $6,987 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
