@@ -20,3 +20,7 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ main                                               ┃       0.00 元 ┃           - ┃    0.00 元 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WARN No products found for aws_rds_cluster.mysql_china Backup storage. Product filter: {"vendorName":"aws","service":"AmazonRDS","productFamily":"Storage Snapshot","region":"cn-north-1","attributeFilters":[{"key":"databaseEngine","value_regex":"/Aurora MySQL/i"},{"key":"usagetype","value_regex":"/Aurora:BackupUsage$/i"}]} Price filter:null
+WARN No products found for aws_rds_cluster.mysql_china Snapshot export. Product filter: {"vendorName":"aws","service":"AmazonRDS","productFamily":"System Operation","region":"cn-north-1","attributeFilters":[{"key":"databaseEngine","value_regex":"/Aurora MySQL/i"},{"key":"usagetype","value_regex":"/Aurora:SnapshotExportToS3$/i"}]} Price filter:null
