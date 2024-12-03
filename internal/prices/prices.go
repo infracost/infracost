@@ -307,19 +307,23 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 	// between runs, we sort any multiple prices so we always pick the smallest non-zero
 	// price first.
 	var productPrices [][]productPrice
+	distinctPrices := map[string]bool{}
 	for _, product := range products {
 		pricesResults := product.Get("prices").Array()
 		if len(pricesResults) > 0 {
 			// map pricesResults to decimals
 			var prices []productPrice
 			for _, price := range pricesResults {
-				p, err := decimal.NewFromString(price.Get(currency).String())
+				priceStr := price.Get(currency).String()
+				p, err := decimal.NewFromString(priceStr)
 				if err != nil {
 					logging.Logger.Warn().Msgf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, price.Get(currency).String(), err.Error())
 					prices = append(prices, productPrice{Hash: price.Get("priceHash").String(), Price: decimal.Zero})
 					continue
 				}
 				prices = append(prices, productPrice{Hash: price.Get("priceHash").String(), Price: p})
+
+				distinctPrices[priceStr] = true
 			}
 
 			// sort prices with the smallest non-zero price first
@@ -362,12 +366,16 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 		return
 	}
 
-	if len(productPrices) > 1 {
-		p.logPriceLookupErr(result.CostComponent, "Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
-	}
+	if len(distinctPrices) > 1 {
+		// only worry about duplicate products/prices if they have different prices.
 
-	if len(productPrices[0]) > 1 {
-		p.logPriceLookupErr(result.CostComponent, "Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		if len(productPrices) > 1 {
+			p.logPriceLookupErr(result.CostComponent, "Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		}
+
+		if len(productPrices[0]) > 1 {
+			p.logPriceLookupErr(result.CostComponent, "Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		}
 	}
 
 	result.CostComponent.SetPrice(productPrices[0][0].Price)
