@@ -257,9 +257,12 @@ func (p *PriceFetcher) getPrices(req apiclient.BatchRequest) error {
 	return nil
 }
 
-func (p *PriceFetcher) logPriceLookupErr(format string, v ...interface{}) {
+func (p *PriceFetcher) logPriceLookupErr(cc *schema.CostComponent, format string, v ...interface{}) {
 	if p.warnOnPriceErrors {
-		logging.Logger.Warn().Msgf(format, v...)
+		productFilterJson, _ := json.Marshal(cc.ProductFilter)
+		priceFilterJson, _ := json.Marshal(cc.PriceFilter)
+		logging.Logger.Warn().Msgf(format+". Product filter: %s Price filter:%s", append(v, productFilterJson, priceFilterJson)...)
+
 	} else {
 		logging.Logger.Debug().Msgf(format, v...)
 	}
@@ -286,6 +289,7 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 			result.Resource.RemoveCostComponent(result.CostComponent)
 			return
 		}
+		p.logPriceLookupErr(result.CostComponent, "No products found for %s %s", result.Resource.Name, result.CostComponent.Name)
 
 		p.addNotFoundResult(result)
 		return
@@ -352,17 +356,18 @@ func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) 
 			result.Resource.RemoveCostComponent(result.CostComponent)
 			return
 		}
+		p.logPriceLookupErr(result.CostComponent, "No prices found for %s %s", result.Resource.Name, result.CostComponent.Name)
 
 		p.addNotFoundResult(result)
 		return
 	}
 
 	if len(productPrices) > 1 {
-		p.logPriceLookupErr("Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		p.logPriceLookupErr(result.CostComponent, "Multiple products with prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
 	}
 
 	if len(productPrices[0]) > 1 {
-		p.logPriceLookupErr("Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
+		p.logPriceLookupErr(result.CostComponent, "Multiple prices found for %s %s, using the smallest non-zero price", result.Resource.Name, result.CostComponent.Name)
 	}
 
 	result.CostComponent.SetPrice(productPrices[0][0].Price)
