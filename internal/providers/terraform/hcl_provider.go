@@ -695,6 +695,12 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		return nil
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			p.logger.Debug().Msgf("could not marshal default_tags block: %v", r)
+		}
+	}()
+
 	marshalledTags := make(map[string]interface{})
 
 	tags := b.GetAttribute("tags")
@@ -765,6 +771,12 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 	if tags == nil {
 		return nil
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			p.logger.Debug().Msgf("could not marshal default_labels block: %v", r)
+		}
+	}()
 
 	marshalledTags := make(map[string]interface{})
 
