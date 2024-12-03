@@ -250,7 +250,12 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 		level = *options.LogLevel
 	}
 
-	logBuf := testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
+	var logBuf *bytes.Buffer
+	if options != nil && options.CaptureLogs {
+		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
+	} else {
+		testutil.ConfigureTestToFailOnLogs(t, runCtx)
+	}
 
 	if options != nil && options.Currency != "" {
 		runCtx.Config.Currency = options.Currency

@@ -219,6 +219,15 @@ func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext, level s
 	return logBuf
 }
 
+func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
+	runCtx.Config.LogLevel = "warn"
+	runCtx.Config.SetLogDisableTimestamps(true)
+	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t}))
+
+	err := logging.ConfigureBaseLogger(runCtx.Config)
+	require.Nil(t, err)
+}
+
 // From https://gist.github.com/stoewer/fbe273b711e6a06315d19552dd4d33e6
 func toSnakeCase(s string) string {
 	var res = make([]rune, 0, len(s))
