@@ -4,8 +4,8 @@
  azurerm_sql_managed_instance.example3                                                    
  ├─ Compute (BC_GEN5 40 Cores)                     730  hours                $9,778.47    
  ├─ Storage                                         32  GB                       $4.38    
- ├─ PITR backup storage (ZRS)                      100  GB                      $14.90  * 
- └─ LTR backup storage (ZRS)                       100  GB                       $3.72  * 
+ ├─ PITR backup storage (ZRS)                      100  GB                      $11.90  * 
+ └─ LTR backup storage (ZRS)                       100  GB                       $2.98  * 
                                                                                           
  azurerm_sql_managed_instance.example2                                                    
  ├─ Compute (GP_GEN5 16 Cores)                     730  hours                $1,955.69    
@@ -20,7 +20,7 @@
  ├─ SQL license                                  2,920  vCore-hours            $291.90    
  └─ LTR backup storage (LRS)                         5  GB                       $0.15  * 
                                                                                           
- OVERALL TOTAL                                                              $12,558.78 
+ OVERALL TOTAL                                                              $12,555.04 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -32,5 +32,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $12,528 ┃         $31 ┃    $12,559 ┃
+┃ main                                               ┃       $12,528 ┃         $27 ┃    $12,555 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
