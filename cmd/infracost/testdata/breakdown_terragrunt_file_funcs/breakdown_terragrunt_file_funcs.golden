@@ -123,12 +123,12 @@ Project: main
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
  aws_instance.template_file["pdabs"]                                                                                      
- ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found   
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
  module.mod_files.aws_instance.file["pd"]                                                                                 
- ├─ Instance usage (Linux/UNIX, on-demand, )                                                   730  hours     not found   
+ ├─ Instance usage (Linux/UNIX, on-demand, instance_type-infracost-mock-44956be29f34)          730  hours     not found
  └─ root_block_device                                                                                                     
     └─ Storage (general purpose SSD, gp2)                                                        8  GB            $0.80   
                                                                                                                           
