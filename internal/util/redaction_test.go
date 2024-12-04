@@ -53,6 +53,11 @@ func TestRedactUrlPtr(t *testing.T) {
 		expected *string
 	}{
 		{
+			name:     "nil",
+			url:      nil,
+			expected: nil,
+		},
+		{
 			name:     "github with secrets",
 			url:      stringPtr("https://user:password@github.com/some/repo"),
 			expected: stringPtr("https://****:****@github.com/some/repo"),

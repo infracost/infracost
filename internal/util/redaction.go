@@ -10,6 +10,9 @@ func RedactUrl(source string) string {
 }
 
 func RedactUrlPtr(moduleLocation *string) *string {
+	if moduleLocation == nil {
+		return nil
+	}
 	redacted := RedactUrl(*moduleLocation)
 	return &redacted
 }
