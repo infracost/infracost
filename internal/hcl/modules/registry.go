@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/infracost/infracost/internal/util"
 	"io"
 	"net/http"
 	"net/url"
@@ -138,7 +139,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	resp, err := d.httpClient.Do(retryReq)
 
 	if err != nil {
-		return "", fmt.Errorf("error fetching download URL '%s': %w", downloadURL.String(), err)
+		return "", fmt.Errorf("error fetching download URL '%s': %w", util.RedactUrl(downloadURL.String()), err)
 	}
 	defer resp.Body.Close()
 
@@ -190,7 +191,7 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zero
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", util.RedactUrl(moduleAddr))
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
@@ -199,14 +200,14 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
 	if !ok {
 		if err != nil {
-			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", util.RedactUrl(moduleAddr))
 		}
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", moduleAddr, versionConstraints, err)
+		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", util.RedactUrl(moduleAddr), versionConstraints, err)
 	}
 
 	versions, err := r.fetchModuleVersions(moduleURL)

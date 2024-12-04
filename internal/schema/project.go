@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v5"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/util"
 	"github.com/infracost/infracost/internal/vcs"
 )
 
@@ -106,9 +107,13 @@ func NewDiagJSONParsingFailure(err error) *ProjectDiag {
 // download failure. This contains additional information about the module source
 // and the discovered location returned by the registry.
 func NewPrivateRegistryDiag(source string, moduleLocation *string, err error) *ProjectDiag {
+	source = util.RedactUrl(source)
+	moduleLocation = util.RedactUrlPtr(moduleLocation)
+	errorString := util.RedactUrl(err.Error())
+
 	return newDiag(
 		diagPrivateRegistryModuleDownloadFailure,
-		fmt.Sprintf("Failed to lookup module %q - %s", source, err),
+		fmt.Sprintf("Failed to lookup module %q - %s", source, errorString),
 		true,
 		map[string]interface{}{
 			"moduleLocation": moduleLocation,
@@ -126,9 +131,11 @@ func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
 		sourceType = "ssh"
 	}
 
+	source = util.RedactUrl(source)
+	errorString := util.RedactUrl(err.Error())
 	return newDiag(
 		diagPrivateModuleDownloadFailure,
-		fmt.Sprintf("Failed to download module %q - %s", source, err),
+		fmt.Sprintf("Failed to download module %q - %s", source, errorString),
 		true,
 		map[string]interface{}{
 			"source":       sourceType,
