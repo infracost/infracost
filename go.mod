@@ -117,6 +117,7 @@ require (
 	github.com/soongo/path-to-regexp v1.6.4
 	github.com/spacelift-io/spacectl v1.2.0
 	github.com/turbot/terraform-components v0.0.0-20231213122222-1f3526cab7a7
+	github.com/whilp/git-urls v1.0.0
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	github.com/xanzy/go-gitlab v0.86.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
@@ -216,7 +217,6 @@ require (
 	github.com/urfave/cli/v2 v2.27.2 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	github.com/whilp/git-urls v1.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	github.com/xrash/smetrics v0.0.0-20240312152122-5f08fbb34913 // indirect
@@ -274,7 +274,9 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
-replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20241113223044-d35392684463
+//replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20241113223044-d35392684463
+
+replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20241204130829-f38db1703ecc
 
 replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94
 

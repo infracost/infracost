@@ -887,7 +887,7 @@ func (b *Block) GetAttributes() []*Attribute {
 				Logger: b.logger.With().Str(
 					"attribute_name", k,
 				).Logger(),
-				isGraph: b.isGraph,
+				IsGraph: b.isGraph,
 			})
 			continue
 		}
@@ -900,7 +900,7 @@ func (b *Block) GetAttributes() []*Attribute {
 			Logger: b.logger.With().Str(
 				"attribute_name", hclAttributes[k].Name,
 			).Logger(),
-			isGraph: b.isGraph,
+			IsGraph: b.isGraph,
 		})
 	}
 
@@ -958,7 +958,7 @@ func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
 		Logger: b.logger.With().Str(
 			"attribute_name", name,
 		).Logger(),
-		isGraph: b.isGraph,
+		IsGraph: b.isGraph,
 	}
 }
 
