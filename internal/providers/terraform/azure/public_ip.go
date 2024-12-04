@@ -43,7 +43,7 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			skuTier = skuTierVal
 		}
 		if skuTier == "Global" {
-			sku = "Standard" // When sku_tier is Global, sku is Standard
+			sku = "Global" // When sku_tier is Global, skuname is global
 			meterName = "Global IPv4 " + allocationMethod + " Public IP"
 		} else {
 			meterName = "Standard IPv4 " + allocationMethod + " Public IP"
