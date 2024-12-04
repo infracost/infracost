@@ -109,9 +109,11 @@ func NewDiagJSONParsingFailure(err error) *ProjectDiag {
 func NewPrivateRegistryDiag(source string, moduleLocation *string, err error) *ProjectDiag {
 	source = util.RedactUrl(source)
 	moduleLocation = util.RedactUrlPtr(moduleLocation)
+	errorString := util.RedactUrl(err.Error())
+	
 	return newDiag(
 		diagPrivateRegistryModuleDownloadFailure,
-		fmt.Sprintf("Failed to lookup module %q - %s", source, err),
+		fmt.Sprintf("Failed to lookup module %q - %s", source, errorString),
 		true,
 		map[string]interface{}{
 			"moduleLocation": moduleLocation,
@@ -130,9 +132,10 @@ func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
 	}
 
 	source = util.RedactUrl(source)
+	errorString := util.RedactUrl(err.Error())
 	return newDiag(
 		diagPrivateModuleDownloadFailure,
-		fmt.Sprintf("Failed to download module %q - %s", source, err),
+		fmt.Sprintf("Failed to download module %q - %s", source, errorString),
 		true,
 		map[string]interface{}{
 			"source":       sourceType,

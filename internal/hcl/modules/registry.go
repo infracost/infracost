@@ -191,7 +191,7 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zero
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", util.RedactUrl(moduleAddr))
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
@@ -200,14 +200,14 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
 	if !ok {
 		if err != nil {
-			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", util.RedactUrl(moduleAddr))
 		}
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", moduleAddr, versionConstraints, err)
+		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", util.RedactUrl(moduleAddr), versionConstraints, err)
 	}
 
 	versions, err := r.fetchModuleVersions(moduleURL)

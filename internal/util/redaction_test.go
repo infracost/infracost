@@ -32,6 +32,11 @@ func TestRedactUrl(t *testing.T) {
 			url:      "ssh://gitlab.com:22",
 			expected: "ssh://gitlab.com:22",
 		},
+		{
+			name:     "git error string",
+			url:      "Error downloading ssh://user:password@gitlab.com:22 because it couldn't be found",
+			expected: "Error downloading ssh://****:****@gitlab.com:22 because it couldn't be found",
+		},
 	}
 
 	for _, tt := range tests {
