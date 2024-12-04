@@ -55,19 +55,19 @@
  ├─ Long-term retention (RA-GRS)                                        1,000  GB                          $50.00  * 
  └─ PITR backup storage (RA-GRS)                                          500  GB                         $100.00  * 
                                                                                                                      
- azurerm_mssql_database.backup_zone                                                                                  
- ├─ Compute (provisioned, GP_Gen5_4)                                      730  hours                      $444.47    
- ├─ SQL license                                                         2,920  vCore-hours                $291.90    
- ├─ Storage                                                                 5  GB                           $0.58    
- ├─ Long-term retention (ZRS)                                           1,000  GB                          $31.30  * 
- └─ PITR backup storage (ZRS)                                             500  GB                          $62.50  * 
-                                                                                                                     
  azurerm_mssql_database.backup_local                                                                                 
  ├─ Compute (provisioned, GP_Gen5_4)                                      730  hours                      $444.47    
  ├─ SQL license                                                         2,920  vCore-hours                $291.90    
  ├─ Storage                                                                 5  GB                           $0.58    
  ├─ Long-term retention (LRS)                                           1,000  GB                          $25.00  * 
  └─ PITR backup storage (LRS)                                             500  GB                          $50.00  * 
+                                                                                                                     
+ azurerm_mssql_database.backup_zone                                                                                  
+ ├─ Compute (provisioned, GP_Gen5_4)                                      730  hours                      $444.47    
+ ├─ SQL license                                                         2,920  vCore-hours                $291.90    
+ ├─ Storage                                                                 5  GB                           $0.58    
+ ├─ Long-term retention (ZRS)                                           1,000  GB                          $25.00  * 
+ └─ PITR backup storage (ZRS)                                             500  GB                          $50.00  * 
                                                                                                                      
  azurerm_mssql_database.general_purpose_gen                                                                          
  ├─ Compute (provisioned, GP_Gen5_4)                                      730  hours                      $444.47    
@@ -116,7 +116,7 @@
  ├─ Long-term retention (RA-GRS)                             Monthly cost depends on usage: $0.05 per GB             
  └─ PITR backup storage (RA-GRS)                             Monthly cost depends on usage: $0.20 per GB             
                                                                                                                      
- OVERALL TOTAL                                                                                         $31,585.37 
+ OVERALL TOTAL                                                                                         $31,566.57 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -128,5 +128,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $30,593 ┃        $992 ┃    $31,585 ┃
+┃ main                                               ┃       $30,593 ┃        $973 ┃    $31,567 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

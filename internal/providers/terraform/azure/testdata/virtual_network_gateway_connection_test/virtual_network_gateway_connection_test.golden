@@ -55,9 +55,9 @@
  └─ VPN gateway (VpnGw5)                                          730  hours                     $10.95   
                                                                                                           
  azurerm_public_ip.example                                                                                
- └─ IP address (dynamic, regional)                                730  hours                  not found   
+ └─ IP address (dynamic, regional)                                730  hours                      $2.92   
                                                                                                           
- OVERALL TOTAL                                                                               $5,961.91 
+ OVERALL TOTAL                                                                               $5,964.83 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -69,5 +69,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $5,962 ┃           - ┃     $5,962 ┃
+┃ main                                               ┃        $5,965 ┃           - ┃     $5,965 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

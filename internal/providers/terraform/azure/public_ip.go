@@ -23,10 +23,15 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	var meterName string
 	sku := "Standard" // default sku is Standard
 	skuTier := "Regional"
-	allocationMethod := d.Get("allocation_method").String()
 
 	if d.Get("sku").Type != gjson.Null {
 		sku = d.Get("sku").String()
+	}
+
+	allocationMethod := strings.ToLower(d.Get("allocation_method").String())
+	if allocationMethod == "dynamic" {
+		// dynamic IPs imply a basic sku.
+		sku = "Basic"
 	}
 
 	switch sku {
@@ -38,7 +43,7 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			skuTier = skuTierVal
 		}
 		if skuTier == "Global" {
-			sku = "Standard" // When sku_tier is Global, sku is Standard
+			sku = "Global" // When sku_tier is Global, skuname is global
 			meterName = "Global IPv4 " + allocationMethod + " Public IP"
 		} else {
 			meterName = "Standard IPv4 " + allocationMethod + " Public IP"
@@ -70,7 +75,7 @@ func PublicIPCostComponent(name, region, sku, meterName string) *schema.CostComp
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("IP Addresses")},
 				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", ValueRegex: regexPtr(meterName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

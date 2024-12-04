@@ -37,9 +37,9 @@
  └─ VPN gateway data tranfer               Monthly cost depends on usage: $0.035 per GB        
                                                                                                
  azurerm_public_ip.example                                                                     
- └─ IP address (dynamic, regional)                     730  hours                  not found   
+ └─ IP address (dynamic, regional)                     730  hours                      $2.92   
                                                                                                
- OVERALL TOTAL                                                                   $49,244.35 
+ OVERALL TOTAL                                                                   $49,247.27 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -51,5 +51,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $49,244 ┃           - ┃    $49,244 ┃
+┃ main                                               ┃       $49,247 ┃           - ┃    $49,247 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -77,3 +77,10 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ main                                               ┃         $0.00 ┃         $27 ┃        $27 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WARN No prices found for aws_sns_topic.sns_topic SMS notifications (over 100). Product filter: {"vendorName":"aws","service":"AmazonSNS","productFamily":"Message Delivery","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/DeliveryAttempts-SMS$/i"}]} Price filter:{"startUsageAmount":"100"}
+WARN No prices found for aws_sns_topic.sns_topic_another_region SMS notifications (over 100). Product filter: {"vendorName":"aws","service":"AmazonSNS","productFamily":"Message Delivery","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/DeliveryAttempts-SMS$/i"}]} Price filter:{"startUsageAmount":"100"}
+WARN No prices found for aws_sns_topic.sns_topic_withChargedSubscribers SMS notifications (over 100). Product filter: {"vendorName":"aws","service":"AmazonSNS","productFamily":"Message Delivery","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/DeliveryAttempts-SMS$/i"}]} Price filter:{"startUsageAmount":"100"}
+WARN No prices found for aws_sns_topic.sns_topic_withFreeNotifications SMS notifications (over 100). Product filter: {"vendorName":"aws","service":"AmazonSNS","productFamily":"Message Delivery","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/DeliveryAttempts-SMS$/i"}]} Price filter:{"startUsageAmount":"100"}
+WARN No prices found for aws_sns_topic.sns_topic_withZeroRequests SMS notifications (over 100). Product filter: {"vendorName":"aws","service":"AmazonSNS","productFamily":"Message Delivery","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/DeliveryAttempts-SMS$/i"}]} Price filter:{"startUsageAmount":"100"}

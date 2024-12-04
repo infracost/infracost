@@ -188,7 +188,7 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 		costComponents = append(costComponents, r.commitmentTierHourlyCostComponents("Speech to text", connectedContainerCommitmentTier, "Commitment Tier Speech to Text Connected", *r.MonthlyConnectedContainerCommitmentSpeechToTextHrs, floatPtrToDecimalPtr(r.MonthlyConnectedContainerCommitmentSpeechToTextOverageHrs))...)
 	}
 	if (r.MonthlyCommitmentSpeechToTextHrs == nil && r.MonthlyConnectedContainerCommitmentSpeechToTextHrs == nil) || r.MonthlySpeechToTextStandardHrs != nil {
-		costComponents = append(costComponents, r.s0HourlyCostComponent("Speech to text", "Speech To Text", r.MonthlySpeechToTextStandardHrs))
+		costComponents = append(costComponents, r.s0HourlyCostComponent("Speech to text", "S1 Speech To Text", r.MonthlySpeechToTextStandardHrs))
 	}
 
 	costComponents = append(costComponents,
@@ -202,7 +202,7 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 		costComponents = append(costComponents, r.commitmentTierHourlyCostComponents("Speech to text custom model", connectedContainerCommitmentTier, "Commitment Tier Custom Speech to Text Connected", *r.MonthlyConnectedContainerCommitmentSpeechToTextCustomModelHrs, floatPtrToDecimalPtr(r.MonthlyConnectedContainerCommitmentSpeechToTextCustomModelOverageHrs))...)
 	}
 	if (r.MonthlyCommitmentSpeechToTextCustomModelHrs == nil && r.MonthlyConnectedContainerCommitmentSpeechToTextCustomModelHrs == nil) || r.MonthlySpeechToTextCustomModelHrs != nil {
-		costComponents = append(costComponents, r.s0HourlyCostComponent("Speech to text custom model", "Custom Speech To Text", r.MonthlySpeechToTextCustomModelHrs))
+		costComponents = append(costComponents, r.s0HourlyCostComponent("Speech to text custom model", "S1 Custom Speech To Text", r.MonthlySpeechToTextCustomModelHrs))
 	}
 
 	costComponents = append(costComponents, []*schema.CostComponent{

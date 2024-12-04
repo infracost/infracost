@@ -178,9 +178,9 @@
  └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
                                                                                                                                    
  azurerm_cognitive_account.with_usage["SpeechServices-S0"]                                                                         
- ├─ Speech to text                                                                    20  hours                        not found   
+ ├─ Speech to text                                                                    20  hours                           $20.00   
  ├─ Speech to text batch                                                              56  hours                           $10.08   
- ├─ Speech to text custom model                                                       17  hours                        not found   
+ ├─ Speech to text custom model                                                       17  hours                           $20.40   
  ├─ Speech to text custom model batch                                                 44  hours                            $9.90   
  ├─ Speech to text custom endpoint hosting                                           372  hours                           $20.00   
  ├─ Speech to text custom training                                                     2  hours                           $20.00   
@@ -218,7 +218,7 @@
                                                                                                                                    
  azurerm_cognitive_account.speech_with_commitment["invalid"]                                                                       
  ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
- ├─ Speech to text custom model                                       not found                                                    
+ ├─ Speech to text custom model                                       Monthly cost depends on usage: $1.20 per hours               
  ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
  ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
  ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
@@ -250,9 +250,9 @@
  └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions     
                                                                                                                                    
  azurerm_cognitive_account.without_usage["SpeechServices-S0"]                                                                      
- ├─ Speech to text                                                    not found                                                    
+ ├─ Speech to text                                                    Monthly cost depends on usage: $1.00 per hours               
  ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
- ├─ Speech to text custom model                                       not found                                                    
+ ├─ Speech to text custom model                                       Monthly cost depends on usage: $1.20 per hours               
  ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
  ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
  ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
@@ -281,7 +281,7 @@
  ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
  └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
                                                                                                                                    
- OVERALL TOTAL                                                                                                      $314,836.35 
+ OVERALL TOTAL                                                                                                      $314,876.75 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -295,7 +295,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃      $314,836 ┃           - ┃   $314,836 ┃
+┃ main                                               ┃      $314,877 ┃           - ┃   $314,877 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 

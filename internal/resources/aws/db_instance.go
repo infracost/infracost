@@ -471,8 +471,9 @@ func performanceInsightsAPIRequestCostComponent(region string, additionalRequest
 // engine version Year1 is the date when the extended support starts, Year 3 is
 // the date when the extended increases price.
 type ExtendedSupportDates struct {
-	Year1 time.Time
-	Year3 time.Time
+	UsagetypeVersion string
+	Year1            time.Time
+	Year3            time.Time
 }
 
 // ExtendedSupport contains the extended support dates for a specific RDS engine.
@@ -506,6 +507,11 @@ func (s ExtendedSupport) CostComponent(version string, region string, d time.Tim
 		}
 	}
 
+	usagetypeVersion := supportDates.UsagetypeVersion
+	if usagetypeVersion == "" {
+		usagetypeVersion = matchingVersion
+	}
+
 	if !supportDates.Year3.IsZero() && d.After(supportDates.Year3) {
 		return &schema.CostComponent{
 			Name:           "Extended support (year 3)",
@@ -517,7 +523,7 @@ func (s ExtendedSupport) CostComponent(version string, region string, d time.Tim
 				Region:     strPtr(region),
 				Service:    strPtr("AmazonRDS"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: regexPtr("ExtendedSupport:Yr3:" + s.Engine + matchingVersion)},
+					{Key: "usagetype", ValueRegex: regexPtr("ExtendedSupport:Yr3:" + s.Engine + usagetypeVersion)},
 				},
 			},
 		}
@@ -534,7 +540,7 @@ func (s ExtendedSupport) CostComponent(version string, region string, d time.Tim
 				Region:     strPtr(region),
 				Service:    strPtr("AmazonRDS"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: regexPtr("ExtendedSupport:Yr1-Yr2:" + s.Engine + matchingVersion)},
+					{Key: "usagetype", ValueRegex: regexPtr("ExtendedSupport:Yr1-Yr2:" + s.Engine + usagetypeVersion)},
 				},
 			},
 		}
@@ -557,8 +563,8 @@ var (
 	mysqlAuroraExtendedSupport = ExtendedSupport{
 		Engine: "AuroraMySQL",
 		Versions: map[string]ExtendedSupportDates{
-			"5.7": {Year1: time.Date(2024, time.December, 1, 0, 0, 0, 0, time.UTC)}, // Year3 is zero because it's N/A
-			"8":   {Year1: time.Date(2027, time.May, 1, 0, 0, 0, 0, time.UTC)},      // Year3 is zero because it's N/A
+			"5.7": {UsagetypeVersion: "2", Year1: time.Date(2024, time.December, 1, 0, 0, 0, 0, time.UTC)}, // Year3 is zero because it's N/A
+			"8":   {UsagetypeVersion: "3", Year1: time.Date(2027, time.May, 1, 0, 0, 0, 0, time.UTC)},      // Year3 is zero because it's N/A
 		},
 	}
 

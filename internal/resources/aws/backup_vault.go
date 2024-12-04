@@ -54,13 +54,13 @@ func (r *BackupVault) PopulateUsage(u *schema.UsageData) {
 func (r *BackupVault) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	bd := backupData{ref: "monthly_efs_warm_backup_gb", name: "EFS backup (warm)", unit: "GB", usageType: "WarmStorage-ByteHrs-EFS", service: "AWSBackup", family: "AWS Backup Storage"}
+	bd := backupData{ref: "monthly_efs_warm_backup_gb", name: "EFS backup (warm)", unit: "GB", usageType: "WarmStorage-ByteHrs-EFS$", service: "AWSBackup", family: "AWS Backup Storage"}
 	if r.MonthlyEFSWarmBackupGB != nil {
 		bd.qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyEFSWarmBackupGB))
 	}
 	costComponents = append(costComponents, r.backupVaultCostComponent(bd))
 
-	bd = backupData{ref: "monthly_efs_cold_backup_gb", name: "EFS backup (cold)", unit: "GB", usageType: "EarlyDelete-ColdByteHrs-EFS", service: "AWSBackup", family: "AWS Backup Early Delete Size"}
+	bd = backupData{ref: "monthly_efs_cold_backup_gb", name: "EFS backup (cold)", unit: "GB", usageType: "ColdStorage-ByteHrs-EFS$", service: "AWSBackup", family: "AWS Backup Storage"}
 	if r.MonthlyEFSColdBackupGB != nil {
 		bd.qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyEFSColdBackupGB))
 	}
