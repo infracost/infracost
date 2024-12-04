@@ -3,6 +3,7 @@ package modules
 import (
 	"context"
 	"fmt"
+	"github.com/infracost/infracost/internal/util"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -85,12 +86,12 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
 	if fetched {
-		p.logger.Trace().Msgf("cache hit (local): %s", moduleAddr)
+		p.logger.Trace().Msgf("cache hit (local): %s", util.RedactUrl(moduleAddr))
 		return nil
 	}
 
 	if err != nil {
-		p.logger.Warn().Msgf("error fetching module %s from local cache: %s", moduleAddr, err)
+		p.logger.Warn().Msgf("error fetching module %s from local cache: %s", util.RedactUrl(moduleAddr), err)
 	}
 
 	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
@@ -101,24 +102,24 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	}
 
 	if err != nil {
-		p.logger.Warn().Msgf("error fetching module %s from remote cache: %s", moduleAddr, err)
+		p.logger.Warn().Msgf("error fetching module %s from remote cache: %s", util.RedactUrl(moduleAddr), err)
 	}
 
 	p.logger.Trace().Msgf("cache miss: %s", moduleAddr)
 
 	_, err = p.fetchFromRemote(moduleAddr, dest)
 	if err != nil {
-		return fmt.Errorf("error fetching module %s from remote: %w", moduleAddr, err)
+		return fmt.Errorf("error fetching module %s from remote: %w", util.RedactUrl(moduleAddr), err)
 	}
 
 	p.localCache.Store(moduleAddr, dest)
 
 	if p.remoteCache != nil {
 		ttl := determineTTL(moduleAddr)
-		p.logger.Debug().Msgf("putting module %s into remote cache with ttl %s", moduleAddr, ttl)
+		p.logger.Debug().Msgf("putting module %s into remote cache with ttl %s", util.RedactUrl(moduleAddr), ttl)
 		err = p.remoteCache.Put(moduleAddr, dest, ttl)
 		if err != nil {
-			p.logger.Warn().Msgf("error putting module %s into remote cache: %s", moduleAddr, err)
+			p.logger.Warn().Msgf("error putting module %s into remote cache: %s", util.RedactUrl(moduleAddr), err)
 		}
 	}
 
@@ -137,7 +138,7 @@ func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, err
 		return true, nil
 	}
 
-	p.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
+	p.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", util.RedactUrl(moduleAddr), prevDest, dest)
 
 	err := os.Mkdir(dest, os.ModePerm)
 	if err != nil {

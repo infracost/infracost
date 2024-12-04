@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/infracost/infracost/internal/util"
 	"io"
 	"net/http"
 	"net/url"
@@ -138,7 +139,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	resp, err := d.httpClient.Do(retryReq)
 
 	if err != nil {
-		return "", fmt.Errorf("error fetching download URL '%s': %w", downloadURL.String(), err)
+		return "", fmt.Errorf("error fetching download URL '%s': %w", util.RedactUrl(downloadURL.String()), err)
 	}
 	defer resp.Body.Close()
 
