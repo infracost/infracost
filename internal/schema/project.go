@@ -110,7 +110,7 @@ func NewPrivateRegistryDiag(source string, moduleLocation *string, err error) *P
 	source = util.RedactUrl(source)
 	moduleLocation = util.RedactUrlPtr(moduleLocation)
 	errorString := util.RedactUrl(err.Error())
-	
+
 	return newDiag(
 		diagPrivateRegistryModuleDownloadFailure,
 		fmt.Sprintf("Failed to lookup module %q - %s", source, errorString),
