@@ -33,7 +33,3 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ main                                               ┃           $31 ┃          $7 ┃        $38 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
-Logs:
-
-WARN Multiple prices found for aws_waf_web_acl.my_waf Requests, using the smallest non-zero price. Product filter: {"vendorName":"aws","service":"awswaf","productFamily":"Web Application Firewall","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/^[A-Z0-9]*-(?!ShieldProtected-)Request$/i"}]} Price filter:{"purchaseOption":"on_demand"}
-WARN Multiple prices found for aws_waf_web_acl.withoutUsage Requests, using the smallest non-zero price. Product filter: {"vendorName":"aws","service":"awswaf","productFamily":"Web Application Firewall","region":"us-east-1","attributeFilters":[{"key":"usagetype","value_regex":"/^[A-Z0-9]*-(?!ShieldProtected-)Request$/i"}]} Price filter:{"purchaseOption":"on_demand"}

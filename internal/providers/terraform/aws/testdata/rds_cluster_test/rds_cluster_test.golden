@@ -78,6 +78,3 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ main                                               ┃         $0.00 ┃    $176,131 ┃   $176,131 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
-Logs:
-
-WARN Multiple products with prices found for aws_rds_cluster.my_sql_serverless_io_optimized Storage (I/O-optimized), using the smallest non-zero price. Product filter: {"vendorName":"aws","service":"AmazonRDS","productFamily":"Database Storage","region":"us-east-1","attributeFilters":[{"key":"databaseEngine","value_regex":"/(Any|Aurora MySQL)/i"},{"key":"usagetype","value_regex":"/Aurora:IO-OptimizedStorageUsage$/i"}]} Price filter:null
