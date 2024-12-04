@@ -59,7 +59,7 @@ resource "google_compute_instance" "preemptible" {
 }
 
 resource "google_compute_instance" "local_ssd" {
-  name         = "local_ssd"
+  name         = "local-ssd"
   machine_type = "f1-micro"
   zone         = "us-central1-a"
 
@@ -83,7 +83,7 @@ resource "google_compute_instance" "local_ssd" {
 }
 
 resource "google_compute_instance" "preemptible_local_ssd" {
-  name         = "preemptible_local_ssd"
+  name         = "preemptible-local-ssd"
   machine_type = "f1-micro"
   zone         = "us-central1-a"
 
@@ -128,7 +128,7 @@ resource "google_compute_instance" "gpu" {
 }
 
 resource "google_compute_instance" "gpu_l4" {
-  name         = "gpu_l4"
+  name         = "gpu-l4"
   machine_type = "g2-standard-4"
   zone         = "us-central1-a"
 
@@ -149,7 +149,7 @@ resource "google_compute_instance" "gpu_l4" {
 }
 
 resource "google_compute_instance" "preemptible_gpu" {
-  name         = "preemptible_gpu"
+  name         = "preemptible-gpu"
   machine_type = "n1-standard-16"
   zone         = "us-central1-a"
 
@@ -227,7 +227,7 @@ resource "google_compute_instance" "custom" {
 }
 
 resource "google_compute_instance" "custom_preemptible" {
-  name         = "custom_preemptible"
+  name         = "custom-preemptible"
   machine_type = "custom-6-20480"
   zone         = "us-central1-a"
 
@@ -247,7 +247,7 @@ resource "google_compute_instance" "custom_preemptible" {
 }
 
 resource "google_compute_instance" "custom_n1" {
-  name         = "custom_n1"
+  name         = "custom-n1"
   machine_type = "n1-custom-6-20480"
   zone         = "us-central1-a"
 
@@ -263,7 +263,7 @@ resource "google_compute_instance" "custom_n1" {
 }
 
 resource "google_compute_instance" "custom_n2" {
-  name         = "custom_n2"
+  name         = "custom-n2"
   machine_type = "n2-custom-6-20480"
   zone         = "us-central1-a"
 
@@ -280,7 +280,7 @@ resource "google_compute_instance" "custom_n2" {
 
 
 resource "google_compute_instance" "custom_n2d" {
-  name         = "custom_n2d"
+  name         = "custom-n2d"
   machine_type = "n2d-custom-4-20480"
   zone         = "us-central1-a"
 
@@ -300,7 +300,7 @@ resource "google_compute_instance" "custom_n2d" {
 }
 
 resource "google_compute_instance" "custom_ext" {
-  name         = "custom_ext"
+  name         = "custom-ext"
   machine_type = "custom-2-15360-ext"
   zone         = "us-central1-a"
 
@@ -317,7 +317,7 @@ resource "google_compute_instance" "custom_ext" {
 
 // Not supported yet
 resource "google_compute_instance" "e2_custom" {
-  name         = "e2_custom"
+  name         = "e2-custom"
   machine_type = "e2-custom-2-15360"
   zone         = "us-central1-a"
 
@@ -333,7 +333,7 @@ resource "google_compute_instance" "e2_custom" {
 }
 
 resource "google_compute_instance" "sud_20_perc_with_hours" {
-  name         = "n2_standard_8"
+  name         = "n2-standard-8"
   machine_type = "n2-standard-8"
   zone         = "us-central1-a"
 
@@ -349,7 +349,7 @@ resource "google_compute_instance" "sud_20_perc_with_hours" {
 }
 
 resource "google_compute_instance" "sud_30_perc_with_hours" {
-  name         = "m1_ultramem_80"
+  name         = "m1-ultramem-80"
   machine_type = "m1-ultramem-80"
   zone         = "us-central1-a"
 
