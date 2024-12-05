@@ -382,20 +382,10 @@ func (g *Graph) AsJSON() ([]byte, error) {
 
 func (g *Graph) Walk() {
 	v := NewGraphVisitor(g.logger, g.vertexMutex)
-	// flowCallback := func(d *dag.DAG, id string, _ []dag.FlowResult) (interface{}, error) {
-	// 	vertex, _ := d.GetVertex(id)
-	// 	v.Visit(id, vertex)
-	// 	return nil, nil
-	// }
-
-	TopologicalOrder(g.dag, v.Visit)
-
-	//	g.dag.DFSWalk()
-
-	//	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+	TopologicalWalk(g.dag, v.Visit)
 }
 
-func TopologicalOrder(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
+func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
 	inDegrees := make(map[string]int)
 	type queueItem struct {
 		id     string
@@ -475,36 +465,34 @@ func (g *Graph) loadAllBlocks(evaluator *Evaluator) ([]*Block, error) {
 }
 
 func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
-	var blocks []*Block
+	blocks := make([]*Block, 0, len(evaluator.module.Blocks))
+	copy(blocks, evaluator.module.Blocks)
+	moduleBlocks := evaluator.module.Blocks.OfType("module")
 
-	for _, block := range evaluator.module.Blocks {
-		blocks = append(blocks, block)
-
-		if block.Type() == "module" {
-			modCall, err := evaluator.loadModule(block)
-			if err != nil {
-				return nil, fmt.Errorf("could not load module %q", block.FullName())
-			}
-
-			moduleEvaluator := NewEvaluator(
-				*modCall.Module,
-				evaluator.workingDir,
-				map[string]cty.Value{},
-				evaluator.moduleMetadata,
-				map[string]map[string]cty.Value{},
-				evaluator.workspace,
-				evaluator.blockBuilder,
-				evaluator.logger,
-				evaluator.isGraph,
-			)
-
-			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
-			if err != nil {
-				return nil, fmt.Errorf("could not load blocks for module %q", block.FullName())
-			}
-
-			blocks = append(blocks, modBlocks...)
+	for _, block := range moduleBlocks {
+		modCall, err := evaluator.loadModule(block)
+		if err != nil {
+			return nil, fmt.Errorf("could not load module %q", block.FullName())
 		}
+
+		moduleEvaluator := NewEvaluator(
+			*modCall.Module,
+			evaluator.workingDir,
+			map[string]cty.Value{},
+			evaluator.moduleMetadata,
+			map[string]map[string]cty.Value{},
+			evaluator.workspace,
+			evaluator.blockBuilder,
+			evaluator.logger,
+			evaluator.isGraph,
+		)
+
+		modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
+		if err != nil {
+			return nil, fmt.Errorf("could not load blocks for module %q", block.FullName())
+		}
+
+		blocks = append(blocks, modBlocks...)
 	}
 
 	return blocks, nil
