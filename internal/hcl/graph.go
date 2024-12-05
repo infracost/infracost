@@ -99,37 +99,14 @@ func (g *Graph) ReduceTransitively() {
 }
 
 func (g *Graph) Populate(evaluator *Evaluator) error {
+	var vertexes []Vertex
 
 	blocks, err := g.loadAllBlocks(evaluator)
 	if err != nil {
 		return err
 	}
 
-	// Build a set of all the provider keys so we can look up
-	// provider references later
-	providerKeys := make(map[string]string)
-	edges := make([]dag.EdgeInput, 0)
-
-	// load variables first because we depend on this for module loading next
-	for _, block := range Blocks(blocks).OfType("variable") {
-		vertex := &VertexVariable{
-			logger:        g.logger,
-			moduleConfigs: g.moduleConfigs,
-			block:         block,
-		}
-		id := vertex.ID()
-		g.logger.Debug().Msgf("adding vertex: %s", id)
-		err := g.dag.AddVertexByID(id, vertex)
-		if err != nil {
-			// We don't actually mind if blocks are added multiple times
-			// since this helps us support cases like _override.tf files
-			// and in-progress changes.
-			g.logger.Debug().Err(err).Msgf("error adding vertex %q", id)
-		}
-	}
-
 	for _, block := range blocks {
-		var vertexes []Vertex
 		switch block.Type() {
 		case "locals":
 			for _, attr := range block.GetAttributes() {
@@ -141,21 +118,68 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				})
 			}
 		case "module":
+			vertexes = append(vertexes, &VertexModuleCall{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+			vertexes = append(vertexes, &VertexModuleExit{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+		case "variable":
+			vertexes = append(vertexes, &VertexVariable{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+		case "output":
+			vertexes = append(vertexes, &VertexOutput{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+		case "provider":
+			vertexes = append(vertexes, &VertexProvider{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+		case "resource":
+			vertexes = append(vertexes, &VertexResource{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+		case "data":
+			vertexes = append(vertexes, &VertexData{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+		}
+	}
 
+	// Build a set of all the provider keys so we can look up
+	// provider references later
+	providerKeys := make(map[string]string)
+	for _, vertex := range vertexes {
+		if _, ok := vertex.(*VertexProvider); ok {
+			providerKeys[vertex.ID()] = vertex.ID()
+		}
+	}
+
+	// Also add a mapping for all the provider attributes in module calls
+	// so we can look up the providers based on their alias later.
+	for _, vertex := range vertexes {
+		if v, ok := vertex.(*VertexModuleCall); ok {
 			// Decode the provider attribute to get the aliases
-			attr := block.GetAttribute("providers")
+			attr := v.block.GetAttribute("providers")
 			if attr == nil {
 				continue
 			}
 
-			vertex := &VertexModuleCall{
-				logger:        g.logger,
-				moduleConfigs: g.moduleConfigs,
-				block:         block,
-			}
-
-			// Also add a mapping for all the provider attributes in module calls
-			// so we can look up the providers based on their alias later.
 			providers := attr.DecodeProviders()
 			for alias, provider := range providers {
 				// Generate the full key and value for the provider map relative to the module
@@ -178,187 +202,147 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 				providerKeys[key] = val
 			}
+		}
+	}
 
-			vertexes = append(vertexes, vertex)
-			vertexes = append(vertexes, &VertexModuleExit{
-				logger:        g.logger,
-				moduleConfigs: g.moduleConfigs,
-				block:         block,
-			})
-		case "output":
-			vertexes = append(vertexes, &VertexOutput{
-				logger:        g.logger,
-				moduleConfigs: g.moduleConfigs,
-				block:         block,
-			})
-		case "provider":
-			vertex := &VertexProvider{
-				logger:        g.logger,
-				moduleConfigs: g.moduleConfigs,
-				block:         block,
+	for _, vertex := range vertexes {
+		id := vertex.ID()
+
+		g.logger.Debug().Msgf("adding vertex: %s", id)
+		err := g.dag.AddVertexByID(id, vertex)
+		if err != nil {
+			// We don't actually mind if blocks are added multiple times
+			// since this helps us support cases like _override.tf files
+			// and in-progress changes.
+			g.logger.Debug().Err(err).Msgf("error adding vertex %q", id)
+		}
+	}
+
+	for _, vertex := range vertexes {
+		id := vertex.ID()
+		modAddr := vertex.ModuleAddress()
+
+		if modAddr == "" {
+			g.logger.Debug().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
+			if err := g.dag.AddEdge(g.rootVertex.ID(), id); err != nil {
+				return fmt.Errorf("error adding edge %s, %s %w", g.rootVertex.ID(), id, err)
 			}
-			vertexes = append(vertexes, vertex)
-			providerKeys[vertex.ID()] = vertex.ID()
-		case "resource":
-			vertexes = append(vertexes, &VertexResource{
-				logger:        g.logger,
-				moduleConfigs: g.moduleConfigs,
-				block:         block,
-			})
-		case "data":
-			vertexes = append(vertexes, &VertexData{
-				logger:        g.logger,
-				moduleConfigs: g.moduleConfigs,
-				block:         block,
-			})
+		} else {
+			// Add the module call edge
+			g.logger.Debug().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
+			if err := g.dag.AddEdge(moduleCallID(modAddr), id); err != nil {
+				return fmt.Errorf("error adding edge %s, %s %w", moduleCallID(modAddr), id, err)
+			}
+
+			// Add the module exit edge
+			g.logger.Debug().Msgf("adding edge: %s, %s", id, modAddr)
+			if err := g.dag.AddEdge(id, modAddr); err != nil {
+				return fmt.Errorf("error adding edge %s, %s %w", id, modAddr, err)
+			}
 		}
 
-		for _, vertex := range vertexes {
-			id := vertex.ID()
-			g.logger.Debug().Msgf("adding vertex: %s", id)
-			err := g.dag.AddVertexByID(id, vertex)
-			if err != nil {
-				// We don't actually mind if blocks are added multiple times
-				// since this helps us support cases like _override.tf files
-				// and in-progress changes.
-				g.logger.Debug().Err(err).Msgf("error adding vertex %q", id)
+		for _, ref := range vertex.References() {
+			var srcID string
+
+			parts := strings.Split(ref.Key, ".")
+			idx := len(parts)
+
+			// data references should always have a length of 3
+			// provider references might have a length of 3 (if using an alias) or 2 (if not).
+			if (strings.HasPrefix(ref.Key, "data.") || strings.HasPrefix(ref.Key, "provider.")) && len(parts) >= 3 {
+				// Source ID is the first 3 parts or less if the length of parts is less than 3
+				idx = 3
+			} else if len(parts) >= 2 {
+				// variable, local, resources and output references should all have length 2
+				idx = 2
+			}
+			srcID = strings.Join(parts[:idx], ".")
+
+			// Don't add the module prefix for providers since they are
+			// evaluated in the root module
+			if !strings.HasPrefix(srcID, "provider.") && ref.ModuleAddress != "" {
+				modAddress := stripCount(ref.ModuleAddress)
+
+				srcID = fmt.Sprintf("%s.%s", modAddress, srcID)
 			}
 
-			modAddr := vertex.ModuleAddress()
+			// Find the correct provider vertex by looking in for a matching provider
+			// block in the module hierarchy. If we can't find one, then we should
+			// assume the reference is to a provider in the root module.
+			if strings.HasPrefix(srcID, "provider.") {
+				modAddress := vertex.ModuleAddress()
 
-			if modAddr == "" {
-				g.logger.Debug().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
-				edges = append(edges, dag.EdgeInput{
-					SrcID: g.rootVertex.ID(),
-					DstID: id,
-				})
-			} else {
-				// Add the module call edge
-				g.logger.Debug().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
-				edges = append(edges, dag.EdgeInput{
-					SrcID: moduleCallID(modAddr),
-					DstID: id,
-				})
+				for modAddress != "" {
+					k := fmt.Sprintf("%s.%s", modAddress, srcID)
+					if v, ok := providerKeys[k]; ok {
+						srcID = v
+						break
+					}
 
-				// Add the module exit edge
-				g.logger.Debug().Msgf("adding edge: %s, %s", id, modAddr)
-				edges = append(edges, dag.EdgeInput{
-					SrcID: id,
-					DstID: modAddr,
-				})
+					modAddress, _ = splitModuleAddr(modAddress)
+				}
 			}
 
-			for _, ref := range vertex.References() {
-				var srcID string
+			dstID := id
 
-				parts := strings.Split(ref.Key, ".")
-				idx := len(parts)
+			// If the vertex is a module call and the attribute for the reference isn't a module call
+			// arg (source, count, for_each), etc, then the reference is a module input and points to
+			// a variable block within the module. In that case we should add the edge directly to that
+			// variable block instead of the module call. We need to do this to avoid a circular dependency
+			// where a module input can depend on a module output, e.g:
+			//
+			// module "my_module" {
+			//   source = "./foo"
+			//   foo = module.my_module.bar
+			// }
+			if _, ok := vertex.(*VertexModuleCall); ok {
+				if ref.AttributeName != "" && attrIsVarInput(ref.AttributeName) {
+					dstID = fmt.Sprintf("%s.variable.%s", stripModuleCallPrefix(id), ref.AttributeName)
 
-				// data references should always have a length of 3
-				// provider references might have a length of 3 (if using an alias) or 2 (if not).
-				if (strings.HasPrefix(ref.Key, "data.") || strings.HasPrefix(ref.Key, "provider.")) && len(parts) >= 3 {
-					// Source ID is the first 3 parts or less if the length of parts is less than 3
-					idx = 3
-				} else if len(parts) >= 2 {
-					// variable, local, resources and output references should all have length 2
-					idx = 2
-				}
-				srcID = strings.Join(parts[:idx], ".")
-
-				// Don't add the module prefix for providers since they are
-				// evaluated in the root module
-				if !strings.HasPrefix(srcID, "provider.") && ref.ModuleAddress != "" {
-					modAddress := stripCount(ref.ModuleAddress)
-
-					srcID = fmt.Sprintf("%s.%s", modAddress, srcID)
-				}
-
-				// Find the correct provider vertex by looking in for a matching provider
-				// block in the module hierarchy. If we can't find one, then we should
-				// assume the reference is to a provider in the root module.
-				if strings.HasPrefix(srcID, "provider.") {
-					modAddress := vertex.ModuleAddress()
-
-					for modAddress != "" {
-						k := fmt.Sprintf("%s.%s", modAddress, srcID)
-						if v, ok := providerKeys[k]; ok {
-							srcID = v
-							break
-						}
-
-						modAddress, _ = splitModuleAddr(modAddress)
-					}
-				}
-
-				dstID := id
-
-				// If the vertex is a module call and the attribute for the reference isn't a module call
-				// arg (source, count, for_each), etc, then the reference is a module input and points to
-				// a variable block within the module. In that case we should add the edge directly to that
-				// variable block instead of the module call. We need to do this to avoid a circular dependency
-				// where a module input can depend on a module output, e.g:
-				//
-				// module "my_module" {
-				//   source = "./foo"
-				//   foo = module.my_module.bar
-				// }
-				if _, ok := vertex.(*VertexModuleCall); ok {
-					if ref.AttributeName != "" && attrIsVarInput(ref.AttributeName) {
-						dstID = fmt.Sprintf("%s.variable.%s", stripModuleCallPrefix(id), ref.AttributeName)
-
-						// Check this vertex exists
-						_, err := g.dag.GetVertex(dstID)
-						if err != nil {
-							g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcID, dstID)
-							continue
-						}
-					}
-				}
-
-				// Strip the count/index suffix from the source ID
-				srcID = stripCount(srcID)
-
-				if srcID == dstID {
-					continue
-				}
-
-				// Check if the source vertex exists
-				_, err := g.dag.GetVertex(srcID)
-				if err == nil || true {
-					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
-					edges = append(edges, dag.EdgeInput{
-						SrcID: srcID,
-						DstID: dstID,
-					})
-
-					continue
-				}
-
-				// If the source vertex doesn't exist, it might be a module output attribute,
-				// so we need to check if the module output exists and add an edge from that
-				// to the current vertex instead.
-				if ref.ModuleAddress != "" && stripCount(ref.ModuleAddress) != modAddr {
-					srcID = fmt.Sprintf("%s.%s", stripCount(ref.ModuleAddress), parts[0])
-
-					// Check if the source vertex exists
-					_, err := g.dag.GetVertex(srcID)
-					if err == nil || true {
-						g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
-						edges = append(edges, dag.EdgeInput{
-							SrcID: srcID,
-							DstID: dstID,
-						})
-
+					// Check this vertex exists
+					_, err := g.dag.GetVertex(dstID)
+					if err != nil {
+						g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcID, dstID)
 						continue
 					}
 				}
 			}
-		}
-	}
 
-	err = g.dag.AddEdges(edges)
-	if err != nil {
-		return fmt.Errorf("error adding edges %w", err)
+			// Strip the count/index suffix from the source ID
+			srcID = stripCount(srcID)
+
+			if srcID == dstID {
+				continue
+			}
+
+			// Check if the source vertex exists
+			_, err := g.dag.GetVertex(srcID)
+			if err == nil {
+				g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
+				if err := g.dag.AddEdge(srcID, dstID); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+				}
+				continue
+			}
+
+			// If the source vertex doesn't exist, it might be a module output attribute,
+			// so we need to check if the module output exists and add an edge from that
+			// to the current vertex instead.
+			if ref.ModuleAddress != "" && stripCount(ref.ModuleAddress) != modAddr {
+				srcID = fmt.Sprintf("%s.%s", stripCount(ref.ModuleAddress), parts[0])
+
+				// Check if the source vertex exists
+				_, err := g.dag.GetVertex(srcID)
+				if err == nil {
+					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
+					if err := g.dag.AddEdge(srcID, dstID); err != nil {
+						return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+					}
+
+					continue
+				}
+			}
+		}
 	}
 
 	// Setup initial context
@@ -442,10 +426,10 @@ func (g *Graph) loadAllBlocks(evaluator *Evaluator) ([]*Block, error) {
 }
 
 func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
-	blocks := make([]*Block, 0, len(evaluator.module.Blocks))
-	copy(blocks, evaluator.module.Blocks)
+	var blocks []*Block
 
 	for _, block := range evaluator.module.Blocks {
+		blocks = append(blocks, block)
 
 		if block.Type() == "module" {
 			modCall, err := evaluator.loadModule(block)
