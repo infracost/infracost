@@ -382,22 +382,12 @@ func (g *Graph) AsJSON() ([]byte, error) {
 
 func (g *Graph) Walk() {
 	v := NewGraphVisitor(g.logger, g.vertexMutex)
-
-	// flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
-	// 	vertex, _ := d.GetVertex(id)
-	//
-	// 	v.Visit(id, vertex)
-	//
-	// 	return vertex, nil
-	// }
-
-	idChan, _, _ := g.dag.DescendantsWalker(g.rootVertex.ID())
-	for id := range idChan {
-		vertex, _ := g.dag.GetVertex(id)
+	flowCallback := func(d *dag.DAG, id string, _ []dag.FlowResult) (interface{}, error) {
+		vertex, _ := d.GetVertex(id)
 		v.Visit(id, vertex)
+		return nil, nil
 	}
-
-	// _, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
 }
 
 func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
