@@ -243,7 +243,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		cmd:            cmd,
 		pathMuxs:       pathMuxs,
 		prior:          prior,
-		pricingFetcher: prices.NewPriceFetcher(runCtx),
+		pricingFetcher: prices.NewPriceFetcher(runCtx, false),
 	}, nil
 }
 

@@ -45,8 +45,10 @@ func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
 		return nil
 	}
 
+	subResources := make([]*schema.Resource, 0)
+
 	for _, disk := range r.Disks {
-		costComponents = append(costComponents, computeDiskCostComponent(r.Region, disk.Type, disk.Size, r.TargetSize))
+		subResources = append(subResources, disk.BuildResource())
 	}
 
 	if r.ScratchDisks > 0 {
@@ -62,6 +64,7 @@ func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		UsageSchema:    r.UsageSchema(),
+		SubResources:   subResources,
 		CostComponents: costComponents,
 	}
 }

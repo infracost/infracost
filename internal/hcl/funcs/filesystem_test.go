@@ -25,14 +25,14 @@ func TestFile(t *testing.T) {
 		{
 			cty.StringVal("testdata/icon.png"),
 			func(t *testing.T) {},
-			cty.NilVal,
-			true, // Not valid UTF-8
+			cty.StringVal(""),
+			false,
 		},
 		{
 			cty.StringVal("testdata/missing"),
 			func(t *testing.T) {},
-			cty.NilVal,
-			true, // no file exists
+			cty.StringVal(""),
+			false,
 		},
 		{
 			cty.StringVal("testdata/hello.txt"),
@@ -472,8 +472,8 @@ func TestFileBase64(t *testing.T) {
 		},
 		{
 			cty.StringVal("testdata/missing"),
-			cty.NilVal,
-			true, // no file exists
+			cty.StringVal(""),
+			false,
 		},
 	}
 

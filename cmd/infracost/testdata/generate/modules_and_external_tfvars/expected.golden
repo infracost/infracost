@@ -2,7 +2,7 @@ version: 0.1
 
 projects:
   - path: db/dev
-    name: db-dev-dev
+    name: db-dev
     terraform_var_files:
       - ../../default.tfvars
       - ../../envs/dev.tfvars
@@ -13,7 +13,7 @@ projects:
       - default.tfvars
       - envs/dev.tfvars
   - path: db/prod
-    name: db-prod-prod
+    name: db-prod
     terraform_var_files:
       - ../../default.tfvars
       - ../../envs/prod.tfvars

@@ -29,6 +29,14 @@
             "isError": false
           }
         ],
+        "pastErrors": [
+          {
+            "code": 102,
+            "message": "Diff baseline error: Error loading Terraform modules: failed to inspect module path dev diag: Invalid block definition: Either a quoted string block label or an opening brace (\"{\") is expected here. (and 1 other messages)",
+            "data": null,
+            "isError": false
+          }
+        ],
         "providers": [
           {
             "name": "aws",

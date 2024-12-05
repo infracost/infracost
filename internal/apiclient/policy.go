@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -48,6 +49,9 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds
 	if project.Metadata == nil {
 		project.Metadata = &schema.ProjectMetadata{}
 	}
+
+	// remove .git suffix from the module path
+	project.Metadata.TerraformModulePath = strings.ReplaceAll(project.Metadata.TerraformModulePath, ".git/", "/")
 
 	err := c.fetchAllowList()
 	if err != nil {

@@ -62,9 +62,11 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"base":       p.base,
 		"stem":       p.stem,
 		"ext":        p.ext,
+		"lower":      p.lower,
 		"startsWith": p.startsWith,
 		"endsWith":   p.endsWith,
 		"contains":   p.contains,
+		"splitList":  p.splitList,
 		"trimPrefix": p.trimPrefix,
 		"trimSuffix": p.trimSuffix,
 		"replace":    p.replace,
@@ -145,6 +147,11 @@ func (p *Parser) ext(path string) string {
 	return filepath.Ext(path)
 }
 
+// lower returns a copy of the string s with all Unicode letters mapped to their lower case.
+func (p *Parser) lower(s string) string {
+	return strings.ToLower(s)
+}
+
 // startsWith tests whether the string s begins with prefix.
 func (p *Parser) startsWith(s, prefix string) bool {
 	return strings.HasPrefix(s, prefix)
@@ -158,6 +165,11 @@ func (p *Parser) endsWith(s, suffix string) bool {
 // contains reports whether substr is within s.
 func (p *Parser) contains(s, substr string) bool {
 	return strings.Contains(s, substr)
+}
+
+// splitList splits the string s into a slice of substrings separated by sep.
+func (p *Parser) splitList(sep, s string) []string {
+	return strings.Split(s, sep)
 }
 
 // trimPrefix returns s without the provided prefix string.

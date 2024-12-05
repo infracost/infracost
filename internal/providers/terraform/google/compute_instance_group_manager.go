@@ -1,6 +1,8 @@
 package google
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -49,7 +51,7 @@ func newComputeInstanceGroupManager(d *schema.ResourceData) schema.CoreResource 
 		purchaseOption = getComputePurchaseOption(instanceTemplate.RawValues)
 
 		if len(instanceTemplate.Get("disk").Array()) > 0 {
-			for _, disk := range instanceTemplate.Get("disk").Array() {
+			for i, disk := range instanceTemplate.Get("disk").Array() {
 
 				diskType := disk.Get("type").String()
 				switch diskType {
@@ -63,11 +65,13 @@ func newComputeInstanceGroupManager(d *schema.ResourceData) schema.CoreResource 
 					diskType := disk.Get("disk_type").String()
 
 					disks = append(disks, &google.ComputeDisk{
-						Type: diskType,
-						Size: float64(diskSize),
+						Address:       fmt.Sprintf("disk[%d]", i),
+						Type:          diskType,
+						Size:          float64(diskSize),
+						Region:        d.Region,
+						InstanceCount: &targetSize,
 					})
 				}
-
 			}
 		}
 

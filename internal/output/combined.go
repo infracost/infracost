@@ -138,6 +138,7 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 		scp.PastResources = nil
 		scp.Metadata.PastPolicySha = ""
 		scp.HasDiff = true
+		scp.Metadata.CurrentErrors = scp.Metadata.Errors
 
 		metadata := p.LabelWithMetadata()
 		if v, ok := priorProjects[metadata]; ok {
@@ -164,6 +165,8 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 					// be ignored.
 					continue
 				}
+
+				scp.Metadata.PastErrors = append(scp.Metadata.PastErrors, pastE)
 
 				pastE.Message = "Diff baseline error: " + pastE.Message
 				scp.Metadata.Errors = append(scp.Metadata.Errors, pastE)

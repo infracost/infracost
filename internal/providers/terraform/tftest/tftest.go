@@ -250,7 +250,12 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 		level = *options.LogLevel
 	}
 
-	logBuf := testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
+	var logBuf *bytes.Buffer
+	if options != nil && options.CaptureLogs {
+		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
+	} else {
+		testutil.ConfigureTestToFailOnLogs(t, runCtx)
+	}
 
 	if options != nil && options.Currency != "" {
 		runCtx.Config.Currency = options.Currency
@@ -349,7 +354,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 }
 
 func RunCostCalculations(runCtx *config.RunContext, projects []*schema.Project) ([]*schema.Project, error) {
-	pf := prices.NewPriceFetcher(runCtx)
+	pf := prices.NewPriceFetcher(runCtx, true)
 	for _, project := range projects {
 		err := pf.PopulatePrices(project)
 		if err != nil {

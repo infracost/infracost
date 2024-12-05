@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 module "aft" {
-  source = "github.com/aws-ia/terraform-aws-control_tower_account_factory"
+  source = "github.com/aws-ia/terraform-aws-control_tower_account_factory?ref=1.13.2"
   # Required Variables
   ct_management_account_id    = "1234"
   log_archive_account_id      = "1234"

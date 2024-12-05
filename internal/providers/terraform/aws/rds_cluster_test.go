@@ -7,21 +7,22 @@ import (
 )
 
 func TestRDSClusterGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "rds_cluster_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "rds_cluster_test", &tftest.GoldenFileOptions{
+		CaptureLogs: true,
+	})
 }
 
 func TestRDSClusterChinaGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
 	tftest.GoldenFileResourceTestsWithOpts(t, "rds_cluster_china_test", &tftest.GoldenFileOptions{
-		Currency: "CNY",
+		CaptureLogs: true,
+		Currency:    "CNY",
 	})
 }

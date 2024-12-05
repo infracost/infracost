@@ -160,7 +160,25 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		}
 	}
 
-	loader := modules.NewModuleLoader(ctx.RunContext.Config.CachePath(), modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
+	var remoteCache modules.RemoteCache
+	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
+		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix)
+		if err != nil {
+			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
+		} else {
+			remoteCache = s3ModuleCache
+		}
+	}
+
+	loader := modules.NewModuleLoader(modules.ModuleLoaderOptions{
+		CachePath:         runCtx.Config.CachePath(),
+		HCLParser:         modules.NewSharedHCLParser(),
+		CredentialsSource: credsSource,
+		SourceMap:         runCtx.Config.TerraformSourceMap,
+		Logger:            logger,
+		ModuleSync:        runCtx.ModuleMutex,
+		RemoteCache:       remoteCache,
+	})
 	cachePath := ctx.RunContext.Config.CachePath()
 	initialPath := rootPath.DetectedPath
 	rootPath.DetectedPath = initialPath
@@ -174,9 +192,15 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		options = append(options, hcl.OptionGraphEvaluator())
 	}
 
+	if ctx.ProjectConfig.Name != "" {
+		options = append(options, hcl.OptionWithProjectName(ctx.ProjectConfig.Name))
+	}
+
+	envMatcher := hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions)
+
 	return &HCLProvider{
 		policyClient:   policyClient,
-		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions), loader, logger, options...),
+		Parser:         hcl.NewParser(rootPath, envMatcher, loader, logger, options...),
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
@@ -186,14 +210,6 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 func (p *HCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *HCLProvider) ProjectName() string {
-	if p.ctx.ProjectConfig.Name != "" {
-		return p.ctx.ProjectConfig.Name
-	}
-
-	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
-		return p.Parser.ProjectName() + "-" + p.ctx.ProjectConfig.TerraformWorkspace
-	}
-
 	return p.Parser.ProjectName()
 }
 
@@ -331,9 +347,18 @@ func (p *HCLProvider) LoadPlanJSON() HCLProject {
 	module := p.Module()
 	if module.Error == nil {
 		module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
-
 		if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
-			err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm) // nolint: gosec
+			targetPath := fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-"))
+			targetDir, ok := os.LookupEnv("INFRACOST_JSON_DUMP_PATH")
+			if ok {
+				targetPath = filepath.Join(targetDir, targetPath)
+				if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+					p.logger.Debug().Err(err).Msg("failed to create directory for json dump")
+					// use the default
+					targetPath = fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-"))
+				}
+			}
+			err := os.WriteFile(targetPath, module.JSON, os.ModePerm) // nolint: gosec
 			if err != nil {
 				p.logger.Debug().Err(err).Msg("failed to write to json dump")
 			}
@@ -670,6 +695,12 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		return nil
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			p.logger.Debug().Msgf("could not marshal default_tags block: %v", r)
+		}
+	}()
+
 	marshalledTags := make(map[string]interface{})
 
 	tags := b.GetAttribute("tags")
@@ -740,6 +771,12 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 	if tags == nil {
 		return nil
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			p.logger.Debug().Msgf("could not marshal default_labels block: %v", r)
+		}
+	}()
 
 	marshalledTags := make(map[string]interface{})
 

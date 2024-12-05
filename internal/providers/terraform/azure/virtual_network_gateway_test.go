@@ -7,11 +7,9 @@ import (
 )
 
 func TestAzureRMVirtualNetworkGateway(t *testing.T) {
+	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
-
-	opts := tftest.DefaultGoldenFileOptions()
-	opts.CaptureLogs = true
-	tftest.GoldenFileResourceTestsWithOpts(t, "virtual_network_gateway_test", opts)
+	tftest.GoldenFileResourceTests(t, "virtual_network_gateway_test")
 }

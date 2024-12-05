@@ -11,8 +11,8 @@
  ├─ Intelligent tiering                                                                                   
  │  ├─ Storage (frequent access)                        20,000  GB                         3,900.00 元  * 
  │  ├─ Storage (infrequent access)                      20,000  GB                         2,675.40 元  * 
- │  ├─ Storage (archive access)                         20,000  GB                           not found  * 
- │  ├─ Storage (deep archive access)                    20,000  GB                           not found  * 
+ │  ├─ Storage (archive access)                         20,000  GB                           601.20 元  * 
+ │  ├─ Storage (deep archive access)                    20,000  GB                           267.20 元  * 
  │  ├─ Monitoring and automation                            20  1k objects                     0.33 元  * 
  │  ├─ PUT, COPY, POST, LIST requests                       20  1k requests                    0.09 元  * 
  │  ├─ GET, SELECT, and all other requests                  20  1k requests                    0.03 元  * 
@@ -71,7 +71,7 @@
     ├─ Select data scanned                  Monthly cost depends on usage: 0.01593 元 per GB              
     └─ Select data returned                 Monthly cost depends on usage: 0.0057 元 per GB               
                                                                                                           
- OVERALL TOTAL (CNY)                                                                       87,161.77 元 
+ OVERALL TOTAL (CNY)                                                                       88,030.17 元 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -82,5 +82,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       0.00 元 ┃   87,162 元 ┃  87,162 元 ┃
+┃ main                                               ┃       0.00 元 ┃   88,030 元 ┃  88,030 元 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

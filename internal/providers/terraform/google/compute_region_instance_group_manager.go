@@ -1,6 +1,8 @@
 package google
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -18,8 +20,6 @@ func getComputeRegionInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 }
 
 func newComputeRegionInstanceGroupManager(d *schema.ResourceData) schema.CoreResource {
-	region := d.Get("region").String()
-
 	targetSize := int64(1)
 	if d.Get("target_size").Exists() {
 		targetSize = d.Get("target_size").Int()
@@ -43,7 +43,7 @@ func newComputeRegionInstanceGroupManager(d *schema.ResourceData) schema.CoreRes
 			purchaseOption = "preemptible"
 		}
 
-		for _, disk := range instanceTemplate.Get("disk").Array() {
+		for i, disk := range instanceTemplate.Get("disk").Array() {
 			diskType := disk.Get("type").String()
 			switch diskType {
 			case "SCRATCH":
@@ -56,8 +56,11 @@ func newComputeRegionInstanceGroupManager(d *schema.ResourceData) schema.CoreRes
 				diskType := disk.Get("disk_type").String()
 
 				disks = append(disks, &google.ComputeDisk{
-					Type: diskType,
-					Size: float64(diskSize),
+					Address:       fmt.Sprintf("disk[%d]", i),
+					Type:          diskType,
+					Size:          float64(diskSize),
+					Region:        d.Region,
+					InstanceCount: &targetSize,
 				})
 			}
 		}
@@ -67,7 +70,7 @@ func newComputeRegionInstanceGroupManager(d *schema.ResourceData) schema.CoreRes
 
 	r := &google.ComputeRegionInstanceGroupManager{
 		Address:           d.Address,
-		Region:            region,
+		Region:            d.Region,
 		MachineType:       machineType,
 		PurchaseOption:    purchaseOption,
 		TargetSize:        targetSize,

@@ -1,74 +1,191 @@
 package modules
 
 import (
+	"context"
 	"fmt"
+	"github.com/infracost/infracost/internal/util"
 	"net/url"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
+	"time"
 
-	getter "github.com/hashicorp/go-getter"
+	"github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 
 	"github.com/infracost/infracost/internal/logging"
 )
 
+var tagRegex = regexp.MustCompile(`^v?\d+\.\d+\.\d+`)
+var commitRegex = regexp.MustCompile(`^([0-9a-f]{40})|([0-9a-f]{7})$`)
+var defaultTTL = 24 * time.Hour
+var tagCommitTTL = 30 * 24 * time.Hour
+
+const defaultModuleRetrieveTimeout = 3 * time.Minute
+
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
-	cache  sync.Map
-	logger zerolog.Logger
+	localCache  sync.Map
+	remoteCache RemoteCache
+	logger      zerolog.Logger
+	getters     map[string]getter.Getter
+	timeout     time.Duration
 }
 
+type PackageFetcherOpts func(*PackageFetcher)
+
 // NewPackageFetcher constructs a new package fetcher
-func NewPackageFetcher(logger zerolog.Logger) *PackageFetcher {
-	return &PackageFetcher{
-		logger: logger,
+func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...PackageFetcherOpts) *PackageFetcher {
+	getters := make(map[string]getter.Getter, len(getter.Getters))
+	for k, g := range getter.Getters {
+		getters[k] = g
+	}
+	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
+
+	p := &PackageFetcher{
+		remoteCache: remoteCache,
+		logger:      logger,
+		getters:     getters,
+		timeout:     defaultModuleRetrieveTimeout,
+	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	return p
+}
+
+func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
+	return func(p *PackageFetcher) {
+		for k, g := range getters {
+			p.getters[k] = g
+		}
+	}
+}
+
+var WithTimeout = func(d time.Duration) PackageFetcherOpts {
+	return func(p *PackageFetcher) {
+		p.timeout = d
 	}
 }
 
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
-func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
-	if v, ok := r.cache.Load(moduleAddr); ok {
-		prevDest, _ := v.(string)
+func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
+	if strings.HasPrefix(moduleAddr, "file://") {
+		// Skip to the remote getter so it just copies this instead of
+		// looking up the cache
+		_, err := p.fetchFromRemote(moduleAddr, dest)
+		return err
+	}
 
-		r.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
-
-		err := os.Mkdir(dest, os.ModePerm)
-		if err != nil {
-			return fmt.Errorf("failed to create directory '%s': %w", dest, err)
-		}
-
-		// Skip dotfiles and create new symlinks to be consistent with what Terraform init does
-		opt := copy.Options{
-			Skip: func(src string) (bool, error) {
-				return strings.HasPrefix(filepath.Base(src), "."), nil
-			},
-			OnSymlink: func(src string) copy.SymlinkAction {
-				return copy.Shallow
-			},
-		}
-
-		err = copy.Copy(prevDest, dest, opt)
-		if err != nil {
-			return fmt.Errorf("failed to copy module from '%s' to '%s': %w", prevDest, dest, err)
-		}
-
+	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
+	if fetched {
+		p.logger.Trace().Msgf("cache hit (local): %s", util.RedactUrl(moduleAddr))
 		return nil
 	}
-	var cached []string
-	r.cache.Range(func(k, value any) bool {
-		s, _ := value.(string)
-		cached = append(cached, s)
 
-		return true
-	})
+	if err != nil {
+		p.logger.Warn().Msgf("error fetching module %s from local cache: %s", util.RedactUrl(moduleAddr), err)
+	}
 
-	r.logger.Debug().Strs("cached_module_addresses", cached).Msgf("module %s does not exist in cache, proceeding to download", moduleAddr)
+	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
+	if fetched {
+		p.logger.Trace().Msgf("cache hit (remote): %s", moduleAddr)
+		p.localCache.Store(moduleAddr, dest)
+		return nil
+	}
 
+	if err != nil {
+		p.logger.Warn().Msgf("error fetching module %s from remote cache: %s", util.RedactUrl(moduleAddr), err)
+	}
+
+	p.logger.Trace().Msgf("cache miss: %s", moduleAddr)
+
+	_, err = p.fetchFromRemote(moduleAddr, dest)
+	if err != nil {
+		return fmt.Errorf("error fetching module %s from remote: %w", util.RedactUrl(moduleAddr), err)
+	}
+
+	p.localCache.Store(moduleAddr, dest)
+
+	if p.remoteCache != nil {
+		ttl := determineTTL(moduleAddr)
+		p.logger.Debug().Msgf("putting module %s into remote cache with ttl %s", util.RedactUrl(moduleAddr), ttl)
+		err = p.remoteCache.Put(moduleAddr, dest, ttl)
+		if err != nil {
+			p.logger.Warn().Msgf("error putting module %s into remote cache: %s", util.RedactUrl(moduleAddr), err)
+		}
+	}
+
+	return nil
+}
+
+func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, error) {
+	v, ok := p.localCache.Load(moduleAddr)
+	if !ok {
+		return false, nil
+	}
+
+	prevDest, _ := v.(string)
+
+	if prevDest == dest {
+		return true, nil
+	}
+
+	p.logger.Debug().Msgf("module %s already downloaded, copying from '%s' to '%s'", util.RedactUrl(moduleAddr), prevDest, dest)
+
+	err := os.Mkdir(dest, os.ModePerm)
+	if err != nil {
+		return false, fmt.Errorf("failed to create directory '%s': %w", dest, err)
+	}
+
+	// Skip dotfiles and create new symlinks to be consistent with what Terraform init does
+	opt := copy.Options{
+		Skip: func(src string) (bool, error) {
+			return strings.HasPrefix(filepath.Base(src), "."), nil
+		},
+		OnSymlink: func(src string) copy.SymlinkAction {
+			return copy.Shallow
+		},
+	}
+
+	err = copy.Copy(prevDest, dest, opt)
+	if err != nil {
+		return false, fmt.Errorf("failed to copy module from '%s' to '%s': %w", prevDest, dest, err)
+	}
+
+	return true, nil
+}
+
+func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string) (bool, error) {
+	if p.remoteCache == nil {
+		return false, nil
+	}
+
+	ok, err := p.remoteCache.Exists(moduleAddr)
+	if err != nil {
+		return false, err
+	}
+
+	if !ok {
+		return false, nil
+	}
+
+	err = p.remoteCache.Get(moduleAddr, dest)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) {
 	decompressors := map[string]getter.Decompressor{}
 	for k, decompressor := range getter.Decompressors {
 		decompressors[k] = decompressor
@@ -78,30 +195,52 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 	// I'm not sure if we really need it, but added it just in case/
 	decompressors["tar.tbz2"] = new(getter.TarBzip2Decompressor)
 
-	getters := make(map[string]getter.Getter, len(getter.Getters))
-	for k, g := range getter.Getters {
-		getters[k] = g
+	ctx := context.Background()
+	if p.timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, p.timeout)
+		defer cancel()
 	}
 
-	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
-
 	client := getter.Client{
+		Ctx:           ctx,
 		Src:           moduleAddr,
 		Dst:           dest,
 		Pwd:           dest,
-		Mode:          getter.ClientModeDir,
+		Mode:          getter.ClientModeAny,
 		Decompressors: decompressors,
-		Getters:       getters,
+		Getters:       p.getters,
 	}
-
-	r.cache.Store(moduleAddr, dest)
 
 	err := client.Get()
 	if err != nil {
-		return fmt.Errorf("could not download module %s to cache %w", moduleAddr, err)
+		return false, err
 	}
 
-	return nil
+	return true, nil
+}
+
+func determineTTL(moduleAddr string) time.Duration {
+	u, err := url.Parse(moduleAddr)
+	if err != nil {
+		return defaultTTL
+	}
+
+	// Get the ref parameter
+	ref := u.Query().Get("ref")
+	if ref == "" {
+		return defaultTTL
+	}
+
+	// Check if ref looks like a git tag or a commit
+	isTag := tagRegex.MatchString(ref)
+	isCommit := commitRegex.MatchString(ref)
+
+	if isTag || isCommit {
+		return tagCommitTTL
+	}
+
+	return defaultTTL
 }
 
 // CustomGitGetter extends the standard GitGetter transforming SSH sources to

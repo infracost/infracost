@@ -14,6 +14,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	"golang.org/x/exp/maps"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -22,9 +23,7 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 )
 
-var (
-	defaultTerraformWorkspaceName = "default"
-)
+var defaultTerraformWorkspaceName = "default"
 
 type Option func(p *Parser)
 
@@ -109,10 +108,17 @@ func makePathsRelativeToInitial(paths []string, initialPath string) []string {
 }
 
 // OptionWithModuleSuffix sets an optional module suffix which will be added to the Module after it has finished parsing
-// this can be used to augment auto-detected project path names and metadata.
-func OptionWithModuleSuffix(suffix string) Option {
+// this can be used to augment auto-detected project path names and metadata. If the suffix is already part of the project name - ignore it.
+func OptionWithModuleSuffix(rootPath, suffix string) Option {
 	return func(p *Parser) {
-		p.moduleSuffix = suffix
+		pathEnv := ""
+		if p.envMatcher != nil {
+			pathEnv = p.envMatcher.PathEnv(rootPath)
+		}
+
+		if pathEnv == "" || (suffix != "" && pathEnv != suffix) {
+			p.moduleSuffix = suffix
+		}
 	}
 }
 
@@ -276,6 +282,14 @@ func OptionGraphEvaluator() Option {
 	}
 }
 
+// OptionWithProjectName sets the project name for the parser.
+// This is used if the project name has been explicitly set by the user or the autodetection
+func OptionWithProjectName(name string) Option {
+	return func(p *Parser) {
+		p.projectName = name
+	}
+}
+
 type DetectedProject interface {
 	ProjectName() string
 	EnvName() string
@@ -289,6 +303,7 @@ type DetectedProject interface {
 type Parser struct {
 	startingPath          string
 	detectedProjectPath   string
+	projectName           string
 	tfEnvVars             map[string]cty.Value
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
@@ -411,9 +426,21 @@ func (p *Parser) DependencyPaths() []string {
 	} else {
 		sortedCalls = append(sortedCalls, p.RelativePath()+"/**")
 	}
-	sort.Strings(sortedCalls)
+	return p.uniqueDependencyPaths(sortedCalls)
+}
 
-	return sortedCalls
+func (p *Parser) uniqueDependencyPaths(paths []string) []string {
+	seen := make(map[string]struct{})
+
+	for _, path := range paths {
+		if _, ok := seen[path]; ok {
+			continue
+		}
+		seen[path] = struct{}{}
+	}
+	deps := maps.Keys(seen)
+	sort.Strings(deps)
+	return deps
 }
 
 // ParseDirectory parses all the terraform files in the detectedProjectPath into Blocks and then passes them to an Evaluator
@@ -542,10 +569,16 @@ func (p *Parser) RelativePath() string {
 // ProjectName generates a name for the project that can be used
 // in the Infracost config file.
 func (p *Parser) ProjectName() string {
+	if p.projectName != "" {
+		return p.projectName
+	}
+
 	name := config.CleanProjectName(p.RelativePath())
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
+	} else if p.workspaceName != "" && p.workspaceName != defaultTerraformWorkspaceName {
+		name = fmt.Sprintf("%s-%s", name, p.workspaceName)
 	}
 
 	return name
@@ -557,7 +590,7 @@ func (p *Parser) EnvName() string {
 		return p.moduleSuffix
 	}
 
-	return p.ProjectName()
+	return p.envMatcher.EnvName(p.ProjectName())
 }
 
 // TerraformVarFiles returns the list of terraform var files that the parser
@@ -615,8 +648,9 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 	if p.remoteVariableLoaders != nil {
 		for _, loader := range p.remoteVariableLoaders {
 			remoteVars, err := loader.Load(RemoteVarLoaderOptions{
-				Blocks:  blocks,
-				EnvName: p.EnvName(),
+				Blocks:      blocks,
+				ModulePath:  p.RelativePath(),
+				Environment: p.EnvName(),
 			})
 			if err != nil {
 				p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)

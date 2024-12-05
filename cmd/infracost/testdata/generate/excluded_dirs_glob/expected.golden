@@ -1,0 +1,10 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+    name: apps-bar
+    skip_autodetect: true
+  - path: apps/foo
+    name: apps-foo
+    skip_autodetect: true
+
