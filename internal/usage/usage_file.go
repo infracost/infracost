@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
 	yamlv3 "gopkg.in/yaml.v3"
@@ -48,6 +49,8 @@ func CreateUsageFile(path string) error {
 }
 
 func LoadUsageFile(path string) (*UsageFile, error) {
+	loadUsageTimer := metrics.GetTimer("parallel_runner.load_usage.duration", false, path).Start()
+	defer loadUsageTimer.Stop()
 	blankUsage := NewBlankUsageFile()
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		logging.Logger.Debug().Msg("Specified usage file does not exist. Using a blank file")

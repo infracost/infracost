@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
+	"github.com/infracost/infracost/internal/metrics"
 	componentsFuncs "github.com/turbot/terraform-components/lang/funcs"
 
 	"github.com/hashicorp/go-cty-funcs/crypto"
@@ -239,6 +240,10 @@ func (e *Evaluator) MissingVars() []string {
 // this Module.
 func (e *Evaluator) Run() (*Module, error) {
 	var lastContext hcl.EvalContext
+
+	timer := metrics.GetTimer("evaluator.run", false, e.module.RootPath).Start()
+	defer timer.Stop()
+
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.logger.Debug().Msg("evaluating top level context")
 	e.evaluate(lastContext)

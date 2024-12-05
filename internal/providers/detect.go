@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/awslabs/goformation/v7"
+	"github.com/infracost/infracost/internal/metrics"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
@@ -38,6 +39,8 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		projectContext.ContextValues.SetValue("project_type", projectType)
 	}
 
+	metrics.GetSetting("project_type", project.Path).Set(projectType)
+
 	switch projectType {
 	case ProjectTypeTerraformPlanJSON:
 		return &DetectionOutput{Providers: []schema.Provider{terraform.NewPlanJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
@@ -52,6 +55,9 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	case ProjectTypeCloudFormation:
 		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	}
+
+	autodetectTimer := metrics.GetTimer("autodetect.duration", false, project.Path).Start()
+	defer autodetectTimer.Stop()
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
 	for i, override := range ctx.Config.Autodetect.PathOverrides {

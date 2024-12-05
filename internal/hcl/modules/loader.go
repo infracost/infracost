@@ -2,7 +2,7 @@ package modules
 
 import (
 	"bytes"
-	"crypto/md5" //nolint
+	"crypto/md5" // nolint
 	"errors"
 	"fmt"
 	"net/url"
@@ -16,9 +16,10 @@ import (
 	"sync"
 	"time"
 
-	getter "github.com/hashicorp/go-getter"
+	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 	giturls "github.com/whilp/git-urls"
@@ -122,7 +123,7 @@ func (m *ModuleLoader) manifestFilePath(projectPath string) string {
 	}
 
 	rel, _ := filepath.Rel(m.cachePath, projectPath)
-	sum := md5.Sum([]byte(rel)) //nolint
+	sum := md5.Sum([]byte(rel)) // nolint
 	return filepath.Join(m.cachePath, ".infracost/terraform_modules/", fmt.Sprintf("manifest-%x.json", sum))
 }
 
@@ -219,6 +220,10 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	errGroup := &errgroup.Group{}
 	manifestMu := sync.Mutex{}
 
+	remoteModuleCounter := metrics.GetCounter("remote_module.count", true)
+	submoduleLoadTimer := metrics.GetTimer("submodule.load.total_duration", false, path).Start()
+	defer submoduleLoadTimer.Stop()
+
 	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
 			for moduleCall := range jobs {
@@ -229,6 +234,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 				// only include non-local modules in the manifest since we don't want to cache local ones.
 				if !IsLocalModule(metadata.Source) {
+					remoteModuleCounter.Inc()
 					manifestMu.Lock()
 					manifestModules = append(manifestModules, metadata)
 					manifestMu.Unlock()
@@ -267,6 +273,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	key := prefix + moduleCall.Name
 	source := moduleCall.Source
 	version := moduleCall.Version
+
+	moduleLoadTimer := metrics.GetTimer("submodule.load.duration", false, source, version).Start()
+	defer moduleLoadTimer.Stop()
 
 	mappedResult, err := mapSource(m.sourceMap, source)
 	if err != nil {
@@ -810,7 +819,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 }
 
 func (m *ModuleLoader) downloadDest(moduleAddr string, version string) string {
-	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) //nolint
+	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) // nolint
 	return filepath.Join(m.downloadDir(), hash)
 }
 

@@ -32,6 +32,7 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -266,6 +267,10 @@ func (i *terragruntWorkingDirInfo) addWarning(pd *schema.ProjectDiag) {
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
 // process each with an HCLProvider.
 func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
+
+	loadResourcesTimer := metrics.GetTimer("terragrunt.LoadResources", false, p.ctx.ProjectConfig.Path).Start()
+	defer loadResourcesTimer.Stop()
+
 	dirs, err := p.prepWorkingDirs()
 	if err != nil {
 		return nil, err

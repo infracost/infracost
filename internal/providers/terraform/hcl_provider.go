@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/infracost/infracost/internal/schema"
 
 	jsoniter "github.com/json-iterator/go"
@@ -262,13 +263,21 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 
+	loadResourcesTimer := metrics.GetTimer("hcl.LoadResources", false, p.ctx.ProjectConfig.Path).Start()
+	defer loadResourcesTimer.Stop()
+
+	loadPlanTimer := metrics.GetTimer("hcl.LoadPlanJSON", false, p.ctx.ProjectConfig.Path).Start()
 	j := p.LoadPlanJSON()
+	loadPlanTimer.Stop()
 	if j.Error != nil {
 		return []*schema.Project{p.newProject(j)}, nil
 	}
 
 	project := p.newProject(j)
+
+	parseJSONTimer := metrics.GetTimer("hcl.ParseJSON", false, p.ctx.ProjectConfig.Path).Start()
 	parsedConf, err := p.planJSONParser.parseJSON(j.JSON, usage)
+	parseJSONTimer.Stop()
 	if err != nil {
 		project.Metadata.AddError(schema.NewDiagJSONParsingFailure(err))
 
@@ -286,7 +295,9 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 	project.PartialResources = parsedConf.CurrentResources
 
 	if p.policyClient != nil {
+		uploadPolicyDataTimer := metrics.GetTimer("hcl.UploadPolicyData", false, p.ctx.ProjectConfig.Path).Start()
 		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
+		uploadPolicyDataTimer.Stop()
 		if err != nil {
 			p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
 		}
@@ -373,9 +384,15 @@ func (p *HCLProvider) LoadPlanJSON() HCLProject {
 // found Terraform project. This can be used to fetch raw information like
 // outputs, vars, resources, e.t.c.
 func (p *HCLProvider) Module() HCLProject {
+
+	metrics.GetCounter("root_module.count", true).Inc()
+
 	if p.cache != nil {
 		return *p.cache
 	}
+
+	parseTimer := metrics.GetTimer("root_module.parse.duration", false, p.Context().ProjectConfig.Path).Start()
+	defer parseTimer.Stop()
 
 	module, modErr := p.Parser.ParseDirectory()
 	var v *clierror.PanicError
@@ -452,6 +469,12 @@ func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) 
 }
 
 func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
+
+	moduleTimer := metrics.GetTimer("hcl.MarshalModule", false, p.ctx.ProjectConfig.Path).Start()
+	defer moduleTimer.Stop()
+
+	metrics.GetCounter("module.count", true).Inc()
+
 	moduleConfig := ModuleConfig{
 		ModuleCalls: map[string]ModuleCall{},
 	}
@@ -475,6 +498,8 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 	for _, block := range module.Blocks {
 		if block.Type() == "resource" {
 			out := p.getResourceOutput(block, module.SourceURL)
+
+			metrics.GetCounter("resource.count", true).Inc()
 
 			if _, ok := configResources[out.Configuration.Address]; !ok {
 				moduleConfig.Resources = append(moduleConfig.Resources, out.Configuration)

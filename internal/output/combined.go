@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
@@ -36,6 +37,8 @@ type ReportInput struct {
 // Load reads the file at the location p and the file body into a Root struct. Load naively
 // validates that the Infracost JSON body is valid by checking the that the version attribute is within a supported range.
 func Load(p string) (Root, error) {
+	timer := metrics.GetTimer("output.load.duration", false).Start()
+	defer timer.Stop()
 	var out Root
 	_, err := os.Stat(p)
 	if errors.Is(err, os.ErrNotExist) {
@@ -118,6 +121,8 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 // in the prior Root. If we can't find a matching project then we assume that the project
 // has been newly created and will show a 100% increase in the output Root.
 func CompareTo(c *config.Config, current, prior Root) (Root, error) {
+	compareTimer := metrics.GetTimer("output.compare.duration", false).Start()
+	defer compareTimer.Stop()
 	currentProjectLabels := make(map[string]bool, len(current.Projects))
 	for _, p := range current.Projects {
 		currentProjectLabels[p.LabelWithMetadata()] = true
