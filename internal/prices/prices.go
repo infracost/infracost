@@ -48,7 +48,7 @@ func NewPriceFetcher(ctx *config.RunContext, warnOnPriceErrors bool) *PriceFetch
 		components:        make(map[string]int),
 		mux:               &sync.RWMutex{},
 		runCtx:            ctx,
-		client:            apiclient.NewPricingAPIClient(ctx),
+		client:            apiclient.GetPricingAPIClient(ctx),
 		warnOnPriceErrors: warnOnPriceErrors,
 	}
 }
