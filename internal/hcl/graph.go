@@ -382,12 +382,57 @@ func (g *Graph) AsJSON() ([]byte, error) {
 
 func (g *Graph) Walk() {
 	v := NewGraphVisitor(g.logger, g.vertexMutex)
-	flowCallback := func(d *dag.DAG, id string, _ []dag.FlowResult) (interface{}, error) {
-		vertex, _ := d.GetVertex(id)
-		v.Visit(id, vertex)
-		return nil, nil
+	// flowCallback := func(d *dag.DAG, id string, _ []dag.FlowResult) (interface{}, error) {
+	// 	vertex, _ := d.GetVertex(id)
+	// 	v.Visit(id, vertex)
+	// 	return nil, nil
+	// }
+
+	TopologicalOrder(g.dag, v.Visit)
+
+	//	g.dag.DFSWalk()
+
+	//	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+}
+
+func TopologicalOrder(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
+	inDegrees := make(map[string]int)
+	type queueItem struct {
+		id     string
+		vertex Vertex
 	}
-	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+
+	// Calculate in-degrees
+	vertices := graph.GetVertices()
+	queue := make([]queueItem, 0, len(vertices))
+	for id, vertex := range vertices {
+		predecessors, _ := graph.GetParents(id)
+		inDegrees[id] = len(predecessors)
+		if inDegrees[id] == 0 {
+			queue = append(queue, queueItem{
+				id:     id,
+				vertex: vertex.(Vertex),
+			}) // Add root vertices to the queue
+		}
+	}
+
+	// Process in topological order
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+		visitor(current.id, current.vertex) // Call visitor function
+
+		children, _ := graph.GetChildren(current.id)
+		for id, successor := range children {
+			inDegrees[id]--
+			if inDegrees[id] == 0 {
+				queue = append(queue, queueItem{
+					id:     id,
+					vertex: successor.(Vertex),
+				})
+			}
+		}
+	}
 }
 
 func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
@@ -417,10 +462,9 @@ func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisit
 	}
 }
 
-func (v *GraphVisitor) Visit(id string, vertex interface{}) {
-	vert := vertex.(Vertex)
+func (v *GraphVisitor) Visit(id string, vertex Vertex) {
 	v.logger.Debug().Msgf("visiting vertex %q", id)
-	err := vert.Visit(v.vertexMutex)
+	err := vertex.Visit(v.vertexMutex)
 	if err != nil {
 		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
 	}
