@@ -224,20 +224,26 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 		if modAddr == "" {
 			g.logger.Debug().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
-			if err := g.dag.AddEdge(g.rootVertex.ID(), id); err != nil {
-				return fmt.Errorf("error adding edge %s, %s %w", g.rootVertex.ID(), id, err)
+			if ok, _ := g.dag.IsEdge(g.rootVertex.ID(), id); !ok {
+				if err := g.dag.AddEdge(g.rootVertex.ID(), id); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", g.rootVertex.ID(), id, err)
+				}
 			}
 		} else {
 			// Add the module call edge
 			g.logger.Debug().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
-			if err := g.dag.AddEdge(moduleCallID(modAddr), id); err != nil {
-				return fmt.Errorf("error adding edge %s, %s %w", moduleCallID(modAddr), id, err)
+			if ok, _ := g.dag.IsEdge(moduleCallID(modAddr), id); !ok {
+				if err := g.dag.AddEdge(moduleCallID(modAddr), id); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", moduleCallID(modAddr), id, err)
+				}
 			}
 
 			// Add the module exit edge
 			g.logger.Debug().Msgf("adding edge: %s, %s", id, modAddr)
-			if err := g.dag.AddEdge(id, modAddr); err != nil {
-				return fmt.Errorf("error adding edge %s, %s %w", id, modAddr, err)
+			if ok, _ := g.dag.IsEdge(id, modAddr); !ok {
+				if err := g.dag.AddEdge(id, modAddr); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", id, modAddr, err)
+				}
 			}
 		}
 
@@ -319,8 +325,10 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			_, err := g.dag.GetVertex(srcID)
 			if err == nil {
 				g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
-				if err := g.dag.AddEdge(srcID, dstID); err != nil {
-					return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+				if ok, _ := g.dag.IsEdge(srcID, dstID); !ok {
+					if err := g.dag.AddEdge(srcID, dstID); err != nil {
+						return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+					}
 				}
 				continue
 			}
@@ -335,8 +343,10 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				_, err := g.dag.GetVertex(srcID)
 				if err == nil {
 					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
-					if err := g.dag.AddEdge(srcID, dstID); err != nil {
-						return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+					if ok, _ := g.dag.IsEdge(srcID, dstID); !ok {
+						if err := g.dag.AddEdge(srcID, dstID); err != nil {
+							return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+						}
 					}
 
 					continue
