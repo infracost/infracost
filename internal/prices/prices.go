@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	batchSize = 5
+	batchSize = 1000
 )
 
 // notFoundData represents a single price not found entry
@@ -213,7 +213,7 @@ func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 		numWorkers = 16
 	}
 
-	reqs := p.client.BatchRequests(resources, 100) // batchSize)
+	reqs := p.client.BatchRequests(resources, batchSize)
 
 	numJobs := len(reqs)
 	jobs := make(chan apiclient.BatchRequest, numJobs)
