@@ -274,9 +274,6 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	source := moduleCall.Source
 	version := moduleCall.Version
 
-	moduleLoadTimer := metrics.GetTimer("submodule.load.duration", false, source, version).Start()
-	defer moduleLoadTimer.Stop()
-
 	mappedResult, err := mapSource(m.sourceMap, source)
 	if err != nil {
 		return nil, err
@@ -344,6 +341,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 			Dir:    path.Clean(dir),
 		}, nil
 	}
+
+	moduleLoadTimer := metrics.GetTimer("submodule.remote_load.duration", false, source, version).Start()
+	defer moduleLoadTimer.Stop()
 
 	manifestModule, err = m.loadRegistryModule(key, source, version)
 	if err != nil {

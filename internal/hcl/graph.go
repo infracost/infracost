@@ -23,33 +23,24 @@ type ModuleConfig struct {
 }
 
 type ModuleConfigs struct {
-	configs map[string][]ModuleConfig
-	mu      sync.RWMutex
+	configs sync.Map
 }
 
 func NewModuleConfigs() *ModuleConfigs {
-	return &ModuleConfigs{
-		configs: make(map[string][]ModuleConfig),
-		mu:      sync.RWMutex{},
-	}
+	return &ModuleConfigs{}
 }
 
 func (m *ModuleConfigs) Add(moduleAddress string, moduleConfig ModuleConfig) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, ok := m.configs[moduleAddress]; !ok {
-		m.configs[moduleAddress] = []ModuleConfig{}
-	}
-
-	m.configs[moduleAddress] = append(m.configs[moduleAddress], moduleConfig)
+	configs, _ := m.configs.LoadOrStore(moduleAddress, []ModuleConfig{})
+	m.configs.Store(moduleAddress, append(configs.([]ModuleConfig), moduleConfig))
 }
 
 func (m *ModuleConfigs) Get(moduleAddress string) []ModuleConfig {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	return m.configs[moduleAddress]
+	configs, _ := m.configs.Load(moduleAddress)
+	if configs == nil {
+		return nil
+	}
+	return configs.([]ModuleConfig)
 }
 
 type Graph struct {
@@ -386,7 +377,6 @@ func (g *Graph) Walk() {
 }
 
 func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
-	inDegrees := make(map[string]int)
 	type queueItem struct {
 		id     string
 		vertex Vertex
@@ -395,6 +385,7 @@ func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
 	// Calculate in-degrees
 	vertices := graph.GetVertices()
 	queue := make([]queueItem, 0, len(vertices))
+	inDegrees := make(map[string]int, len(vertices))
 	for id, vertex := range vertices {
 		predecessors, _ := graph.GetParents(id)
 		inDegrees[id] = len(predecessors)
@@ -411,6 +402,8 @@ func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
 		current := queue[0]
 		queue = queue[1:]
 		visitor(current.id, current.vertex)
+
+		// TODO: parallelize this
 
 		children, _ := graph.GetChildren(current.id)
 		for id, successor := range children {
