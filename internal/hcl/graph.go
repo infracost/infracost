@@ -383,17 +383,15 @@ func (g *Graph) AsJSON() ([]byte, error) {
 func (g *Graph) Walk() {
 	v := NewGraphVisitor(g.logger, g.vertexMutex)
 
-	// flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
-	// 	vertex, _ := d.GetVertex(id)
-	//
-	// 	v.Visit(id, vertex)
-	//
-	// 	return vertex, nil
-	// }
+	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
+		vertex, _ := d.GetVertex(id)
 
-	g.dag.BFSWalk(v)
+		v.Visit(id, vertex)
 
-	// _, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+		return vertex, nil
+	}
+
+	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
 }
 
 func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
@@ -423,13 +421,12 @@ func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisit
 	}
 }
 
-func (v *GraphVisitor) Visit(vertex dag.Vertexer) {
-	id, rawVertex := vertex.Vertex()
-	vert := rawVertex.(Vertex)
-	v.logger.Debug().Msgf("visiting vertex %q", id)
+func (v *GraphVisitor) Visit(id string, vertex interface{}) {
+	vert := vertex.(Vertex)
+	v.logger.Debug().Msgf("visiting vertex %q", vert.ID())
 	err := vert.Visit(v.vertexMutex)
 	if err != nil {
-		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
+		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", vert.ID())
 	}
 }
 
