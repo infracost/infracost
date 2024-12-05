@@ -324,7 +324,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 				// Check if the source vertex exists
 				_, err := g.dag.GetVertex(srcID)
-				if err == nil {
+				if err == nil || true {
 					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
 					edges = append(edges, dag.EdgeInput{
 						SrcID: srcID,
@@ -342,7 +342,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 					// Check if the source vertex exists
 					_, err := g.dag.GetVertex(srcID)
-					if err == nil {
+					if err == nil || true {
 						g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
 						edges = append(edges, dag.EdgeInput{
 							SrcID: srcID,
