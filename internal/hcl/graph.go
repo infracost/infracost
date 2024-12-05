@@ -99,7 +99,6 @@ func (g *Graph) ReduceTransitively() {
 }
 
 func (g *Graph) Populate(evaluator *Evaluator) error {
-	var vertexes []Vertex
 
 	blocks, err := g.loadAllBlocks(evaluator)
 	if err != nil {
