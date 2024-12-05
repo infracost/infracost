@@ -39,8 +39,6 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		projectContext.ContextValues.SetValue("project_type", projectType)
 	}
 
-	metrics.GetSetting("project_type", project.Path).Set(projectType)
-
 	switch projectType {
 	case ProjectTypeTerraformPlanJSON:
 		return &DetectionOutput{Providers: []schema.Provider{terraform.NewPlanJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil

@@ -11,7 +11,6 @@ func (c *Counter) Result() Result {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return Result{
-		Unit:  "count",
 		Value: c.value,
 	}
 }

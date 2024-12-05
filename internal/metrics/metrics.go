@@ -19,16 +19,16 @@ type Metric interface {
 }
 
 type Result struct {
-	Unit  string      `json:"unit"`
-	Value interface{} `json:"value"`
+	Unit  string
+	Value interface{}
 }
 
 type registeredMetric struct {
-	Name    string   `json:"name"`
-	Key     int      `json:"key"`
-	Type    Type     `json:"type"`
-	Context []string `json:"context,omitempty"`
-	Metric  Metric   `json:"-"`
+	Name    string
+	Key     int
+	Type    Type
+	Context []string
+	Metric  Metric
 }
 
 type registry struct {
@@ -71,13 +71,12 @@ type Output []OutputMetric
 
 type OutputMetric struct {
 	Name   string        `json:"name"`
-	Type   Type          `json:"type"`
-	Unit   string        `json:"unit"`
-	Values []OutputValue `json:"values"`
+	Unit   string        `json:"unit,omitempty"`
+	Values []OutputValue `json:"values,omitempty"`
 }
 
 type OutputValue struct {
-	Context []string    `json:"context"`
+	Context []string    `json:"context,omitempty"`
 	Value   interface{} `json:"value"`
 }
 
@@ -95,7 +94,6 @@ func WriteMetrics(path string) error {
 		if metric == nil {
 			metric = &OutputMetric{
 				Name: m.Name,
-				Type: m.Type,
 				Unit: result.Unit,
 			}
 			outputMap[m.Name] = metric

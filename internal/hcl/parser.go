@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -464,9 +465,13 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.detectedProjectPath)
 
+	metrics.GetCounter("hcl_file.count", true).Inc()
+
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
+	hclTimer := metrics.GetTimer("hcl_file.load.duration", false, p.detectedProjectPath).Start()
 	files, err := loadDirectory(p.hclParser, p.logger, p.detectedProjectPath, false)
+	hclTimer.Stop()
 	if err != nil {
 		return m, err
 	}
@@ -481,8 +486,12 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, errors.New("No valid terraform files found given path, try a different directory")
 	}
 
+	metrics.GetCounter("block.count", true).Add(len(blocks))
+
 	p.logger.Debug().Msg("Loading TFVars...")
+	varLoadTimer := metrics.GetTimer("var.load.duration", false, p.detectedProjectPath).Start()
 	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
+	varLoadTimer.Stop()
 	if err != nil {
 		return m, err
 	}
@@ -520,6 +529,9 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	)
 
 	var root *Module
+
+	evaluationTimer := metrics.GetTimer("eval.duration", false, p.detectedProjectPath).Start()
+	defer evaluationTimer.Stop()
 
 	// Graph evaluation
 	if evaluator.isGraph {

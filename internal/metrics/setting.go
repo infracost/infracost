@@ -11,7 +11,6 @@ func (s *Setting) Result() Result {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return Result{
-		Unit:  "setting",
 		Value: s.value,
 	}
 }
