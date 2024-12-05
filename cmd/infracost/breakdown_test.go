@@ -1565,6 +1565,21 @@ func TestBreakdownTerragruntAutodetectionConfigFileOutput(t *testing.T) {
 	)
 }
 
+func TestBreakdownTerragruntPartialInputs(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--log-level", "info",
+		},
+		&GoldenFileOptions{LogLevel: strPtr("info"), IgnoreNonGraph: true},
+	)
+}
+
 func strPtr(s string) *string {
 	return &s
 }

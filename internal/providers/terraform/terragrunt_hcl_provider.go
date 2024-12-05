@@ -32,13 +32,14 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
+
+	"github.com/infracost/infracost/internal/hcl/mock"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -490,6 +491,38 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		},
 		Parallelism: 1,
 		GetOutputs:  p.terragruntPathToValue,
+		DiagnosticsFunc: func(_ error, filename string, config interface{}, evalContext *hcl2.EvalContext) {
+			configFile := config.(*tgconfig.TerragruntConfigFile)
+			f, err := hclparse.NewParser().ParseHCLFile(filename)
+			if err != nil {
+				p.logger.Warn().Msgf("Terragrunt diagnostic func failed to reparse Terragrunt config file %s: %s", filename, err)
+				return
+			}
+
+			content, _, err := f.Body.PartialContent(&hcl2.BodySchema{
+				Attributes: []hcl2.AttributeSchema{
+					{
+						Name: "inputs",
+					},
+				},
+			})
+			if err != nil {
+				p.logger.Debug().Msgf("Terragrunt diagnostic func failed to reparse Terragrunt inputs for %s: %s", filename, err)
+				return
+			}
+
+			attr := hcl.Attribute{
+				HCLAttr: content.Attributes["inputs"],
+				Ctx:     hcl.NewContext(evalContext, nil, p.logger),
+				Logger:  p.logger,
+				// set is graph to true so that we use the better expression mocking
+				// when the expression hits a diagnostic.
+				IsGraph: true,
+			}
+			v := attr.Value()
+
+			configFile.Inputs = &v
+		},
 	}
 
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)

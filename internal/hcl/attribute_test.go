@@ -8,11 +8,12 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/hcl/mock"
 )
 
 func TestAttribute_AsInt(t *testing.T) {
@@ -150,7 +151,7 @@ locals {
 			Variables: map[string]cty.Value{},
 		}},
 		Logger:  discard,
-		isGraph: true,
+		IsGraph: true,
 	}
 
 	attr := Attribute{
@@ -171,7 +172,7 @@ locals {
 		},
 		Verbose: false,
 		Logger:  logger,
-		isGraph: true,
+		IsGraph: true,
 	}
 
 	v := attr.Value()
