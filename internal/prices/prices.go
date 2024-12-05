@@ -201,7 +201,7 @@ func (p *PriceFetcher) PopulatePrices(project *schema.Project) error {
 
 // getPricesConcurrent gets the prices of all resources concurrently.
 // Concurrency level is calculated using the following formula:
-// max(min(4, numCPU * 4), 16)
+// min(max(4, numCPU * 4), 16)
 func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 	// Set the number of workers
 	numWorkers := 4
@@ -234,6 +234,8 @@ func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 		jobs <- r
 	}
 
+	close(jobs)
+
 	// Get the result of the jobs
 	for i := 0; i < numJobs; i++ {
 		err := <-resultErrors
@@ -241,6 +243,9 @@ func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 			return err
 		}
 	}
+
+	close(resultErrors)
+
 	return nil
 }
 
