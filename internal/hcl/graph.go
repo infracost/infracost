@@ -402,7 +402,7 @@ func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
 			queue = append(queue, queueItem{
 				id:     id,
 				vertex: vertex.(Vertex),
-			}) // Add root vertices to the queue
+			})
 		}
 	}
 
@@ -410,7 +410,7 @@ func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
 	for len(queue) > 0 {
 		current := queue[0]
 		queue = queue[1:]
-		visitor(current.id, current.vertex) // Call visitor function
+		visitor(current.id, current.vertex)
 
 		children, _ := graph.GetChildren(current.id)
 		for id, successor := range children {
@@ -465,11 +465,10 @@ func (g *Graph) loadAllBlocks(evaluator *Evaluator) ([]*Block, error) {
 }
 
 func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
-	blocks := make([]*Block, 0, len(evaluator.module.Blocks))
+	blocks := make([]*Block, len(evaluator.module.Blocks))
 	copy(blocks, evaluator.module.Blocks)
-	moduleBlocks := evaluator.module.Blocks.OfType("module")
 
-	for _, block := range moduleBlocks {
+	for _, block := range evaluator.module.Blocks.OfType("module") {
 		modCall, err := evaluator.loadModule(block)
 		if err != nil {
 			return nil, fmt.Errorf("could not load module %q", block.FullName())
