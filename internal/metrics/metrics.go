@@ -31,11 +31,6 @@ type registeredMetric struct {
 	Metric  Metric   `json:"-"`
 }
 
-type FullResult struct {
-	registeredMetric
-	Result
-}
-
 type registry struct {
 	mu      sync.RWMutex
 	metrics []registeredMetric
@@ -72,21 +67,47 @@ func (r *registry) Find(name string, t Type) Metric {
 	return nil
 }
 
-func GetData() []FullResult {
-	coreRegistry.mu.RLock()
-	defer coreRegistry.mu.RUnlock()
-	data := make([]FullResult, 0, len(coreRegistry.metrics))
-	for _, m := range coreRegistry.metrics {
-		data = append(data, FullResult{
-			registeredMetric: m,
-			Result:           m.Metric.Result(),
-		})
-	}
-	return data
+type Output []OutputMetric
+
+type OutputMetric struct {
+	Name   string        `json:"name"`
+	Type   Type          `json:"type"`
+	Unit   string        `json:"unit"`
+	Values []OutputValue `json:"values"`
+}
+
+type OutputValue struct {
+	Context []string    `json:"context"`
+	Value   interface{} `json:"value"`
 }
 
 func WriteMetrics(path string) error {
-	data, err := json.Marshal(GetData())
+	coreRegistry.mu.RLock()
+	defer coreRegistry.mu.RUnlock()
+
+	outputMap := map[string]*OutputMetric{}
+
+	for _, m := range coreRegistry.metrics {
+
+		result := m.Metric.Result()
+
+		metric := outputMap[m.Name]
+		if metric == nil {
+			metric = &OutputMetric{
+				Name: m.Name,
+				Type: m.Type,
+				Unit: result.Unit,
+			}
+			outputMap[m.Name] = metric
+		}
+
+		metric.Values = append(metric.Values, OutputValue{
+			Context: m.Context,
+			Value:   result.Value,
+		})
+	}
+
+	data, err := json.Marshal(outputMap)
 	if err != nil {
 		return err
 	}
