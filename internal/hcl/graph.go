@@ -95,7 +95,7 @@ func NewGraphWithRoot(logger zerolog.Logger, vertexMutex *sync.Mutex) (*Graph, e
 }
 
 func (g *Graph) ReduceTransitively() {
-	g.dag.ReduceTransitively()
+	// g.dag.ReduceTransitively()
 }
 
 func (g *Graph) Populate(evaluator *Evaluator) error {
