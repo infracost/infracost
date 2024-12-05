@@ -221,8 +221,6 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	manifestMu := sync.Mutex{}
 
 	remoteModuleCounter := metrics.GetCounter("remote_module.count", true)
-	submoduleLoadTimer := metrics.GetTimer("submodule.load.total_duration", false, path).Start()
-	defer submoduleLoadTimer.Stop()
 
 	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
