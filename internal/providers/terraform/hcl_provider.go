@@ -470,7 +470,7 @@ func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) 
 
 func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 
-	moduleTimer := metrics.GetTimer("hcl.MarshalModule", false, p.ctx.ProjectConfig.Path).Start()
+	moduleTimer := metrics.GetTimer("hcl.MarshalModule", false, module.ModulePath).Start()
 	defer moduleTimer.Stop()
 
 	metrics.GetCounter("module.count", true).Inc()
