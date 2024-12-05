@@ -424,11 +424,12 @@ func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisit
 }
 
 func (v *GraphVisitor) Visit(vertex dag.Vertexer) {
-	vert := vertex.(Vertex)
-	v.logger.Debug().Msgf("visiting vertex %q", vert.ID())
+	id, rawVertex := vertex.Vertex()
+	vert := rawVertex.(Vertex)
+	v.logger.Debug().Msgf("visiting vertex %q", id)
 	err := vert.Visit(v.vertexMutex)
 	if err != nil {
-		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", vert.ID())
+		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
 	}
 }
 
