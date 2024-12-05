@@ -9,8 +9,6 @@ import (
 	"sync"
 
 	"github.com/awslabs/goformation/v7"
-	"github.com/infracost/infracost/internal/metrics"
-
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
@@ -53,9 +51,6 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	case ProjectTypeCloudFormation:
 		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	}
-
-	autodetectTimer := metrics.GetTimer("autodetect.duration", false, project.Path).Start()
-	defer autodetectTimer.Stop()
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
 	for i, override := range ctx.Config.Autodetect.PathOverrides {
