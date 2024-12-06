@@ -105,5 +105,5 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WARN Skipping resource azurerm_security_center_subscription_pricing.standard_example["CloudPosture"]. Unknown resource tyoe  'CloudPosture'
-WARN Skipping resource azurerm_security_center_subscription_pricing.standard_example_with_usage["CloudPosture"]. Unknown resource tyoe  'CloudPosture'
+WARN Skipping resource azurerm_security_center_subscription_pricing.standard_example["CloudPosture"]. Unknown resource type  'CloudPosture'
+WARN Skipping resource azurerm_security_center_subscription_pricing.standard_example_with_usage["CloudPosture"]. Unknown resource type  'CloudPosture'

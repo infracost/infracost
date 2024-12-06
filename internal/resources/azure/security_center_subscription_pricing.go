@@ -125,7 +125,7 @@ func (r *SecurityCenterSubscriptionPricing) BuildResource() *schema.Resource {
 	case "cosmosdbs":
 		costComponents = []*schema.CostComponent{r.addCosmosDBCostComponent()}
 	default:
-		logging.Logger.Warn().Msgf("Skipping resource %s. Unknown resource tyoe  '%s'", r.Address, r.ResourceType)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Unknown resource type  '%s'", r.Address, r.ResourceType)
 	}
 
 	return &schema.Resource{
