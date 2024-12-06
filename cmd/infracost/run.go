@@ -114,9 +114,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	for _, projectResult := range projectResults {
 		projectContexts = append(projectContexts, projectResult.ctx)
-		for _, project := range projectResult.projectOut.projects {
-			projects = append(projects, project)
-		}
+		projects = append(projects, projectResult.projectOut.projects...)
 	}
 
 	r, err := output.ToOutputFormat(runCtx.Config, projects)
