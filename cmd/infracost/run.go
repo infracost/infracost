@@ -113,8 +113,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projectContexts := make([]*config.ProjectContext, 0)
 
 	for _, projectResult := range projectResults {
+		projectContexts = append(projectContexts, projectResult.ctx)
 		for _, project := range projectResult.projectOut.projects {
-			projectContexts = append(projectContexts, projectResult.ctx) // TODO: should this be in the outer loop?
 			projects = append(projects, project)
 		}
 	}
