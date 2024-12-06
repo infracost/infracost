@@ -93,8 +93,8 @@ func (p *Parser) sortVarFilesByPrecedence(paths []string, autoDetected bool) {
 }
 
 func makePathsRelativeToInitial(paths []string, initialPath string) []string {
-	var filenames []string
 
+	filenames := make([]string, 0, len(paths))
 	for _, name := range paths {
 		if path.IsAbs(name) {
 			filenames = append(filenames, name)
@@ -404,7 +404,7 @@ func (p *Parser) DependencyPaths() []string {
 		return nil
 	}
 
-	var sortedCalls []string
+	sortedCalls := make([]string, 0, len(p.moduleCalls)+len(p.tfvarsPaths)+1)
 	for _, call := range p.moduleCalls {
 		relCall := call
 		dep, err := filepath.Rel(p.startingPath, call)

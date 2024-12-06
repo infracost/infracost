@@ -296,7 +296,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 		projectCounts[provider.DisplayType()] = 1
 	}
 
-	var order []string
+	order := make([]string, 0, len(projectCounts))
 	for displayType := range projectCounts {
 		order = append(order, displayType)
 	}

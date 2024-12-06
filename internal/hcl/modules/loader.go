@@ -415,7 +415,7 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error
 // RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
 // It then checks any symlinks within the directories and adds them to the sparse-checkout file list as well.
 func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packageFetcher *PackageFetcher, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
-	var newDirs []string
+	newDirs := make([]string, 0, len(dirs))
 
 	// Sort the existing directories and dirs to be added by length
 	// This ensures that parent directories are added before child directories

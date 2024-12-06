@@ -144,7 +144,7 @@ func (p *PriceFetcher) LogWarnings() {
 		return
 	}
 
-	var data []*notFoundData
+	data := make([]*notFoundData, 0, len(p.resources))
 	for _, v := range p.resources {
 		data = append(data, v)
 	}

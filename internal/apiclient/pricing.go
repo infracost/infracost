@@ -361,7 +361,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	}
 
 	// now we deduplicate the queries, ensuring that a request for a price only happens once.
-	var deduplicatedServerQueries []pricingQuery
+	deduplicatedServerQueries := make([]pricingQuery, 0, len(serverQueries))
 	seenQueries := map[uint64]bool{}
 	for _, query := range serverQueries {
 		if seenQueries[query.hash] {

@@ -6,8 +6,6 @@ import (
 )
 
 type Timer struct {
-	group       string
-	name        string
 	startTime   time.Time
 	elapsedTime time.Duration
 	running     bool

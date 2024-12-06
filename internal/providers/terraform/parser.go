@@ -119,8 +119,7 @@ func (p *Parser) createParsedResource(d *schema.ResourceData, u *schema.UsageDat
 }
 
 func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResource, usage schema.UsageMap, confLoader *ConfLoader, parsed, providerConf, vars gjson.Result) []parsedResource {
-	var resources []parsedResource
-	resources = append(resources, baseResources...)
+
 	var vals gjson.Result
 
 	isState := false
@@ -136,6 +135,9 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResou
 	}
 
 	resData := p.parseResourceData(isState, confLoader, providerConf, vals, vars)
+
+	resources := make([]parsedResource, len(baseResources), len(resData)+len(baseResources))
+	copy(resources, baseResources)
 
 	p.parseReferences(resData, confLoader)
 	p.parseTags(resData, confLoader, providerConf)
@@ -294,7 +296,7 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 		return nil
 	}
 
-	var urls []string
+	urls := make([]string, 0, len(remoteUrls))
 	for source := range remoteUrls {
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
@@ -306,7 +308,6 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 }
 
 func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
-	var metadatas []schema.ProviderMetadata
 
 	confMap := providerConf.Map()
 
@@ -316,6 +317,8 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+
+	metadatas := make([]schema.ProviderMetadata, 0, len(keys))
 
 	for _, k := range keys {
 		conf := confMap[k]
@@ -532,13 +535,14 @@ func parseGoogleDefaultTags(providerConf, resConf gjson.Result) (map[string]stri
 	for k, v := range providerConf.Get(fmt.Sprintf("%s.expressions.default_labels.constant_value", gjsonEscape(providerKey))).Map() {
 		defaultTags[k] = v.String()
 	}
-	var missingAttrsCausingUnknownKeys []string
-	for _, address := range providerConf.Get(
+	missingAttributes := providerConf.Get(
 		fmt.Sprintf(
 			"%s.expressions.default_labels.missing_attributes_causing_unknown_keys",
 			gjsonEscape(providerKey),
 		),
-	).Array() {
+	).Array()
+	missingAttrsCausingUnknownKeys := make([]string, 0, len(missingAttributes))
+	for _, address := range missingAttributes {
 		if address.String() == "" {
 			continue
 		}
