@@ -122,12 +122,7 @@ func mergeVars(src cty.Value, parts []string, value cty.Value) cty.Value {
 // takes precedence over object `a`, unless both values are valid cty objects, in
 // which case they are recursively merged.
 func mergeObjects(a cty.Value, b cty.Value) cty.Value {
-	output := make(map[string]cty.Value)
-
-	for key, val := range a.AsValueMap() {
-		output[key] = val
-	}
-
+	output := a.AsValueMap()
 	for key, val := range b.AsValueMap() {
 		old, exists := output[key]
 
