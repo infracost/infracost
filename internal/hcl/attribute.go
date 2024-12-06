@@ -1122,9 +1122,10 @@ func (attr *Attribute) AllReferences() []*Reference {
 // VerticesReferenced traverses all the Expressions used by the attribute to build a
 // list of all the Blocks referenced by the Attribute.
 func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
-	var refs []VertexReference
+	allRefs := attr.AllReferences()
+	refs := make([]VertexReference, 0, len(allRefs))
 
-	for _, ref := range attr.AllReferences() {
+	for _, ref := range allRefs {
 		key := ref.String()
 
 		if shouldSkipRef(b, attr, key) {

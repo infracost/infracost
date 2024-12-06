@@ -829,7 +829,7 @@ func (b *Block) Children() Blocks {
 		return nil
 	}
 
-	var children Blocks
+	children := make(Blocks, 0, len(b.childBlocks))
 	for _, child := range b.childBlocks {
 		// Skip lifecycle meta argument blocks since it never needs to be evaluated
 		if supportsLifecycle(child) && child.Type() == "lifecycle" {

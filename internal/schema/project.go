@@ -413,7 +413,7 @@ func (p *Project) AllResources() []*Resource {
 		}
 	}
 
-	var resources []*Resource
+	resources := make([]*Resource, 0, len(m))
 	for r := range m {
 		resources = append(resources, r)
 	}
@@ -434,7 +434,7 @@ func (p *Project) AllPartialResources() []*PartialResource {
 		}
 	}
 
-	var resources []*PartialResource
+	resources := make([]*PartialResource, 0, len(m))
 	for r := range m {
 		resources = append(resources, r)
 	}

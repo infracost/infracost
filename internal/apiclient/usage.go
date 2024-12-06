@@ -177,7 +177,7 @@ func (c *UsageAPIClient) buildActualCostsQuery(vars ActualCostsQueryVariables) G
 // ListUsageQuantities queries the Infracost Cloud Usage API to retrieve usage estimates
 // derived from cloud provider reported usage and costs.
 func (c *UsageAPIClient) ListUsageQuantities(vars []*UsageQuantitiesQueryVariables) ([]*schema.UsageData, error) {
-	var queries []GraphQLQuery
+	queries := make([]GraphQLQuery, 0, len(vars))
 	for _, v := range vars {
 		logging.Logger.Debug().Msgf("Getting usage quantities from %s for %s %s %v", c.endpoint, v.ResourceType, v.Address, v.UsageKeys)
 		queries = append(queries, c.buildUsageQuantitiesQuery(*v))

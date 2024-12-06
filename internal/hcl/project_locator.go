@@ -100,7 +100,7 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 		return len(extensions[i]) > len(extensions[j])
 	})
 
-	var envNames []string
+	envNames := make([]string, 0, len(names))
 	var wildcards []string
 	for _, name := range names {
 		// envNames can contain wildcards, we need to handle them separately. e.g: dev-*
@@ -130,7 +130,7 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 }
 
 func createWildcardGlobPaths(dirs []string) []string {
-	var paths []string
+	paths := make([]string, 0, len(dirs)*2)
 	for _, dir := range dirs {
 		paths = append(paths, path.Join(dir, "**"))
 	}
@@ -494,7 +494,7 @@ func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]Roo
 		root.AddPath(path)
 	}
 
-	var varFilesSorted []string
+	varFilesSorted := make([]string, 0, len(varFiles))
 	for dir := range varFiles {
 		varFilesSorted = append(varFilesSorted, dir)
 	}
@@ -1116,13 +1116,13 @@ func (r *RootPath) EnvGroupings() []VarFileGrouping {
 		}
 	}
 
-	var envNames []string
+	envNames := make([]string, 0, len(varFileGrouping))
 	for env := range varFileGrouping {
 		envNames = append(envNames, env)
 	}
 	sort.Strings(envNames)
 
-	var varEnvs []VarFileGrouping
+	varEnvs := make([]VarFileGrouping, 0, len(envNames))
 	for _, env := range envNames {
 		varEnvs = append(varEnvs, VarFileGrouping{
 			Name:              env,
@@ -1752,7 +1752,7 @@ func (p *ProjectLocator) findTerragruntDirs(fullPath string) {
 // removeParentTerragruntFiles removes any parent Terragrunt config files from
 // the list of discovered Terragrunt configuration files.
 func (p *ProjectLocator) removeParentTerragruntFiles(startingPath string, files []string) []string {
-	var paths []RootPath
+	paths := make([]RootPath, 0, len(files))
 	nameMap := make(map[string]string)
 	for _, file := range files {
 		dir := filepath.Dir(file)

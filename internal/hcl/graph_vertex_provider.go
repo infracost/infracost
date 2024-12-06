@@ -33,8 +33,6 @@ func (v *VertexProvider) References() []VertexReference {
 }
 
 func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
-	mutex.Lock()
-	defer mutex.Unlock()
 
 	provider := v.block.Label()
 	if provider == "" {

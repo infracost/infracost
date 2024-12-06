@@ -192,7 +192,7 @@ func (r *ArtifactRegistryRepository) toEgressFilters() []artifactRegistryEgressF
 
 	values := r.MonthlyEgressDataTransferGB.Values()
 
-	var data []artifactRegistryEgressFilters
+	data := make([]artifactRegistryEgressFilters, 0, len(values))
 	transferMap := make(map[string]int)
 
 	for _, region := range values {

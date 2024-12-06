@@ -29,8 +29,6 @@ func (v *VertexOutput) References() []VertexReference {
 }
 
 func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
-	mutex.Lock()
-	defer mutex.Unlock()
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {

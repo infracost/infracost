@@ -2,7 +2,7 @@ package modules
 
 import (
 	"bytes"
-	"crypto/md5" //nolint
+	"crypto/md5" // nolint
 	"errors"
 	"fmt"
 	"net/url"
@@ -16,9 +16,10 @@ import (
 	"sync"
 	"time"
 
-	getter "github.com/hashicorp/go-getter"
+	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 	giturls "github.com/whilp/git-urls"
@@ -122,7 +123,7 @@ func (m *ModuleLoader) manifestFilePath(projectPath string) string {
 	}
 
 	rel, _ := filepath.Rel(m.cachePath, projectPath)
-	sum := md5.Sum([]byte(rel)) //nolint
+	sum := md5.Sum([]byte(rel)) // nolint
 	return filepath.Join(m.cachePath, ".infracost/terraform_modules/", fmt.Sprintf("manifest-%x.json", sum))
 }
 
@@ -219,6 +220,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	errGroup := &errgroup.Group{}
 	manifestMu := sync.Mutex{}
 
+	remoteModuleCounter := metrics.GetCounter("remote_module.count", true)
+
 	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
 			for moduleCall := range jobs {
@@ -229,6 +232,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 				// only include non-local modules in the manifest since we don't want to cache local ones.
 				if !IsLocalModule(metadata.Source) {
+					remoteModuleCounter.Inc()
 					manifestMu.Lock()
 					manifestModules = append(manifestModules, metadata)
 					manifestMu.Unlock()
@@ -336,6 +340,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		}, nil
 	}
 
+	moduleLoadTimer := metrics.GetTimer("submodule.remote_load.duration", false, source, version).Start()
+	defer moduleLoadTimer.Stop()
+
 	manifestModule, err = m.loadRegistryModule(key, source, version)
 	if err != nil {
 		return nil, err
@@ -408,7 +415,7 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error
 // RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
 // It then checks any symlinks within the directories and adds them to the sparse-checkout file list as well.
 func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packageFetcher *PackageFetcher, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
-	var newDirs []string
+	newDirs := make([]string, 0, len(dirs))
 
 	// Sort the existing directories and dirs to be added by length
 	// This ensures that parent directories are added before child directories
@@ -810,7 +817,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 }
 
 func (m *ModuleLoader) downloadDest(moduleAddr string, version string) string {
-	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) //nolint
+	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) // nolint
 	return filepath.Join(m.downloadDir(), hash)
 }
 

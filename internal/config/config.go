@@ -163,6 +163,9 @@ type Config struct {
 	S3ModuleCacheBucket string `envconfig:"S3_MODULE_CACHE_BUCKET"`
 	S3ModuleCachePrefix string `envconfig:"S3_MODULE_CACHE_PREFIX"`
 
+	// metrics dump path
+	MetricsPath string `envconfig:"METRICS_PATH"`
+
 	// Org settings
 	EnableCloudForOrganization bool
 

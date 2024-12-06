@@ -78,8 +78,6 @@ func (v *VertexModuleCall) Visit(mutex *sync.Mutex) error {
 }
 
 func (v *VertexModuleCall) evaluate(e *Evaluator, b *Block, mutex *sync.Mutex) error {
-	mutex.Lock()
-	defer mutex.Unlock()
 
 	if b.Label() == "" {
 		return fmt.Errorf("module block %s has no label", b.FullName())
@@ -92,8 +90,6 @@ func (v *VertexModuleCall) evaluate(e *Evaluator, b *Block, mutex *sync.Mutex) e
 }
 
 func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]*Block, error) {
-	mutex.Lock()
-	defer mutex.Unlock()
 	expanded := []*Block{b}
 	expanded = e.expandBlockForEaches(expanded)
 	expanded = e.expandBlockCounts(expanded)

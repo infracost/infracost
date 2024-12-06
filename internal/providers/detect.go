@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/awslabs/goformation/v7"
-
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
