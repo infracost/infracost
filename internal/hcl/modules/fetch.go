@@ -40,6 +40,11 @@ type PackageFetcher struct {
 var localCache sync.Map
 var errorCache sync.Map
 
+func ResetGlobalModuleCache() {
+	localCache = sync.Map{}
+	errorCache = sync.Map{}
+}
+
 type PackageFetcherOpts func(*PackageFetcher)
 
 // NewPackageFetcher constructs a new package fetcher
