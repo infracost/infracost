@@ -38,6 +38,7 @@ type PackageFetcher struct {
 
 // use a global cache to avoid downloading the same module multiple times for each project
 var localCache sync.Map
+var errorCache sync.Map
 
 type PackageFetcherOpts func(*PackageFetcher)
 
@@ -189,6 +190,11 @@ func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string) (bool, er
 }
 
 func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) {
+
+	if err, ok := errorCache.Load(moduleAddr); ok {
+		return false, err.(error)
+	}
+
 	decompressors := map[string]getter.Decompressor{}
 	for k, decompressor := range getter.Decompressors {
 		decompressors[k] = decompressor
@@ -217,6 +223,7 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 
 	err := client.Get()
 	if err != nil {
+		errorCache.Store(moduleAddr, err)
 		return false, err
 	}
 
