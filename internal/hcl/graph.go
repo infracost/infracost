@@ -402,9 +402,6 @@ func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
 		current := queue[0]
 		queue = queue[1:]
 		visitor(current.id, current.vertex)
-
-		// TODO: parallelize this
-
 		children, _ := graph.GetChildren(current.id)
 		for id, successor := range children {
 			inDegrees[id]--
