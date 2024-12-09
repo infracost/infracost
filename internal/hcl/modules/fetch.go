@@ -3,7 +3,6 @@ package modules
 import (
 	"context"
 	"fmt"
-	"github.com/infracost/infracost/internal/util"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -11,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/infracost/infracost/internal/util"
 
 	"github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
@@ -29,12 +30,14 @@ const defaultModuleRetrieveTimeout = 3 * time.Minute
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
-	localCache  sync.Map
 	remoteCache RemoteCache
 	logger      zerolog.Logger
 	getters     map[string]getter.Getter
 	timeout     time.Duration
 }
+
+// use a global cache to avoid downloading the same module multiple times for each project
+var localCache sync.Map
 
 type PackageFetcherOpts func(*PackageFetcher)
 
@@ -97,7 +100,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
 	if fetched {
 		p.logger.Trace().Msgf("cache hit (remote): %s", moduleAddr)
-		p.localCache.Store(moduleAddr, dest)
+		localCache.Store(moduleAddr, dest)
 		return nil
 	}
 
@@ -112,7 +115,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 		return fmt.Errorf("error fetching module %s from remote: %w", util.RedactUrl(moduleAddr), err)
 	}
 
-	p.localCache.Store(moduleAddr, dest)
+	localCache.Store(moduleAddr, dest)
 
 	if p.remoteCache != nil {
 		ttl := determineTTL(moduleAddr)
@@ -127,7 +130,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 }
 
 func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, error) {
-	v, ok := p.localCache.Load(moduleAddr)
+	v, ok := localCache.Load(moduleAddr)
 	if !ok {
 		return false, nil
 	}
