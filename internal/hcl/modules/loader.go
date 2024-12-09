@@ -800,8 +800,10 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 	}
 	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
-	// lock the module address so that we don't interact with an incomplete download.
-	unlock := m.sync.Lock(moduleAddr)
+	// lock the download destination so that we don't interact with an incomplete download.
+	// we can't use module address as the key here because the module address might be different for the same module,
+	// e.g. ssh vs https
+	unlock := m.sync.Lock(dest)
 	defer unlock()
 
 	_, err = os.Stat(dest)
