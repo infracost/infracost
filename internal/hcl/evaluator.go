@@ -239,6 +239,7 @@ func (e *Evaluator) MissingVars() []string {
 // this Module.
 func (e *Evaluator) Run() (*Module, error) {
 	var lastContext hcl.EvalContext
+
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.logger.Debug().Msg("evaluating top level context")
 	e.evaluate(lastContext)

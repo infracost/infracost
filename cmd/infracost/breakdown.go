@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/config"
@@ -23,6 +26,17 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
       infracost breakdown --path plan.json`,
 		ValidArgs: []string{"--", "-"},
 		RunE: checkAPIKeyIsValid(ctx, func(cmd *cobra.Command, args []string) error {
+
+			timer := metrics.GetTimer("breakdown.total_duration", false).Start()
+			defer func() {
+				timer.Stop()
+				if path := ctx.Config.MetricsPath; path != "" {
+					if err := metrics.WriteMetrics(path); err != nil {
+						_, _ = fmt.Fprintf(cmd.ErrOrStderr(), "Error writing metrics: %s\n", err)
+					}
+				}
+			}()
+
 			if err := checkAPIKey(ctx.Config.APIKey, ctx.Config.PricingAPIEndpoint, ctx.Config.DefaultPricingAPIEndpoint); err != nil {
 				return err
 			}

@@ -370,7 +370,7 @@ func buildActualCostRows(t table.Writer, currency string, actualCosts []ActualCo
 }
 
 func filterZeroValComponents(costComponents []CostComponent, resourceName string) []CostComponent {
-	var filteredComponents []CostComponent
+	filteredComponents := make([]CostComponent, 0, len(costComponents))
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
 			logging.Logger.Debug().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
@@ -383,7 +383,7 @@ func filterZeroValComponents(costComponents []CostComponent, resourceName string
 }
 
 func filterZeroValResources(resources []Resource, resourceName string) []Resource {
-	var filteredResources []Resource
+	filteredResources := make([]Resource, 0, len(resources))
 	for _, r := range resources {
 		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))

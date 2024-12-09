@@ -27,8 +27,6 @@ func (v *VertexVariable) References() []VertexReference {
 }
 
 func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
-	mutex.Lock()
-	defer mutex.Unlock()
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
@@ -49,8 +47,8 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 
 		if moduleInstance.moduleCall != nil {
 			attrName := v.block.TypeLabel()
-			attr, ok := moduleInstance.moduleCall.Definition.AttributesAsMap()[attrName]
-			if ok {
+			attr := moduleInstance.moduleCall.Definition.GetAttribute(attrName)
+			if attr != nil {
 				inputVars = map[string]cty.Value{
 					attrName: attr.Value(),
 				}

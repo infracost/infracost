@@ -24,6 +24,9 @@ type TestLoaderE2EOpts = struct {
 }
 
 func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, opts TestLoaderE2EOpts) {
+
+	ResetGlobalModuleCache()
+
 	if opts.Cleanup {
 		err := os.RemoveAll(filepath.Join(path, config.InfracostDir))
 		assert.NoError(t, err)

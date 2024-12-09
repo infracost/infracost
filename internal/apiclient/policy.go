@@ -250,8 +250,9 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		return references[i].Key < references[j].Key
 	})
 
-	var mdCalls []policy2InfracostMetadataCall
-	for _, c := range rd.Metadata["calls"].Array() {
+	calls := rd.Metadata["calls"].Array()
+	mdCalls := make([]policy2InfracostMetadataCall, 0, len(calls))
+	for _, c := range calls {
 		mdCalls = append(mdCalls, policy2InfracostMetadataCall{
 			BlockName: c.Get("blockName").String(),
 			EndLine:   c.Get("endLine").Int(),
