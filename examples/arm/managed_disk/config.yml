@@ -1,0 +1,4 @@
+version: 0.1
+projects:
+ - path: ./examples/arm/managed_disk/standard_disk.json
+   name : standard_disk
