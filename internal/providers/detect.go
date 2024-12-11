@@ -76,6 +76,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		MaxSearchDepth:             ctx.Config.Autodetect.MaxSearchDepth,
 		ForceProjectType:           ctx.Config.Autodetect.ForceProjectType,
 		TerraformVarFileExtensions: ctx.Config.Autodetect.TerraformVarFileExtensions,
+		PreferFolderNameForEnv:     ctx.Config.Autodetect.PreferFolderNameForEnv,
 	}
 
 	// if the config file path is set, we should set the project locator to use the

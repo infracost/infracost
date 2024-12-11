@@ -314,6 +314,7 @@ type ProjectLocator struct {
 	hclParser                  *hclparse.Parser
 	hasCustomEnvExt            bool
 	workingDirectory           string
+	preferFolderNameForEnv     bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -330,6 +331,7 @@ type ProjectLocatorConfig struct {
 	ForceProjectType           string
 	TerraformVarFileExtensions []string
 	WorkingDirectory           string
+	PreferFolderNameForEnv     bool
 }
 
 type PathOverrideConfig struct {
@@ -410,6 +412,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			hclParser:                  hclparse.NewParser(),
 			hasCustomEnvExt:            len(config.TerraformVarFileExtensions) > 0,
 			workingDirectory:           config.WorkingDirectory,
+			preferFolderNameForEnv:     config.PreferFolderNameForEnv,
 		}
 	}
 
@@ -481,7 +484,7 @@ type VarFiles struct {
 
 // CreateTreeNode creates a tree of Terraform projects and directories that
 // contain var files.
-func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]RootPathVarFile, e *EnvFileMatcher) *TreeNode {
+func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]RootPathVarFile, e *EnvFileMatcher, preferFolderNameForEnv bool) *TreeNode {
 	root := &TreeNode{
 		Name: "root",
 	}
@@ -506,14 +509,14 @@ func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]Roo
 		root.AddTerraformVarFiles(basePath, dir, varFiles[dir])
 	}
 
-	buildVarFileEnvNames(root, e)
+	buildVarFileEnvNames(root, e, preferFolderNameForEnv)
 	return root
 }
 
 // buildVarFileEnvNames builds the EnvName field for each var file. Var names
 // can be inferred from the filename or from parent directories, but only if
 // the parent directories don't contain any Terraform projects.
-func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher) {
+func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher, preferFolderNameForEnv bool) {
 	root.PostOrder(func(t *TreeNode) {
 		if t.TerraformVarFiles == nil {
 			return
@@ -543,12 +546,27 @@ func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher) {
 		}
 
 		for i, f := range t.TerraformVarFiles.Files {
-			namesToSearch := append([]string{f.Name}, possibleEnvNames...)
 			var envName string
-			for _, search := range namesToSearch {
-				if e.IsEnvName(search) {
-					envName = search
-					break
+			if preferFolderNameForEnv {
+				// First try to find env name from parent directories
+				for _, search := range possibleEnvNames {
+					if e.IsEnvName(search) {
+						envName = search
+						break
+					}
+				}
+
+				// If no env name found in parent directories, fallback to file name
+				if envName == "" && e.IsEnvName(f.Name) {
+					envName = f.Name
+				}
+			} else {
+				namesToSearch := append([]string{f.Name}, possibleEnvNames...)
+				for _, search := range namesToSearch {
+					if e.IsEnvName(search) {
+						envName = search
+						break
+					}
 				}
 			}
 
@@ -1260,7 +1278,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 		delete(p.discoveredVarFiles, dir.DetectedPath)
 	}
 
-	node := CreateTreeNode(startingPath, projects, p.discoveredVarFiles, p.envMatcher)
+	node := CreateTreeNode(startingPath, projects, p.discoveredVarFiles, p.envMatcher, p.preferFolderNameForEnv)
 	node.AssociateChildVarFiles()
 	node.AssociateSiblingVarFiles()
 	node.AssociateParentVarFiles()
@@ -1765,7 +1783,7 @@ func (p *ProjectLocator) removeParentTerragruntFiles(startingPath string, files 
 	}
 
 	var projects []string
-	root := CreateTreeNode(startingPath, paths, nil, nil)
+	root := CreateTreeNode(startingPath, paths, nil, nil, p.preferFolderNameForEnv)
 
 	// We need to slightly modify the TreeNode behaviour so that it works for this Terragrunt
 	// use case. For this case if there is a detected Terragrunt config file in the root of the
