@@ -43,6 +43,19 @@ type AutodetectConfig struct {
 	// var files. This is useful when there are non-standard terraform var file
 	// names which use different extensions.
 	TerraformVarFileExtensions []string `yaml:"terraform_var_file_extensions,omitempty" ignored:"true"`
+	// PreferFolderNameForEnv tells the autodetect to prefer the folder name over the
+	// over a env specified in a tfvars file. For example, given the following
+	// folder structure:
+	//
+	// .
+	// ├── qa
+	// │   └── dev.tfvars
+	// └── staging
+	//     └── prod.tfvars
+	//
+	// If PreferFolderNameForEnv is true, then the autodetect will group the projects
+	// by the folder name so the projects will be named "qa" and "staging".
+	PreferFolderNameForEnv bool `yaml:"prefer_folder_name_for_env,omitempty" ignored:"true"`
 }
 
 type PathOverride struct {
