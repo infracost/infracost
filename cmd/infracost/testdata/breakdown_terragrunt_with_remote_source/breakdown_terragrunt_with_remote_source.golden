@@ -159,9 +159,9 @@ Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_sou
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-115 cloud resources were detected:
+117 cloud resources were detected:
 ∙ 21 were estimated
-∙ 93 were free
+∙ 95 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
