@@ -759,6 +759,8 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 			}
 		}
 	}
+
+	fixKnownModuleRefIssues(resData)
 }
 
 func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *RegistryItemMap) bool {
@@ -1181,6 +1183,48 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, confLoader *C
 				}
 			}
 		}
+	}
+}
+
+// fixKnownModuleRefIssues deals with edge cases where the module returns an id that doesn't work for the resource
+// this is exemplified by the s3-bucket module which coalesces a number of id's starting with "aws_s3_bucket_policy."
+// this means we're referencing the wrong resource in the plan JSON. This function fixes that by replacing the reference.
+// the intention is to be laser focused in the application of this where we know the specific conditions it will occur
+func fixKnownModuleRefIssues(resData map[string]*schema.ResourceData) {
+	knownRefs := []struct {
+		SourceResourceType  string
+		AttributeName       string
+		TargetResource      string
+		ReplacementResource string
+	}{
+		{
+			SourceResourceType:  "aws_s3_bucket_lifecycle_configuration",
+			AttributeName:       "bucket",
+			TargetResource:      "aws_s3_bucket_policy",
+			ReplacementResource: "aws_s3_bucket",
+		},
+	}
+
+	for _, d := range resData {
+		for _, knownRef := range knownRefs {
+			if d.Type == knownRef.SourceResourceType {
+				for _, ref := range d.ReferencesMap[knownRef.AttributeName] {
+					if ref.Type == knownRef.TargetResource {
+						targetAddress := strings.Replace(ref.Address, knownRef.TargetResource, knownRef.ReplacementResource, 1)
+
+						for _, target := range resData {
+							// find possible targets and ensure that its from the same module as existing reference
+							if target.Type == knownRef.ReplacementResource && target.Address == targetAddress {
+								// replace the reference
+								d.ReplaceReference(knownRef.AttributeName, ref, target)
+
+							}
+						}
+					}
+				}
+			}
+		}
+
 	}
 }
 

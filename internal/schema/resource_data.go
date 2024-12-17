@@ -142,6 +142,19 @@ func (d *ResourceData) AddReference(k string, reference *ResourceData, reverseRe
 	}
 }
 
+func (d *ResourceData) ReplaceReference(k string, oldReference *ResourceData, newReference *ResourceData) {
+	key := strings.Clone(k)
+	for i, r := range d.ReferencesMap[key] {
+		if r == oldReference {
+			d.ReferencesMap[key][i] = newReference
+			break
+		}
+	}
+
+	// update the raw values on the resource data
+	d.Set(key, newReference.Get("id").String())
+}
+
 func (d *ResourceData) Set(key string, value interface{}) {
 	d.RawValues = AddRawValue(d.RawValues, key, value)
 }
