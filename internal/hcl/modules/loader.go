@@ -16,13 +16,13 @@ import (
 	"sync"
 	"time"
 
+	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/infracost/infracost/internal/metrics"
 	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
-	giturls "github.com/whilp/git-urls"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/config"
