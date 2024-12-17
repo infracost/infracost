@@ -93,6 +93,7 @@ require (
 
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
+	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/channelmeter/iso8601duration v0.0.0-20150204201828-8da3af7a2a61
 	github.com/fatih/camelcase v1.0.0
 	github.com/go-errors/errors v1.4.2
@@ -117,7 +118,6 @@ require (
 	github.com/soongo/path-to-regexp v1.6.4
 	github.com/spacelift-io/spacectl v1.2.0
 	github.com/turbot/terraform-components v0.0.0-20231213122222-1f3526cab7a7
-	github.com/whilp/git-urls v1.0.0
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	github.com/xanzy/go-gitlab v0.86.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
