@@ -1,7 +1,6 @@
 package modules
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -33,7 +32,6 @@ type PackageFetcher struct {
 	remoteCache RemoteCache
 	logger      zerolog.Logger
 	getters     map[string]getter.Getter
-	timeout     time.Duration
 }
 
 // use a global cache to avoid downloading the same module multiple times for each project
@@ -53,13 +51,16 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 	for k, g := range getter.Getters {
 		getters[k] = g
 	}
-	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
+	getters["git"] = &CustomGitGetter{
+		&getter.GitGetter{
+			Timeout: defaultModuleRetrieveTimeout,
+		},
+	}
 
 	p := &PackageFetcher{
 		remoteCache: remoteCache,
 		logger:      logger,
 		getters:     getters,
-		timeout:     defaultModuleRetrieveTimeout,
 	}
 
 	for _, opt := range opts {
@@ -74,12 +75,6 @@ func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
 		for k, g := range getters {
 			p.getters[k] = g
 		}
-	}
-}
-
-var WithTimeout = func(d time.Duration) PackageFetcherOpts {
-	return func(p *PackageFetcher) {
-		p.timeout = d
 	}
 }
 
@@ -209,15 +204,7 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	// I'm not sure if we really need it, but added it just in case/
 	decompressors["tar.tbz2"] = new(getter.TarBzip2Decompressor)
 
-	ctx := context.Background()
-	if p.timeout > 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, p.timeout)
-		defer cancel()
-	}
-
 	client := getter.Client{
-		Ctx:           ctx,
 		Src:           moduleAddr,
 		Dst:           dest,
 		Pwd:           dest,
