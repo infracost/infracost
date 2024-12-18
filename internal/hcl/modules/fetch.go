@@ -66,7 +66,9 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 	}
 
 	if p.timeout > 0 {
-		getters["git"].(*CustomGitGetter).GitGetter.Timeout = p.timeout
+		if custom, ok := getters["git"].(*CustomGitGetter); ok {
+			custom.GitGetter.Timeout = p.timeout
+		}
 	}
 
 	return p
