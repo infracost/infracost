@@ -1,0 +1,49 @@
+Project: dev
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terraform_provided_default_envs/mod
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ aws_instance.web_app                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $8.47   
+ ├─ root_block_device                                                                    
+ │  └─ Storage (general purpose SSD, gp2)                      50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                  
+    ├─ Storage (provisioned IOPS SSD, io1)                  1,000  GB          $125.00   
+    └─ Provisioned IOPS                                       800  IOPS         $52.00   
+                                                                                         
+ Project total                                                                 $190.47   
+
+──────────────────────────────────
+Project: prod
+Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terraform_provided_default_envs/mod
+Workspace: stg
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ aws_instance.web_app                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.large)          730  hours        $60.74   
+ ├─ root_block_device                                                                    
+ │  └─ Storage (general purpose SSD, gp2)                      50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                  
+    ├─ Storage (provisioned IOPS SSD, io1)                  1,000  GB          $125.00   
+    └─ Provisioned IOPS                                       800  IOPS         $52.00   
+                                                                                         
+ Project total                                                                 $242.74   
+
+ OVERALL TOTAL                                                                $433.20 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ dev                                                ┃          $190 ┃           - ┃       $190 ┃
+┃ prod                                               ┃          $243 ┃           - ┃       $243 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+
+Err:
+
