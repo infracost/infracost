@@ -32,7 +32,6 @@ type PackageFetcher struct {
 	remoteCache RemoteCache
 	logger      zerolog.Logger
 	getters     map[string]getter.Getter
-	timeout     time.Duration
 }
 
 // use a global cache to avoid downloading the same module multiple times for each project
@@ -52,23 +51,20 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 	for k, g := range getter.Getters {
 		getters[k] = g
 	}
-	getters["git"] = &CustomGitGetter{new(getter.GitGetter)}
+	getters["git"] = &CustomGitGetter{
+		&getter.GitGetter{
+			Timeout: defaultModuleRetrieveTimeout,
+		},
+	}
 
 	p := &PackageFetcher{
 		remoteCache: remoteCache,
 		logger:      logger,
 		getters:     getters,
-		timeout:     defaultModuleRetrieveTimeout,
 	}
 
 	for _, opt := range opts {
 		opt(p)
-	}
-
-	if p.timeout > 0 {
-		if custom, ok := getters["git"].(*CustomGitGetter); ok {
-			custom.GitGetter.Timeout = p.timeout
-		}
 	}
 
 	return p
@@ -79,12 +75,6 @@ func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
 		for k, g := range getters {
 			p.getters[k] = g
 		}
-	}
-}
-
-var WithTimeout = func(d time.Duration) PackageFetcherOpts {
-	return func(p *PackageFetcher) {
-		p.timeout = d
 	}
 }
 
