@@ -356,6 +356,11 @@ func TestBreakdownTerraformDirectoryWithRecursiveModules(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", dir}, &GoldenFileOptions{RunTerraformCLI: true})
 }
 
+func TestBreakdownTerraformProvidedDefaultEnvs(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", path.Join(dir, "infracost.yml")}, nil)
+}
+
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--fields", "all"}, nil)
 }

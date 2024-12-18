@@ -11,11 +11,12 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/infracost/infracost/internal/metrics"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	"golang.org/x/exp/maps"
+
+	"github.com/infracost/infracost/internal/metrics"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -334,7 +335,6 @@ func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *m
 		detectedProjectPath: projectRoot.DetectedPath,
 		hasChanges:          projectRoot.HasChanges,
 		moduleCalls:         projectRoot.ModuleCalls,
-		workspaceName:       defaultTerraformWorkspaceName,
 		hclParser:           hclParser,
 		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
 		logger:              parserLogger,
@@ -344,6 +344,12 @@ func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *m
 
 	for _, option := range options {
 		option(p)
+	}
+
+	// if the project name is not set by the user, we will use the detected env name
+	// as the project name.
+	if p.workspaceName == "" && p.ProjectName() != p.EnvName() {
+		p.workspaceName = p.EnvName()
 	}
 
 	return p
@@ -589,7 +595,7 @@ func (p *Parser) ProjectName() string {
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
-	} else if p.workspaceName != "" && p.workspaceName != defaultTerraformWorkspaceName {
+	} else if p.workspaceName != "" && p.workspaceName != defaultTerraformWorkspaceName && !strings.HasSuffix(name, p.workspaceName) {
 		name = fmt.Sprintf("%s-%s", name, p.workspaceName)
 	}
 
@@ -684,6 +690,20 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 
 	for k, v := range p.inputVars {
 		combinedVars[k] = v
+	}
+
+	// add a common "env" name to the input vars for the project if it is not
+	// explicitly defined. This is done as often users have a common project variable
+	// called "env" that is used to define the environment name. Adding this default
+	// allows us to have a somewhat sane fallback for situations where we
+	// fail to provide the input from a var file or similar config.
+	if _, ok := combinedVars["env"]; !ok {
+		env := p.workspaceName
+		if env == "" {
+			env = p.EnvName()
+		}
+
+		combinedVars["env"] = cty.StringVal(env)
 	}
 
 	return combinedVars, nil

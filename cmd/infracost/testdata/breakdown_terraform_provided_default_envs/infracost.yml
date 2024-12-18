@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+  - path: "./testdata/breakdown_terraform_provided_default_envs/mod"
+    name: "dev"
+  - path: "./testdata/breakdown_terraform_provided_default_envs/mod"
+    name: "prod"
+    terraform_workspace: "stg"
