@@ -1,7 +1,6 @@
 package modules
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 	"os"
@@ -64,6 +63,10 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 
 	for _, opt := range opts {
 		opt(p)
+	}
+
+	if p.timeout > 0 {
+		getters["git"].(*CustomGitGetter).GitGetter.Timeout = p.timeout
 	}
 
 	return p
@@ -209,15 +212,7 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	// I'm not sure if we really need it, but added it just in case/
 	decompressors["tar.tbz2"] = new(getter.TarBzip2Decompressor)
 
-	ctx := context.Background()
-	if p.timeout > 0 {
-		var cancel context.CancelFunc
-		ctx, cancel = context.WithTimeout(ctx, p.timeout)
-		defer cancel()
-	}
-
 	client := getter.Client{
-		Ctx:           ctx,
 		Src:           moduleAddr,
 		Dst:           dest,
 		Pwd:           dest,
