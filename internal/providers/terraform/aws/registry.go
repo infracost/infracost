@@ -123,6 +123,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSchedulerScheduleRegistryItem(),
 	getPipesPipeRegistryItem(),
 	getCloudwatchEventTargetRegistryItem(),
+	getCloudfrontFunctionRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
