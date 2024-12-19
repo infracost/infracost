@@ -430,7 +430,7 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 	if options.Environment != "" {
 		var filteredStacks []stack
 		for _, stack := range stacks {
-			if strings.HasSuffix(stack.Name, fmt.Sprintf(":%s", options.Environment)) {
+			if strings.HasSuffix(stack.Name, fmt.Sprintf(":%s", options.Environment)) || strings.HasPrefix(stack.Name, fmt.Sprintf("%s/", options.Environment)) {
 				filteredStacks = append(filteredStacks, stack)
 			}
 		}
