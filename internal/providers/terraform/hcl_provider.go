@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strings"
 
+	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/infracost/infracost/internal/metrics"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -603,7 +604,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block, moduleSourceURL string
 }
 
 func buildModuleFilename(filename string, moduleSourceURL string) string {
-	httpsURL, err := transformSSHToHTTPS(moduleSourceURL)
+	httpsURL, err := normalizeModuleURL(moduleSourceURL)
 	if err != nil {
 		logging.Logger.Debug().Err(err).Msgf("failed to build module filename, could not transform url %s to https", moduleSourceURL)
 		return ""
@@ -628,42 +629,35 @@ func buildModuleFilename(filename string, moduleSourceURL string) string {
 	return moduleFilename
 }
 
-func transformSSHToHTTPS(sshURL string) (string, error) {
-	if !strings.HasPrefix(sshURL, "git@") {
-		// nothing to do, the URL is not an SSH URL
-		return sshURL, nil
+func normalizeModuleURL(sshURL string) (string, error) {
+	// git::ssh and git:https aren't recognized as a valid URL scheme, so we need to strip it so they just use ssh or https schemes
+	u := sshURL
+	if strings.HasPrefix(sshURL, "git::") {
+		u = strings.Replace(sshURL, "git::", "", 1)
 	}
 
-	colonCount := strings.Count(sshURL, ":")
-	var domainAndPort, path string
-
-	switch colonCount {
-	case 1:
-		components := strings.SplitN(sshURL, ":", 2)
-		userAndDomain := strings.Split(components[0], "@")
-		if len(userAndDomain) != 2 {
-			return "", fmt.Errorf("invalid SSH URL format")
+	parsedURL, err := url.Parse(u)
+	if err != nil {
+		// Try parsing it as a git URL
+		parsedURL, err = giturls.Parse(u)
+		if err != nil {
+			return "", err
 		}
-		domainAndPort = userAndDomain[1]
-		path = components[1]
-	case 2:
-		// case with a port in the url
-		components := strings.SplitN(sshURL, ":", 3)
-		userAndDomain := strings.Split(components[0], "@")
-		if len(userAndDomain) != 2 {
-			return "", fmt.Errorf("invalid SSH URL format")
-		}
-		domainAndPort = userAndDomain[1]
-		path = components[2]
-	default:
-		return "", fmt.Errorf("invalid SSH URL format")
 	}
 
-	// remove port if it exists
-	domainComponents := strings.SplitN(domainAndPort, ":", 2)
-	domain := domainComponents[0]
+	// Save the query string, since this is lost when we normalize the URL
+	// and it may contain the ref
+	query := parsedURL.Query()
 
-	return strings.TrimSuffix(fmt.Sprintf("https://%s/%s", domain, path), "/"), nil
+	res, err := modules.NormalizeGitURLToHTTPS(parsedURL)
+	if err != nil {
+		return "", err
+	}
+
+	// Add the query string back in
+	res.RawQuery = query.Encode()
+
+	return res.String(), nil
 }
 
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {

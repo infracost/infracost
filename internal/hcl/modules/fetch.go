@@ -261,7 +261,7 @@ func (g *CustomGitGetter) Get(dst string, u *url.URL) error {
 		return g.GitGetter.Get(dst, u)
 	}
 
-	httpsURL, err := TransformSSHToHttps(u)
+	httpsURL, err := NormalizeGitURLToHTTPS(u)
 	if err != nil {
 		logging.Logger.Debug().Err(err).Msgf("failed to transform %s to https", u)
 		return g.GitGetter.Get(dst, u)
@@ -284,34 +284,50 @@ func IsGitSSHSource(u *url.URL) bool {
 		return false
 	}
 
-	if u.Scheme == "ssh" || u.Scheme == "git::ssh" {
+	if u.Scheme == "ssh" || u.Scheme == "git::ssh" || u.Scheme == "git+ssh" {
 		return true
 	}
 
 	return false
 }
 
-// TransformSSHToHttps transforms a Terraform module source url to an HTTPS
-// equivalent. This only handles source urls prefixed with ssh:: or git::ssh. The
-// shorthand ssh source referenced here:
-// https://developer.hashicorp.com/terraform/language/modules/sources#github e.g.
-// "git@github.com:hashicorp/example.git" in not handled by this method as we
-// expect the source to already be Detected to the valid longhand equivalent
-// before calling this function. This can be achieved by calling
-// getter.Detect(src) before calling TransformSSHToHttps.
-func TransformSSHToHttps(u *url.URL) (*url.URL, error) {
-	if !IsGitSSHSource(u) {
-		return u, nil
+// NormalizeGitURLToHTTPS normalizes a Git source url to an HTTPS equivalent.
+// It supports SSH URLs, as well as HTTPS URLS with usernames.
+// This allows us to convert Terraform module source urls to HTTPS URLs, so we can
+// attempt to download over HTTPS first using the existing credentials we have.
+// It can also be used for generating links to resources within the module.
+// There is a special case for Azure DevOps SSH URLs to handle converting them
+// to the equivalent HTTPS URL.
+func NormalizeGitURLToHTTPS(u *url.URL) (*url.URL, error) {
+	hostname := u.Host
+	// Strip the port if it's an SSH url
+	if IsGitSSHSource(u) {
+		hostname = strings.Split(hostname, ":")[0]
 	}
 
-	hostname := u.Host
 	path := strings.TrimPrefix(u.Path, "/")
 
-	// SSH URLs might contain ':' after the host (like 'git@hostname:user/repo.git')
-	// We need to replace the first ':' with a '/'
-	if idx := strings.Index(path, ":"); idx != -1 {
-		path = path[:idx] + "/" + path[idx+1:]
+	// Handle Azure DevOps SSH URLs
+	if hostname == "ssh.dev.azure.com" {
+		// Azure DevOps URLs need special handling
+		// Convert from: ssh://git@ssh.dev.azure.com/v3/org/project/repo
+		// To: https://dev.azure.com/org/project/_git/repo
+		parts := strings.Split(path, "/")
+		if len(parts) >= 4 && strings.HasPrefix(parts[0], "v") {
+			org := parts[1]
+			project := parts[2]
+			repo := parts[3]
+			return &url.URL{
+				Scheme: "https",
+				Host:   "dev.azure.com",
+				Path:   fmt.Sprintf("/%s/%s/_git/%s", org, project, repo),
+			}, nil
+		}
+		return nil, fmt.Errorf("invalid Azure DevOps SSH URL format")
 	}
+
+	// Strip .git from the end of the path
+	path = strings.TrimSuffix(path, ".git")
 
 	return &url.URL{
 		Scheme: "https",
