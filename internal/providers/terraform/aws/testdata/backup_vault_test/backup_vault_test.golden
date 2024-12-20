@@ -2,7 +2,7 @@
  Name                             Monthly Qty  Unit                Monthly Cost    
                                                                                    
  aws_backup_vault.usage                                                            
- ├─ EFS backup (warm)                  10,000  GB                       $600.00  * 
+ ├─ EFS backup (warm)                  10,000  GB                       $690.00  * 
  ├─ EFS backup (cold)                  10,000  GB                       $120.00  * 
  ├─ EFS restore (warm)                 10,000  GB                       $240.00  * 
  ├─ EFS restore (cold)                 10,000  GB                       $360.00  * 
@@ -16,7 +16,7 @@
  └─ FSx for Lustre backup              10,000  GB                       $550.00  * 
                                                                                    
  aws_backup_vault.non_usage                                                        
- ├─ EFS backup (warm)         Monthly cost depends on usage: $0.06 per GB          
+ ├─ EFS backup (warm)         Monthly cost depends on usage: $0.069 per GB         
  ├─ EFS backup (cold)         Monthly cost depends on usage: $0.012 per GB         
  ├─ EFS restore (warm)        Monthly cost depends on usage: $0.024 per GB         
  ├─ EFS restore (cold)        Monthly cost depends on usage: $0.036 per GB         
@@ -29,7 +29,7 @@
  ├─ FSx for Windows backup    Monthly cost depends on usage: $0.055 per GB         
  └─ FSx for Lustre backup     Monthly cost depends on usage: $0.055 per GB         
                                                                                    
- OVERALL TOTAL                                                       $12,960.00 
+ OVERALL TOTAL                                                       $13,050.00 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -40,5 +40,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃         $0.00 ┃     $12,960 ┃    $12,960 ┃
+┃ main                                               ┃         $0.00 ┃     $13,050 ┃    $13,050 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
