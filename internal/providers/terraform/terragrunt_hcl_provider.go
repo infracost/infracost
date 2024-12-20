@@ -803,7 +803,7 @@ func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return false
 	}
 
-	newUrl, err := modules.TransformSSHToHttps(u)
+	newUrl, err := modules.NormalizeGitURLToHTTPS(u)
 	if err != nil {
 		return false
 	}

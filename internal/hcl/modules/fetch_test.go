@@ -16,20 +16,27 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestTransformSSHToHTTPS(t *testing.T) {
+func TestNormalizeGitURLToHTTPS(t *testing.T) {
 	testCases := []struct {
 		sshURL   *url.URL
 		expected string
 	}{
-		{&url.URL{Scheme: "ssh", User: url.User("git"), Path: "user/repo.git", Host: "github.com"}, "https://github.com/user/repo.git"},
-		{&url.URL{Scheme: "https", Path: "user/repo.git", Host: "github.com"}, "https://github.com/user/repo.git"},
-		{&url.URL{Scheme: "git::ssh", User: url.User("git"), Path: "user/repo.git", Host: "github.com"}, "https://github.com/user/repo.git"},
+		{&url.URL{Scheme: "ssh", User: url.User("git"), Path: "user/repo.git", Host: "github.com"}, "https://github.com/user/repo"},
+		{&url.URL{Scheme: "ssh", User: url.User("git"), Path: "group/project.git", Host: "gitlab.com"}, "https://gitlab.com/group/project"},
+		{&url.URL{Scheme: "ssh", User: url.User("git"), Path: "team/repo.git", Host: "bitbucket.org"}, "https://bitbucket.org/team/repo"},
+		{&url.URL{Scheme: "ssh", User: url.User("git"), Path: "v3/organization/project/repo", Host: "ssh.dev.azure.com"}, "https://dev.azure.com/organization/project/_git/repo"}, // Azure Repos
+		{&url.URL{Scheme: "ssh", User: url.User("user"), Path: "user/repo.git", Host: "github.com"}, "https://github.com/user/repo"},                                              // ssh with custom username
+		{&url.URL{Scheme: "ssh", User: url.User("git"), Path: "/user/repo.git", Host: "myserver.com:2222"}, "https://myserver.com/user/repo"},                                     // with port
+		{&url.URL{Scheme: "git+ssh", User: url.User("git"), Path: "/user/repo.git", Host: "myserver.com"}, "https://myserver.com/user/repo"},                                      // with git+ssh
+		{&url.URL{Scheme: "git::ssh", User: url.User("git"), Path: "/user/repo.git", Host: "myserver.com"}, "https://myserver.com/user/repo"},                                     // with git::ssh
+		{&url.URL{Scheme: "https", Path: "/user/repo.git", Host: "github.com"}, "https://github.com/user/repo"},                                                                   // https
+		{&url.URL{Scheme: "https", User: url.User("user"), Path: "/user/repo.git", Host: "myserver.com"}, "https://myserver.com/user/repo"},                                       // https with username
+		{&url.URL{Scheme: "git::https", Path: "/user/repo.git", Host: "github.com"}, "https://github.com/user/repo"},                                                              // git::https
 	}
 
 	for _, tc := range testCases {
-		transformed, err := TransformSSHToHttps(tc.sshURL)
+		transformed, err := NormalizeGitURLToHTTPS(tc.sshURL)
 		assert.NoError(t, err)
-
 		assert.Equal(t, tc.expected, transformed.String())
 	}
 }
