@@ -13,7 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-type parseTagFunc func(baseTags map[string]string, r *schema.ResourceData)
+type parseTagFunc func(baseTags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig)
 
 var tagProviders = map[string]parseTagFunc{
 	"aws_instance":          parseInstanceTags,
@@ -21,7 +21,7 @@ var tagProviders = map[string]parseTagFunc{
 	"aws_launch_template":   parseLaunchTemplateTags,
 }
 
-func parseLaunchTemplateTags(tags map[string]string, r *schema.ResourceData) {
+func parseLaunchTemplateTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
 	for _, s := range r.Get("tag_specifications").Array() {
 		for k, v := range s.Get("tags").Map() {
 			tags[fmt.Sprintf("tag_specifications.%s", k)] = v.String()
@@ -111,27 +111,12 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 
 	tags := make(map[string]string)
 
-	if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
-		for k, v := range defaultTags {
-			k = fmt.Sprintf("volume_tags.%s", k)
-			tags[k] = v
-		}
-	}
-
 	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[r.Type]
 	if supportsDefaultTags && defaultTags != nil {
 		keysAndValues := make([]string, 0, len(defaultTags)*2)
 		for k, v := range defaultTags {
 			tags[k] = v
 			keysAndValues = append(keysAndValues, k, v)
-		}
-
-		if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
-			for k, v := range defaultTags {
-				k = fmt.Sprintf("volume_tags.%s", k)
-				tags[k] = v
-				keysAndValues = append(keysAndValues, k, v)
-			}
 		}
 
 		sort.Strings(keysAndValues)
@@ -178,13 +163,13 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	}
 
 	if f, ok := tagProviders[r.Type]; ok {
-		f(tags, r)
+		f(tags, defaultTags, r, config)
 	}
 
 	return tags, missing
 }
 
-func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {
+func parseAutoScalingTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
 	referencedTagSpecifications(r, func(resourceType string, specs map[string]gjson.Result) {
 		if resourceType == "instance" {
 			for k, v := range specs {
@@ -194,7 +179,43 @@ func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {
 	})
 }
 
-func parseInstanceTags(tags map[string]string, r *schema.ResourceData) {
+func parseInstanceTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
+	if config.PropagateDefaultsToVolumeTags && len(defaultTags) > 0 {
+		// when propagating default tags, we add them to volume_tags if they already exist
+		// or if they cannot conflict with tags defined directly on block devices. To be sure
+		// there's no conflict:
+		//   1. there should be no tags defined on any inline root_block_device or ebs_block_device sub resource.
+		//   2. there must be at least one inline ebs_block_device, because that means there cannot be
+		//      any attached aws_ebs_block_devices.
+		hasVolTags := r.Get("volume_tags").Exists()
+		hasRbdTags := r.Get("root_block_device.0.tags").Exists()
+		hasEbd := false
+		hasEbdTags := false
+		for _, ebd := range r.Get("ebs_block_device").Array() {
+			hasEbd = true
+			if ebd.Get("tags").Exists() {
+				hasEbdTags = true
+				break
+			}
+		}
+
+		if hasVolTags || (hasEbd && !hasRbdTags && !hasEbdTags) {
+			for k, v := range defaultTags {
+				tags[fmt.Sprintf("volume_tags.%s", k)] = v
+			}
+		} else {
+			// a root_block_device is assumed even if not explicitly defined
+			for k, v := range defaultTags {
+				tags[fmt.Sprintf("root_block_device.%s", k)] = v
+			}
+			for i := range r.Get("ebs_block_device").Array() {
+				for k, v := range defaultTags {
+					tags[fmt.Sprintf("ebs_block_device[%d].%s", i, k)] = v
+				}
+			}
+		}
+	}
+
 	if rbd := r.Get("root_block_device"); rbd.Exists() {
 		for k, v := range rbd.Get("0.tags").Map() {
 			tags[fmt.Sprintf("root_block_device.%s", k)] = v.String()
