@@ -510,6 +510,7 @@
   "aws_redshiftserverless_namespace": true,
   "aws_redshiftserverless_workgroup": true,
   "aws_rekognition_collection": true,
+  "aws_rekognition_stream_processor": true,
   "aws_resourceexplorer2_index": true,
   "aws_resourceexplorer2_view": true,
   "aws_resourcegroups_group": true,
