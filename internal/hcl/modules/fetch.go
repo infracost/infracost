@@ -245,22 +245,19 @@ func determineTTL(moduleAddr string) time.Duration {
 	return defaultTTL
 }
 
-// CustomGitGetter extends the standard GitGetter transforming SSH sources to
-// HTTPs first before attempting a Get. This means that we can attempt to use any
-// Git credentials on the host machine to resolve the Get before falling back to
-// SSH.
+// CustomGitGetter extends the standard GitGetter and normalizes SSH and HTTPS URLs
+// so it can attempt to use the Git credentials on the host machine to resolve the
+// Get before falling back to the original method.
+// SSH URLs are transformed to their HTTPS equivalent before attempting a Get.
+// HTTPS URLS are stripped of any credentials.
 type CustomGitGetter struct {
 	*getter.GitGetter
 }
 
-// Get overrides the standard Get method transforming SSH urls to their HTTPS
-// equivalent. Get then tries to get the new url into the dst, falling back to
-// the original SSH url if an HTTPS get fails.
+// Get overrides the standard Get method to normalize SSH and HTTPS URLs before
+// attempting a Get. If the normalized URL fails it falls back to the original
+// URL.
 func (g *CustomGitGetter) Get(dst string, u *url.URL) error {
-	if u.Scheme != "ssh" {
-		return g.GitGetter.Get(dst, u)
-	}
-
 	httpsURL, err := NormalizeGitURLToHTTPS(u)
 	if err != nil {
 		logging.Logger.Debug().Err(err).Msgf("failed to transform %s to https", u)
@@ -330,8 +327,10 @@ func NormalizeGitURLToHTTPS(u *url.URL) (*url.URL, error) {
 	path = strings.TrimSuffix(path, ".git")
 
 	return &url.URL{
-		Scheme: "https",
-		Host:   hostname,
-		Path:   path,
+		Scheme:      "https",
+		Host:        hostname,
+		Path:        path,
+		RawQuery:    u.RawQuery,
+		RawFragment: u.RawFragment,
 	}, nil
 }
