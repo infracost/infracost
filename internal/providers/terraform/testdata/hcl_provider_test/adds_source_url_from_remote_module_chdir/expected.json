@@ -254,15 +254,15 @@
                     {
                       "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                       "blockName": "aws_s3_bucket_acl.this",
-                      "startLine": 65,
-                      "endLine": 102
+                      "startLine": 66,
+                      "endLine": 103
                     }
                   ],
                   "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
-                  "endLine": 102,
+                  "endLine": 103,
                   "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                   "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                  "startLine": 65
+                  "startLine": 66
                 }
               },
               {
@@ -291,15 +291,15 @@
                     {
                       "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                       "blockName": "aws_s3_bucket_ownership_controls.this",
-                      "startLine": 922,
-                      "endLine": 937
+                      "startLine": 923,
+                      "endLine": 938
                     }
                   ],
                   "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
-                  "endLine": 937,
+                  "endLine": 938,
                   "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                   "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                  "startLine": 922
+                  "startLine": 923
                 }
               },
               {
@@ -327,15 +327,15 @@
                     {
                       "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                       "blockName": "aws_s3_bucket_public_access_block.this",
-                      "startLine": 911,
-                      "endLine": 920
+                      "startLine": 912,
+                      "endLine": 921
                     }
                   ],
                   "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
-                  "endLine": 920,
+                  "endLine": 921,
                   "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                   "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                  "startLine": 911
+                  "startLine": 912
                 }
               },
               {
@@ -367,15 +367,15 @@
                     {
                       "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                       "blockName": "aws_s3_bucket_versioning.this",
-                      "startLine": 159,
-                      "endLine": 173
+                      "startLine": 160,
+                      "endLine": 174
                     }
                   ],
                   "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
-                  "endLine": 173,
+                  "endLine": 174,
                   "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                   "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                  "startLine": 159
+                  "startLine": 160
                 }
               }
             ],
@@ -1078,15 +1078,15 @@
                   {
                     "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                     "blockName": "aws_s3_bucket_acl.this",
-                    "startLine": 65,
-                    "endLine": 102
+                    "startLine": 66,
+                    "endLine": 103
                   }
                 ],
                 "checksum": "2a79b34cee7ece7b7a5231adf7ebbf8efc9b246e0b02c43ff0857bb70742ac53",
-                "endLine": 102,
+                "endLine": 103,
                 "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                 "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                "startLine": 65
+                "startLine": 66
               }
             },
             {
@@ -1115,15 +1115,15 @@
                   {
                     "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                     "blockName": "aws_s3_bucket_ownership_controls.this",
-                    "startLine": 922,
-                    "endLine": 937
+                    "startLine": 923,
+                    "endLine": 938
                   }
                 ],
                 "checksum": "30169ea40fd2d6891c592ed40354fe60e9dd50d530309030802fafc49eb3f9bb",
-                "endLine": 937,
+                "endLine": 938,
                 "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                 "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                "startLine": 922
+                "startLine": 923
               }
             },
             {
@@ -1151,15 +1151,15 @@
                   {
                     "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                     "blockName": "aws_s3_bucket_public_access_block.this",
-                    "startLine": 911,
-                    "endLine": 920
+                    "startLine": 912,
+                    "endLine": 921
                   }
                 ],
                 "checksum": "37c21c291bc3f8b8e8594a769ba27d4c164473569562b3f4fc7661e58d8e6917",
-                "endLine": 920,
+                "endLine": 921,
                 "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                 "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                "startLine": 911
+                "startLine": 912
               }
             },
             {
@@ -1191,15 +1191,15 @@
                   {
                     "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                     "blockName": "aws_s3_bucket_versioning.this",
-                    "startLine": 159,
-                    "endLine": 173
+                    "startLine": 160,
+                    "endLine": 174
                   }
                 ],
                 "checksum": "d87dc101b6296498b9a2114efae840b7b1b1173c2e10fa9b312ae39df0142db5",
-                "endLine": 173,
+                "endLine": 174,
                 "filename": ".infracost/terraform_modules/2d1f98832c35b580d7d2ddad6b43dc8a/main.tf",
                 "moduleFilename": "https://github.com/terraform-aws-modules/terraform-aws-s3-bucket/blob/v4.1.1/main.tf",
-                "startLine": 159
+                "startLine": 160
               }
             }
           ],
