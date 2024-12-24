@@ -1,0 +1,8 @@
+└── apps
+    ├── default.tfvars
+    ├── dev.tfvars
+    ├── network-bat.tfvars
+    ├── network-baz.tfvars
+    └── prod.tfvars
+    ├── bar (terraform)
+    └── foo (terraform)

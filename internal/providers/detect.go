@@ -20,6 +20,7 @@ import (
 type DetectionOutput struct {
 	Providers   []schema.Provider
 	RootModules int
+	Tree        string
 }
 
 // Detect returns a list of providers for the given path. Multiple returned
@@ -88,9 +89,11 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	}
 
 	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
-	rootPaths := pl.FindRootModules(project.Path)
+	rootPaths, tree := pl.FindRootModules(project.Path)
 	if len(rootPaths) == 0 {
-		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", project.Path)
+		return &DetectionOutput{
+			Tree: tree,
+		}, fmt.Errorf("could not detect path type for '%s'", project.Path)
 	}
 
 	var autoProviders []schema.Provider
@@ -110,7 +113,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		}
 	}
 
-	return &DetectionOutput{Providers: autoProviders, RootModules: len(rootPaths)}, nil
+	return &DetectionOutput{Providers: autoProviders, RootModules: len(rootPaths), Tree: tree}, nil
 }
 
 // configFileRootToProvider returns a provider for the given root path which is

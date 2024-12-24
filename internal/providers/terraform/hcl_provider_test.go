@@ -207,7 +207,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 				startingPath = "."
 			}
 
-			mods := pl.FindRootModules(startingPath)
+			mods, _ := pl.FindRootModules(startingPath)
 			options := []hcl.Option{hcl.OptionWithBlockBuilder(
 				hcl.BlockBuilder{
 					MockFunc: func(a *hcl.Attribute) cty.Value {

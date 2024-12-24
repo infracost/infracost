@@ -1,0 +1,8 @@
+└── apps
+    ├── .config.dev.env.tfvars
+    ├── .config.prod.env.tfvars
+    ├── .dev-custom-ext
+    ├── .prod-custom-ext
+    └── default.tfvars
+    ├── bar (terraform)
+    └── foo (terraform)
