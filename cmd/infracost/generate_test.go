@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
@@ -109,11 +110,46 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 				})
 
 				return
+			} else {
+				assertGoldenFile(tt, args, dir)
+			}
+		})
+
+		t.Run(name+"-tree", func(tt *testing.T) {
+			tempDir := tt.TempDir()
+			testutil.CreateDirectoryStructure(tt, path.Join(dir, "tree.txt"), tempDir)
+
+			args := []string{
+				"generate",
+				"config",
+				"--repo-path",
+				tempDir,
+				"--tree-file",
+				path.Join(dir, "infracost-tree.txt"),
+			}
+			templatePath := path.Join(dir, "infracost.yml.tmpl")
+			if _, err := os.Stat(templatePath); err == nil {
+				args = append(args, "--template-path", templatePath)
 			}
 
-			assertGoldenFile(tt, args, dir)
+			assertGoldenFileTree(tt, args, dir)
 		})
 	}
+}
+
+func assertGoldenFileTree(tt *testing.T, args []string, dir string) {
+	GetCommandOutput(tt, args, nil)
+
+	actual, err := os.ReadFile(path.Join(dir, "infracost-tree.txt"))
+	require.NoError(tt, err)
+
+	if _, err := os.Stat(path.Join(dir, "expected-tree.golden")); err != nil {
+		err := os.WriteFile(path.Join(dir, "expected-tree.golden"), actual, 0600)
+		assert.NoError(tt, err)
+		return
+	}
+
+	testutil.AssertGoldenFile(tt, path.Join(dir, "expected-tree.golden"), actual)
 }
 
 func assertGoldenFile(tt *testing.T, args []string, dir string) {

@@ -1,0 +1,5 @@
+└── apps
+    ├── bar (terragrunt)
+    ├── baz
+    │   └── bip (terragrunt)
+    └── foo (terragrunt)

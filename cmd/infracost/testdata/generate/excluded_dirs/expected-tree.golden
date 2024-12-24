@@ -1,0 +1,5 @@
+└── apps
+    ├── default.tfvars
+    ├── dev.tfvars
+    └── prod.tfvars
+    └── bar (terraform)

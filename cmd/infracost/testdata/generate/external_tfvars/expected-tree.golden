@@ -1,0 +1,12 @@
+├── apps
+│   └── foo (terraform)
+├── envs
+│   └── default.tfvars
+│   ├── dev
+│   │   └── dev.tfvars
+│   ├── prod
+│   │   └── prod.tfvars
+│   └── test
+│       └── test.tfvars
+└── infra
+    └── db (terraform)

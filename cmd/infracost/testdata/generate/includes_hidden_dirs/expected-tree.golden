@@ -1,0 +1,3 @@
+└── .infra
+    ├── bat (terraform)
+    └── baz (terraform)

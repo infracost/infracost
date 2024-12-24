@@ -1,0 +1,5 @@
+└── infra
+    ├── dev (terraform)
+    ├── modules
+    │   └── is_a_project (terraform)
+    └── prod (terraform)

@@ -1,0 +1,10 @@
+└── apps
+    ├── default.tfvars
+    ├── dev.tfvars
+    └── prod.tfvars
+    ├── bar
+    │   ├── us1 (terraform)
+    │   └── us2 (terraform)
+    └── foo
+        ├── us1 (terraform)
+        └── us2 (terraform)
