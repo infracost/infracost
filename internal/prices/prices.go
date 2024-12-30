@@ -213,7 +213,7 @@ func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 		numWorkers = 16
 	}
 
-	reqs := p.client.BatchRequests(resources, batchSize)
+	reqs := p.client.BatchRequests(resources, batchSize, p.runCtx.Config.Currency)
 
 	numJobs := len(reqs)
 	jobs := make(chan apiclient.BatchRequest, numJobs)
@@ -279,7 +279,10 @@ type productPrice struct {
 }
 
 func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) {
-	currency := p.client.Currency
+	currency := p.runCtx.Config.Currency
+	if currency == "" {
+		currency = "USD"
+	}
 
 	if result.CostComponent.CustomPrice() != nil {
 		logging.Logger.Debug().Msgf("Using user-defined custom price %v for %s %s.", *result.CostComponent.CustomPrice(), result.Resource.Name, result.CostComponent.Name)
