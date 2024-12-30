@@ -1,8 +1,8 @@
-FROM cgr.dev/chainguard/go:latest-dev as builder
+FROM cgr.dev/chainguard/go:latest-dev AS builder
 
-ENV HOME /app
+ENV HOME=/app
 WORKDIR /app
-ENV CGO_ENABLED 0
+ENV CGO_ENABLED=0
 
 # Build Application
 COPY . .
