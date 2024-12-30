@@ -1,77 +1,77 @@
 
- Name                                               Monthly Qty  Unit                  Monthly Cost (CNY)    
-                                                                                                             
- aws_s3_bucket.bucket_china_with_usage                                                                       
- ├─ Standard                                                                                                 
- │  ├─ Storage                                           10,000  GB                             267.74 元  * 
- │  ├─ PUT, COPY, POST, LIST requests                        10  1k requests                      0.01 元  * 
- │  ├─ GET, SELECT, and all other requests                   10  1k requests                      0.00 元  * 
- │  ├─ Select data scanned                               10,000  GB                              21.87 元  * 
- │  └─ Select data returned                              10,000  GB                               7.83 元  * 
- ├─ Intelligent tiering                                                                                      
- │  ├─ Storage (frequent access)                         20,000  GB                             535.47 元  * 
- │  ├─ Storage (infrequent access)                       20,000  GB                             367.33 元  * 
- │  ├─ Storage (archive access)                          20,000  GB                              82.54 元  * 
- │  ├─ Storage (deep archive access)                     20,000  GB                              36.69 元  * 
- │  ├─ Monitoring and automation                             20  1k objects                       0.05 元  * 
- │  ├─ PUT, COPY, POST, LIST requests                        20  1k requests                      0.01 元  * 
- │  ├─ GET, SELECT, and all other requests                   20  1k requests                      0.00 元  * 
- │  ├─ Lifecycle transition                                  20  1k requests                      0.17 元  * 
- │  ├─ Select data scanned                               20,000  GB                              43.74 元  * 
- │  ├─ Select data returned                              20,000  GB                              15.65 元  * 
- │  └─ Early delete (within 30 days)                     20,000  GB                             535.47 元  * 
- ├─ Standard - infrequent access                                                                             
- │  ├─ Storage                                           30,000  GB                             551.00 元  * 
- │  ├─ PUT, COPY, POST, LIST requests                        30  1k requests                      0.26 元  * 
- │  ├─ GET, SELECT, and all other requests                   30  1k requests                      0.03 元  * 
- │  ├─ Lifecycle transition                                  30  1k requests                      0.26 元  * 
- │  ├─ Retrievals                                        30,000  GB                             262.38 元  * 
- │  ├─ Select data scanned                               30,000  GB                              65.62 元  * 
- │  └─ Select data returned                              30,000  GB                             262.38 元  * 
- ├─ One zone - infrequent access                                                                             
- │  ├─ Storage                                           40,000  GB                             587.73 元  * 
- │  ├─ PUT, COPY, POST, LIST requests                        40  1k requests                      0.35 元  * 
- │  ├─ GET, SELECT, and all other requests                   40  1k requests                      0.03 元  * 
- │  ├─ Lifecycle transition                                  40  1k requests                      0.35 元  * 
- │  ├─ Retrievals                                        40,000  GB                             349.84 元  * 
- │  ├─ Select data scanned                               40,000  GB                              87.49 元  * 
- │  └─ Select data returned                              40,000  GB                             349.84 元  * 
- ├─ Glacier flexible retrieval                                                                               
- │  ├─ Storage                                           50,000  GB                             206.36 元  * 
- │  ├─ PUT, COPY, POST, LIST requests                        50  1k requests                      1.54 元  * 
- │  ├─ GET, SELECT, and all other requests                   50  1k requests                      0.01 元  * 
- │  ├─ Lifecycle transition                                  50  1k requests                      1.54 元  * 
- │  ├─ Retrieval requests (standard)                         50  1k requests                      1.54 元  * 
- │  ├─ Retrievals (standard)                             50,000  GB                             457.90 元  * 
- │  ├─ Select data scanned (standard)                    50,000  GB                             384.44 元  * 
- │  ├─ Select data returned (standard)                   50,000  GB                             457.90 元  * 
- │  ├─ Retrieval requests (expedited)                        50  1k requests                    457.90 元  * 
- │  ├─ Retrievals (expedited)                            50,000  GB                           1,373.69 元  * 
- │  ├─ Select data scanned (expedited)                   50,000  GB                             961.79 元  * 
- │  ├─ Select data returned (expedited)                  50,000  GB                           1,373.69 元  * 
- │  ├─ Select data scanned (bulk)                        50,000  GB                              46.00 元  * 
- │  ├─ Select data returned (bulk)                       50,000  GB                             114.65 元  * 
- │  └─ Early delete (within 90 days)                     50,000  GB                             206.36 元  * 
- └─ Glacier deep archive                                                                                     
-    ├─ Storage                                           60,000  GB                             110.06 元  * 
-    ├─ PUT, COPY, POST, LIST requests                        60  1k requests                      3.69 元  * 
-    ├─ GET, SELECT, and all other requests                   60  1k requests                      0.01 元  * 
-    ├─ Lifecycle transition                                  60  1k requests                      3.69 元  * 
-    ├─ Retrieval requests (standard)                         60  1k requests                      6.15 元  * 
-    ├─ Retrievals (standard)                             60,000  GB                           1,098.95 元  * 
-    ├─ Retrieval requests (bulk)                             60  1k requests                      1.37 元  * 
-    ├─ Retrievals (bulk)                                 60,000  GB                             275.15 元  * 
-    └─ Early delete (within 180 days)                    60,000  GB                             110.06 元  * 
-                                                                                                             
- aws_s3_bucket.bucket_china                                                                                  
- └─ Standard                                                                                                 
-    ├─ Storage                              Monthly cost depends on usage: 0.0267735 元 per GB               
-    ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: 0.0006179 元 per 1k requests      
-    ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: 0.000206 元 per 1k requests       
-    ├─ Select data scanned                  Monthly cost depends on usage: 0.002187189 元 per GB             
-    └─ Select data returned                 Monthly cost depends on usage: 0.00078261 元 per GB              
-                                                                                                             
- OVERALL TOTAL (CNY)                                                                          12,086.54 元 
+ Name                                              Monthly Qty  Unit                Monthly Cost (CNY)    
+                                                                                                          
+ aws_s3_bucket.bucket_china_with_usage                                                                    
+ ├─ Standard                                                                                              
+ │  ├─ Storage                                          10,000  GB                         1,950.00 元  * 
+ │  ├─ PUT, COPY, POST, LIST requests                       10  1k requests                    0.05 元  * 
+ │  ├─ GET, SELECT, and all other requests                  10  1k requests                    0.02 元  * 
+ │  ├─ Select data scanned                              10,000  GB                           159.30 元  * 
+ │  └─ Select data returned                             10,000  GB                            57.00 元  * 
+ ├─ Intelligent tiering                                                                                   
+ │  ├─ Storage (frequent access)                        20,000  GB                         3,900.00 元  * 
+ │  ├─ Storage (infrequent access)                      20,000  GB                         2,675.40 元  * 
+ │  ├─ Storage (archive access)                         20,000  GB                           601.20 元  * 
+ │  ├─ Storage (deep archive access)                    20,000  GB                           267.20 元  * 
+ │  ├─ Monitoring and automation                            20  1k objects                     0.33 元  * 
+ │  ├─ PUT, COPY, POST, LIST requests                       20  1k requests                    0.09 元  * 
+ │  ├─ GET, SELECT, and all other requests                  20  1k requests                    0.03 元  * 
+ │  ├─ Lifecycle transition                                 20  1k requests                    1.27 元  * 
+ │  ├─ Select data scanned                              20,000  GB                           318.60 元  * 
+ │  ├─ Select data returned                             20,000  GB                           114.00 元  * 
+ │  └─ Early delete (within 30 days)                    20,000  GB                         3,900.00 元  * 
+ ├─ Standard - infrequent access                                                                          
+ │  ├─ Storage                                          30,000  GB                         4,013.10 元  * 
+ │  ├─ PUT, COPY, POST, LIST requests                       30  1k requests                    1.91 元  * 
+ │  ├─ GET, SELECT, and all other requests                  30  1k requests                    0.19 元  * 
+ │  ├─ Lifecycle transition                                 30  1k requests                    1.91 元  * 
+ │  ├─ Retrievals                                       30,000  GB                         1,911.00 元  * 
+ │  ├─ Select data scanned                              30,000  GB                           477.90 元  * 
+ │  └─ Select data returned                             30,000  GB                         1,911.00 元  * 
+ ├─ One zone - infrequent access                                                                          
+ │  ├─ Storage                                          40,000  GB                         4,280.64 元  * 
+ │  ├─ PUT, COPY, POST, LIST requests                       40  1k requests                    2.55 元  * 
+ │  ├─ GET, SELECT, and all other requests                  40  1k requests                    0.25 元  * 
+ │  ├─ Lifecycle transition                                 40  1k requests                    2.55 元  * 
+ │  ├─ Retrievals                                       40,000  GB                         2,548.00 元  * 
+ │  ├─ Select data scanned                              40,000  GB                           637.20 元  * 
+ │  └─ Select data returned                             40,000  GB                         2,548.00 元  * 
+ ├─ Glacier flexible retrieval                                                                            
+ │  ├─ Storage                                          50,000  GB                         1,503.00 元  * 
+ │  ├─ PUT, COPY, POST, LIST requests                       50  1k requests                   11.20 元  * 
+ │  ├─ GET, SELECT, and all other requests                  50  1k requests                    0.08 元  * 
+ │  ├─ Lifecycle transition                                 50  1k requests                   11.20 元  * 
+ │  ├─ Retrieval requests (standard)                        50  1k requests                   11.20 元  * 
+ │  ├─ Retrievals (standard)                            50,000  GB                         3,335.00 元  * 
+ │  ├─ Select data scanned (standard)                   50,000  GB                         2,800.00 元  * 
+ │  ├─ Select data returned (standard)                  50,000  GB                         3,335.00 元  * 
+ │  ├─ Retrieval requests (expedited)                       50  1k requests                3,335.00 元  * 
+ │  ├─ Retrievals (expedited)                           50,000  GB                        10,005.00 元  * 
+ │  ├─ Select data scanned (expedited)                  50,000  GB                         7,005.00 元  * 
+ │  ├─ Select data returned (expedited)                 50,000  GB                        10,005.00 元  * 
+ │  ├─ Select data scanned (bulk)                       50,000  GB                           335.00 元  * 
+ │  ├─ Select data returned (bulk)                      50,000  GB                           835.00 元  * 
+ │  └─ Early delete (within 90 days)                    50,000  GB                         1,503.00 元  * 
+ └─ Glacier deep archive                                                                                  
+    ├─ Storage                                          60,000  GB                           801.60 元  * 
+    ├─ PUT, COPY, POST, LIST requests                       60  1k requests                   26.87 元  * 
+    ├─ GET, SELECT, and all other requests                  60  1k requests                    0.09 元  * 
+    ├─ Lifecycle transition                                 60  1k requests                   26.87 元  * 
+    ├─ Retrieval requests (standard)                        60  1k requests                   44.78 元  * 
+    ├─ Retrievals (standard)                            60,000  GB                         8,004.00 元  * 
+    ├─ Retrieval requests (bulk)                            60  1k requests                   10.01 元  * 
+    ├─ Retrievals (bulk)                                60,000  GB                         2,004.00 元  * 
+    └─ Early delete (within 180 days)                   60,000  GB                           801.60 元  * 
+                                                                                                          
+ aws_s3_bucket.bucket_china                                                                               
+ └─ Standard                                                                                              
+    ├─ Storage                              Monthly cost depends on usage: 0.20 元 per GB                 
+    ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: 0.0045 元 per 1k requests      
+    ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: 0.0015 元 per 1k requests      
+    ├─ Select data scanned                  Monthly cost depends on usage: 0.01593 元 per GB              
+    └─ Select data returned                 Monthly cost depends on usage: 0.0057 元 per GB               
+                                                                                                          
+ OVERALL TOTAL (CNY)                                                                       88,030.17 元 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -82,5 +82,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       0.00 元 ┃   12,087 元 ┃  12,087 元 ┃
+┃ main                                               ┃       0.00 元 ┃   88,030 元 ┃  88,030 元 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

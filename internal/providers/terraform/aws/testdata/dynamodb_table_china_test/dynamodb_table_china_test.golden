@@ -1,16 +1,16 @@
 
- Name                                                    Monthly Qty  Unit                Monthly Cost (CNY)   
-                                                                                                               
- aws_dynamodb_table.my_dynamodb_table_china                                                                    
- ├─ Write capacity unit (WCU)                                     20  WCU                           11.63 元   
- ├─ Read capacity unit (RCU)                                      30  RCU                            3.49 元   
- ├─ Data storage                                  Monthly cost depends on usage: 0.30 元 per GB                
- ├─ Point-In-Time Recovery (PITR) backup storage  Monthly cost depends on usage: 0.24 元 per GB                
- ├─ On-demand backup storage                      Monthly cost depends on usage: 0.12 元 per GB                
- ├─ Table data restored                           Monthly cost depends on usage: 0.18 元 per GB                
- └─ Streams read request unit (sRRU)              Monthly cost depends on usage: 0.0000002444 元 per sRRUs     
-                                                                                                               
- OVERALL TOTAL (CNY)                                                                                15.11 元 
+ Name                                                   Monthly Qty  Unit               Monthly Cost (CNY)   
+                                                                                                             
+ aws_dynamodb_table.my_dynamodb_table_china                                                                  
+ ├─ Write capacity unit (WCU)                                    20  WCU                          84.68 元   
+ ├─ Read capacity unit (RCU)                                     30  RCU                          25.40 元   
+ ├─ Data storage                                  Monthly cost depends on usage: 2.20 元 per GB              
+ ├─ Point-In-Time Recovery (PITR) backup storage  Monthly cost depends on usage: 1.76 元 per GB              
+ ├─ On-demand backup storage                      Monthly cost depends on usage: 0.88 元 per GB              
+ ├─ Table data restored                           Monthly cost depends on usage: 1.32 元 per GB              
+ └─ Streams read request unit (sRRU)              Monthly cost depends on usage: 0.00000178 元 per sRRUs     
+                                                                                                             
+ OVERALL TOTAL (CNY)                                                                             110.08 元 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -21,5 +21,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃         15 元 ┃           - ┃      15 元 ┃
+┃ main                                               ┃        110 元 ┃           - ┃     110 元 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
