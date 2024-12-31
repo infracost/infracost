@@ -214,6 +214,29 @@ func TestBreakdownFormatJsonPropagateDefaultsToVolumeTags(t *testing.T) {
 	)
 }
 
+func TestBreakdownFormatJsonMissingDefaultTags(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--config-file", path.Join(dir, "config.yml"),
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+			JSONInclude: regexp.MustCompile("^(name|missingVarsCausingUnknownDefaultTagKeys)$"),
+			JSONExclude: regexp.MustCompile("^(costComponents|metadata|pastBreakdown|subresources)$"),
+		}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		},
+	)
+}
+
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
