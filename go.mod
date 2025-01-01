@@ -121,7 +121,7 @@ require (
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	github.com/xanzy/go-gitlab v0.86.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
-	golang.org/x/oauth2 v0.21.0
+	golang.org/x/oauth2 v0.24.0
 	k8s.io/apimachinery v0.29.2
 )
 
