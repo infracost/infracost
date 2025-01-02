@@ -94,7 +94,14 @@
       "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_var"
     },
     {
-      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_var_tag_key"
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app"
+          }
+        ]
+      },
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/default_var_tag_key"
     }
   ]
 }

@@ -13,7 +13,7 @@ projects:
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/default_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_module_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_var
-  - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_var_tag_key
+  - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/default_var_tag_key
     terraform_vars:
       tags:
         t1: k1
