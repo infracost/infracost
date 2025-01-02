@@ -1,17 +1,19 @@
 version: 0.1
 
 projects:
-  # these projects should have the missingVarsCausingUnknownDefaultTagKeys list on their resources
+  # this project should have the missingVarsCausingUnknownDefaultTagKeys list on its resources
+  - path: ./testdata/breakdown_format_json_missing_default_tags/with_missing_default_tags_flag/missing_required_var_tag_key
+  
+  # these projects should not have the missingVarsCausingUnknownDefaultTagKeys list on their resources
   - path: ./testdata/breakdown_format_json_missing_default_tags/with_missing_default_tags_flag/missing_required_module_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/with_missing_default_tags_flag/missing_required_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/with_missing_default_tags_flag/unknown_required_module_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/with_missing_default_tags_flag/unknown_var
-
-  # these projects should not have the missingVarsCausingUnknownDefaultTagKeys list on their resources
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/default_module_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/default_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_module_var
   - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_var
+  - path: ./testdata/breakdown_format_json_missing_default_tags/without_missing_default_tags_flag/present_var_tag_key
     terraform_vars:
       tags:
         t1: k1
