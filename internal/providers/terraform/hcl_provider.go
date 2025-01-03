@@ -164,7 +164,13 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 
 	var remoteCache modules.RemoteCache
 	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
-		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix)
+		s3ModuleCache, err := modules.NewS3Cache(modules.S3CacheConfig{
+			Region:        runCtx.Config.S3ModuleCacheRegion,
+			BucketName:    runCtx.Config.S3ModuleCacheBucket,
+			Prefix:        runCtx.Config.S3ModuleCachePrefix,
+			KMSKeyID:      runCtx.Config.S3ModuleCacheKMSKeyID,
+			UseEncryption: true,
+		})
 		if err != nil {
 			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
 		} else {
