@@ -705,6 +705,14 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 
 		combinedVars["env"] = cty.StringVal(env)
 	}
+	if _, ok := combinedVars["environment"]; !ok {
+		env := p.workspaceName
+		if env == "" {
+			env = p.EnvName()
+		}
+
+		combinedVars["environment"] = cty.StringVal(env)
+	}
 
 	return combinedVars, nil
 }
