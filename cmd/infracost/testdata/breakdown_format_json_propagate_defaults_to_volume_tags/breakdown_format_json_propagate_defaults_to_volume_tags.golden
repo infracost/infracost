@@ -8,8 +8,10 @@
             "tags": {
               "DefaultNoOverride": "default_no_override",
               "DefaultOverride": "default_override",
-              "volume_tags.DefaultNoOverride": "default_no_override",
-              "volume_tags.DefaultOverride": "default_override"
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
             }
           },
           {
@@ -64,8 +66,10 @@
             "tags": {
               "DefaultNoOverride": "default_no_override",
               "DefaultOverride": "default_override",
-              "volume_tags.DefaultNoOverride": "default_no_override",
-              "volume_tags.DefaultOverride": "default_override"
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
             }
           },
           {
