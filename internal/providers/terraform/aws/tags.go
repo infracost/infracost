@@ -211,24 +211,9 @@ func parseAutoScalingTags(tags, defaultTags map[string]string, r *schema.Resourc
 func parseInstanceTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
 	if config.PropagateDefaultsToVolumeTags && len(defaultTags) > 0 {
 		// when propagating default tags, we add them to volume_tags if they already exist
-		// or if they cannot conflict with tags defined directly on block devices. To be sure
-		// there's no conflict:
-		//   1. there should be no tags defined on any inline root_block_device or ebs_block_device sub resource.
-		//   2. there must be at least one inline ebs_block_device, because that means there cannot be
-		//      any attached aws_ebs_block_devices.
-		hasVolTags := r.Get("volume_tags").Exists()
-		hasRbdTags := r.Get("root_block_device.0.tags").Exists()
-		hasEbd := false
-		hasEbdTags := false
-		for _, ebd := range r.Get("ebs_block_device").Array() {
-			hasEbd = true
-			if ebd.Get("tags").Exists() {
-				hasEbdTags = true
-				break
-			}
-		}
+		// otherwise they are propogated to directly to the block devices.
 
-		if hasVolTags || (hasEbd && !hasRbdTags && !hasEbdTags) {
+		if r.Get("volume_tags").Exists() {
 			for k, v := range defaultTags {
 				tags[fmt.Sprintf("volume_tags.%s", k)] = v
 			}
