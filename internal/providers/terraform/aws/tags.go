@@ -103,7 +103,28 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	tagsAllMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags_all")
 	missing = append(missing, tagsAllMissing...)
 
-	rTags := r.Get("tags").Map()
+	rTagBlock := r.Get("tags")
+	var rTags map[string]gjson.Result
+
+	// If the tags attribute is a list, we need to handle it differently - this is the case with AutoScalingGroups
+	// where the tags are a slice of objects with details about propagation. When it is a list, we should parse it as such
+	switch t := rTagBlock.Value().(type) {
+	case []interface{}:
+		rTags = make(map[string]gjson.Result, len(t))
+		for _, el := range t {
+			tag, ok := el.(map[string]interface{})
+			if !ok {
+				// This should never happen, but if it does, we should skip it
+				continue
+			}
+			k := tag["key"].(string)
+			v := tag["value"].(string)
+			rTags[k] = gjson.Parse(fmt.Sprintf(`"%s"`, v))
+		}
+	default:
+		rTags = rTagBlock.Map()
+	}
+
 	rTagsAll := r.Get("tags_all").Map()
 	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil, missing
