@@ -117,8 +117,16 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 				// This should never happen, but if it does, we should skip it
 				continue
 			}
-			k := tag["key"].(string)
-			v := tag["value"].(string)
+			k, ok := tag["key"].(string)
+			if !ok {
+				// the key was forgotten, so we should skip it
+				continue
+			}
+			v, ok := tag["value"].(string)
+			if !ok {
+				// the value was forgotten, so we should skip it
+				continue
+			}
 			rTags[k] = gjson.Parse(fmt.Sprintf(`"%s"`, v))
 		}
 	default:
