@@ -1467,16 +1467,16 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 		return false
 	}
 
-	if force {
-		return true
-	}
-
 	if p.shouldIncludeDir(dir.path) {
 		return true
 	}
 
 	if p.shouldRemoveDuplicateProject(dir) {
 		return false
+	}
+
+	if force {
+		return true
 	}
 
 	// we only include Terraform projects that have been found alongside Terragrunt

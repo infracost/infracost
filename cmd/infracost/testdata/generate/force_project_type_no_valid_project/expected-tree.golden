@@ -1,0 +1,3 @@
+└── dup (terraform)
+    ├── dev.tfvars
+    └── prod.tfvars
