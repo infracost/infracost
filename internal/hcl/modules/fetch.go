@@ -85,7 +85,10 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 		// Skip to the remote getter so it just copies this instead of
 		// looking up the cache
 		_, err := p.fetchFromRemote(moduleAddr, dest)
-		return err
+		if err != nil {
+			return fmt.Errorf("error fetching file:// module %s from remote: %w", moduleAddr, err)
+		}
+		return nil
 	}
 
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)

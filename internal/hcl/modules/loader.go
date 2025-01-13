@@ -447,7 +447,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 	// Create a temporary directory for this fetch
 	tmpDir, err := os.MkdirTemp(os.TempDir(), "infracost-sparse-checkout")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating temporary directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
 
@@ -465,7 +465,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 		dirTmpDir := filepath.Join(tmpDir, "fetch-"+filepath.Base(dir))
 		err := packageFetcher.Fetch(s, dirTmpDir)
 		if err != nil {
-			return err
+			return fmt.Errorf("error fetching module %s: %w", s, err)
 		}
 
 		mu.Lock()
@@ -477,7 +477,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 		}
 		err = copy.Copy(dirTmpDir, repoRoot, opt)
 		if err != nil {
-			return err
+			return fmt.Errorf("error copying module %s to repo root: %w", s, err)
 		}
 
 		// After we've fetched the package we need to update the sparse checkout list
@@ -487,7 +487,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 		mu.Unlock()
 
 		if err != nil {
-			return err
+			return fmt.Errorf("error setting sparse checkout list: %w", err)
 		}
 	}
 
@@ -499,7 +499,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 	for _, dir := range newDirs {
 		symlinkedDirs, err := ResolveSymLinkedDirs(repoRoot, dir)
 		if err != nil {
-			return err
+			return fmt.Errorf("error resolving symlinks for dir %s: %w", dir, err)
 		}
 
 		for _, symlinkedDir := range symlinkedDirs {
