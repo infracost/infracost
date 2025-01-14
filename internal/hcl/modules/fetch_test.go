@@ -70,21 +70,23 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 					}
 				`), 0600))
 				// Store the module directory path in the cache
-				require.NoError(t, c.Put("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", moduleDir, 24*time.Hour))
+				require.NoError(t, c.Put("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", moduleDir, 24*time.Hour, true))
 			},
 			expectedCalls: map[string]int{
-				"Exists": 1,
-				"Get":    1,
-				"Put":    0,
+				"Exists":      1,
+				"Get":         1,
+				"Put":         0,
+				"PublicCheck": 1,
 			},
 		},
 		{
 			name:       "should cache module to remote cache when not found",
 			setupCache: func(c *mockRemoteCache, tmpDir string) {},
 			expectedCalls: map[string]int{
-				"Exists": 1,
-				"Get":    0,
-				"Put":    1,
+				"Exists":      1,
+				"Get":         0,
+				"Put":         1,
+				"PublicCheck": 1,
 			},
 		},
 		{
@@ -93,9 +95,10 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 				c.shouldError = true
 			},
 			expectedCalls: map[string]int{
-				"Exists": 1,
-				"Get":    0,
-				"Put":    1,
+				"Exists":      1,
+				"Get":         0,
+				"Put":         1,
+				"PublicCheck": 1,
 			},
 		},
 	}
@@ -108,6 +111,8 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 			tt.setupCache(mock, tmpDir)
 			mock.ResetCounters()
 
+			mockPublicRepoChecker := &mockPublicRepoChecker{}
+
 			// Create the test Terraform configuration
 			err := os.WriteFile(filepath.Join(tmpDir, "main.tf"), []byte(`
 				module "ec2_instance" {
@@ -116,7 +121,7 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 			`), 0600)
 			require.NoError(t, err)
 
-			fetcher := NewPackageFetcher(mock, logger)
+			fetcher := NewPackageFetcher(mock, logger, WithPublicModuleChecker(mockPublicRepoChecker))
 
 			err = fetcher.Fetch("git::https://github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.15.0", filepath.Join(tmpDir, "module"))
 			if tt.expectedError {
@@ -128,6 +133,7 @@ func TestPackageFetcher_fetch_RemoteCache(t *testing.T) {
 			assert.Equal(t, tt.expectedCalls["Exists"], mock.existsCalls, "wrong number of Exists calls")
 			assert.Equal(t, tt.expectedCalls["Get"], mock.getCalls, "wrong number of Get calls")
 			assert.Equal(t, tt.expectedCalls["Put"], mock.putCalls, "wrong number of Put calls")
+			assert.Equal(t, tt.expectedCalls["PublicCheck"], mockPublicRepoChecker.calls, "wrong number of PublicCheck calls")
 		})
 	}
 }
@@ -146,7 +152,7 @@ type mockRemoteCache struct {
 	mu          sync.Mutex
 }
 
-func (m *mockRemoteCache) Exists(key string) (bool, error) {
+func (m *mockRemoteCache) Exists(key string, public bool) (bool, error) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.existsCalls++
@@ -166,7 +172,7 @@ func (m *mockRemoteCache) Exists(key string) (bool, error) {
 	return exists, nil
 }
 
-func (m *mockRemoteCache) Get(key string, dest string) error {
+func (m *mockRemoteCache) Get(key string, dest string, public bool) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.getCalls++
@@ -190,7 +196,7 @@ func (m *mockRemoteCache) Get(key string, dest string) error {
 	return client.Get()
 }
 
-func (m *mockRemoteCache) Put(key string, src string, ttl time.Duration) error {
+func (m *mockRemoteCache) Put(key string, src string, ttl time.Duration, public bool) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.putCalls++
@@ -217,4 +223,13 @@ func (m *mockRemoteCache) ResetCounters() {
 	m.getCalls = 0
 	m.putCalls = 0
 	m.shouldError = false
+}
+
+type mockPublicRepoChecker struct {
+	calls int
+}
+
+func (m *mockPublicRepoChecker) IsPublicModule(moduleAddr string) (bool, error) {
+	m.calls++
+	return true, nil
 }
