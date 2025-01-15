@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -64,6 +65,10 @@ func (cache *S3Cache) applyPrefix(key string, public bool) string {
 
 // Exists checks if the key exists in the S3 bucket
 func (cache *S3Cache) Exists(key string, public bool) (bool, error) {
+	if !public && !cache.cachePrivate {
+		return false, nil
+	}
+
 	prefixedKey := cache.applyPrefix(key, public)
 	headObj, err := cache.s3Client.HeadObject(&s3.HeadObjectInput{
 		Bucket: aws.String(cache.bucketName),
@@ -96,6 +101,11 @@ func (cache *S3Cache) Exists(key string, public bool) (bool, error) {
 
 // Get downloads the key from the S3 bucket to the destPath
 func (cache *S3Cache) Get(key, destPath string, public bool) error {
+	if !public && !cache.cachePrivate {
+		logger.Debug("Cache is disabled for private modules")
+		return nil
+	}
+
 	prefixedKey := cache.applyPrefix(key, public)
 
 	// Download from S3
@@ -133,6 +143,11 @@ func (cache *S3Cache) Get(key, destPath string, public bool) error {
 
 // Put uploads the srcPath to the S3 bucket with the key
 func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration, public bool) error {
+	if !public && !cache.cachePrivate {
+		logger.Debug("Cache is disabled for private modules")
+		return nil
+	}
+
 	prefixedKey := cache.applyPrefix(key, public)
 
 	// Generate a temporary file path without creating the file
