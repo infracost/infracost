@@ -22,6 +22,11 @@ func NewHttpPublicModuleChecker() *HttpPublicModuleChecker {
 // IsPublic checks if a module is public by making a HEAD request to the module address
 // and checking if the response status code is 200.
 func (h *HttpPublicModuleChecker) IsPublicModule(moduleAddr string) (bool, error) {
+	if strings.HasPrefix(moduleAddr, "git@") {
+		// We don't support git@ urls
+		return false, nil
+	}
+
 	u := strings.TrimPrefix(moduleAddr, "git::")
 
 	parsedUrl, err := url.Parse(u)

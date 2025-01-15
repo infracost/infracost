@@ -152,7 +152,7 @@ func (p *PackageFetcher) isPublicModule(moduleAddr string) bool {
 	}
 	result, err := p.publicModuleChecker.IsPublicModule(moduleAddr)
 	if err != nil {
-		p.logger.Error().Msgf("Failed to check if %s is a public module: %v", util.RedactUrl(moduleAddr), err)
+		p.logger.Debug().Msgf("Failed to check if %s is a public module: %v", util.RedactUrl(moduleAddr), err)
 	}
 	return result
 }
