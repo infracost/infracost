@@ -49,9 +49,14 @@ var (
 
 // RemoteCache is an interface that defines the methods for a remote cache, i.e. an S3 bucket.
 type RemoteCache interface {
-	Exists(key string) (bool, error)
-	Get(key string, dest string) error
-	Put(key string, src string, ttl time.Duration) error
+	Exists(key string, public bool) (bool, error)
+	Get(key string, dest string, public bool) error
+	Put(key string, src string, ttl time.Duration, public bool) error
+}
+
+// PublicModuleChecker is an interface that defines the method for checking if a module is public.
+type PublicModuleChecker interface {
+	IsPublicModule(moduleAddr string) (bool, error)
 }
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
@@ -81,18 +86,19 @@ type SourceMapResult struct {
 	RawQuery string
 }
 type ModuleLoaderOptions struct {
-	CachePath         string
-	HCLParser         *SharedHCLParser
-	CredentialsSource *CredentialsSource
-	SourceMap         config.TerraformSourceMap
-	Logger            zerolog.Logger
-	ModuleSync        *intSync.KeyMutex
-	RemoteCache       RemoteCache
+	CachePath           string
+	HCLParser           *SharedHCLParser
+	CredentialsSource   *CredentialsSource
+	SourceMap           config.TerraformSourceMap
+	Logger              zerolog.Logger
+	ModuleSync          *intSync.KeyMutex
+	RemoteCache         RemoteCache
+	PublicModuleChecker PublicModuleChecker
 }
 
 // NewModuleLoader constructs a new module loader
 func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
-	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger)
+	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger, WithPublicModuleChecker(opts.PublicModuleChecker))
 	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(opts.CredentialsSource, opts.Logger)
 

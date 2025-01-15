@@ -124,7 +124,7 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 	var remoteCache modules.RemoteCache
 	runCtx := ctx.RunContext
 	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
-		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix)
+		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix, runCtx.Config.S3ModuleCachePrivate)
 		if err != nil {
 			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
 		} else {
@@ -135,7 +135,7 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 	fetcher := modules.NewPackageFetcher(remoteCache, logger, modules.WithGetters(map[string]getter.Getter{
 		"tfr":  &tgterraform.RegistryGetter{},
 		"file": &tgcliterraform.FileCopyGetter{},
-	}))
+	}), modules.WithPublicModuleChecker(modules.NewHttpPublicModuleChecker()))
 
 	return &TerragruntHCLProvider{
 		ctx:            ctx,

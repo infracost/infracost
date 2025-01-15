@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -18,13 +19,15 @@ import (
 )
 
 type S3Cache struct {
-	s3Client   *s3.S3
-	bucketName string
-	prefix     string
+	s3Client     *s3.S3
+	bucketName   string
+	prefix       string
+	publicPrefix string
+	cachePrivate bool
 }
 
 // NewS3Cache creates a new S3Cache instance
-func NewS3Cache(region, bucketName, prefix string) (*S3Cache, error) {
+func NewS3Cache(region, bucketName, prefix string, cachePrivate bool) (*S3Cache, error) {
 	sess, err := session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 		Config: aws.Config{
@@ -36,16 +39,23 @@ func NewS3Cache(region, bucketName, prefix string) (*S3Cache, error) {
 	}
 
 	return &S3Cache{
-		s3Client:   s3.New(sess),
-		bucketName: bucketName,
-		prefix:     prefix,
+		s3Client:     s3.New(sess),
+		bucketName:   bucketName,
+		prefix:       prefix,
+		publicPrefix: "publicModules",
+		cachePrivate: cachePrivate,
 	}, nil
 }
 
-func (cache *S3Cache) applyPrefix(key string) string {
+func (cache *S3Cache) applyPrefix(key string, public bool) string {
 	// URL encode the key first since the module address contains /'s
 	// and these create folders in S3
 	encodedKey := url.QueryEscape(key)
+
+	// if its public, put it in the public prefix
+	if public {
+		return fmt.Sprintf("%s/%s", cache.publicPrefix, encodedKey)
+	}
 
 	if cache.prefix != "" {
 		return fmt.Sprintf("%s/%s", cache.prefix, encodedKey)
@@ -54,8 +64,12 @@ func (cache *S3Cache) applyPrefix(key string) string {
 }
 
 // Exists checks if the key exists in the S3 bucket
-func (cache *S3Cache) Exists(key string) (bool, error) {
-	prefixedKey := cache.applyPrefix(key)
+func (cache *S3Cache) Exists(key string, public bool) (bool, error) {
+	if !public && !cache.cachePrivate {
+		return false, nil
+	}
+
+	prefixedKey := cache.applyPrefix(key, public)
 	headObj, err := cache.s3Client.HeadObject(&s3.HeadObjectInput{
 		Bucket: aws.String(cache.bucketName),
 		Key:    aws.String(prefixedKey),
@@ -86,8 +100,13 @@ func (cache *S3Cache) Exists(key string) (bool, error) {
 }
 
 // Get downloads the key from the S3 bucket to the destPath
-func (cache *S3Cache) Get(key, destPath string) error {
-	prefixedKey := cache.applyPrefix(key)
+func (cache *S3Cache) Get(key, destPath string, public bool) error {
+	if !public && !cache.cachePrivate {
+		logger.Debug("Cache is disabled for private modules")
+		return nil
+	}
+
+	prefixedKey := cache.applyPrefix(key, public)
 
 	// Download from S3
 	result, err := cache.s3Client.GetObject(&s3.GetObjectInput{
@@ -123,8 +142,13 @@ func (cache *S3Cache) Get(key, destPath string) error {
 }
 
 // Put uploads the srcPath to the S3 bucket with the key
-func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration) error {
-	prefixedKey := cache.applyPrefix(key)
+func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration, public bool) error {
+	if !public && !cache.cachePrivate {
+		logger.Debug("Cache is disabled for private modules")
+		return nil
+	}
+
+	prefixedKey := cache.applyPrefix(key, public)
 
 	// Generate a temporary file path without creating the file
 	tmpPath := filepath.Join(os.TempDir(), fmt.Sprintf("s3cache-%s.tar.gz", uuid.New().String()))
