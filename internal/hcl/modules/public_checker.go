@@ -38,6 +38,10 @@ func (h *HttpPublicModuleChecker) IsPublicModule(moduleAddr string) (bool, error
 		parsedUrl.Scheme = "https"
 	}
 
+	if parsedUrl.User != nil {
+		return false, nil
+	}
+
 	req, err := http.NewRequest("HEAD", parsedUrl.String(), nil)
 	if err != nil {
 		return false, err

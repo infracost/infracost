@@ -46,6 +46,11 @@ func TestIsPublic(t *testing.T) {
 			moduleAddr: "git@github.com:terraform-aws-modules/terraform-aws-alb?ref=46852b88a2bf09bd097e6ad3d1acc9a763cf9005",
 			expected:   false,
 		},
+		{
+			name:       "with username and password",
+			moduleAddr: "https://username:password@jfrog.infraacost.com",
+			expected:   false,
+		},
 	}
 
 	for _, tt := range tests {
