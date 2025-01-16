@@ -3,9 +3,16 @@ package modules
 import (
 	"net/http"
 	"net/url"
+	"slices"
 	"strings"
 	"time"
 )
+
+// permittedPublicHosts is a list of hosts that are allowed to be public. This is to avoid storing
+// private modules that are accessible by signed URLs in the public cache.
+var permittedPublicHosts = []string{
+	"github.com",
+}
 
 type HttpPublicModuleChecker struct {
 	client *http.Client
@@ -43,6 +50,10 @@ func (h *HttpPublicModuleChecker) IsPublicModule(moduleAddr string) (bool, error
 	}
 
 	if parsedUrl.User != nil {
+		return false, nil
+	}
+
+	if !slices.Contains(permittedPublicHosts, parsedUrl.Host) {
 		return false, nil
 	}
 
