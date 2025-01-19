@@ -29,9 +29,10 @@ const defaultModuleRetrieveTimeout = 3 * time.Minute
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
-	remoteCache RemoteCache
-	logger      zerolog.Logger
-	getters     map[string]getter.Getter
+	remoteCache         RemoteCache
+	logger              zerolog.Logger
+	getters             map[string]getter.Getter
+	publicModuleChecker PublicModuleChecker
 }
 
 // use a global cache to avoid downloading the same module multiple times for each project
@@ -78,6 +79,13 @@ func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
 	}
 }
 
+// Option to provide a checker to determine if a module is public
+func WithPublicModuleChecker(publicModuleChecker PublicModuleChecker) PackageFetcherOpts {
+	return func(p *PackageFetcher) {
+		p.publicModuleChecker = publicModuleChecker
+	}
+}
+
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
 func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
@@ -85,7 +93,10 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 		// Skip to the remote getter so it just copies this instead of
 		// looking up the cache
 		_, err := p.fetchFromRemote(moduleAddr, dest)
-		return err
+		if err != nil {
+			return fmt.Errorf("error fetching file:// module %s from remote: %w", moduleAddr, err)
+		}
+		return nil
 	}
 
 	fetched, err := p.fetchFromLocalCache(moduleAddr, dest)
@@ -99,7 +110,10 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 		p.logger.Debug().Msgf("error fetching module %s from local cache: %s", util.RedactUrl(moduleAddr), err)
 	}
 
-	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest)
+	// check if the module is public by HEADing the module address
+	isPublicModule := p.isPublicModule(moduleAddr)
+
+	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest, isPublicModule)
 	if fetched {
 		p.logger.Trace().Msgf("cache hit (remote): %s", moduleAddr)
 		localCache.Store(moduleAddr, dest)
@@ -123,13 +137,24 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 	if p.remoteCache != nil {
 		ttl := determineTTL(moduleAddr)
 		p.logger.Debug().Msgf("putting module %s into remote cache with ttl %s", util.RedactUrl(moduleAddr), ttl)
-		err = p.remoteCache.Put(moduleAddr, dest, ttl)
+		err = p.remoteCache.Put(moduleAddr, dest, ttl, isPublicModule)
 		if err != nil {
 			p.logger.Warn().Msgf("error putting module %s into remote cache: %s", util.RedactUrl(moduleAddr), err)
 		}
 	}
 
 	return nil
+}
+
+func (p *PackageFetcher) isPublicModule(moduleAddr string) bool {
+	if p.publicModuleChecker == nil {
+		return false
+	}
+	result, err := p.publicModuleChecker.IsPublicModule(moduleAddr)
+	if err != nil {
+		p.logger.Debug().Msgf("Failed to check if %s is a public module: %v", util.RedactUrl(moduleAddr), err)
+	}
+	return result
 }
 
 func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, error) {
@@ -169,12 +194,12 @@ func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, err
 	return true, nil
 }
 
-func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string) (bool, error) {
+func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string, public bool) (bool, error) {
 	if p.remoteCache == nil {
 		return false, nil
 	}
 
-	ok, err := p.remoteCache.Exists(moduleAddr)
+	ok, err := p.remoteCache.Exists(moduleAddr, public)
 	if err != nil {
 		return false, err
 	}
@@ -183,7 +208,7 @@ func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string) (bool, er
 		return false, nil
 	}
 
-	err = p.remoteCache.Get(moduleAddr, dest)
+	err = p.remoteCache.Get(moduleAddr, dest, public)
 	if err != nil {
 		return false, err
 	}

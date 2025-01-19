@@ -49,9 +49,14 @@ var (
 
 // RemoteCache is an interface that defines the methods for a remote cache, i.e. an S3 bucket.
 type RemoteCache interface {
-	Exists(key string) (bool, error)
-	Get(key string, dest string) error
-	Put(key string, src string, ttl time.Duration) error
+	Exists(key string, public bool) (bool, error)
+	Get(key string, dest string, public bool) error
+	Put(key string, src string, ttl time.Duration, public bool) error
+}
+
+// PublicModuleChecker is an interface that defines the method for checking if a module is public.
+type PublicModuleChecker interface {
+	IsPublicModule(moduleAddr string) (bool, error)
 }
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
@@ -81,18 +86,19 @@ type SourceMapResult struct {
 	RawQuery string
 }
 type ModuleLoaderOptions struct {
-	CachePath         string
-	HCLParser         *SharedHCLParser
-	CredentialsSource *CredentialsSource
-	SourceMap         config.TerraformSourceMap
-	Logger            zerolog.Logger
-	ModuleSync        *intSync.KeyMutex
-	RemoteCache       RemoteCache
+	CachePath           string
+	HCLParser           *SharedHCLParser
+	CredentialsSource   *CredentialsSource
+	SourceMap           config.TerraformSourceMap
+	Logger              zerolog.Logger
+	ModuleSync          *intSync.KeyMutex
+	RemoteCache         RemoteCache
+	PublicModuleChecker PublicModuleChecker
 }
 
 // NewModuleLoader constructs a new module loader
 func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
-	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger)
+	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger, WithPublicModuleChecker(opts.PublicModuleChecker))
 	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(opts.CredentialsSource, opts.Logger)
 
@@ -447,7 +453,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 	// Create a temporary directory for this fetch
 	tmpDir, err := os.MkdirTemp(os.TempDir(), "infracost-sparse-checkout")
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating temporary directory: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
 
@@ -465,7 +471,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 		dirTmpDir := filepath.Join(tmpDir, "fetch-"+filepath.Base(dir))
 		err := packageFetcher.Fetch(s, dirTmpDir)
 		if err != nil {
-			return err
+			return fmt.Errorf("error fetching module %s: %w", s, err)
 		}
 
 		mu.Lock()
@@ -477,7 +483,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 		}
 		err = copy.Copy(dirTmpDir, repoRoot, opt)
 		if err != nil {
-			return err
+			return fmt.Errorf("error copying module %s to repo root: %w", s, err)
 		}
 
 		// After we've fetched the package we need to update the sparse checkout list
@@ -487,7 +493,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 		mu.Unlock()
 
 		if err != nil {
-			return err
+			return fmt.Errorf("error setting sparse checkout list: %w", err)
 		}
 	}
 
@@ -499,7 +505,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packa
 	for _, dir := range newDirs {
 		symlinkedDirs, err := ResolveSymLinkedDirs(repoRoot, dir)
 		if err != nil {
-			return err
+			return fmt.Errorf("error resolving symlinks for dir %s: %w", dir, err)
 		}
 
 		for _, symlinkedDir := range symlinkedDirs {

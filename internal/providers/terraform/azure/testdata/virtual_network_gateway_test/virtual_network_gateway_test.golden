@@ -22,7 +22,7 @@
  └─ VPN gateway data tranfer                            20  GB                         $0.70   
                                                                                                
  azurerm_virtual_network_gateway.VpnGw1AZ                                                      
- ├─ VPN gateway (VpnGw1AZ)                             730  hours                    $263.53   
+ ├─ VPN gateway (VpnGw1AZ)                             730  hours                    $153.30   
  ├─ VPN gateway P2S tunnels (over 128)                  22  tunnel                   $160.60   
  └─ VPN gateway data tranfer               Monthly cost depends on usage: $0.035 per GB        
                                                                                                
@@ -39,7 +39,7 @@
  azurerm_public_ip.example                                                                     
  └─ IP address (dynamic, regional)                     730  hours                      $2.92   
                                                                                                
- OVERALL TOTAL                                                                   $49,247.27 
+ OVERALL TOTAL                                                                   $49,137.04 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -51,5 +51,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $49,247 ┃           - ┃    $49,247 ┃
+┃ main                                               ┃       $49,137 ┃           - ┃    $49,137 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

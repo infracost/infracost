@@ -103,7 +103,36 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	tagsAllMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags_all")
 	missing = append(missing, tagsAllMissing...)
 
-	rTags := r.Get("tags").Map()
+	rTagBlock := r.Get("tags")
+	var rTags map[string]gjson.Result
+
+	// If the tags attribute is a list, we need to handle it differently - this is the case with AutoScalingGroups
+	// where the tags are a slice of objects with details about propagation. When it is a list, we should parse it as such
+	switch t := rTagBlock.Value().(type) {
+	case []interface{}:
+		rTags = make(map[string]gjson.Result, len(t))
+		for _, el := range t {
+			tag, ok := el.(map[string]interface{})
+			if !ok {
+				// This should never happen, but if it does, we should skip it
+				continue
+			}
+			k, ok := tag["key"].(string)
+			if !ok {
+				// the key was forgotten, so we should skip it
+				continue
+			}
+			v, ok := tag["value"].(string)
+			if !ok {
+				// the value was forgotten, so we should skip it
+				continue
+			}
+			rTags[k] = gjson.Parse(fmt.Sprintf(`"%s"`, v))
+		}
+	default:
+		rTags = rTagBlock.Map()
+	}
+
 	rTagsAll := r.Get("tags_all").Map()
 	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil, missing
@@ -182,24 +211,9 @@ func parseAutoScalingTags(tags, defaultTags map[string]string, r *schema.Resourc
 func parseInstanceTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
 	if config.PropagateDefaultsToVolumeTags && len(defaultTags) > 0 {
 		// when propagating default tags, we add them to volume_tags if they already exist
-		// or if they cannot conflict with tags defined directly on block devices. To be sure
-		// there's no conflict:
-		//   1. there should be no tags defined on any inline root_block_device or ebs_block_device sub resource.
-		//   2. there must be at least one inline ebs_block_device, because that means there cannot be
-		//      any attached aws_ebs_block_devices.
-		hasVolTags := r.Get("volume_tags").Exists()
-		hasRbdTags := r.Get("root_block_device.0.tags").Exists()
-		hasEbd := false
-		hasEbdTags := false
-		for _, ebd := range r.Get("ebs_block_device").Array() {
-			hasEbd = true
-			if ebd.Get("tags").Exists() {
-				hasEbdTags = true
-				break
-			}
-		}
+		// otherwise they are propogated to directly to the block devices.
 
-		if hasVolTags || (hasEbd && !hasRbdTags && !hasEbdTags) {
+		if r.Get("volume_tags").Exists() {
 			for k, v := range defaultTags {
 				tags[fmt.Sprintf("volume_tags.%s", k)] = v
 			}

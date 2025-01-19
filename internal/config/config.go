@@ -172,9 +172,10 @@ type Config struct {
 	// TerraformSourceMap replaces any source URL with the provided value.
 	TerraformSourceMap TerraformSourceMap `envconfig:"TERRAFORM_SOURCE_MAP"`
 
-	S3ModuleCacheRegion string `envconfig:"S3_MODULE_CACHE_REGION"`
-	S3ModuleCacheBucket string `envconfig:"S3_MODULE_CACHE_BUCKET"`
-	S3ModuleCachePrefix string `envconfig:"S3_MODULE_CACHE_PREFIX"`
+	S3ModuleCacheRegion  string `envconfig:"S3_MODULE_CACHE_REGION"`
+	S3ModuleCacheBucket  string `envconfig:"S3_MODULE_CACHE_BUCKET"`
+	S3ModuleCachePrefix  string `envconfig:"S3_MODULE_CACHE_PREFIX"`
+	S3ModuleCachePrivate bool   `envconfig:"S3_MODULE_CACHE_PRIVATE, default=false"`
 
 	// metrics dump path
 	MetricsPath string `envconfig:"METRICS_PATH"`

@@ -22,7 +22,7 @@
  └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB        
                                                                                                           
  azurerm_virtual_network_gateway.VpnGw1AZ                                                                 
- ├─ VPN gateway (VpnGw1AZ)                                        730  hours                    $263.53   
+ ├─ VPN gateway (VpnGw1AZ)                                        730  hours                    $153.30   
  ├─ VPN gateway P2S tunnels (over 128)                Monthly cost depends on usage: $7.30 per tunnel     
  └─ VPN gateway data tranfer                          Monthly cost depends on usage: $0.035 per GB        
                                                                                                           
@@ -57,7 +57,7 @@
  azurerm_public_ip.example                                                                                
  └─ IP address (dynamic, regional)                                730  hours                      $2.92   
                                                                                                           
- OVERALL TOTAL                                                                               $5,964.83 
+ OVERALL TOTAL                                                                               $5,854.60 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -69,5 +69,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $5,965 ┃           - ┃     $5,965 ┃
+┃ main                                               ┃        $5,855 ┃           - ┃     $5,855 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
