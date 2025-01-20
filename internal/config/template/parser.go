@@ -10,7 +10,6 @@ import (
 	"text/template"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
 	"gopkg.in/yaml.v2"
 
@@ -220,30 +219,19 @@ func (p *Parser) pathExists(base, path string) bool {
 	// Ensure the base path is within the repo directory
 	baseAbs, _ := filepath.Abs(base)
 	repoDirAbs, _ := filepath.Abs(p.repoDir)
+
 	// Add a file separator at the end to ensure we don't match a directory that starts with the same prefix
 	// e.g. `/path/to/infracost` shouldn't match `/path/to/infra`.
 	if !strings.HasPrefix(fmt.Sprintf("%s%s", baseAbs, string(filepath.Separator)), fmt.Sprintf("%s%s", repoDirAbs, string(filepath.Separator))) {
 		return false
 	}
 
-	var fileExists bool
-	_ = filepath.WalkDir(base, func(subpath string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
+	targetPath := filepath.Join(base, path)
+	if _, err := os.Stat(targetPath); err == nil {
+		return true
+	}
 
-		rel, _ := filepath.Rel(base, subpath)
-		if rel == path {
-			fileExists = true
-
-			// exit the WalkDir tree evaluation early as we've found the file we're looking for
-			return errors.New("file found")
-		}
-
-		return nil
-	})
-
-	return fileExists
+	return false
 }
 
 // matchPaths returns a list of matches that in the project directory tree that match the pattern.
