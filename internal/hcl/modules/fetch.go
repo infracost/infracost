@@ -129,6 +129,7 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 
 	_, err = p.fetchFromRemote(moduleAddr, dest)
 	if err != nil {
+		p.logger.Warn().Msgf("error fetching module %s from remote: %w", util.RedactUrl(moduleAddr), err)
 		return fmt.Errorf("error fetching module %s from remote: %w", util.RedactUrl(moduleAddr), err)
 	}
 
