@@ -1,0 +1,135 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "2025-01-28T12:16:43.297656+01:00",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost",
+    "configFilePath": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/infracost.yml"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "us",
+      "displayName": "us",
+      "metadata": {
+        "path": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/dev",
+        "type": "terragrunt_dir",
+        "terraformModulePath": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/dev",
+        "vcsSubPath": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/dev",
+        "errors": [
+          {
+            "code": 201,
+            "message": "Failed to download module \"doesntexist\" - error fetching module doesntexist from remote: stat BAD_MODULE_PATH: no such file or directory",
+            "data": {
+              "moduleSource": "doesntexist",
+              "source": "https"
+            },
+            "isError": true
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "breakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 0,
+        "totalSupportedResources": 0,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    },
+    {
+      "name": "us",
+      "displayName": "us",
+      "metadata": {
+        "path": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/prod",
+        "type": "terragrunt_dir",
+        "terraformModulePath": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/prod",
+        "vcsSubPath": "testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/prod",
+        "errors": [
+          {
+            "code": 201,
+            "message": "Failed to download module \"doesntexist\" - error fetching module doesntexist from remote: stat BAD_MODULE_PATH: no such file or directory",
+            "data": {
+              "moduleSource": "doesntexist",
+              "source": "https"
+            },
+            "isError": true
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "breakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 0,
+        "totalSupportedResources": 0,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "totalMonthlyUsageCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "pastTotalMonthlyUsageCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
+  "timeGenerated": "2025-01-28T12:16:43.297656+01:00",
+  "summary": {
+    "totalDetectedResources": 0,
+    "totalSupportedResources": 0,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 0,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
+
+
+
