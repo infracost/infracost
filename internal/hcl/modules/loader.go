@@ -244,7 +244,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 					manifestMu.Unlock()
 				}
 
-				if IsLocalModule(metadata.Source) && isSourceMapped {
+				if IsLocalModule(metadata.Source) && metadata.IsSourceMapped {
 					manifestMu.Lock()
 					manifestModules = append(manifestModules, metadata)
 					manifestMu.Unlock()
