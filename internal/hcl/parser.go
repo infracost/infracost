@@ -514,6 +514,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, fmt.Errorf("Error could not evaluate current working directory %w", err)
 	}
 
+	fmt.Println("modulesManifest", modulesManifest)
+
 	// load an Evaluator with the top level Blocks to begin Context propagation.
 	evaluator := NewEvaluator(
 		Module{
