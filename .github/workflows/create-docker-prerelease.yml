@@ -1,6 +1,7 @@
 name: Create docker prerelease
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
 
