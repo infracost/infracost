@@ -170,7 +170,7 @@ type Config struct {
 	GoogleOverrideRegion string `envconfig:"GOOGLE_OVERRIDE_REGION"`
 
 	// TerraformSourceMap replaces any source URL with the provided value.
-	TerraformSourceMap TerraformSourceMap `yaml:"terraform_source_map,omitempty" envconfig:"TERRAFORM_SOURCE_MAP"`
+	TerraformSourceMap TerraformSourceMap `envconfig:"TERRAFORM_SOURCE_MAP"`
 
 	S3ModuleCacheRegion  string `envconfig:"S3_MODULE_CACHE_REGION"`
 	S3ModuleCacheBucket  string `envconfig:"S3_MODULE_CACHE_BUCKET"`

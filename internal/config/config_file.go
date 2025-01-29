@@ -108,6 +108,7 @@ func (y *YamlError) Error() string {
 type ConfigFileSpec struct {
 	Version  string     `yaml:"version"`
 	Projects []*Project `yaml:"projects" ignored:"true"`
+	TerraformSourceMap TerraformSourceMap `yaml:"terraform_source_map,omitempty"`
 }
 
 // UnmarshalYAML implements the yaml.v2.Unmarshaller interface. Marshalls the
@@ -118,6 +119,7 @@ func (f *ConfigFileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 	type roughFile struct {
 		Version  string                   `yaml:"version"`
 		Projects []map[string]interface{} `yaml:"projects"`
+		TerraformSourceMap TerraformSourceMap `yaml:"terraform_source_map,omitempty"`
 	}
 
 	var r roughFile
@@ -196,6 +198,7 @@ func (f *ConfigFileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 
 	f.Version = c.Version
 	f.Projects = c.Projects
+	f.TerraformSourceMap = c.TerraformSourceMap
 	return nil
 }
 
