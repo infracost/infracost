@@ -1093,6 +1093,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		modulePath = filepath.Join(e.module.ModulePath, source)
 
 		fmt.Println("e.module.ModulePath", e.module.ModulePath)
+		fmt.Println("source", source)
 	}
 
 	fmt.Println("modulePath", modulePath)
