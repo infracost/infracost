@@ -1094,6 +1094,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	}
 
 	fmt.Println("modulePath", modulePath)
+	fmt.Println("e.module.RootPath", e.module.RootPath)
 
 	blocks, err := e.blockBuilder.BuildModuleBlocks(b, modulePath, e.module.RootPath)
 	if err != nil {
