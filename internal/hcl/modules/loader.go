@@ -244,6 +244,12 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 					manifestMu.Unlock()
 				}
 
+				if IsLocalModule(metadata.Source) && isSourceMapped {
+					manifestMu.Lock()
+					manifestModules = append(manifestModules, metadata)
+					manifestMu.Unlock()
+				}
+
 				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
 				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
 				if err != nil {
@@ -277,8 +283,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	key := prefix + moduleCall.Name
 	source := moduleCall.Source
 	version := moduleCall.Version
+	isSourceMapped := false
 
-	mappedResult, err := mapSource(m.sourceMap, source)
+	mappedResult, err := MapSource(m.sourceMap, source)
 	if err != nil {
 		return nil, err
 	}
@@ -286,11 +293,13 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	if mappedResult.Source != source {
 		m.logger.Debug().Msgf("remapping module source %s to %s", source, mappedResult.Source)
 		source = mappedResult.Source
+		isSourceMapped = true
 	}
 
 	if mappedResult.Version != "" {
 		m.logger.Debug().Msgf("remapping module version %s to %s", version, mappedResult.Version)
 		version = mappedResult.Version
+		isSourceMapped = true
 	}
 
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
@@ -340,9 +349,10 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		}
 
 		return &ManifestModule{
-			Key:    key,
-			Source: source,
-			Dir:    path.Clean(dir),
+			Key:            key,
+			Source:         source,
+			Dir:            path.Clean(dir),
+			IsSourceMapped: isSourceMapped,
 		}, nil
 	}
 
@@ -900,7 +910,7 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 // It does not support mapping registry versions to git tags since we can't
 // guarantee that the tag is correct - depending on the git repo the version
 // might be prefixed with a 'v' or not.
-func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapResult, error) {
+func MapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapResult, error) {
 	result := SourceMapResult{
 		Source:   source,
 		Version:  "",
