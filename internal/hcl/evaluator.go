@@ -1093,7 +1093,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		modulePath = filepath.Join(e.module.ModulePath, source)
 	}
 
-	fmt.Println(
+	fmt.Println("modulePath", modulePath)
 
 	blocks, err := e.blockBuilder.BuildModuleBlocks(b, modulePath, e.module.RootPath)
 	if err != nil {
