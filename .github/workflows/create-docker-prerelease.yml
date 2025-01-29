@@ -30,7 +30,7 @@ jobs:
           images: |
             ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
           tags: |
-            type=edge
+            type=edge,branch=arm64-ci
           flavor: |
             prefix=alistair-
             latest=false
@@ -54,7 +54,7 @@ jobs:
           images: |
             ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
           tags: |
-            type=edge
+            type=edge,branch=arm64-ci
           flavor: |
             prefix=alistair-ci-
             latest=false
