@@ -1091,6 +1091,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 
 		// combine the current calling module with relative source of the module
 		modulePath = filepath.Join(e.module.ModulePath, source)
+
+		fmt.Println("e.module.ModulePath", e.module.ModulePath)
 	}
 
 	fmt.Println("modulePath", modulePath)
