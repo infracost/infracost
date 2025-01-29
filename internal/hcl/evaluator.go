@@ -1093,8 +1093,11 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		modulePath = filepath.Join(e.module.ModulePath, source)
 	}
 
+	fmt.Println(
+
 	blocks, err := e.blockBuilder.BuildModuleBlocks(b, modulePath, e.module.RootPath)
 	if err != nil {
+		fmt.Println("error building module blocks", err)
 		return nil, err
 	}
 	e.logger.Debug().Msgf("loaded module '%s' (requested at %s)", modulePath, b.FullName())
