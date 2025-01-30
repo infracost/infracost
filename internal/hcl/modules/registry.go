@@ -141,7 +141,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	retryReq, _ := retryablehttp.FromRequest(req)
 
 	var client *retryablehttp.Client
-	if moduleURL.Host == defaultRegistryHost {
+	if moduleURL.Host == defaultRegistryHost || strings.HasSuffix(moduleURL.Host, ".terraform.io") {
 		client = d.proxyHttpClient
 	} else {
 		client = d.httpClient
@@ -258,7 +258,7 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL RegistryURL) ([]string, e
 	retryReq, _ := retryablehttp.FromRequest(req)
 
 	var client *retryablehttp.Client
-	if moduleURL.Host == defaultRegistryHost {
+	if moduleURL.Host == defaultRegistryHost || strings.HasSuffix(moduleURL.Host, ".terraform.io") {
 		client = r.proxyHttpClient
 	} else {
 		client = r.httpClient
