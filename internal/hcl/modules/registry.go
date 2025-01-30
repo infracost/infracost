@@ -65,7 +65,23 @@ type Disco struct {
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
 func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *Disco {
-	return &Disco{disco: disco.NewWithCredentialsSource(credentialsSource), logger: logger, httpClient: newRetryableClient(""), proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY"))}
+
+	innerDisco := disco.NewWithCredentialsSource(credentialsSource)
+
+	if proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxyURL != "" {
+		if parsed, err := url.Parse(proxyURL); err == nil {
+			innerDisco.Transport = &http.Transport{
+				Proxy: http.ProxyURL(parsed),
+			}
+		}
+	}
+
+	return &Disco{
+		disco:           innerDisco,
+		logger:          logger,
+		httpClient:      newRetryableClient(""),
+		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
+	}
 }
 
 // ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
