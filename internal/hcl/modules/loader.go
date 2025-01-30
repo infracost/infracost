@@ -901,7 +901,7 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 	return moduleAddr
 }
 
-// mapSource maps the module source to a new source if it is in the source map
+// MapSource maps the module source to a new source if it is in the source map
 // otherwise it returns the original source. It works similarly to the
 // TERRAGRUNT_SOURCE_MAP environment variable except it matches by prefixes
 // and supports query params. It works by matching the longest prefix first,
