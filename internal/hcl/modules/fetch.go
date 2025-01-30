@@ -2,6 +2,7 @@ package modules
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -46,6 +47,28 @@ func ResetGlobalModuleCache() {
 
 type PackageFetcherOpts func(*PackageFetcher)
 
+type ConditionalTransport struct {
+	ProxyHosts []string
+	ProxyURL   string
+	Inner      http.RoundTripper
+}
+
+func (t *ConditionalTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	for _, host := range t.ProxyHosts {
+		if req.URL.Host == host || strings.HasSuffix(req.URL.Host, "."+host) {
+			if parsed, err := url.Parse(t.ProxyURL); err == nil {
+				proxy := http.ProxyURL(parsed)
+				proxyTransport := &http.Transport{Proxy: proxy}
+				return proxyTransport.RoundTrip(req)
+			}
+		}
+	}
+	if t.Inner != nil {
+		return t.Inner.RoundTrip(req)
+	}
+	return http.DefaultTransport.RoundTrip(req)
+}
+
 // NewPackageFetcher constructs a new package fetcher
 func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...PackageFetcherOpts) *PackageFetcher {
 	getters := make(map[string]getter.Getter, len(getter.Getters))
@@ -56,6 +79,20 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 		&getter.GitGetter{
 			Timeout: defaultModuleRetrieveTimeout,
 		},
+	}
+	if proxy := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxy != "" {
+		httpGetter := &getter.HttpGetter{
+			Netrc: true,
+			Client: &http.Client{
+				Transport: &ConditionalTransport{
+					ProxyHosts: []string{"terraform.io"},
+					ProxyURL:   proxy,
+					Inner:      http.DefaultTransport,
+				},
+			},
+		}
+		getters["http"] = httpGetter
+		getters["https"] = httpGetter
 	}
 
 	p := &PackageFetcher{
