@@ -69,10 +69,10 @@ func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *
 	innerDisco := disco.NewWithCredentialsSource(credentialsSource)
 
 	if proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxyURL != "" {
-		if parsed, err := url.Parse(proxyURL); err == nil {
-			innerDisco.Transport = &http.Transport{
-				Proxy: http.ProxyURL(parsed),
-			}
+		innerDisco.Transport = &ConditionalTransport{
+			ProxyHosts: []string{"terraform.io"},
+			ProxyURL:   proxyURL,
+			Inner:      innerDisco.Transport,
 		}
 	}
 
