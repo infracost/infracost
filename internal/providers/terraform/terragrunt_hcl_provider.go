@@ -132,7 +132,10 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 	}
 
 	fetcher := modules.NewPackageFetcher(remoteCache, logger, modules.WithGetters(map[string]getter.Getter{
-		"tfr":  &tgterraform.RegistryGetter{},
+		"tfr": &tgterraform.RegistryGetter{
+			ProxyForDomains: []string{".terraform.io"},
+			ProxyURL:        os.Getenv("INFRACOST_REGISTRY_PROXY"),
+		},
 		"file": &tgcliterraform.FileCopyGetter{},
 	}), modules.WithPublicModuleChecker(modules.NewHttpPublicModuleChecker()))
 
