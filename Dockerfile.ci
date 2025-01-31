@@ -1,7 +1,6 @@
-FROM golang:1.23 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.23 AS builder
 
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
+ARG BUILDPLATFORM TARGETOS TARGETARCH
 
 # Set Environment Variables
 SHELL ["/bin/bash", "-c"]
@@ -12,13 +11,8 @@ WORKDIR /app
 
 # Build Application
 COPY . .
-RUN echo "Building on $BUILDPLATFORM, targeting $TARGETPLATFORM" && \
-    case "$TARGETPLATFORM" in \
-      "linux/amd64") export GOARCH=amd64 ;; \
-      "linux/arm64") export GOARCH=arm64 ;; \
-      *) echo "Unsupported platform: $TARGETPLATFORM" && exit 1 ;; \
-    esac && \
-    NO_DIRTY=true make build && \
+RUN echo "Building on $BUILDPLATFORM, targeting $TARGETOS/$TARGETARCH" && \
+    GOOS=$TARGETOS GOARCH=$TARGETARCH NO_DIRTY=true make build && \
     chmod +x /app/build/infracost
 
 # Application

@@ -35,7 +35,7 @@ jobs:
             prefix=alistair-
             latest=false
 
-      - name: Build and push Docker images (Multi-Arch)
+      - name: Build and push Docker images
         uses: docker/build-push-action@v4
         id: build_push_docker
         with:
