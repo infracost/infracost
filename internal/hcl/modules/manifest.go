@@ -39,11 +39,12 @@ func (m Manifest) Get(key string) ManifestModule {
 
 // ManifestModule represents a single module in the manifest.json file
 type ManifestModule struct {
-	Key         string `json:"Key"`
-	Source      string `json:"Source"`
-	Version     string `json:"Version,omitempty"`
-	Dir         string `json:"Dir"`
-	DownloadURL string
+	Key            string `json:"Key"`
+	Source         string `json:"Source"`
+	Version        string `json:"Version,omitempty"`
+	Dir            string `json:"Dir"`
+	DownloadURL    string
+	IsSourceMapped bool `json:"-"`
 }
 
 func (m ManifestModule) URL() string {
