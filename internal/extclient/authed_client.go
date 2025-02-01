@@ -3,6 +3,10 @@ package extclient
 import (
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
@@ -23,6 +27,13 @@ type AuthedAPIClient struct {
 // NewAuthedAPIClient returns a new API client.
 func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
 	client := retryablehttp.NewClient()
+	if proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxyURL != "" && strings.HasSuffix(host, ".terraform.io") {
+		if parsed, err := url.Parse(proxyURL); err == nil {
+			client.HTTPClient.Transport = &http.Transport{
+				Proxy: http.ProxyURL(parsed),
+			}
+		}
+	}
 	client.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
 	client.HTTPClient.Timeout = time.Second * 30
 	return &AuthedAPIClient{

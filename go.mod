@@ -1,6 +1,6 @@
 module github.com/infracost/infracost
 
-go 1.23
+go 1.23.0
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -117,6 +117,7 @@ require (
 	github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466
 	github.com/soongo/path-to-regexp v1.6.4
 	github.com/spacelift-io/spacectl v1.2.0
+	github.com/terraform-linters/tflint-plugin-sdk v0.16.1
 	github.com/turbot/terraform-components v0.0.0-20231213122222-1f3526cab7a7
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	github.com/xanzy/go-gitlab v0.86.0
@@ -212,7 +213,6 @@ require (
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/terraform-linters/tflint v0.46.1 // indirect
-	github.com/terraform-linters/tflint-plugin-sdk v0.16.1 // indirect
 	github.com/terraform-linters/tflint-ruleset-terraform v0.3.0 // indirect
 	github.com/urfave/cli/v2 v2.27.2 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
@@ -274,7 +274,7 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
-replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20241204180911-19aacb9f0819
+replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20250130112047-6e924d9038f0
 
 replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94
 
