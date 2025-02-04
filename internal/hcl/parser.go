@@ -646,9 +646,7 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 			continue
 		}
 
-		if len(fileBlocks) > 0 {
-			p.logger.Debug().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
-		}
+		p.logger.Trace().Msgf("loaded %d blocks from %s", len(fileBlocks), file.path)
 
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
