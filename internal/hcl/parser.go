@@ -482,6 +482,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, err
 	}
 
+	p.logger.Trace().Msgf("loaded %d files", len(files))
+
 	// load the files into given hcl block types. These are then wrapped with *Block structs.
 	blocks, err := p.parseDirectoryFiles(files)
 	if err != nil {
@@ -636,6 +638,8 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 	var blocks Blocks
 
 	for _, file := range files {
+		p.logger.Trace().Msgf("loading blocks from file %s", file.path)
+
 		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
 			p.logger.Debug().Msgf("skipping file could not load blocks err: %s", err)
