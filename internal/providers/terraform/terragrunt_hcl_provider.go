@@ -55,6 +55,10 @@ var (
 	// concurrency safe downloading.
 	terragruntSourceLock = infSync.KeyMutex{}
 
+	// terragruntWorkingDirLock is the global lock which works across TerragrunHCLProviders to provide
+	// concurrency safe downloading.
+	terragruntWorkingDirLock = infSync.KeyMutex{}
+
 	// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
 	// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
 	// up the cache directory unnecessarily.  If that is fixed we can remove this.
@@ -265,7 +269,6 @@ type terragruntWorkingDirInfo struct {
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
 // process each with an HCLProvider.
 func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-
 	loadResourcesTimer := metrics.GetTimer("terragrunt.LoadResources", false, p.ctx.ProjectConfig.Path).Start()
 	defer loadResourcesTimer.Stop()
 
@@ -631,6 +634,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedWorkingDir}
 		}
 	}
+
+	unlock := terragruntWorkingDirLock.Lock(info.workingDir)
+	defer unlock()
 
 	if err = generateConfig(terragruntConfig, opts, info.workingDir); err != nil {
 		info.error = err
