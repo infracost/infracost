@@ -79,6 +79,21 @@ type TerragruntOutputCache struct {
 	mu    *infSync.KeyMutex
 }
 
+var GlobalLocker = &DirectoryLocker{}
+
+type DirectoryLocker struct {
+	m sync.Map
+}
+
+func (l *DirectoryLocker) LockDirectory(dir string) func() {
+	lock, _ := l.m.LoadOrStore(dir, &sync.Mutex{})
+	mutex := lock.(*sync.Mutex)
+	mutex.Lock()
+	return func() {
+		mutex.Unlock()
+	}
+}
+
 // Set stores a value in the cache for the given key using the value returned
 // from getVal function. If the key already exists in the cache, the value is
 // returned from the cache.
@@ -265,6 +280,8 @@ type terragruntWorkingDirInfo struct {
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
 // process each with an HCLProvider.
 func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
+	unlock := GlobalLocker.LockDirectory(p.ctx.ProjectConfig.Path)
+	defer unlock()
 
 	loadResourcesTimer := metrics.GetTimer("terragrunt.LoadResources", false, p.ctx.ProjectConfig.Path).Start()
 	defer loadResourcesTimer.Stop()
