@@ -635,8 +635,8 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		}
 	}
 
-	terragruntWorkingDirLock.Lock(info.workingDir)
-	defer terragruntWorkingDirLock.Unlock(info.workingDir)
+	unlock := terragruntWorkingDirLock.Lock(info.workingDir)
+	defer unlock()
 
 	if err = generateConfig(terragruntConfig, opts, info.workingDir); err != nil {
 		info.error = err
