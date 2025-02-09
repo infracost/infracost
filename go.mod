@@ -120,7 +120,7 @@ require (
 	github.com/terraform-linters/tflint-plugin-sdk v0.16.1
 	github.com/turbot/terraform-components v0.0.0-20231213122222-1f3526cab7a7
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
-	github.com/xanzy/go-gitlab v0.86.0
+	github.com/xanzy/go-gitlab v0.115.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 	golang.org/x/oauth2 v0.21.0
 	k8s.io/apimachinery v0.29.2
