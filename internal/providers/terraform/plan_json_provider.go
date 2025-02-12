@@ -108,6 +108,8 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte)
 	project.PartialPastResources = parsedConf.PastResources
 	project.PartialResources = parsedConf.CurrentResources
 
+	panic("LOL")
+
 	// use TagPolicyAPIEndpoint for Policy2 instead of creating a new config variable
 	if p.policyClient != nil {
 		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
