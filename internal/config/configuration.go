@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -67,22 +66,6 @@ func loadConfiguration(cfg *Config) error {
 
 	if cfg.TLSCACertFile == "" {
 		cfg.TLSCACertFile = cfg.Configuration.TLSCACertFile
-	}
-
-	if projectFilter := os.Getenv("LIAM_PROJECT_FILTER"); projectFilter != "" {
-		names := strings.Split(projectFilter, ",")
-		var filtered []*Project
-		panic(len(cfg.Projects))
-		for _, project := range cfg.Projects {
-			fmt.Println(project.Name)
-			for _, name := range names {
-				if project.Name == name {
-					filtered = append(filtered, project)
-					break
-				}
-			}
-		}
-		cfg.Projects = filtered
 	}
 
 	return nil

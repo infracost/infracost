@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/infracost/infracost/internal/metrics"
 	"github.com/spf13/cobra"
@@ -47,6 +49,22 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			ctx.ContextValues.SetValue("outputFormat", ctx.Config.Format)
+
+			if projectFilter := os.Getenv("LIAM_PROJECT_FILTER"); projectFilter != "" {
+				names := strings.Split(projectFilter, ",")
+				var filtered []*config.Project
+				panic(len(ctx.Config.Projects))
+				for _, project := range ctx.Config.Projects {
+					fmt.Println(project.Name)
+					for _, name := range names {
+						if project.Name == name {
+							filtered = append(filtered, project)
+							break
+						}
+					}
+				}
+				ctx.Config.Projects = filtered
+			}
 
 			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config)
 			if err != nil {
