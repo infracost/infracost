@@ -68,6 +68,20 @@ func loadConfiguration(cfg *Config) error {
 		cfg.TLSCACertFile = cfg.Configuration.TLSCACertFile
 	}
 
+	if projectFilter := os.Getenv("LIAM_PROJECT_FILTER"); projectFilter != "" {
+		names := strings.Split(projectFilter, ",")
+		var filtered []*Project
+		for _, name := range names {
+			for _, project := range cfg.Projects {
+				if project.Name == name {
+					filtered = append(filtered, project)
+					break
+				}
+			}
+		}
+		cfg.Projects = filtered
+	}
+
 	return nil
 }
 
