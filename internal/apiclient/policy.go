@@ -63,6 +63,7 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds
 	if os.Getenv("LIAM_P2R_DUMP") != "" {
 		data, _ := json.MarshalIndent(filteredResources, "", "  ")
 		os.WriteFile("cli_p2r.json", data, 0644)
+		os.Exit(0)
 	}
 
 	if len(filteredResources) > 0 {

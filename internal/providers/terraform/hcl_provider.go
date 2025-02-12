@@ -155,7 +155,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 	runCtx := ctx.RunContext
 
 	var policyClient *apiclient.PolicyAPIClient
-	if runCtx.Config.PoliciesEnabled {
+	if runCtx.Config.PoliciesEnabled || os.Getenv("LIAM_P2R_DUMP") != "" {
 		policyClient, err = apiclient.NewPolicyAPIClient(runCtx)
 		if err != nil {
 			logger.Err(err).Msgf("failed to initialize policy client")
