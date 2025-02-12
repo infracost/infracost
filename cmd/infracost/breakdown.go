@@ -53,7 +53,6 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 			if projectFilter := os.Getenv("LIAM_PROJECT_FILTER"); projectFilter != "" {
 				names := strings.Split(projectFilter, ",")
 				var filtered []*config.Project
-				panic(len(ctx.Config.Projects))
 				for _, project := range ctx.Config.Projects {
 					fmt.Println(project.Name)
 					for _, name := range names {
