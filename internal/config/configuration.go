@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -72,6 +73,7 @@ func loadConfiguration(cfg *Config) error {
 		names := strings.Split(projectFilter, ",")
 		var filtered []*Project
 		for _, project := range cfg.Projects {
+			fmt.Println(project.Name)
 			for _, name := range names {
 				if project.Name == name {
 					filtered = append(filtered, project)
