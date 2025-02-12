@@ -54,12 +54,6 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds
 	// remove .git suffix from the module path
 	project.Metadata.TerraformModulePath = strings.ReplaceAll(project.Metadata.TerraformModulePath, ".git/", "/")
 
-	if os.Getenv("LIAM_P2R_DUMP") != "" {
-		data, _ := json.MarshalIndent(rds, "", "  ")
-		os.WriteFile("cli_p2r.json", data, 0644)
-		os.Exit(0)
-	}
-
 	err := c.fetchAllowList()
 	if err != nil {
 		panic(err)
@@ -67,6 +61,12 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds
 	}
 
 	filteredResources := c.filterResources(rds)
+
+	if os.Getenv("LIAM_P2R_DUMP") != "" {
+		data, _ := json.MarshalIndent(filteredResources, "", "  ")
+		os.WriteFile("cli_p2r.json", data, 0644)
+		os.Exit(0)
+	}
 
 	if len(filteredResources) > 0 {
 		sha, err := c.uploadProjectPolicyData(filteredResources)
