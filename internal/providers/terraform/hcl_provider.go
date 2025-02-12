@@ -296,6 +296,8 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 	project.PartialPastResources = parsedConf.PastResources
 	project.PartialResources = parsedConf.CurrentResources
 
+	panic("WTF")
+
 	if p.policyClient != nil {
 		uploadPolicyDataTimer := metrics.GetTimer("hcl.UploadPolicyData", false, p.ctx.ProjectConfig.Path).Start()
 		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
