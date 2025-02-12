@@ -801,6 +801,10 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		return errors.New(m)
 	}
 
+	if len(cfg.Projects) == 0 {
+		return errors.New("no projects found")
+	}
+
 	projectCfg := cfg.Projects[0]
 
 	if hasProjectFlags {
