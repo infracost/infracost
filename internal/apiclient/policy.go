@@ -56,6 +56,7 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds
 
 	err := c.fetchAllowList()
 	if err != nil {
+		panic(err)
 		return err
 	}
 
