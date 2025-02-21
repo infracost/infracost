@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  Microsoft.Compute/disks/custom_size_ssd:
+    monthly_disk_operations: 20000
