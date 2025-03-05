@@ -131,7 +131,7 @@ func (r *SQLDatabaseInstance) sharedInstanceCostComponent() *schema.CostComponen
 		return nil
 	}
 
-	descriptionRegex := fmt.Sprintf("Cloud SQL for %s: %s", r.dbTypeDescName(), r.availabilityTypeDescName())
+	descriptionRegex := fmt.Sprintf("Cloud SQL for %s: %s(?! - Extended).*", r.dbTypeDescName(), r.availabilityTypeDescName())
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("SQL instance (%s, %s)", r.Tier, strings.ToLower(r.AvailabilityType)),
