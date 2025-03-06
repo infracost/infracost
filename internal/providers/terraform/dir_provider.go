@@ -444,7 +444,7 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 			Links map[string]string
 		}
 	}
-	if json.Unmarshal(body, &parsedResp) != nil {
+	if err = json.Unmarshal(body, &parsedResp); err != nil {
 		return []byte{}, err
 	}
 
