@@ -500,7 +500,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 
 			metrics.GetCounter("resource.count", true).Inc()
 
-			fmt.Println("Processing resource", out.Configuration.Address)
+			fmt.Println("Processing resource", module.Name, out.Configuration.Address)
 
 			if _, ok := configResources[out.Configuration.Address]; !ok {
 				moduleConfig.Resources = append(moduleConfig.Resources, out.Configuration)
