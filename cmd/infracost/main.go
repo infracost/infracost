@@ -262,6 +262,8 @@ func loadCloudSettings(ctx *config.RunContext) {
 	}
 	logging.Logger.Debug().Str("result", fmt.Sprintf("%+v", result)).Msg("Successfully loaded settings from Infracost Cloud")
 
+	result.TagsAPIEnabled = true
+
 	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
 	if result.UsageAPIEnabled && ctx.Config.UsageAPIEndpoint == "" {
 		ctx.Config.UsageAPIEndpoint = ctx.Config.DashboardAPIEndpoint
