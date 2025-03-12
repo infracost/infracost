@@ -1,6 +1,6 @@
-FROM golang:1.23 AS builder
+FROM --platform=$BUILDPLATFORM golang:1.23 AS builder
 
-ARG ARCH=linux64
+ARG BUILDPLATFORM TARGETOS TARGETARCH
 
 # Set Environment Variables
 SHELL ["/bin/bash", "-c"]
@@ -11,8 +11,9 @@ WORKDIR /app
 
 # Build Application
 COPY . .
-RUN NO_DIRTY=true make build
-RUN chmod +x /app/build/infracost
+RUN echo "Building on $BUILDPLATFORM, targeting $TARGETOS/$TARGETARCH" && \
+    GOOS=$TARGETOS GOARCH=$TARGETARCH NO_DIRTY=true make build && \
+    chmod +x /app/build/infracost
 
 # Application
 FROM alpine:3.16 AS app
