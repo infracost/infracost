@@ -147,10 +147,8 @@ func (p *PackageFetcher) Fetch(moduleAddr string, dest string) error {
 		p.logger.Debug().Msgf("error fetching module %s from local cache: %s", util.RedactUrl(moduleAddr), err)
 	}
 
-	// check if the module is public by HEADing the module address
-	isPublicModule := p.isPublicModule(moduleAddr)
-
-	fetched, err = p.fetchFromRemoteCache(moduleAddr, dest, isPublicModule)
+	var isPublicModule bool
+	fetched, isPublicModule, err = p.fetchFromRemoteCache(moduleAddr, dest)
 	if fetched {
 		p.logger.Trace().Msgf("cache hit (remote): %s", moduleAddr)
 		localCache.Store(moduleAddr, dest)
@@ -231,26 +229,29 @@ func (p *PackageFetcher) fetchFromLocalCache(moduleAddr, dest string) (bool, err
 	return true, nil
 }
 
-func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string, public bool) (bool, error) {
+func (p *PackageFetcher) fetchFromRemoteCache(moduleAddr, dest string) (bool, bool, error) {
 	if p.remoteCache == nil {
-		return false, nil
+		return false, false, nil
 	}
+
+	// check if the module is public by HEADing the module address
+	public := p.isPublicModule(moduleAddr)
 
 	ok, err := p.remoteCache.Exists(moduleAddr, public)
 	if err != nil {
-		return false, err
+		return false, public, err
 	}
 
 	if !ok {
-		return false, nil
+		return false, public, nil
 	}
 
 	err = p.remoteCache.Get(moduleAddr, dest, public)
 	if err != nil {
-		return false, err
+		return false, public, err
 	}
 
-	return true, nil
+	return true, public, nil
 }
 
 func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) {
