@@ -13,6 +13,7 @@ import (
 	pathToRegexp "github.com/soongo/path-to-regexp"
 	"gopkg.in/yaml.v2"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 )
 
@@ -46,39 +47,41 @@ type Variables struct {
 // It exposes custom template functions to the user which can act on Parser.repoDir
 // or in isolation.
 type Parser struct {
-	repoDir   string
-	template  *template.Template
-	variables Variables
+	repoDir           string
+	template          *template.Template
+	variables         Variables
+	productionFilters []config.ProductionFilter
 }
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
 // Parser functions and sets the underlying default template name. Default variables can be passed to the parser which
 // will be passed to the template on execution.
-func NewParser(repoDir string, variables Variables) *Parser {
+func NewParser(repoDir string, variables Variables, productionFilters []config.ProductionFilter) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
-	p := Parser{repoDir: absRepoDir, variables: variables}
+	p := Parser{repoDir: absRepoDir, variables: variables, productionFilters: productionFilters}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
-		"base":       p.base,
-		"stem":       p.stem,
-		"ext":        p.ext,
-		"lower":      p.lower,
-		"startsWith": p.startsWith,
-		"endsWith":   p.endsWith,
-		"contains":   p.contains,
-		"splitList":  p.splitList,
-		"trimPrefix": p.trimPrefix,
-		"trimSuffix": p.trimSuffix,
-		"replace":    p.replace,
-		"quote":      p.quote,
-		"squote":     p.squote,
-		"pathExists": p.pathExists,
-		"matchPaths": p.matchPaths,
-		"list":       p.list,
-		"relPath":    p.relPath,
-		"isDir":      p.isDir,
-		"readFile":   p.readFile,
-		"parseJson":  p.parseJson,
-		"parseYaml":  p.parseYaml,
+		"base":         p.base,
+		"stem":         p.stem,
+		"ext":          p.ext,
+		"lower":        p.lower,
+		"startsWith":   p.startsWith,
+		"endsWith":     p.endsWith,
+		"contains":     p.contains,
+		"splitList":    p.splitList,
+		"trimPrefix":   p.trimPrefix,
+		"trimSuffix":   p.trimSuffix,
+		"replace":      p.replace,
+		"quote":        p.quote,
+		"squote":       p.squote,
+		"pathExists":   p.pathExists,
+		"matchPaths":   p.matchPaths,
+		"list":         p.list,
+		"relPath":      p.relPath,
+		"isDir":        p.isDir,
+		"readFile":     p.readFile,
+		"parseJson":    p.parseJson,
+		"parseYaml":    p.parseYaml,
+		"isProduction": p.isProduction,
 	})
 	p.template = t
 
@@ -366,6 +369,73 @@ func (p *Parser) parseJson(contents string) map[string]interface{} {
 	}
 
 	return out
+}
+
+// isProduction returns true if the project is production.
+func (p *Parser) isProduction(value string) bool {
+	matchesProduction := false
+
+	for _, filter := range p.productionFilters {
+		if filter.Type != "PROJECT" {
+			continue
+		}
+
+		isMatch := matchesWildcard(filter.Value, value)
+
+		if filter.Include && isMatch {
+			matchesProduction = true
+		}
+
+		// If it matches a non-production filter, it's definitely not production
+		if !filter.Include && isMatch {
+			return false
+		}
+	}
+
+	// Project is production only if it matched a production filter
+	// and didn't match any non-production filters
+	return matchesProduction
+}
+
+// matchesWildcard checks if the pattern matches the string, supporting * as a wildcard
+// that matches any number of characters
+func matchesWildcard(pattern, s string) bool {
+	// If there's no wildcard, just do a direct comparison
+	if !strings.Contains(pattern, "*") {
+		return pattern == s
+	}
+
+	parts := strings.Split(pattern, "*")
+
+	if parts[0] != "" {
+		if !strings.HasPrefix(s, parts[0]) {
+			return false
+		}
+		s = s[len(parts[0]):]
+	}
+
+	if parts[len(parts)-1] != "" {
+		if !strings.HasSuffix(s, parts[len(parts)-1]) {
+			return false
+		}
+		s = s[:len(s)-len(parts[len(parts)-1])]
+		parts = parts[:len(parts)-1]
+	}
+
+	for _, part := range parts[1:] {
+		if part == "" {
+			continue
+		}
+
+		idx := strings.Index(s, part)
+		if idx == -1 {
+			return false
+		}
+
+		s = s[idx+len(part):]
+	}
+
+	return true
 }
 
 func isSubdirectory(base, target string) bool {
