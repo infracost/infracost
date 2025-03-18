@@ -19,6 +19,7 @@ type ServicePlan struct {
 	WorkerCount int64
 	OSType      string
 	Region      string
+	IsDevTest   bool
 }
 
 func (r *ServicePlan) CoreType() string {
@@ -79,16 +80,25 @@ func (r *ServicePlan) BuildResource() *schema.Resource {
 		productName += " - Linux"
 	}
 
+	purchaseOption := "Consumption"
+	name := fmt.Sprintf("Instance usage (%s)", r.SKUName)
+	if r.IsDevTest && strings.Contains(os, "windows") {
+		purchaseOption = "DevTestConsumption"
+		name = fmt.Sprintf("Instance usage (dev/test, %s)", r.SKUName)
+	}
+
 	return &schema.Resource{
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			servicePlanCostComponent(
 				r.Region,
-				fmt.Sprintf("Instance usage (%s)", r.SKUName),
+				name,
 				productName,
 				sku,
 				r.WorkerCount,
-				additionalAttributeFilters...),
+				purchaseOption,
+				additionalAttributeFilters...,
+			),
 		},
 	}
 }

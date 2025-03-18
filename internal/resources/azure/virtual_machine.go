@@ -23,6 +23,7 @@ type VirtualMachine struct {
 	MonthlyHours               *float64              `infracost_usage:"monthly_hrs"`
 	StorageOSDisk              *StorageOSDiskUsage   `infracost_usage:"storage_os_disk"`
 	StorageDataDisk            *StorageDataDiskUsage `infracost_usage:"storage_data_disk"`
+	IsDevTest                  bool
 }
 
 type StorageOSDiskUsage struct {
@@ -83,7 +84,7 @@ func (r *VirtualMachine) BuildResource() *schema.Resource {
 
 	if strings.ToLower(os) == "windows" {
 		licenseType := r.LicenseType
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, r.MonthlyHours))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, r.MonthlyHours, r.IsDevTest))
 	} else {
 		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, r.MonthlyHours))
 	}

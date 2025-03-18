@@ -16,6 +16,7 @@ type AppServicePlan struct {
 	SKUCapacity int64
 	Kind        string
 	Region      string
+	IsDevTest   bool
 }
 
 func (r *AppServicePlan) CoreType() string {
@@ -79,15 +80,23 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 		productName += " - Linux"
 	}
 
+	purchaseOption := "Consumption"
+	name := fmt.Sprintf("Instance usage (%s)", r.SKUSize)
+	if r.IsDevTest && strings.Contains(os, "windows") && strings.ToLower(r.SKUSize[:2]) != "pc" {
+		purchaseOption = "DevTestConsumption"
+		name = fmt.Sprintf("Instance usage (dev/test, %s)", r.SKUSize)
+	}
+
 	return &schema.Resource{
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			servicePlanCostComponent(
 				r.Region,
-				fmt.Sprintf("Instance usage (%s)", r.SKUSize),
+				name,
 				productName,
 				sku,
 				capacity,
+				purchaseOption,
 				additionalAttributeFilters...,
 			),
 		},
@@ -95,7 +104,7 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 	}
 }
 
-func servicePlanCostComponent(region, name, productName, skuRefactor string, capacity int64, additionalAttributeFilters ...*schema.AttributeFilter) *schema.CostComponent {
+func servicePlanCostComponent(region, name, productName, skuRefactor string, capacity int64, purchaseOption string, additionalAttributeFilters ...*schema.AttributeFilter) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -112,7 +121,7 @@ func servicePlanCostComponent(region, name, productName, skuRefactor string, cap
 			}, additionalAttributeFilters...),
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr("Consumption"),
+			PurchaseOption: strPtr(purchaseOption),
 		},
 	}
 }

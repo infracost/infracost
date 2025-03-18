@@ -52,6 +52,7 @@ func NewKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
 		OSDiskType:   d.Get("os_disk_type").String(),
 		OSDiskSizeGB: d.Get("os_disk_size_gb").Int(),
 		NodeCount:    nodeCount,
+		IsDevTest:    d.ProjectMetadata["isProduction"] == "false",
 	}
 	return r
 }

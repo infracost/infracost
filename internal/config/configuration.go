@@ -22,6 +22,16 @@ type Configuration struct {
 	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
 	EnableCloud           *bool  `yaml:"enable_cloud"`
 	EnableCloudUpload     *bool  `yaml:"enable_cloud_upload"`
+
+	ProductionFilters []ProductionFilter `yaml:"production_filters,omitempty"`
+}
+
+// ProductionFilter is a filter for production/non-production paths..
+type ProductionFilter struct {
+	ID      string `yaml:"id"`
+	Type    string `yaml:"type"`
+	Include bool   `yaml:"include"`
+	Value   string `yaml:"value"`
 }
 
 func loadConfiguration(cfg *Config) error {

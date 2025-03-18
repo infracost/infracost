@@ -15,6 +15,7 @@ func getServicePlanRegistryItem() *schema.RegistryItem {
 				SKUName:     d.Get("sku_name").String(),
 				WorkerCount: d.GetInt64OrDefault("worker_count", 1),
 				OSType:      d.Get("os_type").String(),
+				IsDevTest:   d.ProjectMetadata["isProduction"] == "false",
 			}
 		},
 	}

@@ -16,6 +16,7 @@ type VirtualMachineScaleSet struct {
 	SKUName                   string
 	SKUCapacity               int64
 	IsWindows                 bool
+	IsDevTest                 bool
 	LicenseType               string
 	StorageProfileOSDiskData  *ManagedDiskData
 	StorageProfileOSDisksData []*ManagedDiskData
@@ -92,7 +93,7 @@ func (r *VirtualMachineScaleSet) BuildResource() *schema.Resource {
 		if r.LicenseType != "" {
 			licenseType = r.LicenseType
 		}
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil, r.IsDevTest))
 	}
 
 	res := &schema.Resource{

@@ -455,6 +455,9 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
 		data.Metadata = gjson.ParseBytes([]byte(r.Get("infracost_metadata").Raw)).Map()
+		for k, v := range p.ctx.ProjectConfig.Metadata {
+			data.ProjectMetadata[k] = v
+		}
 		resources[strings.Clone(addr)] = data
 	}
 
