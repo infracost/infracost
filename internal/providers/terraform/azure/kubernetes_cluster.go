@@ -49,6 +49,7 @@ func NewKubernetesCluster(d *schema.ResourceData) schema.CoreResource {
 		DefaultNodePoolVMSize:         d.Get("default_node_pool.0.vm_size").String(),
 		DefaultNodePoolOSDiskSizeGB:   d.Get("default_node_pool.0.os_disk_size_gb").Int(),
 		HttpApplicationRoutingEnabled: d.Get("http_application_routing_enabled").Bool(),
+		IsDevTest:                     d.ProjectMetadata["isProduction"] == "false",
 	}
 
 	// Deprecated and removed in v3

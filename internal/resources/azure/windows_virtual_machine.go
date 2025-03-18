@@ -20,6 +20,7 @@ type WindowsVirtualMachine struct {
 	OSDiskData                            *ManagedDiskData
 	MonthlyHours                          *float64     `infracost_usage:"monthly_hrs"`
 	OSDisk                                *OSDiskUsage `infracost_usage:"os_disk"`
+	IsDevTest                             bool
 }
 
 type OSDiskUsage struct {
@@ -55,7 +56,7 @@ func (r *WindowsVirtualMachine) BuildResource() *schema.Resource {
 	instanceType := r.Size
 	licenseType := r.LicenseType
 
-	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, r.MonthlyHours)}
+	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, r.MonthlyHours, r.IsDevTest)}
 
 	if r.AdditionalCapabilitiesUltraSSDEnabled {
 		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
@@ -82,7 +83,7 @@ func (r *WindowsVirtualMachine) BuildResource() *schema.Resource {
 	}
 }
 
-func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string, monthlyHours *float64) *schema.CostComponent {
+func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string, monthlyHours *float64, isDevTest bool) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 
@@ -96,6 +97,11 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 	if strings.ToLower(licenseType) == "windows_client" || strings.ToLower(licenseType) == "windows_server" {
 		purchaseOption = "DevTestConsumption"
 		purchaseOptionLabel = "hybrid benefit"
+	}
+
+	if isDevTest {
+		purchaseOption = "DevTestConsumption"
+		purchaseOptionLabel = "dev/test"
 	}
 
 	qty := schema.HourToMonthUnitMultiplier

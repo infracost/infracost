@@ -23,6 +23,7 @@ type KubernetesCluster struct {
 	HttpApplicationRoutingEnabled bool
 	LoadBalancer                  *KubernetesClusterLoadBalancer    `infracost_usage:"load_balancer"`
 	DefaultNodePool               *KubernetesClusterDefaultNodePool `infracost_usage:"default_node_pool"`
+	IsDevTest                     bool
 }
 
 type KubernetesClusterLoadBalancer struct {
@@ -108,7 +109,7 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 	}
 
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOS, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount, monthlyHours),
+		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOS, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount, monthlyHours, r.IsDevTest),
 	}
 
 	if strings.ToLower(r.NetworkProfileLoadBalancerSKU) == "standard" {

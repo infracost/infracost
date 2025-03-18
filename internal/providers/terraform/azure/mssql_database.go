@@ -91,6 +91,7 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 		ReadReplicaCount:  replicaCount,
 		ZoneRedundant:     d.Get("zone_redundant").Bool(),
 		BackupStorageType: storageAccountType,
+		IsDevTest:         d.ProjectMetadata["isProduction"] == "false",
 	}
 
 	if strings.ToLower(sku) == "elasticpool" || !d.IsEmpty("elastic_pool_id") {

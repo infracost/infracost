@@ -126,6 +126,10 @@ type Project struct {
 	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
 	// YorConfigPath is the path to a Yor config file, which we can extract default tags from
 	YorConfigPath string `yaml:"yor_config_path,omitempty" ignored:"true"`
+	// Metadata is a map of key-value pairs that can be used to store additional information about the project.
+	// This is useful for storing flexible project information that needs to be accessed by other parts
+	// of the application.
+	Metadata map[string]string `yaml:"metadata,omitempty" ignored:"true"`
 }
 
 type Config struct {

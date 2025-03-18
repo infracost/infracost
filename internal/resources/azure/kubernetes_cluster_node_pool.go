@@ -21,6 +21,7 @@ type KubernetesClusterNodePool struct {
 	OSDiskSizeGB int64
 	Nodes        *int64   `infracost_usage:"nodes"`
 	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
+	IsDevTest    bool
 }
 
 func (r *KubernetesClusterNodePool) CoreType() string {
@@ -47,12 +48,12 @@ func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
 		nodeCount = decimal.NewFromInt(*r.Nodes)
 	}
 
-	pool := aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours)
+	pool := aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours, r.IsDevTest)
 	pool.UsageSchema = r.UsageSchema()
 	return pool
 }
 
-func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64) *schema.Resource {
+func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64, isDevTest bool) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource
 
@@ -61,7 +62,7 @@ func aksClusterNodePool(name, region, instanceType, os string, osDiskType string
 	}
 
 	if strings.EqualFold(os, "windows") {
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, "None", monthlyHours))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, "None", monthlyHours, isDevTest))
 	} else {
 		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
 	}
