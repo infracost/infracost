@@ -83,6 +83,11 @@ func TestParser_Compile(t *testing.T) {
 						},
 						{
 							Type:    "PROJECT",
+							Value:   "foo*bar",
+							Include: true,
+						},
+						{
+							Type:    "PROJECT",
 							Value:   "foo1",
 							Include: false,
 						},

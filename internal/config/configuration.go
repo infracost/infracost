@@ -138,7 +138,7 @@ func ConfigurationFilePath() string {
 	return path.Join(userConfigDir(), "configuration.yml")
 }
 
-// isProduction returns true if the project is production.
+// IsProduction returns true if the project is production.
 func (c *Config) IsProduction(value string) bool {
 	matchesProduction := false
 
