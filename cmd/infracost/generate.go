@@ -175,7 +175,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			variables.BaseBranch = m.PullRequest.BaseBranch
 		}
 
-		parser := template.NewParser(wd, variables, ctx.Config.Configuration.ProductionFilters)
+		parser := template.NewParser(wd, variables, ctx.Config)
 		if g.template != "" {
 			err := parser.Compile(g.template, &buf)
 			if err != nil {
