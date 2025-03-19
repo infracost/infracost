@@ -15,9 +15,9 @@ import (
 
 func TestParser_Compile(t *testing.T) {
 	tests := []struct {
-		name              string
-		variables         Variables
-		productionFilters []config.ProductionFilter
+		name      string
+		variables Variables
+		config    *config.Config
 	}{
 		{
 			name: "different env dirs",
@@ -58,31 +58,40 @@ func TestParser_Compile(t *testing.T) {
 		},
 		{
 			name: "with is production",
-			productionFilters: []config.ProductionFilter{
-				{
-					Type:    "PROJECT",
-					Value:   "test",
-					Include: true,
-				},
-				{
-					Type:    "PROJECT",
-					Value:   "test",
-					Include: false,
-				},
-				{
-					Type:    "PROJECT",
-					Value:   "test2",
-					Include: true,
-				},
-				{
-					Type:    "PROJECT",
-					Value:   "foo*",
-					Include: true,
-				},
-				{
-					Type:    "PROJECT",
-					Value:   "foo1",
-					Include: false,
+			config: &config.Config{
+				Configuration: config.Configuration{
+					ProductionFilters: []config.ProductionFilter{
+						{
+							Type:    "PROJECT",
+							Value:   "test",
+							Include: true,
+						},
+						{
+							Type:    "PROJECT",
+							Value:   "test",
+							Include: false,
+						},
+						{
+							Type:    "PROJECT",
+							Value:   "test2",
+							Include: true,
+						},
+						{
+							Type:    "PROJECT",
+							Value:   "foo*",
+							Include: true,
+						},
+						{
+							Type:    "PROJECT",
+							Value:   "foo*bar",
+							Include: true,
+						},
+						{
+							Type:    "PROJECT",
+							Value:   "foo1",
+							Include: false,
+						},
+					},
 				},
 			},
 		},
@@ -96,7 +105,7 @@ func TestParser_Compile(t *testing.T) {
 			f, err := os.Open(golden)
 			require.NoError(t, err)
 
-			p := NewParser(testDataPath, tt.variables, tt.productionFilters)
+			p := NewParser(testDataPath, tt.variables, tt.config)
 
 			wr := &bytes.Buffer{}
 			err = p.CompileFromFile(input, wr)
