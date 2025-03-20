@@ -167,9 +167,9 @@ func (c *Config) IsProduction(value string) bool {
 // matchesWildcard checks if the pattern matches the string, supporting * as a wildcard
 // that matches any number of characters
 func matchesWildcard(pattern, s string) bool {
-	// If there's no wildcard, just do a direct comparison
+	// If there's no wildcard, just do a sub string comparison
 	if !strings.Contains(pattern, "*") {
-		return pattern == s
+		return strings.Contains(s, pattern)
 	}
 
 	parts := strings.Split(pattern, "*")
