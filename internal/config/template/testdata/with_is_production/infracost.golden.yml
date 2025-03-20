@@ -1,7 +1,7 @@
 version: 0.1
 
 projects:
-  - path: foo1bar
   - path: foo2
+  - path: foo2bar
   - path: foo3
-  - path: test2
+  - path: test
