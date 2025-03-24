@@ -43,7 +43,7 @@ jobs:
           push: true
 
       - name: Clean Docker image
-        run: docker rmi ${{ steps.build_push_docker.outputs.imageid }} -f
+        run: docker rmi ${{ steps.build_push_docker.outputs.imageid }} -f || true
 
       - name: Docker meta (CI)
         id: meta-ci
@@ -57,11 +57,11 @@ jobs:
             prefix=ci-
             latest=false
 
-      - name: Build and push Docker images (CI)
+      - name: Build and push Docker images (CI, Multi-Arch)
         uses: docker/build-push-action@v4
         with:
           context: .
           file: Dockerfile.ci
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta-ci.outputs.tags }}
           push: true
