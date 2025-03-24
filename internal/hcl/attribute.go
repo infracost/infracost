@@ -287,6 +287,14 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 	}()
 
+	if len(attr.varsCausingUnknownKeys) > 0 {
+		// Reset this here because in some cases (e.g. when initially evaluating a provider block
+		// we can flag variables as missing even though they will later be evaluated correctly.
+		// This should be ok because any vars that should remain in this list will be added again.
+		attr.Logger.Trace().Msgf("Resetting 'varsCausingUnkownKeys for attr: %s. vars: %v", attr.Name(), attr.varsCausingUnknownKeys)
+		attr.varsCausingUnknownKeys = nil
+	}
+
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
