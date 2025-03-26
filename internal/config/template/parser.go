@@ -68,6 +68,7 @@ func NewParser(repoDir string, variables Variables, config *config.Config) *Pars
 		"endsWith":     p.endsWith,
 		"contains":     p.contains,
 		"splitList":    p.splitList,
+		"join":         p.join,
 		"trimPrefix":   p.trimPrefix,
 		"trimSuffix":   p.trimSuffix,
 		"replace":      p.replace,
@@ -172,6 +173,11 @@ func (p *Parser) contains(s, substr string) bool {
 // splitList splits the string s into a slice of substrings separated by sep.
 func (p *Parser) splitList(sep, s string) []string {
 	return strings.Split(s, sep)
+}
+
+// join joins the list of strings l into a single string separated by sep.
+func (p *Parser) join(sep string, l []string) string {
+	return strings.Join(l, sep)
 }
 
 // trimPrefix returns s without the provided prefix string.
