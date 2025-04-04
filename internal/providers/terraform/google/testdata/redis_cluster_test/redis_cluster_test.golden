@@ -1,0 +1,23 @@
+
+ Name                                    Monthly Qty  Unit   Monthly Cost   
+                                                                            
+ google_redis_cluster.standard_cluster                                      
+ └─ Redis Cluster node (highmem medium)        4,380  hours         $0.49   
+                                                                            
+ google_redis_cluster.basic_cluster                                         
+ └─ Redis Cluster node (standard small)        1,460  hours         $0.16   
+                                                                            
+ OVERALL TOTAL                                                     $0.65 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.65 ┃           - ┃      $0.65 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
