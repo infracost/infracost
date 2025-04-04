@@ -12,8 +12,8 @@ import (
 type RedisCluster struct {
 	Address      string
 	Region       string
-	Tier         string
-	MemorySizeGB float64
+	NodeType     string
+	NodeCount    int
 }
 
 func (r *RedisCluster) CoreType() string {
@@ -29,35 +29,36 @@ func (r *RedisCluster) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *RedisCluster) BuildResource() *schema.Resource {
-	serviceTier := "Standard"
-
-	tierMapping := map[string]string{
-		"STANDARD_HA": "Standard",
-		"BASIC":       "Basic",
+	nodeTypeDescriptions := map[string]string{
+		"REDIS_SHARED_CORE_NANO": "Shared Core Nano",
+		"REDIS_STANDARD_SMALL":   "Standard Small",
+		"REDIS_HIGHMEM_MEDIUM":   "Highmem Medium",
+		"REDIS_HIGHMEM_XLARGE":   "Highmem XLarge",
 	}
 
-	if mapped, ok := tierMapping[strings.ToUpper(r.Tier)]; ok {
-		serviceTier = mapped
+	desc, ok := nodeTypeDescriptions[strings.ToUpper(r.NodeType)]
+	if !ok {
+		desc = r.NodeType
 	}
 
-	name := fmt.Sprintf("Redis cluster (%s)", strings.ToLower(serviceTier))
-	description := fmt.Sprintf("/Redis Cluster Capacity %s/", serviceTier)
+	name := fmt.Sprintf("Redis Cluster node (%s)", strings.ToLower(desc))
+	descriptionRegex := fmt.Sprintf("(?i).*Redis Cluster Node %s.*", desc)
 
 	return &schema.Resource{
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           name,
-				Unit:           "GB",
-				UnitMultiplier: schema.HourToMonthUnitMultiplier,
-				HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.MemorySizeGB)),
+				Unit:           "hours",
+				UnitMultiplier: decimal.NewFromInt(1),
+				HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(r.NodeCount))),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(r.Region),
-					Service:       strPtr("Cloud Memorystore for Redis Cluster"),
+					Service:       strPtr("Cloud Memorystore for Redis"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: strPtr(description)},
+						{Key:"description",ValueRegex: strPtr(descriptionRegex)},
 					},
 				},
 			},

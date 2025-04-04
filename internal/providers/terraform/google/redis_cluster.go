@@ -16,7 +16,7 @@ func NewRedisCluster(d *schema.ResourceData) schema.CoreResource {
 	return &google.RedisCluster{
 		Address:		d.Address,
 		Region:			d.Get("region").String(),
-		MemorySizeGB:	d.Get("memory_size_gb").Float(),
-		Tier:			d.Get("tier").String(),
+		NodeType:	    d.Get("node_type").String(),
+		NodeCount:	    int(d.Get("shard_count").Int() * d.Get("replica_count").Int()),
 	}
 }
