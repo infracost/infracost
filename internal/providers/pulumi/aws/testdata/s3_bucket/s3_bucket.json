@@ -1,0 +1,49 @@
+{
+  "steps": [
+    {
+      "resource": {
+        "type": "aws:s3/bucket:Bucket",
+        "name": "my-golden-bucket",
+        "urn": "urn:pulumi:dev::test::aws:s3/bucket:Bucket::my-golden-bucket",
+        "properties": {
+          "bucket": "my-golden-bucket",
+          "region": "us-east-1",
+          "versioning": {
+            "enabled": true
+          },
+          "objectLockEnabled": true,
+          "acl": "private",
+          "serverSideEncryptionConfiguration": {
+            "rule": {
+              "applyServerSideEncryptionByDefault": {
+                "sseAlgorithm": "AES256"
+              }
+            }
+          },
+          "lifecycleRules": [
+            {
+              "enabled": true,
+              "id": "transition-to-ia",
+              "transitions": [
+                {
+                  "days": 30,
+                  "storageClass": "STANDARD_IA"
+                }
+              ]
+            },
+            {
+              "enabled": true,
+              "id": "transition-to-glacier",
+              "transitions": [
+                {
+                  "days": 90,
+                  "storageClass": "GLACIER"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
