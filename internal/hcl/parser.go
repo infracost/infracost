@@ -16,6 +16,8 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 	"golang.org/x/exp/maps"
 
+	"github.com/infracost/infracost/internal/metrics"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/extclient"
@@ -92,8 +94,8 @@ func (p *Parser) sortVarFilesByPrecedence(paths []string, autoDetected bool) {
 }
 
 func makePathsRelativeToInitial(paths []string, initialPath string) []string {
-	var filenames []string
 
+	filenames := make([]string, 0, len(paths))
 	for _, name := range paths {
 		if path.IsAbs(name) {
 			filenames = append(filenames, name)
@@ -108,10 +110,17 @@ func makePathsRelativeToInitial(paths []string, initialPath string) []string {
 }
 
 // OptionWithModuleSuffix sets an optional module suffix which will be added to the Module after it has finished parsing
-// this can be used to augment auto-detected project path names and metadata.
-func OptionWithModuleSuffix(suffix string) Option {
+// this can be used to augment auto-detected project path names and metadata. If the suffix is already part of the project name - ignore it.
+func OptionWithModuleSuffix(rootPath, suffix string) Option {
 	return func(p *Parser) {
-		p.moduleSuffix = suffix
+		pathEnv := ""
+		if p.envMatcher != nil {
+			pathEnv = p.envMatcher.PathEnv(rootPath)
+		}
+
+		if pathEnv == "" || (suffix != "" && pathEnv != suffix) {
+			p.moduleSuffix = suffix
+		}
 	}
 }
 
@@ -275,6 +284,14 @@ func OptionGraphEvaluator() Option {
 	}
 }
 
+// OptionWithProjectName sets the project name for the parser.
+// This is used if the project name has been explicitly set by the user or the autodetection
+func OptionWithProjectName(name string) Option {
+	return func(p *Parser) {
+		p.projectName = name
+	}
+}
+
 type DetectedProject interface {
 	ProjectName() string
 	EnvName() string
@@ -288,6 +305,7 @@ type DetectedProject interface {
 type Parser struct {
 	startingPath          string
 	detectedProjectPath   string
+	projectName           string
 	tfEnvVars             map[string]cty.Value
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
@@ -317,7 +335,6 @@ func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *m
 		detectedProjectPath: projectRoot.DetectedPath,
 		hasChanges:          projectRoot.HasChanges,
 		moduleCalls:         projectRoot.ModuleCalls,
-		workspaceName:       defaultTerraformWorkspaceName,
 		hclParser:           hclParser,
 		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
 		logger:              parserLogger,
@@ -327,6 +344,12 @@ func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *m
 
 	for _, option := range options {
 		option(p)
+	}
+
+	// if the project name is not set by the user, we will use the detected env name
+	// as the project name.
+	if p.workspaceName == "" && p.ProjectName() != p.EnvName() {
+		p.workspaceName = p.EnvName()
 	}
 
 	return p
@@ -387,7 +410,7 @@ func (p *Parser) DependencyPaths() []string {
 		return nil
 	}
 
-	var sortedCalls []string
+	sortedCalls := make([]string, 0, len(p.moduleCalls)+len(p.tfvarsPaths)+1)
 	for _, call := range p.moduleCalls {
 		relCall := call
 		dep, err := filepath.Rel(p.startingPath, call)
@@ -448,9 +471,13 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.detectedProjectPath)
 
+	metrics.GetCounter("hcl_file.count", true).Inc()
+
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
+	hclTimer := metrics.GetTimer("hcl_file.load.duration", false, p.detectedProjectPath).Start()
 	files, err := loadDirectory(p.hclParser, p.logger, p.detectedProjectPath, false)
+	hclTimer.Stop()
 	if err != nil {
 		return m, err
 	}
@@ -465,8 +492,12 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, errors.New("No valid terraform files found given path, try a different directory")
 	}
 
+	metrics.GetCounter("block.count", true).Add(len(blocks))
+
 	p.logger.Debug().Msg("Loading TFVars...")
+	varLoadTimer := metrics.GetTimer("var.load.duration", false, p.detectedProjectPath).Start()
 	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
+	varLoadTimer.Stop()
 	if err != nil {
 		return m, err
 	}
@@ -504,6 +535,9 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	)
 
 	var root *Module
+
+	evaluationTimer := metrics.GetTimer("eval.duration", false, p.detectedProjectPath).Start()
+	defer evaluationTimer.Stop()
 
 	// Graph evaluation
 	if evaluator.isGraph {
@@ -553,10 +587,16 @@ func (p *Parser) RelativePath() string {
 // ProjectName generates a name for the project that can be used
 // in the Infracost config file.
 func (p *Parser) ProjectName() string {
+	if p.projectName != "" {
+		return p.projectName
+	}
+
 	name := config.CleanProjectName(p.RelativePath())
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
+	} else if p.workspaceName != "" && p.workspaceName != defaultTerraformWorkspaceName && !strings.HasSuffix(name, p.workspaceName) {
+		name = fmt.Sprintf("%s-%s", name, p.workspaceName)
 	}
 
 	return name
@@ -568,7 +608,7 @@ func (p *Parser) EnvName() string {
 		return p.moduleSuffix
 	}
 
-	return p.ProjectName()
+	return p.envMatcher.EnvName(p.ProjectName())
 }
 
 // TerraformVarFiles returns the list of terraform var files that the parser
@@ -626,8 +666,9 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 	if p.remoteVariableLoaders != nil {
 		for _, loader := range p.remoteVariableLoaders {
 			remoteVars, err := loader.Load(RemoteVarLoaderOptions{
-				Blocks:  blocks,
-				EnvName: p.EnvName(),
+				Blocks:      blocks,
+				ModulePath:  p.RelativePath(),
+				Environment: p.EnvName(),
 			})
 			if err != nil {
 				p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
@@ -649,6 +690,28 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 
 	for k, v := range p.inputVars {
 		combinedVars[k] = v
+	}
+
+	// add a common "env" name to the input vars for the project if it is not
+	// explicitly defined. This is done as often users have a common project variable
+	// called "env" that is used to define the environment name. Adding this default
+	// allows us to have a somewhat sane fallback for situations where we
+	// fail to provide the input from a var file or similar config.
+	if _, ok := combinedVars["env"]; !ok {
+		env := p.workspaceName
+		if env == "" {
+			env = p.EnvName()
+		}
+
+		combinedVars["env"] = cty.StringVal(env)
+	}
+	if _, ok := combinedVars["environment"]; !ok {
+		env := p.workspaceName
+		if env == "" {
+			env = p.EnvName()
+		}
+
+		combinedVars["environment"] = cty.StringVal(env)
 	}
 
 	return combinedVars, nil

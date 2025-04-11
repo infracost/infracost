@@ -71,7 +71,6 @@ func TestPricingAPIClient_PerformRequest(t *testing.T) {
 			apiKey:     ctx.Config.APIKey,
 			uuid:       ctx.UUID(),
 		},
-		Currency: "USD",
 	}
 	initCache(ctx, c)
 
@@ -113,12 +112,12 @@ func TestPricingAPIClient_PerformRequest(t *testing.T) {
 			},
 		},
 	}
-	q := c.buildQuery(cachedProduct, nil)
+	q := c.buildQuery(cachedProduct, nil, "USD")
 	k, err := hashstructure.Hash(q, hashstructure.FormatV2, nil)
 	assert.NoError(t, err)
 	c.cache.Add(k, cacheValue{Result: gjson.Parse(`{"data":{"products":[{"prices":[{"priceHash":"cached-ee3dd7e4624338037ca6fea0933a662f","USD":"0.1250000000"}]}]}`), ExpiresAt: time.Now().Add(time.Hour)})
 
-	batches := c.BatchRequests(resources, 100)
+	batches := c.BatchRequests(resources, 100, "USD")
 	result, err := c.PerformRequest(batches[0])
 
 	assert.Len(t, requestMap, 1, "invalid number of requests made to pricing API")

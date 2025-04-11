@@ -8,8 +8,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/rs/zerolog"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/credentials"
@@ -23,6 +24,9 @@ type TestLoaderE2EOpts = struct {
 }
 
 func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, opts TestLoaderE2EOpts) {
+
+	ResetGlobalModuleCache()
+
 	if opts.Cleanup {
 		err := os.RemoveAll(filepath.Join(path, config.InfracostDir))
 		assert.NoError(t, err)
@@ -30,7 +34,14 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 
 	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, opts.SourceMap, logger, &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath:         path,
+		HCLParser:         NewSharedHCLParser(),
+		CredentialsSource: &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
+		SourceMap:         opts.SourceMap,
+		Logger:            logger,
+		ModuleSync:        &sync2.KeyMutex{},
+	})
 
 	manifest, err := moduleLoader.Load(path)
 	if !assert.NoError(t, err) {
@@ -44,10 +55,11 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 	expected := []*ManifestModule{}
 	for _, m := range expectedModules {
 		e := &ManifestModule{
-			Key:         m.Key,
-			Source:      m.Source,
-			Version:     m.Version,
-			DownloadURL: m.DownloadURL,
+			Key:            m.Key,
+			Source:         m.Source,
+			Version:        m.Version,
+			DownloadURL:    m.DownloadURL,
+			IsSourceMapped: m.IsSourceMapped,
 		}
 
 		if !opts.IgnoreDir {
@@ -256,7 +268,14 @@ func TestMultiProject(t *testing.T) {
 
 	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath:         path,
+		HCLParser:         NewSharedHCLParser(),
+		CredentialsSource: &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
+		SourceMap:         config.TerraformSourceMap{},
+		Logger:            logger,
+		ModuleSync:        &sync2.KeyMutex{},
+	})
 
 	wg := &sync.WaitGroup{}
 	wg.Add(3)
@@ -789,6 +808,51 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testLoaderE2E(t, "./testdata/sourcemap_git_submodule", tt.want, TestLoaderE2EOpts{SourceMap: tt.sourceMap, Cleanup: true, IgnoreDir: true})
+		})
+	}
+}
+
+func TestSourceMapLocalModule(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	tests := []struct {
+		name      string
+		sourceMap config.TerraformSourceMap
+		want      []*ManifestModule
+	}{
+		{
+			name:      "empty source map",
+			sourceMap: config.TerraformSourceMap{},
+			want:      []*ManifestModule{},
+		},
+		{
+			name: "with mapping",
+			sourceMap: config.TerraformSourceMap{
+				"../sourcemap_local_module/": "",
+			},
+			want: []*ManifestModule{
+				{
+					Key:            "local-module",
+					Source:         "./modules/local-module",
+					Version:        "",
+					IsSourceMapped: true,
+				},
+			},
+		},
+		{
+			name: "when path is not starting with the map",
+			sourceMap: config.TerraformSourceMap{
+				"./modules": "",
+			},
+			want: []*ManifestModule{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testLoaderE2E(t, "./testdata/sourcemap_local_module", tt.want, TestLoaderE2EOpts{SourceMap: tt.sourceMap, Cleanup: true, IgnoreDir: true})
 		})
 	}
 }

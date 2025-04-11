@@ -1,0 +1,19 @@
+version: 0.1
+autodetect:
+  env_names:
+   - dev
+   - prod
+   - qa
+
+projects:
+  - path: infra/components/foo-dev
+    name: infra-components-foo-dev
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/dev/foo-dev.tfvars
+  - path: infra/components/foo-prod
+    name: infra-components-foo-prod
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/prod/foo-prod.tfvars
+

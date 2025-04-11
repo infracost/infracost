@@ -29,7 +29,19 @@ func MakeFileFunc(baseDir string, encBase64 bool) function.Function {
 				return cty.StringVal(""), err
 			}
 
-			return ff.Call(args)
+			c, err := ff.Call(args)
+
+			// if we get an error calling the underlying file function this is likely because the path
+			// argument has been transformed at some point because of infracost mocking/state fallbacks
+			// so we return a blank string instead of failing the evaluation. This is safer than returning
+			// an error as we in complex expression cases we can actually return a partial value instead
+			// of a unknown value which will cause subsequent evaluations to fail.
+			if err != nil {
+				logging.Logger.Debug().Msgf("error calling file func: %s returning a blank string for filesytem func", err)
+				return cty.StringVal(""), nil
+			}
+
+			return c, nil
 		},
 	})
 }

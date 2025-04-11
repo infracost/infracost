@@ -1,0 +1,12 @@
+└── infra
+    ├── bat.tfvars
+    ├── baz.tfvars
+    ├── bip.tfvars
+    ├── default.tfvars
+    ├── network-bat.tfvars
+    └── network-baz.tfvars
+    └── components
+        ├── bar (terraform)
+        ├── blah (terraform)
+        └── foo (terraform)
+            └── var.auto.tfvars

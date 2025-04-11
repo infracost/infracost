@@ -1,0 +1,8 @@
+.
+└── infra
+    ├── envs
+    │   ├── stg
+    │   │   └── dev.tfvars
+    │   └── qa
+    │       └── prod.tfvars
+    └── main.tf

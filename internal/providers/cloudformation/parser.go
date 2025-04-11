@@ -91,7 +91,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) par
 }
 
 func (p *Parser) parseTemplate(t *cloudformation.Template, usage schema.UsageMap) []parsedResource {
-	var resources []parsedResource
+	resources := make([]parsedResource, 0, len(t.Resources))
 
 	for name, d := range t.Resources {
 		resourceData := schema.NewCFResourceData(d.AWSCloudFormationType(), "aws", name, nil, d)

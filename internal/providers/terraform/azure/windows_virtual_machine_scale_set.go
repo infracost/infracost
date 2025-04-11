@@ -17,6 +17,7 @@ func NewWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 		Region:                                d.Region,
 		SKU:                                   d.Get("sku").String(),
 		LicenseType:                           d.Get("license_type").String(),
+		IsDevTest:                             d.ProjectMetadata["isProduction"] == "false",
 		AdditionalCapabilitiesUltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
 	}
 	if len(d.Get("os_disk").Array()) > 0 {

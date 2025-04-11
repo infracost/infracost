@@ -1,0 +1,152 @@
+{
+  "projects": [
+    {
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.with_root_block_device_no_tags_and_ebs_block_device_no_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_no_tags_and_ebs_block_device_no_tags_and_volume_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "volume_tags.DefaultNoOverride": "default_no_override",
+              "volume_tags.DefaultOverride": "volume_tag_override",
+              "volume_tags.VolTag": "volume_tag"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_no_tags_and_ebs_block_device_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "ebd_tag_override",
+              "ebs_block_device[0].EBDTagKey": "ebd_tag_val",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_tags_and_ebs_block_device_no_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "rbd_tag_override",
+              "root_block_device.RBDTagKey": "rbd_tag_val"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_tags_and_ebs_block_device_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "ebd_tag_override",
+              "ebs_block_device[0].EBDTagKey": "ebd_tag_val",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "rbd_tag_override",
+              "root_block_device.RBDTagKey": "rbd_tag_val"
+            }
+          },
+          {
+            "name": "aws_instance.with_implicit_root_block_device_and_ebs_block_device_no_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
+            }
+          },
+          {
+            "name": "aws_instance.with_implicit_root_block_device_and_ebs_block_device_no_tags_and_volume_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "volume_tags.DefaultNoOverride": "default_no_override",
+              "volume_tags.DefaultOverride": "volume_tag_override",
+              "volume_tags.VolTag": "volume_tag"
+            }
+          },
+          {
+            "name": "aws_instance.with_implicit_root_block_device_and_ebs_block_device_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "ebs_block_device[0].DefaultNoOverride": "default_no_override",
+              "ebs_block_device[0].DefaultOverride": "ebd_tag_override",
+              "ebs_block_device[0].EBDTagKey": "ebd_tag_val",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_no_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_no_tags_and_volume_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "volume_tags.DefaultNoOverride": "default_no_override",
+              "volume_tags.DefaultOverride": "volume_tag_override",
+              "volume_tags.VolTag": "volume_tag"
+            }
+          },
+          {
+            "name": "aws_instance.with_root_block_device_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "rbd_tag_override",
+              "root_block_device.RBDTagKey": "rbd_tag_val"
+            }
+          },
+          {
+            "name": "aws_instance.with_implicit_root_block_device",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "root_block_device.DefaultNoOverride": "default_no_override",
+              "root_block_device.DefaultOverride": "default_override"
+            }
+          },
+          {
+            "name": "aws_instance.with_implicit_root_block_device_and_volume_tags",
+            "tags": {
+              "DefaultNoOverride": "default_no_override",
+              "DefaultOverride": "default_override",
+              "volume_tags.DefaultNoOverride": "default_no_override",
+              "volume_tags.DefaultOverride": "volume_tag_override",
+              "volume_tags.VolTag": "volume_tag"
+            }
+          }
+        ]
+      },
+      "name": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_propagate_defaults_to_volume_tags"
+    }
+  ]
+}
+Err:
+

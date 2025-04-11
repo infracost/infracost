@@ -7,9 +7,12 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/infracost/infracost/internal/util"
 
 	"github.com/hashicorp/go-retryablehttp"
 	goversion "github.com/hashicorp/go-version"
@@ -51,9 +54,10 @@ type RegistryURL struct {
 // discovery rules. It caches the results by hostname to avoid repeated requests for the same information.
 // Therefore, it is advisable to use Disco per project and pass it to all required clients.
 type Disco struct {
-	disco      *disco.Disco
-	logger     zerolog.Logger
-	httpClient *retryablehttp.Client
+	disco           *disco.Disco
+	logger          zerolog.Logger
+	httpClient      *retryablehttp.Client
+	proxyHttpClient *retryablehttp.Client
 
 	locks sync.Map
 }
@@ -61,7 +65,23 @@ type Disco struct {
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
 func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *Disco {
-	return &Disco{disco: disco.NewWithCredentialsSource(credentialsSource), logger: logger, httpClient: newRetryableClient()}
+
+	innerDisco := disco.NewWithCredentialsSource(credentialsSource)
+
+	if proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxyURL != "" {
+		innerDisco.Transport = &ConditionalTransport{
+			ProxyHosts: []string{"terraform.io"},
+			ProxyURL:   proxyURL,
+			Inner:      innerDisco.Transport,
+		}
+	}
+
+	return &Disco{
+		disco:           innerDisco,
+		logger:          logger,
+		httpClient:      newRetryableClient(""),
+		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
+	}
 }
 
 // ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
@@ -135,10 +155,18 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	req, _ := http.NewRequest("GET", downloadURL.String(), nil)
 	moduleURL.Credentials.PrepareRequest(req)
 	retryReq, _ := retryablehttp.FromRequest(req)
-	resp, err := d.httpClient.Do(retryReq)
+
+	var client *retryablehttp.Client
+	if moduleURL.Host == defaultRegistryHost || strings.HasSuffix(moduleURL.Host, ".terraform.io") {
+		client = d.proxyHttpClient
+	} else {
+		client = d.httpClient
+	}
+
+	resp, err := client.Do(retryReq)
 
 	if err != nil {
-		return "", fmt.Errorf("error fetching download URL '%s': %w", downloadURL.String(), err)
+		return "", fmt.Errorf("error fetching download URL '%s': %w", util.RedactUrl(downloadURL.String()), err)
 	}
 	defer resp.Body.Close()
 
@@ -161,27 +189,36 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	return location, nil
 }
 
-func newRetryableClient() *retryablehttp.Client {
+func newRetryableClient(proxyURL string) *retryablehttp.Client {
 	httpClient := retryablehttp.NewClient()
 	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	if proxyURL != "" {
+		if parsed, err := url.Parse(proxyURL); err == nil {
+			httpClient.HTTPClient.Transport = &http.Transport{
+				Proxy: http.ProxyURL(parsed),
+			}
+		}
+	}
 	return httpClient
 }
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
 type RegistryLoader struct {
-	packageFetcher *PackageFetcher
-	disco          *Disco
-	logger         zerolog.Logger
-	httpClient     *retryablehttp.Client
+	packageFetcher  *PackageFetcher
+	disco           *Disco
+	logger          zerolog.Logger
+	httpClient      *retryablehttp.Client
+	proxyHttpClient *retryablehttp.Client
 }
 
 // NewRegistryLoader constructs a registry loader
 func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zerolog.Logger) *RegistryLoader {
 	return &RegistryLoader{
-		packageFetcher: packageFetcher,
-		disco:          disco,
-		logger:         logger,
-		httpClient:     newRetryableClient(),
+		packageFetcher:  packageFetcher,
+		disco:           disco,
+		logger:          logger,
+		httpClient:      newRetryableClient(""),
+		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
 	}
 }
 
@@ -190,7 +227,7 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zero
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", util.RedactUrl(moduleAddr))
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
@@ -199,14 +236,14 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
 	if !ok {
 		if err != nil {
-			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
+			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", util.RedactUrl(moduleAddr))
 		}
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", moduleAddr, versionConstraints, err)
+		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", util.RedactUrl(moduleAddr), versionConstraints, err)
 	}
 
 	versions, err := r.fetchModuleVersions(moduleURL)
@@ -236,8 +273,13 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL RegistryURL) ([]string, e
 	moduleURL.Credentials.PrepareRequest(req)
 	retryReq, _ := retryablehttp.FromRequest(req)
 
-	resp, err := r.httpClient.Do(retryReq)
-
+	var client *retryablehttp.Client
+	if moduleURL.Host == defaultRegistryHost || strings.HasSuffix(moduleURL.Host, ".terraform.io") {
+		client = r.proxyHttpClient
+	} else {
+		client = r.httpClient
+	}
+	resp, err := client.Do(retryReq)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch registry module versions: %w", err)
 	}
@@ -288,7 +330,7 @@ func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest
 	// Deliberately not logging the download URL since it contains a token
 	r.logger.Debug().Msgf("Downloading module %s", lookupResult.ModuleURL.RawSource)
 
-	return r.packageFetcher.fetch(downloadURL, dest)
+	return r.packageFetcher.Fetch(downloadURL, dest)
 }
 
 func (r *RegistryLoader) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {

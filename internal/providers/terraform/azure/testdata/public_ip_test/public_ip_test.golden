@@ -1,16 +1,16 @@
 
  Name                               Monthly Qty  Unit   Monthly Cost   
                                                                        
+ azurerm_public_ip.global                                              
+ └─ IP address (static, global)             730  hours         $7.30   
+                                                                       
  azurerm_public_ip.example                                             
  └─ IP address (static, regional)           730  hours         $3.65   
                                                                        
  azurerm_public_ip.example1                                            
  └─ IP address (dynamic, regional)          730  hours         $2.92   
                                                                        
- azurerm_public_ip.global                                              
- └─ IP address (static, global)             730  hours     not found   
-                                                                       
- OVERALL TOTAL                                                $6.57 
+ OVERALL TOTAL                                               $13.87 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -22,5 +22,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃            $7 ┃           - ┃         $7 ┃
+┃ main                                               ┃           $14 ┃           - ┃        $14 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

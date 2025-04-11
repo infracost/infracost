@@ -1,73 +1,64 @@
 package pulumi
 
 import (
-	"encoding/json"
+	"fmt"
 	"os"
-
+	
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pkg/errors"
-	"github.com/pulumi/pulumi/pkg/v3/display"
-	"github.com/tidwall/gjson"
+	log "github.com/sirupsen/logrus"
 )
 
 type PreviewJSONProvider struct {
-	ctx                  *config.ProjectContext
-	Path                 string
+	ctx                 *config.ProjectContext
+	Path                string
 	includePastResources bool
 }
 
-func NewPreviewJSONProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+// NewPreviewJSONProvider creates a new provider from a Pulumi preview JSON file
+func NewPreviewJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PreviewJSONProvider {
 	return &PreviewJSONProvider{
-		ctx:                  ctx,
-		Path:                 ctx.ProjectConfig.Path,
+		ctx:                 ctx,
+		Path:                ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 	}
 }
 
+// Type returns the provider type
 func (p *PreviewJSONProvider) Type() string {
 	return "pulumi_preview_json"
 }
 
+// DisplayType returns the provider display type
 func (p *PreviewJSONProvider) DisplayType() string {
-	return "Pulumi preview JSON file"
+	return "Pulumi (preview.json)"
 }
 
-func (p *PreviewJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
-}
-
+// Project returns the project information
 func (p *PreviewJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-	b, err := os.ReadFile(p.Path)
+	j, err := os.ReadFile(p.Path)
 	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi preview JSON file")
+		return []*schema.Project{}, err
 	}
-	var jsonPreviewDigest display.PreviewDigest
-	err = json.Unmarshal(b, &jsonPreviewDigest)
-	gjsonResult := gjson.ParseBytes(b)
 
+	parser := Parser{
+		previewJSON: j,
+		ctx:         p.ctx,
+		usage:       usage,
+		includePastResources: p.includePastResources,
+	}
+
+	parsedResources, err := parser.parseResources()
 	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi preview JSON file")
+		log.Warnf("Error parsing Pulumi preview JSON file: %s", err)
+		return []*schema.Project{}, fmt.Errorf("Error parsing Pulumi preview JSON file: %w", err)
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
-	metadata.Type = p.Type()
-	p.AddMetadata(metadata)
-	name := metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
-
-	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parsePreviewDigest(jsonPreviewDigest, usage, gjsonResult)
-	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Pulumi preview JSON file")
-	}
-
-	project.PartialPastResources = pastResources
-	project.PartialResources = resources
-
-	if !p.includePastResources {
-		project.PartialPastResources = nil
-	}
+	project := schema.NewProject(p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.VCSRepoURL)
+	project.Metadata = p.ctx.ProjectConfig.Metadata
+	project.Environment = p.ctx.ProjectConfig.Environment
+	project.HasDiff = true
+	project.Resources = parsedResources
 
 	return []*schema.Project{project}, nil
 }

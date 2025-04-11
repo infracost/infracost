@@ -66,7 +66,8 @@ type AzureReposExtra struct {
 	// Token is the Azure DevOps access token.
 	Token string
 	// Tag is used to identify the Infracost comment.
-	Tag string
+	Tag        string
+	InitActive bool
 }
 
 // azureAPIComment represents API response structure of Azure Repos comment.
@@ -134,9 +135,10 @@ func buildAzureAPIURL(repoURL string) (string, error) {
 // implements the PlatformHandler interface and contains the functions
 // for finding, creating, updating, deleting comments on Azure Repos pull requests.
 type azureReposPRHandler struct {
-	httpClient *http.Client
-	repoAPIURL string
-	prNumber   int
+	httpClient   *http.Client
+	repoAPIURL   string
+	prNumber     int
+	initAsActive bool
 }
 
 // NewAzureReposPRHandler creates a new PlatformHandler for Azure Repos pull requests.
@@ -157,9 +159,10 @@ func NewAzureReposPRHandler(ctx context.Context, repoURL string, targetRef strin
 	}
 
 	h := &azureReposPRHandler{
-		httpClient: httpClient,
-		repoAPIURL: apiURL,
-		prNumber:   prNumber,
+		httpClient:   httpClient,
+		repoAPIURL:   apiURL,
+		prNumber:     prNumber,
+		initAsActive: extra.InitActive,
 	}
 
 	return NewCommentHandler(ctx, h, extra.Tag), nil
@@ -236,6 +239,10 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 // CallCreateComment calls the Azure Repos API to create a new comment on the pull request.
 func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
+	status := "closed"
+	if h.initAsActive {
+		status = "active"
+	}
 	reqData, err := json.Marshal(map[string]interface{}{
 		"comments": []map[string]interface{}{
 			{
@@ -244,7 +251,7 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 				"commentType":     1,
 			},
 		},
-		"status": 4,
+		"status": status,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "Error marshaling comment body")
@@ -260,11 +267,16 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 
 	res, err := h.httpClient.Do(req)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error creating comment")
+		return nil, fmt.Errorf("Error creating comment: %w", err)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.Errorf("Error creating comment: %s", res.Status)
+		resBody, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, fmt.Errorf("Error reading response body: %w", err)
+		}
+
+		return nil, fmt.Errorf("Error creating comment: %s\n%s", res.Status, string(resBody))
 	}
 
 	if res.Body != nil {

@@ -193,10 +193,12 @@ func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformPr
 }
 
 type GoldenFileOptions = struct {
-	Currency    string
-	CaptureLogs bool
-	IgnoreCLI   bool
-	LogLevel    *string
+	Currency         string
+	CaptureLogs      bool
+	IgnoreCLI        bool
+	LogLevel         *string
+	ProjectMetadata  map[string]string
+	GoldenFileSuffix string
 }
 
 func DefaultGoldenFileOptions() *GoldenFileOptions {
@@ -250,7 +252,12 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 		level = *options.LogLevel
 	}
 
-	logBuf := testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
+	var logBuf *bytes.Buffer
+	if options != nil && options.CaptureLogs {
+		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
+	} else {
+		testutil.ConfigureTestToFailOnLogs(t, runCtx)
+	}
 
 	if options != nil && options.Currency != "" {
 		runCtx.Config.Currency = options.Currency
@@ -317,6 +324,9 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 	}
 
 	goldenFilePath := filepath.Join("testdata", testName, testName+".golden")
+	if options != nil && options.GoldenFileSuffix != "" {
+		goldenFilePath = filepath.Join("testdata", testName, testName+"_"+options.GoldenFileSuffix+".golden")
+	}
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
@@ -330,7 +340,8 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 		provider = newHCLProvider(t, runCtx, tfdir)
 	} else {
 		provider = terraform.NewDirProvider(config.NewProjectContext(runCtx, &config.Project{
-			Path: tfdir,
+			Path:     tfdir,
+			Metadata: runCtx.Config.Projects[0].Metadata,
 		}, nil), false)
 	}
 
@@ -349,7 +360,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 }
 
 func RunCostCalculations(runCtx *config.RunContext, projects []*schema.Project) ([]*schema.Project, error) {
-	pf := prices.NewPriceFetcher(runCtx)
+	pf := prices.NewPriceFetcher(runCtx, true)
 	for _, project := range projects {
 		err := pf.PopulatePrices(project)
 		if err != nil {
@@ -436,7 +447,8 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 	t.Helper()
 
 	projectCtx := config.NewProjectContext(runCtx, &config.Project{
-		Path: tfdir,
+		Path:     tfdir,
+		Metadata: runCtx.Config.Projects[0].Metadata,
 	}, nil)
 
 	provider, err := terraform.NewHCLProvider(projectCtx, hcl.RootPath{StartingPath: tfdir, DetectedPath: tfdir}, &terraform.HCLProviderConfig{SuppressLogging: true})

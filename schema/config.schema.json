@@ -123,6 +123,14 @@
         },
         "yor_config_path": {
           "type": "string"
+        },
+        "metadata": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       },
       "additionalProperties": false,

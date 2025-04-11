@@ -22,13 +22,15 @@ type ResourceData struct {
 	CFResource                              cloudformation.Resource
 	UsageData                               *UsageData
 	Metadata                                map[string]gjson.Result
+	ProjectMetadata                         map[string]string
 	MissingVarsCausingUnknownTagKeys        []string
 	MissingVarsCausingUnknownDefaultTagKeys []string
 	// Region is the region of the resource. When building a resource callers should
 	// use this value instead of the deprecated d.Get("region").String() or
 	// lookupRegion method.
 	Region string
-	PulumiUrn     string
+	// PulumiUrn is the unique URN of the resource in Pulumi
+	PulumiUrn string
 }
 
 type TagPropagation struct {
@@ -41,40 +43,40 @@ type TagPropagation struct {
 
 func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {
 	return &ResourceData{
-		Type:          resourceType,
-		ProviderName:  providerName,
-		Address:       address,
-		Tags:          tags,
-		RawValues:     rawValues,
-		ReferencesMap: make(map[string][]*ResourceData),
-		CFResource:    nil,
-		PulumiUrn:     "",
+		Type:            resourceType,
+		ProviderName:    providerName,
+		Address:         address,
+		Tags:            tags,
+		RawValues:       rawValues,
+		ReferencesMap:   make(map[string][]*ResourceData),
+		CFResource:      nil,
+		ProjectMetadata: make(map[string]string),
+		PulumiUrn:       "",
 	}
 }
 
 func NewCFResourceData(resourceType string, providerName string, address string, tags *map[string]string, cfResource cloudformation.Resource) *ResourceData {
 	return &ResourceData{
-		Type:          resourceType,
-		ProviderName:  providerName,
-		Address:       address,
-		Tags:          tags,
-		RawValues:     gjson.Result{},
-		ReferencesMap: make(map[string][]*ResourceData),
-		CFResource:    cfResource,
-		PulumiUrn:     "",
+		Type:            resourceType,
+		ProviderName:    providerName,
+		Address:         address,
+		Tags:            tags,
+		RawValues:       gjson.Result{},
+		ReferencesMap:   make(map[string][]*ResourceData),
+		CFResource:      cfResource,
+		ProjectMetadata: make(map[string]string),
+		PulumiUrn:       "",
 	}
 }
 
-func NewPulumiResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result, pulumiURN string) *ResourceData {
+func NewResourceDataFromProviderPulumi(resourceType string, address string, rawValues gjson.Result) *ResourceData {
 	return &ResourceData{
-		Type:          resourceType,
-		ProviderName:  providerName,
-		Address:       address,
-		Tags:          tags,
-		RawValues:     rawValues,
-		ReferencesMap: make(map[string][]*ResourceData),
-		CFResource:    nil,
-		PulumiUrn:     pulumiURN,
+		Type:            resourceType,
+		ProviderName:    "pulumi",
+		Address:         address,
+		RawValues:       rawValues,
+		ReferencesMap:   make(map[string][]*ResourceData),
+		ProjectMetadata: make(map[string]string),
 	}
 }
 
@@ -127,6 +129,19 @@ func (d *ResourceData) IsEmpty(key string) bool {
 	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
 }
 
+// emptyObjectOrArray returns true if the gjson.Result is an empty object or array
+func emptyObjectOrArray(g gjson.Result) bool {
+	if g.Type == gjson.JSON {
+		if g.IsObject() {
+			return len(g.Map()) == 0
+		}
+		if g.IsArray() {
+			return len(g.Array()) == 0
+		}
+	}
+	return false
+}
+
 func (d *ResourceData) References(keys ...string) []*ResourceData {
 	var data []*ResourceData
 
@@ -157,6 +172,19 @@ func (d *ResourceData) AddReference(k string, reference *ResourceData, reverseRe
 			reference.ReferencesMap[reverseRefKey] = append(reference.ReferencesMap[reverseRefKey], d)
 		}
 	}
+}
+
+func (d *ResourceData) ReplaceReference(k string, oldReference *ResourceData, newReference *ResourceData) {
+	key := strings.Clone(k)
+	for i, r := range d.ReferencesMap[key] {
+		if r == oldReference {
+			d.ReferencesMap[key][i] = newReference
+			break
+		}
+	}
+
+	// update the raw values on the resource data
+	d.Set(key, newReference.Get("id").String())
 }
 
 func (d *ResourceData) Set(key string, value interface{}) {

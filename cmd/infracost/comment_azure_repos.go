@@ -41,9 +41,11 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 
 			token, _ := cmd.Flags().GetString("azure-access-token")
 			tag, _ := cmd.Flags().GetString("tag")
+			initActive, _ := cmd.Flags().GetBool("init-active")
 			extra := comment.AzureReposExtra{
-				Token: token,
-				Tag:   tag,
+				Token:      token,
+				Tag:        tag,
+				InitActive: initActive,
 			}
 
 			prNumber, _ := cmd.Flags().GetInt("pull-request")
@@ -149,6 +151,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")
 	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to Azure Repos")
 	cmd.Flags().String("format", "", "Output format: json")
+	cmd.Flags().Bool("init-active", false, "Initialize the comment as active instead of the default: closed")
 
 	return cmd
 }

@@ -1016,6 +1016,15 @@
             "defaultTags": {
               "managed_by": "AFT"
             },
+            "name": "module.aft.module.aft_ssm_parameters.aws_ssm_parameter.gitlab_selfmanaged_url",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "defaultTags": {
+              "managed_by": "AFT"
+            },
             "name": "module.aft.module.aft_ssm_parameters.aws_ssm_parameter.global_customizations_repo_branch",
             "tags": {
               "managed_by": "AFT"

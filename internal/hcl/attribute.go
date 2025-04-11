@@ -9,11 +9,12 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/hcl/mock"
 )
 
 var (
@@ -48,8 +49,8 @@ type Attribute struct {
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
 	Logger  zerolog.Logger
-	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
-	isGraph bool
+	// IsGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
+	IsGraph bool
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock                func(attr *Attribute) cty.Value
 	previousValue          cty.Value
@@ -135,7 +136,7 @@ func (attr *Attribute) Value() cty.Value {
 
 	attr.Logger.Trace().Msg("fetching attribute value")
 	var val cty.Value
-	if attr.isGraph {
+	if attr.IsGraph {
 		val = attr.graphValue()
 	} else {
 		val = attr.value(0)
@@ -258,7 +259,7 @@ func (attr *Attribute) HasChanged() (change bool) {
 
 	previous := attr.previousValue
 	var current cty.Value
-	if attr.isGraph {
+	if attr.IsGraph {
 		current = attr.graphValue()
 	} else {
 		current = attr.value(0)
@@ -668,6 +669,14 @@ func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mocke
 			SrcRange: t.SrcRange,
 		}
 	case *hclsyntax.TemplateExpr:
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
 		newParts := make([]hclsyntax.Expression, len(t.Parts))
 		for i, part := range t.Parts {
 			newParts[i] = mockExpressionCalls(part, diagnostics, mockedVal)
@@ -1113,9 +1122,10 @@ func (attr *Attribute) AllReferences() []*Reference {
 // VerticesReferenced traverses all the Expressions used by the attribute to build a
 // list of all the Blocks referenced by the Attribute.
 func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
-	var refs []VertexReference
+	allRefs := attr.AllReferences()
+	refs := make([]VertexReference, 0, len(allRefs))
 
-	for _, ref := range attr.AllReferences() {
+	for _, ref := range allRefs {
 		key := ref.String()
 
 		if shouldSkipRef(b, attr, key) {

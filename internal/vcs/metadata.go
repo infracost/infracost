@@ -600,7 +600,7 @@ func (f *metadataFetcher) getFileChanges(path string, r *git.Repository, current
 		changedMap[change.To.Name] = struct{}{}
 	}
 
-	var changedFiles []string
+	changedFiles := make([]string, 0, len(changedMap))
 	for name := range changedMap {
 		if name == "" {
 			continue

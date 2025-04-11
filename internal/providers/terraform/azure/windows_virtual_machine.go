@@ -22,6 +22,7 @@ func NewWindowsVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 		Size:                                  d.Get("size").String(),
 		LicenseType:                           d.Get("license_type").String(),
 		AdditionalCapabilitiesUltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
+		IsDevTest:                             d.ProjectMetadata["isProduction"] == "false",
 	}
 	if len(d.Get("os_disk").Array()) > 0 {
 		diskData := d.Get("os_disk").Array()[0]

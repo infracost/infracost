@@ -1,0 +1,15 @@
+.
+└── infra
+    ├── components
+    │   ├── foo-dev
+    │   │   └── main.tf
+    │   └── foo-prod
+    │       └── main.tf
+    └── variables
+        ├── dev
+        │   └── foo-dev.tfvars
+        ├── prod
+        │   └── foo-prod.tfvars
+        ├── qa
+        │   └── bar.tfvars
+        └── defaults.tfvars

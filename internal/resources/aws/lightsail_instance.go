@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -30,36 +29,34 @@ func (r *LightsailInstance) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *LightsailInstance) BuildResource() *schema.Resource {
-	type bundleSpecs struct {
-		vcpu   string
-		memory string
+	bundlePrefixMappings := map[string]string{
+		"nano":    "0.5GB",
+		"micro":   "1GB",
+		"small":   "2GB",
+		"medium":  "4GB",
+		"large":   "8GB",
+		"xlarge":  "16GB",
+		"2xlarge": "32GB",
+		"4xlarge": "64GB",
 	}
 
-	bundlePrefixMappings := map[string]bundleSpecs{
-		"nano":    {"2", "0.5GB"},
-		"micro":   {"2", "1GB"},
-		"small":   {"2", "2GB"},
-		"medium":  {"2", "4GB"},
-		"large":   {"2", "8GB"},
-		"xlarge":  {"4", "16GB"},
-		"2xlarge": {"8", "32GB"},
-	}
-
-	operatingSystem := "Linux"
+	operatingSystemSuffix := ""
 	operatingSystemLabel := "Linux/UNIX"
 
 	if strings.Contains(strings.ToLower(r.BundleID), "_win_") {
-		operatingSystem = "Windows"
+		operatingSystemSuffix = "_win"
 		operatingSystemLabel = "Windows"
 	}
 
 	bundlePrefix := strings.Split(strings.ToLower(r.BundleID), "_")[0]
 
-	specs, ok := bundlePrefixMappings[bundlePrefix]
+	memory, ok := bundlePrefixMappings[bundlePrefix]
 	if !ok {
-		logging.Logger.Warn().Msgf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
-		return nil
+		// this will end up showing a 'product not found' warning
+		memory = bundlePrefix
 	}
+
+	usagetypeRegex := fmt.Sprintf("-BundleUsage:%s%s$", memory, operatingSystemSuffix)
 
 	return &schema.Resource{
 		Name: r.Address,
@@ -75,13 +72,8 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 					Service:       strPtr("AmazonLightsail"),
 					ProductFamily: strPtr("Lightsail Instance"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "operatingSystem", Value: strPtr(operatingSystem)},
-						{Key: "vcpu", Value: strPtr(specs.vcpu)},
-						{Key: "memory", Value: strPtr(specs.memory)},
+						{Key: "usagetype", ValueRegex: regexPtr(usagetypeRegex)},
 					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					EndUsageAmount: strPtr("Inf"),
 				},
 			},
 		},

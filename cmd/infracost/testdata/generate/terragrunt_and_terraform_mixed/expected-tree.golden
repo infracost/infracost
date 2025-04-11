@@ -1,0 +1,9 @@
+└── apps
+    ├── bar (terragrunt)
+    ├── baz
+    │   └── bip (terragrunt)
+    ├── envs
+    │   ├── dev.tfvars
+    │   └── prod.tfvars
+    ├── fez (terraform)
+    └── foo (terragrunt)

@@ -15,6 +15,8 @@ import (
 	"sort"
 	"strings"
 
+	giturls "github.com/chainguard-dev/git-urls"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/infracost/infracost/internal/schema"
 
 	jsoniter "github.com/json-iterator/go"
@@ -160,7 +162,26 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		}
 	}
 
-	loader := modules.NewModuleLoader(ctx.RunContext.Config.CachePath(), modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
+	var remoteCache modules.RemoteCache
+	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
+		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix, runCtx.Config.S3ModuleCachePrivate)
+		if err != nil {
+			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
+		} else {
+			remoteCache = s3ModuleCache
+		}
+	}
+
+	loader := modules.NewModuleLoader(modules.ModuleLoaderOptions{
+		CachePath:           runCtx.Config.CachePath(),
+		HCLParser:           modules.NewSharedHCLParser(),
+		CredentialsSource:   credsSource,
+		SourceMap:           runCtx.Config.TerraformSourceMap,
+		Logger:              logger,
+		ModuleSync:          runCtx.ModuleMutex,
+		RemoteCache:         remoteCache,
+		PublicModuleChecker: modules.NewHttpPublicModuleChecker(),
+	})
 	cachePath := ctx.RunContext.Config.CachePath()
 	initialPath := rootPath.DetectedPath
 	rootPath.DetectedPath = initialPath
@@ -174,9 +195,15 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		options = append(options, hcl.OptionGraphEvaluator())
 	}
 
+	if ctx.ProjectConfig.Name != "" {
+		options = append(options, hcl.OptionWithProjectName(ctx.ProjectConfig.Name))
+	}
+
+	envMatcher := hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions)
+
 	return &HCLProvider{
 		policyClient:   policyClient,
-		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions), loader, logger, options...),
+		Parser:         hcl.NewParser(rootPath, envMatcher, loader, logger, options...),
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
@@ -186,14 +213,6 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 func (p *HCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *HCLProvider) ProjectName() string {
-	if p.ctx.ProjectConfig.Name != "" {
-		return p.ctx.ProjectConfig.Name
-	}
-
-	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
-		return p.Parser.ProjectName() + "-" + p.ctx.ProjectConfig.TerraformWorkspace
-	}
-
 	return p.Parser.ProjectName()
 }
 
@@ -246,13 +265,21 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 
+	loadResourcesTimer := metrics.GetTimer("hcl.LoadResources", false, p.ctx.ProjectConfig.Path).Start()
+	defer loadResourcesTimer.Stop()
+
+	loadPlanTimer := metrics.GetTimer("hcl.LoadPlanJSON", false, p.ctx.ProjectConfig.Path).Start()
 	j := p.LoadPlanJSON()
+	loadPlanTimer.Stop()
 	if j.Error != nil {
 		return []*schema.Project{p.newProject(j)}, nil
 	}
 
 	project := p.newProject(j)
+
+	parseJSONTimer := metrics.GetTimer("hcl.ParseJSON", false, p.ctx.ProjectConfig.Path).Start()
 	parsedConf, err := p.planJSONParser.parseJSON(j.JSON, usage)
+	parseJSONTimer.Stop()
 	if err != nil {
 		project.Metadata.AddError(schema.NewDiagJSONParsingFailure(err))
 
@@ -270,7 +297,9 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 	project.PartialResources = parsedConf.CurrentResources
 
 	if p.policyClient != nil {
+		uploadPolicyDataTimer := metrics.GetTimer("hcl.UploadPolicyData", false, p.ctx.ProjectConfig.Path).Start()
 		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
+		uploadPolicyDataTimer.Stop()
 		if err != nil {
 			p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
 		}
@@ -331,9 +360,18 @@ func (p *HCLProvider) LoadPlanJSON() HCLProject {
 	module := p.Module()
 	if module.Error == nil {
 		module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
-
 		if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
-			err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm) // nolint: gosec
+			targetPath := fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-"))
+			targetDir, ok := os.LookupEnv("INFRACOST_JSON_DUMP_PATH")
+			if ok {
+				targetPath = filepath.Join(targetDir, targetPath)
+				if err := os.MkdirAll(targetDir, os.ModePerm); err != nil {
+					p.logger.Debug().Err(err).Msg("failed to create directory for json dump")
+					// use the default
+					targetPath = fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-"))
+				}
+			}
+			err := os.WriteFile(targetPath, module.JSON, os.ModePerm) // nolint: gosec
 			if err != nil {
 				p.logger.Debug().Err(err).Msg("failed to write to json dump")
 			}
@@ -348,9 +386,15 @@ func (p *HCLProvider) LoadPlanJSON() HCLProject {
 // found Terraform project. This can be used to fetch raw information like
 // outputs, vars, resources, e.t.c.
 func (p *HCLProvider) Module() HCLProject {
+
+	metrics.GetCounter("root_module.count", true).Inc()
+
 	if p.cache != nil {
 		return *p.cache
 	}
+
+	parseTimer := metrics.GetTimer("root_module.parse.duration", false, p.Context().ProjectConfig.Path).Start()
+	defer parseTimer.Stop()
 
 	module, modErr := p.Parser.ParseDirectory()
 	var v *clierror.PanicError
@@ -427,6 +471,9 @@ func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) 
 }
 
 func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
+
+	metrics.GetCounter("module.count", true).Inc()
+
 	moduleConfig := ModuleConfig{
 		ModuleCalls: map[string]ModuleCall{},
 	}
@@ -450,6 +497,8 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 	for _, block := range module.Blocks {
 		if block.Type() == "resource" {
 			out := p.getResourceOutput(block, module.SourceURL)
+
+			metrics.GetCounter("resource.count", true).Inc()
 
 			if _, ok := configResources[out.Configuration.Address]; !ok {
 				moduleConfig.Resources = append(moduleConfig.Resources, out.Configuration)
@@ -556,7 +605,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block, moduleSourceURL string
 }
 
 func buildModuleFilename(filename string, moduleSourceURL string) string {
-	httpsURL, err := transformSSHToHTTPS(moduleSourceURL)
+	httpsURL, err := normalizeModuleURL(moduleSourceURL)
 	if err != nil {
 		logging.Logger.Debug().Err(err).Msgf("failed to build module filename, could not transform url %s to https", moduleSourceURL)
 		return ""
@@ -581,42 +630,35 @@ func buildModuleFilename(filename string, moduleSourceURL string) string {
 	return moduleFilename
 }
 
-func transformSSHToHTTPS(sshURL string) (string, error) {
-	if !strings.HasPrefix(sshURL, "git@") {
-		// nothing to do, the URL is not an SSH URL
-		return sshURL, nil
+func normalizeModuleURL(sshURL string) (string, error) {
+	// git::ssh and git:https aren't recognized as a valid URL scheme, so we need to strip it so they just use ssh or https schemes
+	u := sshURL
+	if strings.HasPrefix(sshURL, "git::") {
+		u = strings.Replace(sshURL, "git::", "", 1)
 	}
 
-	colonCount := strings.Count(sshURL, ":")
-	var domainAndPort, path string
-
-	switch colonCount {
-	case 1:
-		components := strings.SplitN(sshURL, ":", 2)
-		userAndDomain := strings.Split(components[0], "@")
-		if len(userAndDomain) != 2 {
-			return "", fmt.Errorf("invalid SSH URL format")
+	parsedURL, err := url.Parse(u)
+	if err != nil {
+		// Try parsing it as a git URL
+		parsedURL, err = giturls.Parse(u)
+		if err != nil {
+			return "", err
 		}
-		domainAndPort = userAndDomain[1]
-		path = components[1]
-	case 2:
-		// case with a port in the url
-		components := strings.SplitN(sshURL, ":", 3)
-		userAndDomain := strings.Split(components[0], "@")
-		if len(userAndDomain) != 2 {
-			return "", fmt.Errorf("invalid SSH URL format")
-		}
-		domainAndPort = userAndDomain[1]
-		path = components[2]
-	default:
-		return "", fmt.Errorf("invalid SSH URL format")
 	}
 
-	// remove port if it exists
-	domainComponents := strings.SplitN(domainAndPort, ":", 2)
-	domain := domainComponents[0]
+	// Save the query string, since this is lost when we normalize the URL
+	// and it may contain the ref
+	query := parsedURL.Query()
 
-	return strings.TrimSuffix(fmt.Sprintf("https://%s/%s", domain, path), "/"), nil
+	res, err := modules.NormalizeGitURLToHTTPS(parsedURL)
+	if err != nil {
+		return "", err
+	}
+
+	// Add the query string back in
+	res.RawQuery = query.Encode()
+
+	return res.String(), nil
 }
 
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
@@ -669,6 +711,12 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 	if b == nil {
 		return nil
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			p.logger.Debug().Msgf("could not marshal default_tags block: %v", r)
+		}
+	}()
 
 	marshalledTags := make(map[string]interface{})
 
@@ -740,6 +788,12 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 	if tags == nil {
 		return nil
 	}
+
+	defer func() {
+		if r := recover(); r != nil {
+			p.logger.Debug().Msgf("could not marshal default_labels block: %v", r)
+		}
+	}()
 
 	marshalledTags := make(map[string]interface{})
 

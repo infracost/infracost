@@ -191,6 +191,29 @@ func TestBreakdownFormatJsonWithTagsGoogle(t *testing.T) {
 	)
 }
 
+func TestBreakdownFormatJsonPropagateDefaultsToVolumeTags(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+			JSONInclude: regexp.MustCompile("^(tags|name)$"),
+			JSONExclude: regexp.MustCompile("^(costComponents|metadata|pastBreakdown|subresources)$"),
+		}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		},
+	)
+}
+
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
@@ -354,6 +377,11 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 func TestBreakdownTerraformDirectoryWithRecursiveModules(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", dir}, &GoldenFileOptions{RunTerraformCLI: true})
+}
+
+func TestBreakdownTerraformProvidedDefaultEnvs(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--config-file", path.Join(dir, "infracost.yml")}, nil)
 }
 
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
@@ -1559,6 +1587,21 @@ func TestBreakdownTerragruntAutodetectionConfigFileOutput(t *testing.T) {
 		[]string{
 			"breakdown",
 			"--config-file", filepath.Join(dir, "infracost.yml"),
+			"--log-level", "info",
+		},
+		&GoldenFileOptions{LogLevel: strPtr("info"), IgnoreNonGraph: true},
+	)
+}
+
+func TestBreakdownTerragruntPartialInputs(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
 			"--log-level", "info",
 		},
 		&GoldenFileOptions{LogLevel: strPtr("info"), IgnoreNonGraph: true},

@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/shopspring/decimal"
@@ -759,6 +760,49 @@ func TestParseReferences_state(t *testing.T) {
 	p.parseReferences(resData, NewConfLoader(conf))
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
+}
+
+func TestFixKnownModuleRefIssues(t *testing.T) {
+	bucket := schema.NewResourceData("aws_s3_bucket", "registry.terraform.io/hashicorp/aws", "module.bucket.aws_s3_bucket.this[0]", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
+				"id": "hcl-bucket-id"
+				"acl":"private",
+				"bucket":"my-bucket"
+	}`,
+	})
+
+	policy := schema.NewResourceData("aws_s3_bucket_policy", "registry.terraform.io/hashicorp/aws", "module.bucket.aws_s3_bucket_policy.this[0]", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
+				"id": "hcl-policy-id",
+				"bucket":"my-bucket",
+				"policy":"{}"
+	}`,
+	})
+
+	lifecycleConfiguration := schema.NewResourceData("aws_s3_bucket_lifecycle_configuration", "registry.terraform.io/hashicorp/aws", "aws_s3_bucket_lifecycle_configuration.bucket_lifecycle", nil, gjson.Result{
+		Type: gjson.JSON,
+		Raw: `{
+				"bucket": "hcl-policy-id"
+	         }`,
+	})
+
+	lifecycleConfiguration.AddReference("bucket", policy, []string{})
+
+	resData := map[string]*schema.ResourceData{
+		lifecycleConfiguration.Address: lifecycleConfiguration,
+		policy.Address:                 policy,
+		bucket.Address:                 bucket,
+	}
+
+	require.Equal(t, lifecycleConfiguration.Get("bucket").String(), "hcl-policy-id")
+	assert.Equal(t, lifecycleConfiguration.References("bucket")[0].Type, "aws_s3_bucket_policy")
+	fixKnownModuleRefIssues(resData)
+
+	assert.Equal(t, lifecycleConfiguration.Get("bucket").String(), "hcl-bucket-id")
+	assert.Equal(t, lifecycleConfiguration.References("bucket")[0].Get("id").String(), "hcl-bucket-id")
+	assert.Equal(t, lifecycleConfiguration.References("bucket")[0].Type, "aws_s3_bucket")
 }
 
 func TestParseKnownModuleRefs(t *testing.T) {

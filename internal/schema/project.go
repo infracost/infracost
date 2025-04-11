@@ -14,6 +14,7 @@ import (
 	"github.com/go-git/go-git/v5"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/util"
 	"github.com/infracost/infracost/internal/vcs"
 )
 
@@ -106,9 +107,13 @@ func NewDiagJSONParsingFailure(err error) *ProjectDiag {
 // download failure. This contains additional information about the module source
 // and the discovered location returned by the registry.
 func NewPrivateRegistryDiag(source string, moduleLocation *string, err error) *ProjectDiag {
+	source = util.RedactUrl(source)
+	moduleLocation = util.RedactUrlPtr(moduleLocation)
+	errorString := util.RedactUrl(err.Error())
+
 	return newDiag(
 		diagPrivateRegistryModuleDownloadFailure,
-		fmt.Sprintf("Failed to lookup module %q - %s", source, err),
+		fmt.Sprintf("Failed to lookup module %q - %s", source, errorString),
 		true,
 		map[string]interface{}{
 			"moduleLocation": moduleLocation,
@@ -126,9 +131,11 @@ func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
 		sourceType = "ssh"
 	}
 
+	source = util.RedactUrl(source)
+	errorString := util.RedactUrl(err.Error())
 	return newDiag(
 		diagPrivateModuleDownloadFailure,
-		fmt.Sprintf("Failed to download module %q - %s", source, err),
+		fmt.Sprintf("Failed to download module %q - %s", source, errorString),
 		true,
 		map[string]interface{}{
 			"source":       sourceType,
@@ -197,7 +204,9 @@ type ProjectMetadata struct {
 	TerraformWorkspace  string             `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string             `json:"vcsSubPath,omitempty"`
 	VCSCodeChanged      *bool              `json:"vcsCodeChanged,omitempty"`
-	Errors              []*ProjectDiag     `json:"errors,omitempty"`
+	Errors              []*ProjectDiag     `json:"errors,omitempty"` // contains merged current and past errors
+	CurrentErrors       []*ProjectDiag     `json:"currentErrors,omitempty"`
+	PastErrors          []*ProjectDiag     `json:"pastErrors,omitempty"`
 	Warnings            []*ProjectDiag     `json:"warnings,omitempty"`
 	Policies            Policies           `json:"policies,omitempty"`
 	Providers           []ProviderMetadata `json:"providers,omitempty"`
@@ -404,7 +413,7 @@ func (p *Project) AllResources() []*Resource {
 		}
 	}
 
-	var resources []*Resource
+	resources := make([]*Resource, 0, len(m))
 	for r := range m {
 		resources = append(resources, r)
 	}
@@ -425,7 +434,7 @@ func (p *Project) AllPartialResources() []*PartialResource {
 		}
 	}
 
-	var resources []*PartialResource
+	resources := make([]*PartialResource, 0, len(m))
 	for r := range m {
 		resources = append(resources, r)
 	}

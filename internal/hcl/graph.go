@@ -23,33 +23,24 @@ type ModuleConfig struct {
 }
 
 type ModuleConfigs struct {
-	configs map[string][]ModuleConfig
-	mu      sync.RWMutex
+	configs sync.Map
 }
 
 func NewModuleConfigs() *ModuleConfigs {
-	return &ModuleConfigs{
-		configs: make(map[string][]ModuleConfig),
-		mu:      sync.RWMutex{},
-	}
+	return &ModuleConfigs{}
 }
 
 func (m *ModuleConfigs) Add(moduleAddress string, moduleConfig ModuleConfig) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	if _, ok := m.configs[moduleAddress]; !ok {
-		m.configs[moduleAddress] = []ModuleConfig{}
-	}
-
-	m.configs[moduleAddress] = append(m.configs[moduleAddress], moduleConfig)
+	configs, _ := m.configs.LoadOrStore(moduleAddress, []ModuleConfig{})
+	m.configs.Store(moduleAddress, append(configs.([]ModuleConfig), moduleConfig))
 }
 
 func (m *ModuleConfigs) Get(moduleAddress string) []ModuleConfig {
-	m.mu.RLock()
-	defer m.mu.RUnlock()
-
-	return m.configs[moduleAddress]
+	configs, _ := m.configs.Load(moduleAddress)
+	if configs == nil {
+		return nil
+	}
+	return configs.([]ModuleConfig)
 }
 
 type Graph struct {
@@ -218,32 +209,33 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 	}
 
-	edges := make([]dag.EdgeInput, 0)
-
 	for _, vertex := range vertexes {
 		id := vertex.ID()
 		modAddr := vertex.ModuleAddress()
 
 		if modAddr == "" {
 			g.logger.Debug().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
-			edges = append(edges, dag.EdgeInput{
-				SrcID: g.rootVertex.ID(),
-				DstID: id,
-			})
+			if ok, _ := g.dag.IsEdge(g.rootVertex.ID(), id); !ok {
+				if err := g.dag.AddEdge(g.rootVertex.ID(), id); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", g.rootVertex.ID(), id, err)
+				}
+			}
 		} else {
 			// Add the module call edge
 			g.logger.Debug().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
-			edges = append(edges, dag.EdgeInput{
-				SrcID: moduleCallID(modAddr),
-				DstID: id,
-			})
+			if ok, _ := g.dag.IsEdge(moduleCallID(modAddr), id); !ok {
+				if err := g.dag.AddEdge(moduleCallID(modAddr), id); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", moduleCallID(modAddr), id, err)
+				}
+			}
 
 			// Add the module exit edge
 			g.logger.Debug().Msgf("adding edge: %s, %s", id, modAddr)
-			edges = append(edges, dag.EdgeInput{
-				SrcID: id,
-				DstID: modAddr,
-			})
+			if ok, _ := g.dag.IsEdge(id, modAddr); !ok {
+				if err := g.dag.AddEdge(id, modAddr); err != nil {
+					return fmt.Errorf("error adding edge %s, %s %w", id, modAddr, err)
+				}
+			}
 		}
 
 		for _, ref := range vertex.References() {
@@ -324,11 +316,11 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			_, err := g.dag.GetVertex(srcID)
 			if err == nil {
 				g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
-				edges = append(edges, dag.EdgeInput{
-					SrcID: srcID,
-					DstID: dstID,
-				})
-
+				if ok, _ := g.dag.IsEdge(srcID, dstID); !ok {
+					if err := g.dag.AddEdge(srcID, dstID); err != nil {
+						return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+					}
+				}
 				continue
 			}
 
@@ -342,20 +334,16 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				_, err := g.dag.GetVertex(srcID)
 				if err == nil {
 					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
-					edges = append(edges, dag.EdgeInput{
-						SrcID: srcID,
-						DstID: dstID,
-					})
+					if ok, _ := g.dag.IsEdge(srcID, dstID); !ok {
+						if err := g.dag.AddEdge(srcID, dstID); err != nil {
+							return fmt.Errorf("error adding edge %s, %s %w", srcID, dstID, err)
+						}
+					}
 
 					continue
 				}
 			}
 		}
-	}
-
-	err = g.dag.AddEdges(edges)
-	if err != nil {
-		return fmt.Errorf("error adding edges %w", err)
 	}
 
 	// Setup initial context
@@ -385,16 +373,46 @@ func (g *Graph) AsJSON() ([]byte, error) {
 
 func (g *Graph) Walk() {
 	v := NewGraphVisitor(g.logger, g.vertexMutex)
+	TopologicalWalk(g.dag, v.Visit)
+}
 
-	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
-		vertex, _ := d.GetVertex(id)
-
-		v.Visit(id, vertex)
-
-		return vertex, nil
+func TopologicalWalk(graph *dag.DAG, visitor func(id string, vertex Vertex)) {
+	type queueItem struct {
+		id     string
+		vertex Vertex
 	}
 
-	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+	// Calculate in-degrees
+	vertices := graph.GetVertices()
+	queue := make([]queueItem, 0, len(vertices))
+	inDegrees := make(map[string]int, len(vertices))
+	for id, vertex := range vertices {
+		predecessors, _ := graph.GetParents(id)
+		inDegrees[id] = len(predecessors)
+		if inDegrees[id] == 0 {
+			queue = append(queue, queueItem{
+				id:     id,
+				vertex: vertex.(Vertex),
+			})
+		}
+	}
+
+	// Process in topological order
+	for len(queue) > 0 {
+		current := queue[0]
+		queue = queue[1:]
+		visitor(current.id, current.vertex)
+		children, _ := graph.GetChildren(current.id)
+		for id, successor := range children {
+			inDegrees[id]--
+			if inDegrees[id] == 0 {
+				queue = append(queue, queueItem{
+					id:     id,
+					vertex: successor.(Vertex),
+				})
+			}
+		}
+	}
 }
 
 func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
@@ -424,11 +442,9 @@ func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisit
 	}
 }
 
-func (v *GraphVisitor) Visit(id string, vertex interface{}) {
+func (v *GraphVisitor) Visit(id string, vertex Vertex) {
 	v.logger.Debug().Msgf("visiting vertex %q", id)
-
-	vert := vertex.(Vertex)
-	err := vert.Visit(v.vertexMutex)
+	err := vertex.Visit(v.vertexMutex)
 	if err != nil {
 		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
 	}
@@ -439,36 +455,33 @@ func (g *Graph) loadAllBlocks(evaluator *Evaluator) ([]*Block, error) {
 }
 
 func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
-	var blocks []*Block
+	blocks := make([]*Block, len(evaluator.module.Blocks))
+	copy(blocks, evaluator.module.Blocks)
 
-	for _, block := range evaluator.module.Blocks {
-		blocks = append(blocks, block)
-
-		if block.Type() == "module" {
-			modCall, err := evaluator.loadModule(block)
-			if err != nil {
-				return nil, fmt.Errorf("could not load module %q", block.FullName())
-			}
-
-			moduleEvaluator := NewEvaluator(
-				*modCall.Module,
-				evaluator.workingDir,
-				map[string]cty.Value{},
-				evaluator.moduleMetadata,
-				map[string]map[string]cty.Value{},
-				evaluator.workspace,
-				evaluator.blockBuilder,
-				evaluator.logger,
-				evaluator.isGraph,
-			)
-
-			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
-			if err != nil {
-				return nil, fmt.Errorf("could not load blocks for module %q", block.FullName())
-			}
-
-			blocks = append(blocks, modBlocks...)
+	for _, block := range evaluator.module.Blocks.OfType("module") {
+		modCall, err := evaluator.loadModule(block)
+		if err != nil {
+			return nil, fmt.Errorf("could not load module %q", block.FullName())
 		}
+
+		moduleEvaluator := NewEvaluator(
+			*modCall.Module,
+			evaluator.workingDir,
+			map[string]cty.Value{},
+			evaluator.moduleMetadata,
+			map[string]map[string]cty.Value{},
+			evaluator.workspace,
+			evaluator.blockBuilder,
+			evaluator.logger,
+			evaluator.isGraph,
+		)
+
+		modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
+		if err != nil {
+			return nil, fmt.Errorf("could not load blocks for module %q", block.FullName())
+		}
+
+		blocks = append(blocks, modBlocks...)
 	}
 
 	return blocks, nil

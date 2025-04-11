@@ -1,0 +1,11 @@
+└── terraform (terraform)
+    ├── config
+    │   ├── dev
+    │   │   └── terraform.tfvars
+    │   └── prod
+    │       └── terraform.tfvars
+    └── foo (terraform)
+        ├── dev
+        │   └── terraform.tfvars
+        └── prod
+            └── terraform.tfvars

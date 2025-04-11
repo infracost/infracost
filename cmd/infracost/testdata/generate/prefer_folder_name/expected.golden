@@ -1,0 +1,20 @@
+version: 0.1
+
+projects:
+  - path: infra
+    name: infra-qa
+    terraform_var_files:
+      - envs/qa/prod.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/**
+      - infra/envs/qa/prod.tfvars
+  - path: infra
+    name: infra-stg
+    terraform_var_files:
+      - envs/stg/dev.tfvars
+    skip_autodetect: true
+    dependency_paths:
+      - infra/**
+      - infra/envs/stg/dev.tfvars
+

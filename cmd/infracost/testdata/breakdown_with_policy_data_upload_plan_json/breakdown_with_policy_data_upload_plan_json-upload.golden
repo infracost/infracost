@@ -67,7 +67,7 @@ storePolicyResources:
           },
           "references": [],
           "infracostMetadata": {
-            "calls": null,
+            "calls": [],
             "checksum": "a1c17a5372d0b56215b34af598a205bb8cdc208b82780e3ba2cac92460b26dd7",
             "endLine": 0,
             "filename": "",

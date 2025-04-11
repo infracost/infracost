@@ -78,10 +78,10 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(r.Region),
-					Service:       strPtr("Cloud Functions"),
+					Service:       strPtr("Cloud Run Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", Value: strPtr("CPU Time")},
+						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) CPU Time")},
 					},
 				},
 				UsageBased: true,
@@ -94,10 +94,10 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(r.Region),
-					Service:       strPtr("Cloud Functions"),
+					Service:       strPtr("Cloud Run Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", Value: strPtr("Memory Time")},
+						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) Memory Time")},
 					},
 				},
 				UsageBased: true,
@@ -110,10 +110,10 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr("global"),
-					Service:       strPtr("Cloud Functions"),
+					Service:       strPtr("Cloud Run Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", Value: strPtr("Invocations")},
+						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) Invocations")},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{
@@ -129,10 +129,10 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(r.Region),
-					Service:       strPtr("Cloud Functions"),
+					Service:       strPtr("Cloud Run Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: regexPtr("^Network Data Transfer Out")},
+						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) Network Data Transfer Out")},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{

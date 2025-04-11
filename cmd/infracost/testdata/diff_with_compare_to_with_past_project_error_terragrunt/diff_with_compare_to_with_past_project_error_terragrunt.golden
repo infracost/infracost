@@ -1,0 +1,25 @@
+──────────────────────────────────
+Project: us
+Module path: REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/dev
+Errors:
+  Diff baseline error:
+    Failed to download module "doesntexist" - error fetching module doesntexist from remote:
+      stat BAD_MODULE_PATH:
+        no such file or directory
+
+──────────────────────────────────
+Project: us
+Module path: REPLACED_PROJECT_PATH/testdata/diff_with_compare_to_with_past_project_error_terragrunt/us/prod
+Errors:
+  Diff baseline error:
+    Failed to download module "doesntexist" - error fetching module doesntexist from remote:
+      stat BAD_MODULE_PATH:
+        no such file or directory
+
+──────────────────────────────────
+
+4 cloud resources were detected:
+∙ 4 were estimated
+
+Err:
+

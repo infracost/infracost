@@ -2,7 +2,7 @@ package modules
 
 import (
 	"bytes"
-	"crypto/md5" //nolint
+	"crypto/md5" // nolint
 	"errors"
 	"fmt"
 	"net/url"
@@ -14,10 +14,14 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
-	getter "github.com/hashicorp/go-getter"
+	giturls "github.com/chainguard-dev/git-urls"
+	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/infracost/infracost/internal/metrics"
+	"github.com/otiai10/copy"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 
@@ -42,6 +46,18 @@ var (
 	// option to allow users to set this value.
 	maxSparseCheckoutDepth = 1
 )
+
+// RemoteCache is an interface that defines the methods for a remote cache, i.e. an S3 bucket.
+type RemoteCache interface {
+	Exists(key string, public bool) (bool, error)
+	Get(key string, dest string, public bool) error
+	Put(key string, src string, ttl time.Duration, public bool) error
+}
+
+// PublicModuleChecker is an interface that defines the method for checking if a module is public.
+type PublicModuleChecker interface {
+	IsPublicModule(moduleAddr string) (bool, error)
+}
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
 //
@@ -69,24 +85,34 @@ type SourceMapResult struct {
 	Version  string
 	RawQuery string
 }
+type ModuleLoaderOptions struct {
+	CachePath           string
+	HCLParser           *SharedHCLParser
+	CredentialsSource   *CredentialsSource
+	SourceMap           config.TerraformSourceMap
+	Logger              zerolog.Logger
+	ModuleSync          *intSync.KeyMutex
+	RemoteCache         RemoteCache
+	PublicModuleChecker PublicModuleChecker
+}
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(cachePath string, hclParser *SharedHCLParser, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger zerolog.Logger, moduleSync *intSync.KeyMutex) *ModuleLoader {
-	fetcher := NewPackageFetcher(logger)
+func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
+	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger, WithPublicModuleChecker(opts.PublicModuleChecker))
 	// we need to have a disco for each project that has defined credentials
-	d := NewDisco(credentialsSource, logger)
+	d := NewDisco(opts.CredentialsSource, opts.Logger)
 
 	m := &ModuleLoader{
-		cachePath:      cachePath,
-		cache:          NewCache(d, logger),
-		hclParser:      hclParser,
-		sourceMap:      sourceMap,
+		cachePath:      opts.CachePath,
+		cache:          NewCache(d, opts.Logger),
+		hclParser:      opts.HCLParser,
+		sourceMap:      opts.SourceMap,
 		packageFetcher: fetcher,
-		logger:         logger,
-		sync:           moduleSync,
+		logger:         opts.Logger,
+		sync:           opts.ModuleSync,
 	}
 
-	m.registryLoader = NewRegistryLoader(fetcher, d, logger)
+	m.registryLoader = NewRegistryLoader(fetcher, d, opts.Logger)
 
 	return m
 }
@@ -103,7 +129,7 @@ func (m *ModuleLoader) manifestFilePath(projectPath string) string {
 	}
 
 	rel, _ := filepath.Rel(m.cachePath, projectPath)
-	sum := md5.Sum([]byte(rel)) //nolint
+	sum := md5.Sum([]byte(rel)) // nolint
 	return filepath.Join(m.cachePath, ".infracost/terraform_modules/", fmt.Sprintf("manifest-%x.json", sum))
 }
 
@@ -183,7 +209,6 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 
 // loadModules recursively loads the modules from the given path.
 func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModule, error) {
-	manifestModules := make([]*ManifestModule, 0)
 
 	module, err := m.loadModuleFromPath(path)
 	if err != nil {
@@ -192,6 +217,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 	numJobs := len(module.ModuleCalls)
 	jobs := make(chan *tfconfig.ModuleCall, numJobs)
+	manifestModules := make([]*ManifestModule, len(jobs))
 	for _, moduleCall := range module.ModuleCalls {
 		jobs <- moduleCall
 	}
@@ -199,6 +225,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 	errGroup := &errgroup.Group{}
 	manifestMu := sync.Mutex{}
+
+	remoteModuleCounter := metrics.GetCounter("remote_module.count", true)
 
 	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
@@ -210,6 +238,13 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 				// only include non-local modules in the manifest since we don't want to cache local ones.
 				if !IsLocalModule(metadata.Source) {
+					remoteModuleCounter.Inc()
+					manifestMu.Lock()
+					manifestModules = append(manifestModules, metadata)
+					manifestMu.Unlock()
+				}
+
+				if IsLocalModule(metadata.Source) && metadata.IsSourceMapped {
 					manifestMu.Lock()
 					manifestModules = append(manifestModules, metadata)
 					manifestMu.Unlock()
@@ -248,8 +283,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	key := prefix + moduleCall.Name
 	source := moduleCall.Source
 	version := moduleCall.Version
+	isSourceMapped := false
 
-	mappedResult, err := mapSource(m.sourceMap, source)
+	mappedResult, err := MapSource(m.sourceMap, source)
 	if err != nil {
 		return nil, err
 	}
@@ -257,11 +293,13 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	if mappedResult.Source != source {
 		m.logger.Debug().Msgf("remapping module source %s to %s", source, mappedResult.Source)
 		source = mappedResult.Source
+		isSourceMapped = true
 	}
 
 	if mappedResult.Version != "" {
 		m.logger.Debug().Msgf("remapping module version %s to %s", version, mappedResult.Version)
 		version = mappedResult.Version
+		isSourceMapped = true
 	}
 
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
@@ -311,11 +349,15 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		}
 
 		return &ManifestModule{
-			Key:    key,
-			Source: source,
-			Dir:    path.Clean(dir),
+			Key:            key,
+			Source:         source,
+			Dir:            path.Clean(dir),
+			IsSourceMapped: isSourceMapped,
 		}, nil
 	}
+
+	moduleLoadTimer := metrics.GetTimer("submodule.remote_load.duration", false, source, version).Start()
+	defer moduleLoadTimer.Stop()
 
 	manifestModule, err = m.loadRegistryModule(key, source, version)
 	if err != nil {
@@ -347,7 +389,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 }
 
 // checkoutPathIfRequired checks if the given directories are in the sparse-checkout file list and adds them if not.
-func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) error {
+func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dir string) error {
 	// Lock the git repo root so we don't have multiple calls trying to read and update the sparse-checkout file list.
 	unlock := m.sync.Lock(repoRoot)
 	defer unlock()
@@ -368,22 +410,28 @@ func (m *ModuleLoader) checkoutPathIfRequired(repoRoot string, dirs string) erro
 	existingDirs, err := getSparseCheckoutDirs(repoRoot)
 	if err != nil {
 		// If the error indicates that sparse checkout is not enabled, just return nil
+		// Even though we check this above, we need to check it again here because the sparse-checkout
+		// config might be enabled but sparse-checkout might not be fully initialized
 		if err.Error() == "sparse-checkout not enabled" {
 			m.logger.Trace().Msgf("sparse-checkout not enabled for path %s", repoRoot)
 			return nil
 		}
+	}
+
+	sourceURL, err := getGitURL(repoRoot)
+	if err != nil {
 		return err
 	}
 
 	mu := &sync.Mutex{}
 
-	return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, []string{dirs}, mu, m.logger, 0)
+	return RecursivelyAddDirsToSparseCheckout(repoRoot, sourceURL, m.packageFetcher, existingDirs, []string{dir}, mu, m.logger, 0)
 }
 
 // RecursivelyAddDirsToSparseCheckout adds the given directories to the sparse-checkout file list.
 // It then checks any symlinks within the directories and adds them to the sparse-checkout file list as well.
-func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
-	var newDirs []string
+func RecursivelyAddDirsToSparseCheckout(repoRoot string, sourceURL string, packageFetcher *PackageFetcher, existingDirs []string, dirs []string, mu *sync.Mutex, logger zerolog.Logger, depth int) error {
+	newDirs := make([]string, 0, len(dirs))
 
 	// Sort the existing directories and dirs to be added by length
 	// This ensures that parent directories are added before child directories
@@ -407,12 +455,56 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 		return nil
 	}
 
-	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
-	mu.Lock()
-	err := setSparseCheckoutDirs(repoRoot, existingDirs)
-	mu.Unlock()
+	parsedSourceURL, err := url.Parse(sourceURL)
 	if err != nil {
 		return err
+	}
+
+	// Create a temporary directory for this fetch
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "infracost-sparse-checkout")
+	if err != nil {
+		return fmt.Errorf("error creating temporary directory: %w", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	logger.Trace().Msgf("adding dirs to sparse-checkout for repo %s: %v", repoRoot, newDirs)
+	for _, dir := range newDirs {
+		q := parsedSourceURL.Query()
+		q.Set("subdir", dir)
+		parsedSourceURL.RawQuery = q.Encode()
+		s := parsedSourceURL.String()
+
+		// Load the package either from the cache or by pulling from the remote.
+		// We load it into a temporary directory so we can then merge it into the repo root.
+		// If we load it into the repo root then the fetcher will try and cache
+		// the entire repo root which we don't want.
+		dirTmpDir := filepath.Join(tmpDir, "fetch-"+filepath.Base(dir))
+		err := packageFetcher.Fetch(s, dirTmpDir)
+		if err != nil {
+			return fmt.Errorf("error fetching module %s: %w", s, err)
+		}
+
+		mu.Lock()
+		// Copy the downloaded package into the repo root
+		opt := copy.Options{
+			OnSymlink: func(src string) copy.SymlinkAction {
+				return copy.Shallow
+			},
+		}
+		err = copy.Copy(dirTmpDir, repoRoot, opt)
+		if err != nil {
+			return fmt.Errorf("error copying module %s to repo root: %w", s, err)
+		}
+
+		// After we've fetched the package we need to update the sparse checkout list
+		// because the package fetcher retrieved it from the remote cache this won't
+		// have been done and future calls to download other subdirs won't work
+		err = setSparseCheckoutDirs(repoRoot, existingDirs)
+		mu.Unlock()
+
+		if err != nil {
+			return fmt.Errorf("error setting sparse checkout list: %w", err)
+		}
 	}
 
 	if depth >= maxSparseCheckoutDepth {
@@ -423,7 +515,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 	for _, dir := range newDirs {
 		symlinkedDirs, err := ResolveSymLinkedDirs(repoRoot, dir)
 		if err != nil {
-			return err
+			return fmt.Errorf("error resolving symlinks for dir %s: %w", dir, err)
 		}
 
 		for _, symlinkedDir := range symlinkedDirs {
@@ -435,7 +527,7 @@ func RecursivelyAddDirsToSparseCheckout(repoRoot string, existingDirs []string, 
 
 	if len(additionalDirs) > 0 {
 		logger.Trace().Msgf("recursively adding symlinked dirs to sparse-checkout for repo %s: %v", repoRoot, additionalDirs)
-		return RecursivelyAddDirsToSparseCheckout(repoRoot, existingDirs, additionalDirs, mu, logger, depth+1)
+		return RecursivelyAddDirsToSparseCheckout(repoRoot, sourceURL, packageFetcher, existingDirs, additionalDirs, mu, logger, depth+1)
 	}
 
 	return nil
@@ -461,6 +553,31 @@ func findGitRepoRoot(startPath string) (string, error) {
 		return "", fmt.Errorf("not a git repository")
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+// getGitURL gets the Git URL for the given path
+func getGitURL(path string) (string, error) {
+	// Get remote
+	cmd := exec.Command("git", "config", "--get", "remote.origin.url")
+	cmd.Dir = path
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error getting git URL: %w", err)
+	}
+
+	remote := strings.TrimSpace(string(output))
+
+	// Get commit
+	cmd = exec.Command("git", "rev-parse", "HEAD")
+	cmd.Dir = path
+	output, err = cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error getting git commit: %w", err)
+	}
+
+	commit := strings.TrimSpace(string(output))
+
+	return fmt.Sprintf("git::%s?ref=%s", remote, commit), nil
 }
 
 // isSparseCheckoutEnabled checks if sparse-checkout is enabled in the repository
@@ -630,8 +747,10 @@ func (m *ModuleLoader) loadRegistryModule(key string, source string, version str
 	}
 	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
-	// lock the module address so that we don't interact with an incomplete download.
-	unlock := m.sync.Lock(moduleAddr)
+	// lock the download destination so that we don't interact with an incomplete download.
+	// we can't use module address as the key here because the module address might be different for the same module,
+	// e.g. ssh vs https
+	unlock := m.sync.Lock(dest)
 	defer unlock()
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, version)
@@ -697,8 +816,9 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 	}
 	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
-	// lock the module address so that we don't interact with an incomplete download.
-	unlock := m.sync.Lock(moduleAddr)
+	// lock the download destination so that we don't interact with an incomplete download.
+	// we can't use module address here as the version may be different
+	unlock := m.sync.Lock(dest)
 	defer unlock()
 
 	_, err = os.Stat(dest)
@@ -706,8 +826,9 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 		return manifestModule, nil
 	}
 
-	err = m.packageFetcher.fetch(moduleAddr, dest)
+	err = m.packageFetcher.Fetch(moduleAddr, dest)
 	if err != nil {
+		_ = os.RemoveAll(dest)
 		return nil, schema.NewFailedDownloadDiagnostic(source, err)
 	}
 
@@ -715,7 +836,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 }
 
 func (m *ModuleLoader) downloadDest(moduleAddr string, version string) string {
-	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) //nolint
+	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) // nolint
 	return filepath.Join(m.downloadDir(), hash)
 }
 
@@ -780,7 +901,7 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 	return moduleAddr
 }
 
-// mapSource maps the module source to a new source if it is in the source map
+// MapSource maps the module source to a new source if it is in the source map
 // otherwise it returns the original source. It works similarly to the
 // TERRAGRUNT_SOURCE_MAP environment variable except it matches by prefixes
 // and supports query params. It works by matching the longest prefix first,
@@ -789,7 +910,7 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 // It does not support mapping registry versions to git tags since we can't
 // guarantee that the tag is correct - depending on the git repo the version
 // might be prefixed with a 'v' or not.
-func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapResult, error) {
+func MapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapResult, error) {
 	result := SourceMapResult{
 		Source:   source,
 		Version:  "",
@@ -835,12 +956,20 @@ func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapRes
 	// Merge the query params from the source and dest URLs
 	parsedSourceURL, err := url.Parse(moduleAddr)
 	if err != nil {
-		return SourceMapResult{}, err
+		// Try parsing it as a git URL
+		parsedSourceURL, err = giturls.Parse(moduleAddr)
+		if err != nil {
+			return SourceMapResult{}, err
+		}
 	}
 
 	parsedDestURL, err := url.Parse(destSource)
 	if err != nil {
-		return SourceMapResult{}, err
+		// Try parsing it as a git URL
+		parsedDestURL, err = giturls.Parse(destSource)
+		if err != nil {
+			return SourceMapResult{}, err
+		}
 	}
 
 	sourceQuery := parsedSourceURL.Query()

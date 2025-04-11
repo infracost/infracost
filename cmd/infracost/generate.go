@@ -26,6 +26,7 @@ type generateConfigCommand struct {
 	templatePath string
 	template     string
 	outFile      string
+	treeFile     string
 }
 
 func newGenerateConfigCommand() *cobra.Command {
@@ -48,6 +49,7 @@ func newGenerateConfigCommand() *cobra.Command {
 	cmd.Flags().StringVar(&gen.template, "template", "", "Infracost template string that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.templatePath, "template-path", "", "Path to the Infracost template file that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.outFile, "out-file", "", "Save output to a file")
+	cmd.Flags().StringVar(&gen.treeFile, "tree-file", "", "Save a simplified tree of the detected projects and var files to a file")
 
 	return cmd
 }
@@ -67,6 +69,11 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	var buf bytes.Buffer
 
 	ctx := config.EmptyRunContext()
+	err := ctx.Config.LoadFromEnv()
+	if err != nil {
+		logging.Logger.Warn().Msgf("failed to load config from env: %s", err)
+	}
+
 	hasTemplate := g.template != "" || g.templatePath != ""
 	var definedProjects bool
 	if hasTemplate {
@@ -100,6 +107,19 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			logging.Logger.Debug().Err(err).Msg("could not detect providers")
 		} else {
 			return fmt.Errorf("could not detect providers %w", err)
+		}
+	}
+
+	if g.treeFile != "" {
+		treeFile, err := os.Create(g.treeFile)
+		if err != nil {
+			logging.Logger.Warn().Msgf("could not create detected tree file: at %s %s", g.treeFile, err)
+		} else {
+			_, err = treeFile.WriteString(detectionOutput.Tree)
+			if err != nil {
+				logging.Logger.Warn().Msgf("could not write detected tree file: %s", err)
+			}
+			_ = treeFile.Close()
 		}
 	}
 
@@ -155,7 +175,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			variables.BaseBranch = m.PullRequest.BaseBranch
 		}
 
-		parser := template.NewParser(wd, variables)
+		parser := template.NewParser(wd, variables, ctx.Config)
 		if g.template != "" {
 			err := parser.Compile(g.template, &buf)
 			if err != nil {

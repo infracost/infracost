@@ -119,8 +119,7 @@ func (p *Parser) createParsedResource(d *schema.ResourceData, u *schema.UsageDat
 }
 
 func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResource, usage schema.UsageMap, confLoader *ConfLoader, parsed, providerConf, vars gjson.Result) []parsedResource {
-	var resources []parsedResource
-	resources = append(resources, baseResources...)
+
 	var vals gjson.Result
 
 	isState := false
@@ -136,6 +135,9 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResou
 	}
 
 	resData := p.parseResourceData(isState, confLoader, providerConf, vals, vars)
+
+	resources := make([]parsedResource, len(baseResources), len(resData)+len(baseResources))
+	copy(resources, baseResources)
 
 	p.parseReferences(resData, confLoader)
 	p.parseTags(resData, confLoader, providerConf)
@@ -294,7 +296,7 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 		return nil
 	}
 
-	var urls []string
+	urls := make([]string, 0, len(remoteUrls))
 	for source := range remoteUrls {
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
@@ -306,7 +308,6 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 }
 
 func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
-	var metadatas []schema.ProviderMetadata
 
 	confMap := providerConf.Map()
 
@@ -316,6 +317,8 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+
+	metadatas := make([]schema.ProviderMetadata, 0, len(keys))
 
 	for _, k := range keys {
 		conf := confMap[k]
@@ -452,6 +455,9 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
 		data.Metadata = gjson.ParseBytes([]byte(r.Get("infracost_metadata").Raw)).Map()
+		for k, v := range p.ctx.ProjectConfig.Metadata {
+			data.ProjectMetadata[k] = v
+		}
 		resources[strings.Clone(addr)] = data
 	}
 
@@ -532,13 +538,14 @@ func parseGoogleDefaultTags(providerConf, resConf gjson.Result) (map[string]stri
 	for k, v := range providerConf.Get(fmt.Sprintf("%s.expressions.default_labels.constant_value", gjsonEscape(providerKey))).Map() {
 		defaultTags[k] = v.String()
 	}
-	var missingAttrsCausingUnknownKeys []string
-	for _, address := range providerConf.Get(
+	missingAttributes := providerConf.Get(
 		fmt.Sprintf(
 			"%s.expressions.default_labels.missing_attributes_causing_unknown_keys",
 			gjsonEscape(providerKey),
 		),
-	).Array() {
+	).Array()
+	missingAttrsCausingUnknownKeys := make([]string, 0, len(missingAttributes))
+	for _, address := range missingAttributes {
 		if address.String() == "" {
 			continue
 		}
@@ -755,6 +762,8 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLo
 			}
 		}
 	}
+
+	fixKnownModuleRefIssues(resData)
 }
 
 func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *RegistryItemMap) bool {
@@ -1177,6 +1186,48 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, confLoader *C
 				}
 			}
 		}
+	}
+}
+
+// fixKnownModuleRefIssues deals with edge cases where the module returns an id that doesn't work for the resource
+// this is exemplified by the s3-bucket module which coalesces a number of id's starting with "aws_s3_bucket_policy."
+// this means we're referencing the wrong resource in the plan JSON. This function fixes that by replacing the reference.
+// the intention is to be laser focused in the application of this where we know the specific conditions it will occur
+func fixKnownModuleRefIssues(resData map[string]*schema.ResourceData) {
+	knownRefs := []struct {
+		SourceResourceType  string
+		AttributeName       string
+		TargetResource      string
+		ReplacementResource string
+	}{
+		{
+			SourceResourceType:  "aws_s3_bucket_lifecycle_configuration",
+			AttributeName:       "bucket",
+			TargetResource:      "aws_s3_bucket_policy",
+			ReplacementResource: "aws_s3_bucket",
+		},
+	}
+
+	for _, d := range resData {
+		for _, knownRef := range knownRefs {
+			if d.Type == knownRef.SourceResourceType {
+				for _, ref := range d.ReferencesMap[knownRef.AttributeName] {
+					if ref.Type == knownRef.TargetResource {
+						targetAddress := strings.Replace(ref.Address, knownRef.TargetResource, knownRef.ReplacementResource, 1)
+
+						for _, target := range resData {
+							// find possible targets and ensure that its from the same module as existing reference
+							if target.Type == knownRef.ReplacementResource && target.Address == targetAddress {
+								// replace the reference
+								d.ReplaceReference(knownRef.AttributeName, ref, target)
+
+							}
+						}
+					}
+				}
+			}
+		}
+
 	}
 }
 

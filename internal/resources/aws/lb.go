@@ -52,14 +52,24 @@ func (r *LB) BuildResource() *schema.Resource {
 	if r.ActiveConnections != nil {
 		activeConnections := decimal.NewFromInt(*r.ActiveConnections)
 		activeConnectionsLCU = decimalPtr(activeConnections.Div(decimal.NewFromInt(3000)))
-		maxLCU = decimalPtr(decimal.Max(*maxLCU, *activeConnectionsLCU))
+
+		if maxLCU == nil {
+			maxLCU = activeConnectionsLCU
+		} else {
+			maxLCU = decimalPtr(decimal.Max(*maxLCU, *activeConnectionsLCU))
+		}
 	}
 
 	var processedBytesLCU *decimal.Decimal
 	if r.ProcessedBytesGB != nil {
 		processedBytes := decimal.NewFromFloat(*r.ProcessedBytesGB)
 		processedBytesLCU = decimalPtr(processedBytes.Div(decimal.NewFromInt(1)))
-		maxLCU = decimalPtr(decimal.Max(*maxLCU, *processedBytesLCU))
+
+		if maxLCU == nil {
+			maxLCU = processedBytesLCU
+		} else {
+			maxLCU = decimalPtr(decimal.Max(*maxLCU, *processedBytesLCU))
+		}
 	}
 
 	var costComponents []*schema.CostComponent
@@ -69,7 +79,12 @@ func (r *LB) BuildResource() *schema.Resource {
 		if r.RuleEvaluations != nil && maxLCU != nil {
 			ruleEvaluations := decimal.NewFromInt(*r.RuleEvaluations)
 			ruleEvaluationsLCU = ruleEvaluations.Div(decimal.NewFromInt(1000))
-			maxLCU = decimalPtr(decimal.Max(*maxLCU, ruleEvaluationsLCU))
+
+			if maxLCU == nil {
+				maxLCU = &ruleEvaluationsLCU
+			} else {
+				maxLCU = decimalPtr(decimal.Max(*maxLCU, ruleEvaluationsLCU))
+			}
 		}
 
 		costComponents = r.applicationLBCostComponents(maxLCU)
@@ -145,7 +160,7 @@ func (r *LB) capacityUnitsCostComponent(productFamily string, maxLCU *decimal.De
 			ProductFamily: strPtr(productFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "locationType", Value: strPtr("AWS Region")},
-				{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
+				{Key: "usagetype", ValueRegex: strPtr("/^([A-Z]{3}\\d-|Global-|EU-)?LCUUsage/")},
 			},
 		},
 		UsageBased: true,

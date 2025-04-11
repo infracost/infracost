@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
@@ -112,10 +113,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projectContexts := make([]*config.ProjectContext, 0)
 
 	for _, projectResult := range projectResults {
-		for _, project := range projectResult.projectOut.projects {
-			projectContexts = append(projectContexts, projectResult.ctx)
-			projects = append(projects, project)
-		}
+		projectContexts = append(projectContexts, projectResult.ctx)
+		projects = append(projects, projectResult.projectOut.projects...)
 	}
 
 	r, err := output.ToOutputFormat(runCtx.Config, projects)
@@ -237,13 +236,15 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 	}
 	runCtx.ContextValues.SetValue("parallelism", parallelism)
 
+	metrics.GetCounter("parallel_runner.parallelism", false).Add(parallelism)
+
 	return &parallelRunner{
 		parallelism:    parallelism,
 		runCtx:         runCtx,
 		cmd:            cmd,
 		pathMuxs:       pathMuxs,
 		prior:          prior,
-		pricingFetcher: prices.NewPriceFetcher(runCtx),
+		pricingFetcher: prices.NewPriceFetcher(runCtx, false),
 	}, nil
 }
 
@@ -251,6 +252,9 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 	var queue []projectJob
 	var totalRootModules int
 	var i int
+
+	parallelRunnerTimer := metrics.GetTimer("parallel_runner.run.total_duration", false).Start()
+	defer parallelRunnerTimer.Stop()
 
 	isAuto := r.runCtx.IsAutoDetect()
 	for _, p := range r.runCtx.Config.Projects {
@@ -271,6 +275,10 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 		totalRootModules += detectionOutput.RootModules
 	}
+
+	metrics.GetCounter("parallel_runner.project_count", false).Add(i)
+	metrics.GetCounter("parallel_runner.root_module_count", false).Add(totalRootModules)
+
 	projectCounts := make(map[string]int)
 	for _, job := range queue {
 		if job.err != nil {
@@ -286,7 +294,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 		projectCounts[provider.DisplayType()] = 1
 	}
 
-	var order []string
+	order := make([]string, 0, len(projectCounts))
 	for displayType := range projectCounts {
 		order = append(order, displayType)
 	}
@@ -363,6 +371,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 	errGroup, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < r.parallelism; i++ {
 		errGroup.Go(func() (err error) {
+
 			// defer a function to recover from any panics spawned by child goroutines.
 			// This is done as recover works only in the same goroutine that it is called.
 			// We need to catch any child goroutine panics and hand them up to the main caller
@@ -375,29 +384,43 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			}()
 
 			for job := range jobs {
-				var configProjects *projectOutput
-				ctx := job.ctx
-				if job.err != nil {
-					configProjects = newErroredProject(job.provider, job.ctx, job.err)
-				} else {
-					configProjects, err = r.runProvider(job)
-					ctx = job.provider.Context()
-					if err != nil {
-						configProjects = newErroredProject(job.provider, ctx, err)
+				func() {
+					var metricContext []string
+					if job.provider != nil {
+						metricContext = append(metricContext, job.provider.Type())
+						if job.provider.Context() != nil {
+							metricContext = append(metricContext, job.provider.Context().ProjectConfig.Path)
+						}
+					}
+					jobTimer := metrics.GetTimer("parallel_runner.job.duration", false, metricContext...).Start()
+					defer jobTimer.Stop()
+
+					var configProjects *projectOutput
+					ctx := job.ctx
+					if job.err != nil {
+						configProjects = newErroredProject(job.provider, job.ctx, job.err)
+					} else {
+						configProjects, err = r.runProvider(job)
+						ctx = job.provider.Context()
+						if err != nil {
+							configProjects = newErroredProject(job.provider, ctx, err)
+						}
+
 					}
 
-				}
-
-				projectResultChan <- projectResult{
-					index:      job.index,
-					ctx:        ctx,
-					projectOut: configProjects,
-				}
+					projectResultChan <- projectResult{
+						index:      job.index,
+						ctx:        ctx,
+						projectOut: configProjects,
+					}
+				}()
 			}
 
 			return nil
 		})
 	}
+
+	allJobsTimer := metrics.GetTimer("parallel_runner.all_jobs.duration", false).Start()
 
 	for _, job := range queue {
 		jobs <- job
@@ -406,6 +429,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 	close(jobs)
 
 	err := errGroup.Wait()
+	allJobsTimer.Stop()
 	if err != nil {
 		return nil, err
 	}
@@ -453,7 +477,9 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 
 	// Generate usage file
 	if r.runCtx.Config.SyncUsageFile {
+		usageGenTimer := metrics.GetTimer("parallel_runner.usage_gen.duration", false, path).Start()
 		err = r.generateUsageFile(job.provider)
+		usageGenTimer.Stop()
 		if err != nil {
 			return nil, fmt.Errorf("Error generating usage file %w", err)
 		}
@@ -512,7 +538,9 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 	out = &projectOutput{}
 
 	t1 := time.Now()
+	loadResourcesTimer := metrics.GetTimer("parallel_runner.load_resources.duration", false, path).Start()
 	projects, err := job.provider.LoadResources(usageData)
+	loadResourcesTimer.Stop()
 	if err != nil {
 		r.cmd.PrintErrln()
 		return nil, err
@@ -520,8 +548,12 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 
 	_ = r.uploadCloudResourceIDs(projects)
 
+	buildResourcesTimer := metrics.GetTimer("parallel_runner.build_resources.duration", false, path).Start()
 	r.buildResources(projects)
+	buildResourcesTimer.Stop()
 
+	costingTimer := metrics.GetTimer("parallel_runner.costing.duration", false, path).Start()
+	defer costingTimer.Stop()
 	logging.Logger.Debug().Msg("Retrieving cloud prices to calculate costs")
 
 	for _, project := range projects {
