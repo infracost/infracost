@@ -13,5 +13,6 @@ func TestCognitiveDeployment(t *testing.T) {
 
 	opts := tftest.DefaultGoldenFileOptions()
 	opts.CaptureLogs = true
+	opts.IgnoreCLI = true
 	tftest.GoldenFileResourceTestsWithOpts(t, "cognitive_deployment_test", opts)
 }
