@@ -29,6 +29,8 @@ type ResourceData struct {
 	// use this value instead of the deprecated d.Get("region").String() or
 	// lookupRegion method.
 	Region string
+	// PulumiUrn is the unique URN of the resource in Pulumi
+	PulumiUrn string
 }
 
 type TagPropagation struct {
@@ -61,6 +63,17 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 		RawValues:       gjson.Result{},
 		ReferencesMap:   make(map[string][]*ResourceData),
 		CFResource:      cfResource,
+		ProjectMetadata: make(map[string]string),
+	}
+}
+
+func NewResourceDataFromProviderPulumi(resourceType string, address string, rawValues gjson.Result) *ResourceData {
+	return &ResourceData{
+		Type:            resourceType,
+		ProviderName:    "pulumi",
+		Address:         address,
+		RawValues:       rawValues,
+		ReferencesMap:   make(map[string][]*ResourceData),
 		ProjectMetadata: make(map[string]string),
 	}
 }
@@ -112,6 +125,19 @@ func (d *ResourceData) GetBoolOrDefault(key string, def bool) bool {
 func (d *ResourceData) IsEmpty(key string) bool {
 	g := d.RawValues.Get(key)
 	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
+}
+
+// emptyObjectOrArray returns true if the gjson.Result is an empty object or array
+func emptyObjectOrArray(g gjson.Result) bool {
+	if g.Type == gjson.JSON {
+		if g.IsObject() {
+			return len(g.Map()) == 0
+		}
+		if g.IsArray() {
+			return len(g.Array()) == 0
+		}
+	}
+	return false
 }
 
 func (d *ResourceData) References(keys ...string) []*ResourceData {

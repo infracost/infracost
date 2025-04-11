@@ -13,6 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
+	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -51,6 +52,8 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		return &DetectionOutput{Providers: []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	case ProjectTypeCloudFormation:
 		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypePulumiPreviewJSON:
+		return &DetectionOutput{Providers: []schema.Provider{pulumi.NewPreviewJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	}
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
@@ -204,6 +207,7 @@ var (
 	ProjectTypeTerragruntCLI       ProjectType = "terragrunt_cli"
 	ProjectTypeTerraformStateJSON  ProjectType = "terraform_state_json"
 	ProjectTypeCloudFormation      ProjectType = "cloudformation"
+	ProjectTypePulumiPreviewJSON   ProjectType = "pulumi_preview_json"
 	ProjectTypeAutodetect          ProjectType = "autodetect"
 )
 
@@ -222,6 +226,10 @@ func DetectProjectType(path string, forceCLI bool) ProjectType {
 
 	if isTerraformPlan(path) {
 		return ProjectTypeTerraformPlanBinary
+	}
+	
+	if isPulumiPreviewJSON(path) {
+		return ProjectTypePulumiPreviewJSON
 	}
 
 	if forceCLI {
@@ -348,6 +356,38 @@ func isCloudFormationTemplate(path string) bool {
 
 	if len(template.Resources) > 0 {
 		return true
+	}
+
+	return false
+}
+
+func isPulumiPreviewJSON(path string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat struct {
+		Steps []struct {
+			Resource struct {
+				URN  string `json:"urn"`
+				Type string `json:"type"`
+			} `json:"resource"`
+		} `json:"steps"`
+	}
+
+	err = json.Unmarshal(b, &jsonFormat)
+	if err != nil {
+		return false
+	}
+
+	// Check if this looks like a Pulumi preview JSON file by verifying it has steps with URNs
+	if len(jsonFormat.Steps) > 0 {
+		for _, step := range jsonFormat.Steps {
+			if step.Resource.URN != "" && step.Resource.Type != "" {
+				return true
+			}
+		}
 	}
 
 	return false
