@@ -9,18 +9,21 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/rs/zerolog"
 
+	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/credentials"
 	sync2 "github.com/infracost/infracost/internal/sync"
 )
 
 type TestLoaderE2EOpts = struct {
-	SourceMap config.TerraformSourceMap
-	Cleanup   bool
-	IgnoreDir bool
+	SourceMap      config.TerraformSourceMap
+	SourceMapRegex config.TerraformSourceMapRegex
+	Cleanup        bool
+	IgnoreDir      bool
 }
 
 func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, opts TestLoaderE2EOpts) {
@@ -39,6 +42,7 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 		HCLParser:         NewSharedHCLParser(),
 		CredentialsSource: &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
 		SourceMap:         opts.SourceMap,
+		SourceMapRegex:    opts.SourceMapRegex,
 		Logger:            logger,
 		ModuleSync:        &sync2.KeyMutex{},
 	})
@@ -528,6 +532,41 @@ func TestSourceMapRegistryModule(t *testing.T) {
 	}
 }
 
+func TestSourceMapRegistryModuleRegex(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	tests := []struct {
+		name      string
+		sourceMap config.TerraformSourceMapRegex
+		want      []*ManifestModule
+	}{
+		{
+			name: "git with custom version",
+			sourceMap: config.TerraformSourceMapRegex{
+				{
+					Match:   "(.+)/foo/bar\\.git\\?myversion=(.+)$",
+					Replace: "${1}/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=${2}",
+				},
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-module",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v3.4.0",
+					Version: "",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testLoaderE2E(t, "./testdata/regex_sourcemap", tt.want, TestLoaderE2EOpts{SourceMapRegex: tt.sourceMap, Cleanup: true, IgnoreDir: true})
+		})
+	}
+}
+
 func TestSourceMapRegistrySubmodule(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping test in short mode")
@@ -873,4 +912,66 @@ func assertModulesEqual(t *testing.T, moduleLoader *ModuleLoader, path string, e
 	})
 
 	assert.Equal(t, expectedModules, actualModules)
+}
+
+func TestSourceMapRegexModule(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	tempDir, err := os.MkdirTemp("", "infracost")
+	assert.NoError(t, err)
+	defer os.RemoveAll(tempDir)
+
+	err = os.WriteFile(filepath.Join(tempDir, "main.tf"), []byte(`
+	module "vpc" {
+		source = "git::https://VPC_MODULE?ref=virtual_private_cloud/v1.8.0"
+	}
+	`), 0600)
+	assert.NoError(t, err)
+
+	sourceMapRegex := config.TerraformSourceMapRegex{
+		{
+			Match:   "VPC_MODULE\\?ref=(.+)$",
+			Replace: "github.com/org/foo//modules/virtual_private_cloud?ref=${1}",
+		},
+		{
+			Match:   "VPC_MODULE$",
+			Replace: "github.com/org/foo//modules/virtual_private_cloud?ref=virtual_private_cloud_v1.7.0",
+		},
+	}
+
+	err = sourceMapRegex.Compile()
+	assert.NoError(t, err)
+
+	logger := zerolog.New(io.Discard)
+
+	moduleLoader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath:         tempDir,
+		HCLParser:         NewSharedHCLParser(),
+		CredentialsSource: &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
+		SourceMapRegex:    sourceMapRegex,
+		Logger:            logger,
+		ModuleSync:        &sync2.KeyMutex{},
+	})
+
+	moduleCall := &tfconfig.ModuleCall{
+		Source: "git::https://VPC_MODULE?ref=virtual_private_cloud/v1.8.0",
+	}
+
+	manifestModule, err := moduleLoader.MapSourceWithRegex(moduleCall.Source)
+	require.NoError(t, err)
+
+	assert.Equal(t, "git::https://github.com/org/foo//modules/virtual_private_cloud", manifestModule.Source)
+	assert.Equal(t, "ref=virtual_private_cloud/v1.8.0", manifestModule.RawQuery)
+
+	moduleCall = &tfconfig.ModuleCall{
+		Source: "git::https://VPC_MODULE",
+	}
+
+	manifestModule, err = moduleLoader.MapSourceWithRegex(moduleCall.Source)
+	require.NoError(t, err)
+
+	assert.Equal(t, "git::https://github.com/org/foo//modules/virtual_private_cloud", manifestModule.Source)
+	assert.Equal(t, "ref=virtual_private_cloud_v1.7.0", manifestModule.RawQuery)
 }

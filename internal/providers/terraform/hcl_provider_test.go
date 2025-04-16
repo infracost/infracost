@@ -231,6 +231,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 					HCLParser:         moduleParser,
 					CredentialsSource: &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
 					SourceMap:         config.TerraformSourceMap{},
+					SourceMapRegex:    nil,
 					Logger:            logger,
 					ModuleSync:        &sync.KeyMutex{},
 				}),
