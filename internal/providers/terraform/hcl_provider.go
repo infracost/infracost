@@ -177,6 +177,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		HCLParser:           modules.NewSharedHCLParser(),
 		CredentialsSource:   credsSource,
 		SourceMap:           runCtx.Config.TerraformSourceMap,
+		SourceMapRegex:      runCtx.Config.TerraformSourceMapRegex,
 		Logger:              logger,
 		ModuleSync:          runCtx.ModuleMutex,
 		RemoteCache:         remoteCache,
