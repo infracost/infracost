@@ -30,11 +30,26 @@ resource "google_redis_cluster" "standard_cluster" {
   shard_count   = 3
   replica_count = 2
 
-  node_type     = "REDIS_HIGHMEM_MEDIUM"
+  node_type     = "REDIS_HIGHMEM_XLARGE"
 
   psc_configs {
     network = google_compute_network.redis_network.id
   }
 
   transit_encryption_mode = "TRANSIT_ENCRYPTION_MODE_SERVER_AUTHENTICATION"
+}
+
+resource "google_redis_cluster" "basic_cluster_Zero" {
+  name          = "basic-cluster"
+  region        = "us-central1"
+  shard_count   = 1
+  replica_count = 0
+
+  node_type     = "REDIS_STANDARD_SMALL"
+
+  psc_configs {
+    network = google_compute_network.redis_network.id
+  }
+
+  transit_encryption_mode = "TRANSIT_ENCRYPTION_MODE_DISABLED"
 }

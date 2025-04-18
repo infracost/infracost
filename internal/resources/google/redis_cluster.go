@@ -42,7 +42,7 @@ func (r *RedisCluster) BuildResource() *schema.Resource {
 	}
 
 	name := fmt.Sprintf("Redis Cluster node (%s)", strings.ToLower(desc))
-	descriptionRegex := fmt.Sprintf("(?i).*Redis Cluster Node %s.*", desc)
+	descriptionRegex := fmt.Sprintf("Redis Cluster Node %s", desc)
 
 	return &schema.Resource{
 		Name: r.Address,
@@ -58,7 +58,7 @@ func (r *RedisCluster) BuildResource() *schema.Resource {
 					Service:       strPtr("Cloud Memorystore for Redis"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key:"description",ValueRegex: strPtr(descriptionRegex)},
+						{Key:"description",ValueRegex: regexPtr(descriptionRegex)},
 					},
 				},
 			},

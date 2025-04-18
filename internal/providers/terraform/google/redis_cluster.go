@@ -17,6 +17,6 @@ func NewRedisCluster(d *schema.ResourceData) schema.CoreResource {
 		Address:		d.Address,
 		Region:			d.Get("region").String(),
 		NodeType:	    d.Get("node_type").String(),
-		NodeCount:	    int(d.Get("shard_count").Int() * d.Get("replica_count").Int()),
+		NodeCount:	    int(d.Get("shard_count").Int() * (1 + d.Get("replica_count").Int())),
 	}
 }
