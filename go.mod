@@ -146,7 +146,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.5 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
-	github.com/andybalholm/brotli v1.0.1 // indirect
+	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/apparentlymart/go-versions v1.0.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.25 // indirect
@@ -209,7 +209,7 @@ require (
 	github.com/nwaples/rardecode v1.1.0 // indirect
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/owenrumney/go-sarif v1.1.1 // indirect
-	github.com/pierrec/lz4/v4 v4.1.2 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/prometheus/client_golang v1.20.2 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
@@ -297,4 +297,4 @@ replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.202311151145
 
 replace github.com/shurcooL/graphql => github.com/spacelift-io/graphql v1.2.0
 
-replace github.com/hashicorp/go-getter => github.com/infracost/go-getter v0.0.0-20241220120307-7fc78d35b563
+replace github.com/hashicorp/go-getter => github.com/infracost/go-getter v0.0.0-20250421101117-7543cf1e8836
