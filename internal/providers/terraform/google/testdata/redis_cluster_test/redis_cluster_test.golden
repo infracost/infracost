@@ -1,16 +1,16 @@
 
  Name                                     Monthly Qty  Unit   Monthly Cost   
                                                                              
- google_redis_cluster.standard_cluster                                       
- └─ Redis Cluster node (highmem xlarge)         6,570  hours     $5,637.72   
-                                                                             
  google_redis_cluster.basic_cluster                                          
- └─ Redis Cluster node (standard small)         2,190  hours       $312.08   
+ └─ Redis Cluster Node (standard small)         2,190  hours     not found   
                                                                              
  google_redis_cluster.basic_cluster_Zero                                     
- └─ Redis Cluster node (standard small)           730  hours       $104.03   
+ └─ Redis Cluster Node (standard small)           730  hours     not found   
                                                                              
- OVERALL TOTAL                                                  $6,053.82 
+ google_redis_cluster.standard_cluster                                       
+ └─ Redis Cluster Node (highmem xlarge)         6,570  hours     not found   
+                                                                             
+ OVERALL TOTAL                                                      $0.00 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -22,5 +22,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $6,054 ┃           - ┃     $6,054 ┃
+┃ main                                               ┃         $0.00 ┃           - ┃      $0.00 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
