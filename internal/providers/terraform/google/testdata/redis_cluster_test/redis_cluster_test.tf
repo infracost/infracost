@@ -60,3 +60,27 @@ resource "google_redis_cluster" "basic_cluster_zero" {
 
   transit_encryption_mode = "TRANSIT_ENCRYPTION_MODE_DISABLED"
 }
+
+resource "google_redis_cluster" "cluster_with_backups" {
+  name          = "cluster-with-backups"
+  region        = "us-central1"
+  shard_count   = 1
+  replica_count = 2
+  node_type      = "REDIS_STANDARD_SMALL"
+
+  psc_configs {
+    network = google_compute_network.redis_network.id
+  }
+
+  automated_backup_config {
+    retention = 7
+
+    fixed_frequency_schedule {
+      start_time {
+        hours = 1
+      }
+    }
+  }
+
+  transit_encryption_mode = "TRANSIT_ENCRYPTION_MODE_DISABLED"
+}

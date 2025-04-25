@@ -1,26 +1,31 @@
 
- Name                                     Monthly Qty  Unit   Monthly Cost   
-                                                                             
- google_redis_cluster.basic_cluster                                          
- └─ Redis Cluster Node (standard small)         2,190  hours     not found   
-                                                                             
- google_redis_cluster.basic_cluster_Zero                                     
- └─ Redis Cluster Node (standard small)           730  hours     not found   
-                                                                             
- google_redis_cluster.standard_cluster                                       
- └─ Redis Cluster Node (highmem xlarge)         6,570  hours     not found   
-                                                                             
- OVERALL TOTAL                                                      $0.00 
+ Name                                           Monthly Qty  Unit                Monthly Cost   
+                                                                                                
+ google_redis_cluster.standard_cluster                                                          
+ └─ Redis Cluster Node (highmem xlarge)               6,570  hours                  $5,637.72   
+                                                                                                
+ google_redis_cluster.basic_cluster                                                             
+ ├─ Redis Cluster Node (standard small)               2,190  hours                    $312.08   
+ └─ AOF persistence                                   5,110  GB                         $2.80   
+                                                                                                
+ google_redis_cluster.cluster_with_backups                                                      
+ ├─ Redis Cluster Node (standard small)               2,190  hours                    $312.08   
+ └─ Backups                                 Monthly cost depends on usage: $0.00011111 per GB   
+                                                                                                
+ google_redis_cluster.basic_cluster_zero                                                        
+ └─ Redis Cluster Node (standard small)                 730  hours                    $104.03   
+                                                                                                
+ OVERALL TOTAL                                                                     $6,368.69 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 3 were estimated
+5 cloud resources were detected:
+∙ 4 were estimated
 ∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃         $0.00 ┃           - ┃      $0.00 ┃
+┃ main                                               ┃        $6,369 ┃           - ┃     $6,369 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

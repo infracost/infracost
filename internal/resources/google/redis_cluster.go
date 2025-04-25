@@ -78,7 +78,7 @@ func (r *RedisCluster) nodeTypeCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:		strPtr("gcp"),
 			Region:			strPtr(r.Region),
-			Service:		strPtr("Cloud Memorystore Redis"),
+			Service:		strPtr("Cloud Memorystore for Redis"),
 			ProductFamily:	strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "description", ValueRegex: regexPtr(descriptionRegex)},
@@ -98,9 +98,9 @@ func (r *RedisCluster) aofCostComponent() *schema.CostComponent {
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Cloud Memorystore for Redis"),
-			ProductFamily: strPtr("Storage"),
+			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("AOF Persistence")},
+				{Key: "description", ValueRegex: regexPtr("Memorystore for Redis Cluster: AOF Storage")},
 			},
 		},
 	}
@@ -121,9 +121,9 @@ func (r *RedisCluster) backupCostComponent() *schema.CostComponent {
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Cloud Memorystore for Redis"),
-			ProductFamily: strPtr("Storage"),
+			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("Backup Storage")},
+				{Key: "description", ValueRegex: regexPtr("Memorystore for Redis Cluster: Backups")},
 			},
 		},
 	}
