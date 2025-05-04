@@ -75,6 +75,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMSKClusterRegistryItem(),
 	getALBRegistryItem(),
 	getMQBrokerRegistryItem(),
+	getMemoryDBClusterRegistryItem(),
 	getMWAAEnvironmentRegistryItem(),
 	getNATGatewayRegistryItem(),
 	getRDSClusterRegistryItem(),
@@ -463,6 +464,14 @@ var FreeResources = []string{
 
 	// AWS MQ
 	"aws_mq_configuration",
+
+	// AWS MemoryDB
+	"aws_memorydb_acl",
+	"aws_memorydb_parameter_group",
+	"aws_memorydb_snapshot",
+	"aws_memorydb_subnet_group",
+	"aws_memorydb_user",
+	"aws_memorydb_user_group",
 
 	// AWS MSK
 	"aws_msk_configuration",
