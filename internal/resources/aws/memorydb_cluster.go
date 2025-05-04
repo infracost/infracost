@@ -15,11 +15,11 @@ import (
 // Pricing information: https://aws.amazon.com/memorydb/pricing/
 //
 // Pricing notes:
-// - MemoryDB uses the same pricing structure as ElastiCache
+// - MemoryDB has its own pricing, which is different from ElastiCache
 // - Valkey engine is 30% cheaper than Redis OSS
 // - Data written for Valkey is free up to 10TB/month, then $0.04/GB
 // - Data written for Redis OSS is $0.20/GB for all data
-// - Snapshot storage is $0.021/GB-month beyond the first day of retention
+// - Snapshot storage is $0.085/GB-month beyond the first day of retention
 type MemoryDBCluster struct {
 	Address                       string
 	Region                        string
@@ -111,23 +111,9 @@ func (r *MemoryDBCluster) BuildResource() *schema.Resource {
 
 func (r *MemoryDBCluster) memoryDBCostComponent(totalNodes int64, autoscaling bool) *schema.CostComponent {
 	purchaseOptionLabel := "on-demand"
-	priceFilter := &schema.PriceFilter{
-		PurchaseOption: strPtr("on_demand"),
-	}
 
 	// Handle reserved instances
 	if r.ReservedInstanceTerm != nil {
-		resolver := &elasticacheReservationResolver{
-			term:          strVal(r.ReservedInstanceTerm),
-			paymentOption: strVal(r.ReservedInstancePaymentOption),
-			cacheNodeType: r.NodeType,
-		}
-		reservedFilter, err := resolver.PriceFilter()
-		if err != nil {
-			logging.Logger.Warn().Msg(err.Error())
-		} else {
-			priceFilter = reservedFilter
-		}
 		purchaseOptionLabel = "reserved"
 	}
 
@@ -266,37 +252,41 @@ func (r *MemoryDBCluster) backupStorageCostComponent() *schema.CostComponent {
 }
 
 // getMemoryDBInstancePrice returns the hourly price for a given MemoryDB instance type
-// These prices are for us-east-1 and are the same as ElastiCache Redis
+// These prices are for us-east-1 and are from the AWS MemoryDB pricing page
 // Prices from: https://aws.amazon.com/memorydb/pricing/
 func getMemoryDBInstancePrice(instanceType string) float64 {
 	prices := map[string]float64{
 		// T4G instances
-		"db.t4g.small":   0.068,
-		"db.t4g.medium":  0.136,
+		"db.t4g.small":   0.038,
+		"db.t4g.medium":  0.076,
+
+		// T3 instances
+		"db.t3.small":   0.047,
+		"db.t3.medium":  0.094,
 
 		// R6G instances
-		"db.r6g.large":    0.40,
-		"db.r6g.xlarge":   0.80,
-		"db.r6g.2xlarge":  1.60,
-		"db.r6g.4xlarge":  3.20,
-		"db.r6g.8xlarge":  6.40,
-		"db.r6g.12xlarge": 9.60,
-		"db.r6g.16xlarge": 12.80,
+		"db.r6g.large":    0.228,
+		"db.r6g.xlarge":   0.456,
+		"db.r6g.2xlarge":  0.912,
+		"db.r6g.4xlarge":  1.824,
+		"db.r6g.8xlarge":  3.648,
+		"db.r6g.12xlarge": 5.472,
+		"db.r6g.16xlarge": 7.296,
 
 		// R6GD instances
-		"db.r6gd.xlarge":   0.70,
-		"db.r6gd.2xlarge":  1.40,
-		"db.r6gd.4xlarge":  2.80,
-		"db.r6gd.8xlarge":  5.60,
+		"db.r6gd.xlarge":   0.399,
+		"db.r6gd.2xlarge":  0.798,
+		"db.r6gd.4xlarge":  1.596,
+		"db.r6gd.8xlarge":  3.192,
 
 		// M6G instances
-		"db.m6g.large":    0.20,
-		"db.m6g.xlarge":   0.40,
-		"db.m6g.2xlarge":  0.80,
-		"db.m6g.4xlarge":  1.60,
-		"db.m6g.8xlarge":  3.20,
-		"db.m6g.12xlarge": 4.80,
-		"db.m6g.16xlarge": 6.40,
+		"db.m6g.large":    0.114,
+		"db.m6g.xlarge":   0.228,
+		"db.m6g.2xlarge":  0.456,
+		"db.m6g.4xlarge":  0.912,
+		"db.m6g.8xlarge":  1.824,
+		"db.m6g.12xlarge": 2.736,
+		"db.m6g.16xlarge": 3.648,
 	}
 
 	if price, ok := prices[instanceType]; ok {
@@ -306,7 +296,7 @@ func getMemoryDBInstancePrice(instanceType string) float64 {
 	// Default price if instance type is not found
 	// This is a fallback to avoid "not found" errors
 	logging.Logger.Warn().Msgf("Price not found for MemoryDB instance type: %s, using default price", instanceType)
-	return 0.40 // Default to r6g.large price
+	return 0.228 // Default to r6g.large price
 }
 
 
