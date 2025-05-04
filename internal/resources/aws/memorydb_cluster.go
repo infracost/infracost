@@ -3,10 +3,29 @@ package aws
 import (
 	"fmt"
 	"strings"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+)
+
+// Constants for MemoryDB pricing and configuration
+// Last price update: May 2023
+const (
+	// Engine types
+	MemoryDBEngineRedis  = "redis"
+	MemoryDBEngineValkey = "valkey"
+
+	// Pricing constants
+	ValkeyCostDiscount          = 0.3   // 30% discount for Valkey engine
+	ValkeyCostFreeDataWrittenGB = 10240 // 10TB in GB
+	RedisDataWrittenCostPerGB   = 0.20  // $0.20/GB for Redis
+	ValkeyDataWrittenCostPerGB  = 0.04  // $0.04/GB for Valkey (over free tier)
+	BackupStorageCostPerGB      = 0.085 // $0.085/GB for backup storage
+
+	// Default instance type for fallback
+	DefaultInstanceType = "db.r6g.large"
 )
 
 // MemoryDBCluster represents an AWS MemoryDB cluster
@@ -21,13 +40,13 @@ import (
 // - Data written for Redis OSS is $0.20/GB for all data
 // - Snapshot storage is $0.085/GB-month beyond the first day of retention
 type MemoryDBCluster struct {
-	Address                       string
-	Region                        string
-	NodeType                      string
-	Engine                        string // "redis" or "valkey"
-	NumShards                     int64
-	ReplicasPerShard              int64
-	SnapshotRetentionLimit        int64
+	Address                string
+	Region                 string
+	NodeType               string
+	Engine                 string // "redis" or "valkey"
+	NumShards              int64
+	ReplicasPerShard       int64
+	SnapshotRetentionLimit int64
 
 	// Usage parameters
 	MonthlyDataWrittenGB          *float64 `infracost_usage:"monthly_data_written_gb"`
@@ -57,10 +76,15 @@ func (r *MemoryDBCluster) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *MemoryDBCluster) BuildResource() *schema.Resource {
-	engine := r.Engine
+	// Validate and set default engine
+	engine := strings.ToLower(r.Engine)
 	if engine == "" {
 		// Default engine is Redis OSS if not specified
-		engine = "redis"
+		engine = MemoryDBEngineRedis
+	} else if engine != MemoryDBEngineRedis && engine != MemoryDBEngineValkey {
+		// Log warning for unknown engine type and default to Redis
+		logging.Logger.Warn().Msgf("Unknown engine type %s for MemoryDB cluster %s, defaulting to redis", r.Engine, r.Address)
+		engine = MemoryDBEngineRedis
 	}
 
 	// Check for autoscaling configuration
@@ -112,9 +136,29 @@ func (r *MemoryDBCluster) BuildResource() *schema.Resource {
 func (r *MemoryDBCluster) memoryDBCostComponent(totalNodes int64, autoscaling bool) *schema.CostComponent {
 	purchaseOptionLabel := "on-demand"
 
-	// Handle reserved instances
+	// Handle reserved instances with validation
 	if r.ReservedInstanceTerm != nil {
-		purchaseOptionLabel = "reserved"
+		// Validate reserved instance term
+		validTerms := []string{"1_year", "3_year"}
+		term := strVal(r.ReservedInstanceTerm)
+
+		if !stringInSlice(validTerms, term) {
+			logging.Logger.Warn().Msgf("Invalid reserved_instance_term for MemoryDB cluster %s. Expected: %s. Got: %s. Using on-demand pricing.",
+				r.Address, strings.Join(validTerms, ", "), term)
+		} else if r.ReservedInstancePaymentOption == nil {
+			logging.Logger.Warn().Msgf("Reserved instance term specified without payment option for %s. Using on-demand pricing.", r.Address)
+		} else {
+			// Validate payment option
+			validOptions := []string{"all_upfront", "partial_upfront", "no_upfront"}
+			paymentOption := strVal(r.ReservedInstancePaymentOption)
+
+			if !stringInSlice(validOptions, paymentOption) {
+				logging.Logger.Warn().Msgf("Invalid reserved_instance_payment_option for MemoryDB cluster %s. Expected: %s. Got: %s. Using on-demand pricing.",
+					r.Address, strings.Join(validOptions, ", "), paymentOption)
+			} else {
+				purchaseOptionLabel = "reserved"
+			}
+		}
 	}
 
 	// Build the name with appropriate parameters
@@ -123,19 +167,15 @@ func (r *MemoryDBCluster) memoryDBCostComponent(totalNodes int64, autoscaling bo
 		nameParams = append(nameParams, "autoscaling")
 	}
 
-	// Since MemoryDB pricing isn't directly available in the AWS pricing API,
-	// we'll use ElastiCache Redis pricing as it's the same
-
 	// Create a custom price component with a name that reflects MemoryDB
 	var name string
-	if strings.ToLower(r.Engine) == "valkey" {
+	if strings.ToLower(r.Engine) == MemoryDBEngineValkey {
 		name = fmt.Sprintf("MemoryDB instance (valkey, %s)", strings.Join(nameParams, ", "))
 	} else {
 		name = fmt.Sprintf("MemoryDB instance (%s)", strings.Join(nameParams, ", "))
 	}
 
 	// Create a cost component with a custom price based on the instance type
-	// MemoryDB uses the same pricing as ElastiCache Redis
 	costComponent := &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -144,15 +184,19 @@ func (r *MemoryDBCluster) memoryDBCostComponent(totalNodes int64, autoscaling bo
 		UsageBased:     autoscaling,
 	}
 
-	// Set the price based on the instance type
-	// These prices are for us-east-1, other regions may vary
-	price := getMemoryDBInstancePrice(r.NodeType)
+	// Get base price for the instance type with region consideration
+	price := getMemoryDBInstancePrice(r.NodeType, r.Region)
+
+	// Apply reserved instance discount if applicable
+	if purchaseOptionLabel == "reserved" {
+		price = applyReservedInstanceDiscount(price, strVal(r.ReservedInstanceTerm), strVal(r.ReservedInstancePaymentOption))
+	}
+
 	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(price)))
 
 	// Apply a 30% discount for Valkey
-	if strings.ToLower(r.Engine) == "valkey" {
-		// For Valkey, we'll use Redis pricing but apply a 30% discount
-		costComponent.MonthlyDiscountPerc = 0.3 // 30% discount
+	if strings.ToLower(r.Engine) == MemoryDBEngineValkey {
+		costComponent.MonthlyDiscountPerc = ValkeyCostDiscount
 	}
 
 	return costComponent
@@ -165,47 +209,58 @@ func (r *MemoryDBCluster) dataWrittenCostComponent() *schema.CostComponent {
 		monthlyDataWrittenGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataWrittenGB))
 	}
 
-	// For Valkey, data written is free up to 10TB/month
-	if strings.ToLower(r.Engine) == "valkey" {
-		var dataWrittenGB float64 = 0
-		if r.MonthlyDataWrittenGB != nil {
-			dataWrittenGB = *r.MonthlyDataWrittenGB
-		}
+	// Handle data written pricing based on engine type
+	engine := strings.ToLower(r.Engine)
 
-		// Calculate the billable amount (over 10TB)
-		var billableGB float64 = 0
-		if dataWrittenGB > 10240 { // 10TB in GB
-			billableGB = dataWrittenGB - 10240
-		}
+	if engine == MemoryDBEngineValkey {
+		return r.valkeyDataWrittenCostComponent(monthlyDataWrittenGB)
+	}
 
-		// If there's no billable data, return a component showing it's free
-		if billableGB <= 0 {
-			// For free tier, we'll use a custom price of 0
-			costComponent := &schema.CostComponent{
-				Name:            "Data written (free up to 10TB)",
-				Unit:            "GB",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: monthlyDataWrittenGB,
-				UsageBased:      true,
-			}
-			costComponent.SetCustomPrice(decimalPtr(decimal.Zero))
-			return costComponent
-		}
+	// Default to Redis pricing
+	return r.redisDataWrittenCostComponent(monthlyDataWrittenGB)
+}
 
-		// Otherwise, return a component for the billable amount
-		// For Valkey over 10TB, we'll use a custom price of $0.04/GB
+// Helper method for Valkey data written pricing
+func (r *MemoryDBCluster) valkeyDataWrittenCostComponent(monthlyDataWrittenGB *decimal.Decimal) *schema.CostComponent {
+	var dataWrittenGB float64 = 0
+	if r.MonthlyDataWrittenGB != nil {
+		dataWrittenGB = *r.MonthlyDataWrittenGB
+	}
+
+	// Calculate the billable amount (over 10TB)
+	var billableGB float64 = 0
+	if dataWrittenGB > ValkeyCostFreeDataWrittenGB {
+		billableGB = dataWrittenGB - ValkeyCostFreeDataWrittenGB
+	}
+
+	// If there's no billable data, return a component showing it's free
+	if billableGB <= 0 {
+		// For free tier, we'll use a custom price of 0
 		costComponent := &schema.CostComponent{
-			Name:            "Data written (over 10TB)",
+			Name:            "Data written (free up to 10TB)",
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: decimalPtr(decimal.NewFromFloat(billableGB)),
+			MonthlyQuantity: monthlyDataWrittenGB,
 			UsageBased:      true,
 		}
-		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.04)))
+		costComponent.SetCustomPrice(decimalPtr(decimal.Zero))
 		return costComponent
 	}
 
-	// For Redis, all data written is charged at $0.20/GB
+	// Otherwise, return a component for the billable amount
+	costComponent := &schema.CostComponent{
+		Name:            "Data written (over 10TB)",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(billableGB)),
+		UsageBased:      true,
+	}
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(ValkeyDataWrittenCostPerGB)))
+	return costComponent
+}
+
+// Helper method for Redis data written pricing
+func (r *MemoryDBCluster) redisDataWrittenCostComponent(monthlyDataWrittenGB *decimal.Decimal) *schema.CostComponent {
 	costComponent := &schema.CostComponent{
 		Name:            "Data written",
 		Unit:            "GB",
@@ -223,13 +278,14 @@ func (r *MemoryDBCluster) dataWrittenCostComponent() *schema.CostComponent {
 		UsageBased: true,
 	}
 	// Since the pricing API doesn't have data written pricing, we'll use a custom price
-	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.20)))
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(RedisDataWrittenCostPerGB)))
 	return costComponent
 }
 
 func (r *MemoryDBCluster) backupStorageCostComponent() *schema.CostComponent {
 	var monthlyBackupStorageGB *decimal.Decimal
 
+	// Calculate backup retention (days beyond the first day)
 	backupRetention := r.SnapshotRetentionLimit - 1
 
 	if r.SnapshotStorageSizeGB != nil {
@@ -246,23 +302,25 @@ func (r *MemoryDBCluster) backupStorageCostComponent() *schema.CostComponent {
 	}
 
 	// Set a custom price for backup storage
-	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.085)))
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(BackupStorageCostPerGB)))
 
 	return costComponent
 }
 
-// getMemoryDBInstancePrice returns the hourly price for a given MemoryDB instance type
-// These prices are for us-east-1 and are from the AWS MemoryDB pricing page
+// getMemoryDBInstancePrice returns the hourly price for a given MemoryDB instance type and region
+// Base prices are for us-east-1 and are from the AWS MemoryDB pricing page
 // Prices from: https://aws.amazon.com/memorydb/pricing/
-func getMemoryDBInstancePrice(instanceType string) float64 {
+// Last price update: May 2023
+func getMemoryDBInstancePrice(instanceType string, region string) float64 {
+	// Base prices for us-east-1
 	prices := map[string]float64{
 		// T4G instances
-		"db.t4g.small":   0.038,
-		"db.t4g.medium":  0.076,
+		"db.t4g.small":  0.038,
+		"db.t4g.medium": 0.076,
 
 		// T3 instances
-		"db.t3.small":   0.047,
-		"db.t3.medium":  0.094,
+		"db.t3.small":  0.047,
+		"db.t3.medium": 0.094,
 
 		// R6G instances
 		"db.r6g.large":    0.228,
@@ -274,10 +332,10 @@ func getMemoryDBInstancePrice(instanceType string) float64 {
 		"db.r6g.16xlarge": 7.296,
 
 		// R6GD instances
-		"db.r6gd.xlarge":   0.399,
-		"db.r6gd.2xlarge":  0.798,
-		"db.r6gd.4xlarge":  1.596,
-		"db.r6gd.8xlarge":  3.192,
+		"db.r6gd.xlarge":  0.399,
+		"db.r6gd.2xlarge": 0.798,
+		"db.r6gd.4xlarge": 1.596,
+		"db.r6gd.8xlarge": 3.192,
 
 		// M6G instances
 		"db.m6g.large":    0.114,
@@ -289,14 +347,94 @@ func getMemoryDBInstancePrice(instanceType string) float64 {
 		"db.m6g.16xlarge": 3.648,
 	}
 
-	if price, ok := prices[instanceType]; ok {
-		return price
+	// Get base price for the instance type
+	var basePrice float64
+	var ok bool
+	if basePrice, ok = prices[instanceType]; !ok {
+		// Default price if instance type is not found
+		logging.Logger.Warn().Msgf("Price not found for MemoryDB instance type: %s, using default price for %s", instanceType, DefaultInstanceType)
+		basePrice = prices[DefaultInstanceType]
 	}
 
-	// Default price if instance type is not found
-	// This is a fallback to avoid "not found" errors
-	logging.Logger.Warn().Msgf("Price not found for MemoryDB instance type: %s, using default price", instanceType)
-	return 0.228 // Default to r6g.large price
+	// Apply regional price adjustment
+	return basePrice * getRegionPriceMultiplier(region)
 }
 
+// getRegionPriceMultiplier returns a multiplier for prices in different AWS regions
+// These multipliers are approximations based on typical regional price differences
+func getRegionPriceMultiplier(region string) float64 {
+	// Regional price multipliers (approximate)
+	regionMultipliers := map[string]float64{
+		// US Regions
+		"us-east-1": 1.00, // N. Virginia (base)
+		"us-east-2": 1.00, // Ohio
+		"us-west-1": 1.06, // N. California
+		"us-west-2": 1.00, // Oregon
 
+		// Canada
+		"ca-central-1": 1.08, // Canada
+
+		// South America
+		"sa-east-1": 1.25, // São Paulo
+
+		// Europe
+		"eu-central-1": 1.09, // Frankfurt
+		"eu-west-1":    1.03, // Ireland
+		"eu-west-2":    1.07, // London
+		"eu-west-3":    1.09, // Paris
+		"eu-north-1":   1.07, // Stockholm
+		"eu-south-1":   1.09, // Milan
+
+		// Asia Pacific
+		"ap-east-1":      1.20, // Hong Kong
+		"ap-south-1":     1.12, // Mumbai
+		"ap-northeast-1": 1.15, // Tokyo
+		"ap-northeast-2": 1.15, // Seoul
+		"ap-northeast-3": 1.15, // Osaka
+		"ap-southeast-1": 1.15, // Singapore
+		"ap-southeast-2": 1.15, // Sydney
+
+		// Middle East
+		"me-south-1": 1.15, // Bahrain
+
+		// Africa
+		"af-south-1": 1.15, // Cape Town
+	}
+
+	if multiplier, ok := regionMultipliers[region]; ok {
+		return multiplier
+	}
+
+	// Default to base price if region not found
+	logging.Logger.Warn().Msgf("Price multiplier not found for region: %s, using base price", region)
+	return 1.0
+}
+
+// applyReservedInstanceDiscount applies the appropriate discount for reserved instances
+// based on the term and payment option
+func applyReservedInstanceDiscount(basePrice float64, term string, paymentOption string) float64 {
+	// Discount percentages for different reservation options
+	// These are approximate and based on typical RI discounts
+	discounts := map[string]map[string]float64{
+		"1_year": {
+			"no_upfront":      0.20, // 20% discount
+			"partial_upfront": 0.30, // 30% discount
+			"all_upfront":     0.35, // 35% discount
+		},
+		"3_year": {
+			"no_upfront":      0.40, // 40% discount
+			"partial_upfront": 0.50, // 50% discount
+			"all_upfront":     0.60, // 60% discount
+		},
+	}
+
+	if termDiscounts, ok := discounts[term]; ok {
+		if discount, ok := termDiscounts[paymentOption]; ok {
+			return basePrice * (1 - discount)
+		}
+	}
+
+	// If no valid discount found, return the base price
+	logging.Logger.Warn().Msgf("No valid discount found for term: %s, payment option: %s. Using on-demand price.", term, paymentOption)
+	return basePrice
+}
