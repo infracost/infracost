@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+  aws_memorydb_cluster.redis_with_usage:
+    monthly_data_written_gb: 1000
+    snapshot_storage_size_gb: 100
+
+  aws_memorydb_cluster.valkey_with_usage:
+    monthly_data_written_gb: 15000  # Over 10TB to test the pricing tier
+    snapshot_storage_size_gb: 200
+
+  aws_memorydb_cluster.redis_reserved:
+    reserved_instance_term: "1_year"
+    reserved_instance_payment_option: "all_upfront"
