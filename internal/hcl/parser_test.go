@@ -60,6 +60,7 @@ data "cats_cat" "the-cats-mother" {
 		HCLParser:         modules.NewSharedHCLParser(),
 		CredentialsSource: nil,
 		SourceMap:         config.TerraformSourceMap{},
+		SourceMapRegex:    nil,
 		Logger:            logger,
 		ModuleSync:        &sync.KeyMutex{},
 	})
@@ -165,6 +166,7 @@ output "loadbalancer"  {
 		HCLParser:         modules.NewSharedHCLParser(),
 		CredentialsSource: nil,
 		SourceMap:         config.TerraformSourceMap{},
+		SourceMapRegex:    nil,
 		Logger:            logger,
 		ModuleSync:        &sync.KeyMutex{},
 	}), logger)
@@ -244,6 +246,7 @@ output "exp2" {
 		HCLParser:         modules.NewSharedHCLParser(),
 		CredentialsSource: nil,
 		SourceMap:         config.TerraformSourceMap{},
+		SourceMapRegex:    nil,
 		Logger:            logger,
 		ModuleSync:        &sync.KeyMutex{},
 	}), logger)
@@ -298,6 +301,7 @@ output "instances" {
 		HCLParser:         modules.NewSharedHCLParser(),
 		CredentialsSource: nil,
 		SourceMap:         config.TerraformSourceMap{},
+		SourceMapRegex:    nil,
 		Logger:            logger,
 		ModuleSync:        &sync.KeyMutex{},
 	}), logger)
@@ -344,6 +348,7 @@ resource "other_resource" "test" {
 		HCLParser:         modules.NewSharedHCLParser(),
 		CredentialsSource: nil,
 		SourceMap:         config.TerraformSourceMap{},
+		SourceMapRegex:    nil,
 		Logger:            logger,
 		ModuleSync:        &sync.KeyMutex{},
 	}), logger)
@@ -396,6 +401,7 @@ output "attr_not_exists" {
 		HCLParser:         modules.NewSharedHCLParser(),
 		CredentialsSource: nil,
 		SourceMap:         config.TerraformSourceMap{},
+		SourceMapRegex:    nil,
 		Logger:            logger,
 		ModuleSync:        &sync.KeyMutex{},
 	}), logger)

@@ -69,11 +69,12 @@ type ModuleLoader struct {
 	// cachePath is the path to the directory that Infracost will download modules to.
 	// This is normally the top level directory of a multi-project environment, where the
 	// Infracost config file resides or project auto-detection starts from.
-	cachePath string
-	cache     *Cache
-	sync      *intSync.KeyMutex
-	hclParser *SharedHCLParser
-	sourceMap config.TerraformSourceMap
+	cachePath      string
+	cache          *Cache
+	sync           *intSync.KeyMutex
+	hclParser      *SharedHCLParser
+	sourceMap      config.TerraformSourceMap
+	sourceMapRegex config.TerraformSourceMapRegex
 
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
@@ -90,6 +91,7 @@ type ModuleLoaderOptions struct {
 	HCLParser           *SharedHCLParser
 	CredentialsSource   *CredentialsSource
 	SourceMap           config.TerraformSourceMap
+	SourceMapRegex      config.TerraformSourceMapRegex
 	Logger              zerolog.Logger
 	ModuleSync          *intSync.KeyMutex
 	RemoteCache         RemoteCache
@@ -102,11 +104,16 @@ func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
 	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(opts.CredentialsSource, opts.Logger)
 
+	if err := opts.SourceMapRegex.Compile(); err != nil {
+		opts.Logger.Error().Err(err).Msg("error compiling source map regex")
+	}
+
 	m := &ModuleLoader{
 		cachePath:      opts.CachePath,
 		cache:          NewCache(d, opts.Logger),
 		hclParser:      opts.HCLParser,
 		sourceMap:      opts.SourceMap,
+		sourceMapRegex: opts.SourceMapRegex,
 		packageFetcher: fetcher,
 		logger:         opts.Logger,
 		sync:           opts.ModuleSync,
@@ -285,7 +292,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	version := moduleCall.Version
 	isSourceMapped := false
 
-	mappedResult, err := MapSource(m.sourceMap, source)
+	mappedResult, err := m.MapSourceWithRegex(source)
 	if err != nil {
 		return nil, err
 	}
@@ -993,6 +1000,53 @@ func MapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapRes
 	}
 
 	return result, nil
+}
+
+// MapSourceWithRegex maps the module source using regex patterns if available.
+// Falls back to the standard MapSource function if regex mapping is not configured
+// or if no regex patterns match.
+func (m *ModuleLoader) MapSourceWithRegex(source string) (SourceMapResult, error) {
+	if len(m.sourceMapRegex) > 0 {
+		mappedSource, err := config.ApplyRegexMapping(m.sourceMapRegex, source)
+		if err != nil {
+			return SourceMapResult{}, err
+		}
+
+		if mappedSource != source {
+			// Split for submodule path and extract version if available
+			moduleAddr, submodulePath, err := splitModuleSubDir(mappedSource)
+			if err != nil {
+				return SourceMapResult{}, err
+			}
+
+			result := SourceMapResult{
+				Source:   mappedSource,
+				Version:  "",
+				RawQuery: "",
+			}
+
+			// Parse the URL to extract ref for version
+			parsedURL, err := url.Parse(moduleAddr)
+			if err == nil && parsedURL.RawQuery != "" {
+				query := parsedURL.Query()
+				result.RawQuery = parsedURL.RawQuery
+
+				// If query params have a ref then use that as the version
+				ref := query.Get("ref")
+				if ref != "" {
+					result.Version = strings.TrimPrefix(ref, "v")
+				}
+
+				// Reconstruct the URL without query for final source
+				parsedURL.RawQuery = ""
+				result.Source = joinModuleSubDir(parsedURL.String(), submodulePath)
+			}
+
+			return result, nil
+		}
+	}
+
+	return MapSource(m.sourceMap, source)
 }
 
 // resolveSymlink resolves symlinks even if the target does not exist
