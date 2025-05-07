@@ -235,6 +235,10 @@ func (p *TerragruntHCLProvider) YAML() string {
 
 	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
 
+	if env := p.EnvName(); env != "" {
+		str.WriteString(fmt.Sprintf("    terraform_workspace: %s\n", env))
+	}
+
 	return str.String()
 }
 
