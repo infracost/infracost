@@ -370,7 +370,7 @@ func (p *Parser) YAML() string {
 
 	str.WriteString("    skip_autodetect: true\n")
 
-	if env := p.EnvName(); env != "" {
+	if env := p.EnvName(); env != "" && env != p.ProjectName() {
 		str.WriteString(fmt.Sprintf("    terraform_workspace: %s\n", env))
 	}
 
