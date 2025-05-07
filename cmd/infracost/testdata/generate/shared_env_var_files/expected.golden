@@ -8,6 +8,7 @@ projects:
       - ../dev-default.tfvars
       - dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - apps/bar/**
       - apps/bar/dev.tfvars
@@ -20,6 +21,7 @@ projects:
       - ../staging-default.tfvars
       - staging.tfvars
     skip_autodetect: true
+    terraform_workspace: staging
     dependency_paths:
       - apps/bar/**
       - apps/bar/staging.tfvars
@@ -31,6 +33,7 @@ projects:
       - ../default.tfvars
       - ../dev-default.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - apps/default.tfvars
       - apps/dev-default.tfvars
@@ -41,6 +44,7 @@ projects:
       - ../default.tfvars
       - ../prod-default.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - apps/default.tfvars
       - apps/foo/**
@@ -51,6 +55,7 @@ projects:
       - ../default.tfvars
       - ../staging-default.tfvars
     skip_autodetect: true
+    terraform_workspace: staging
     dependency_paths:
       - apps/default.tfvars
       - apps/foo/**
