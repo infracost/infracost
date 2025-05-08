@@ -1472,6 +1472,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	}
 
 	if p.shouldRemoveDuplicateProject(dir) {
+		p.logger.Debug().Msgf("skipping directory %s as it has been flagged as a duplicate project", dir.path)
 		return false
 	}
 
@@ -1488,6 +1489,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	// infer that the Terraform projects are not modules.
 	isForcedDupDir := p.projectDuplicates[dir.path] && p.forceProjectType != ""
 	if !isForcedDupDir && p.wdContainsTerragrunt && !dir.isTerragrunt {
+		p.logger.Debug().Msgf("skipping directory %s as we are within a Terragrunt workspace and the project is not a Terragrunt project", dir.path)
 		return false
 	}
 
@@ -1506,6 +1508,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	}
 
 	if !dir.hasRootModuleBlocks() && !dir.isTerragrunt {
+		p.logger.Debug().Msgf("skipping directory %s as it does not have a root module block and is not a Terragrunt project", dir.path)
 		return false
 	}
 
