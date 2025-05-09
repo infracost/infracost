@@ -16,6 +16,11 @@
  ├─ Storage                                                            32  GB                       $4.42    
  └─ Additional backup storage                                       5,000  GB                     $475.00  * 
                                                                                                              
+ azurerm_postgresql_flexible_server.high_availability                                                        
+ ├─ Compute (GP_Standard_D2ads_v5)                                    730  hours                  $148.19    
+ ├─ Storage                                                            32  GB                       $4.42    
+ └─ Additional backup storage                                       5,000  GB                     $475.00  * 
+                                                                                                             
  azurerm_postgresql_flexible_server.burstable                                                                
  ├─ Compute (B_Standard_B1ms)                                         730  hours                   $16.06    
  ├─ Storage                                                           128  GB                      $17.66    
@@ -36,17 +41,17 @@
  ├─ Storage                                                Monthly cost depends on usage: $0.12 per GB       
  └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
                                                                                                              
- OVERALL TOTAL                                                                                  $3,584.74 
+ OVERALL TOTAL                                                                                  $4,212.34 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-8 cloud resources were detected:
-∙ 7 were estimated
+9 cloud resources were detected:
+∙ 8 were estimated
 ∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $2,160 ┃      $1,425 ┃     $3,585 ┃
+┃ main                                               ┃        $2,312 ┃      $1,900 ┃     $4,212 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -176,6 +176,9 @@ type Config struct {
 	// TerraformSourceMap replaces any source URL with the provided value.
 	TerraformSourceMap TerraformSourceMap `envconfig:"TERRAFORM_SOURCE_MAP"`
 
+	// TerraformSourceMapRegex is a more flexible source mapping that supports regex patterns.
+	TerraformSourceMapRegex TerraformSourceMapRegex `yaml:"terraform_source_map,omitempty"`
+
 	S3ModuleCacheRegion  string `envconfig:"S3_MODULE_CACHE_REGION"`
 	S3ModuleCacheBucket  string `envconfig:"S3_MODULE_CACHE_BUCKET"`
 	S3ModuleCachePrefix  string `envconfig:"S3_MODULE_CACHE_PREFIX"`
@@ -303,6 +306,14 @@ func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
 	}
 
 	c.Projects = cfgFile.Projects
+
+	if len(cfgFile.TerraformSourceMapRegex) > 0 {
+		c.TerraformSourceMapRegex = cfgFile.TerraformSourceMapRegex
+		err = c.TerraformSourceMapRegex.Compile()
+		if err != nil {
+			return fmt.Errorf("error compiling terraform_source_map regex patterns: %w", err)
+		}
+	}
 
 	// Reload the environment and global flags to overwrite any of the config file configs
 	err = c.LoadFromEnv()

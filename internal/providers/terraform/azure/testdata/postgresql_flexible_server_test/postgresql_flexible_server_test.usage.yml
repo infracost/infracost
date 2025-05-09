@@ -8,3 +8,6 @@ resource_usage:
 
   azurerm_postgresql_flexible_server.mo:
     additional_backup_storage_gb: 5000
+
+  azurerm_postgresql_flexible_server.high_availability:
+    additional_backup_storage_gb: 5000

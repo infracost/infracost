@@ -180,8 +180,12 @@ func (r *KMSCryptoKey) cryptoKeyDescription(algorithm string, protectionLevel st
 		if strings.ToLower(algorithm) == "ec_sign_p384_sha384" {
 			return "HSM ECDSA P-384"
 		}
-		rsaType := strings.Split(algorithm, "_")[3]
-		return "HSM RSA " + rsaType
+		if strings.HasPrefix(strings.ToLower(algorithm), "rsa_sign_") {
+			parts := strings.Split(algorithm, "_")
+			if len(parts) > 3 {
+				return "HSM RSA " + parts[3]
+			}
+		}
 	}
 	return ""
 }
@@ -204,8 +208,12 @@ func keyOperationsDescription(algorithm string, protectionLevel string) string {
 		if strings.ToLower(algorithm) == "ec_sign_p384_sha384" {
 			return "HSM cryptographic operations with an ECDSA P-384"
 		}
-		rsaType := strings.Split(algorithm, "_")[3]
-		return "HSM cryptographic operations with a RSA " + rsaType
+		if strings.HasPrefix(strings.ToLower(algorithm), "rsa_sign_") {
+			parts := strings.Split(algorithm, "_")
+			if len(parts) > 3 {
+				return "HSM cryptographic operations with a RSA   " + parts[3]
+			}
+		}
 	}
 	return ""
 }
