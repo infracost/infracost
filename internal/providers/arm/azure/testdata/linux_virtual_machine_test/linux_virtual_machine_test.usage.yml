@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  Microsoft.Compute/virtualMachines/Linux/standard_a2_v2_custom_disk:
+    os_disk:
+      monthly_disk_operations: 20000
+  Microsoft.Compute/virtualMachines/Linux/basic_b1_withMonthlyHours:
+    monthly_hrs: 100
