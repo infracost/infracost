@@ -62,14 +62,14 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 	}
 
 	r := &azure.PostgreSQLFlexibleServer{
-		Address:           d.Address,
-		Region:            region,
-		SKU:               sku,
-		Tier:              tier,
-		InstanceType:      size,
-		InstanceVersion:   version,
-		Storage:           storage,
-		HighAvailability:  highAvailability,
+		Address:          d.Address,
+		Region:           region,
+		SKU:              sku,
+		Tier:             tier,
+		InstanceType:     size,
+		InstanceVersion:  version,
+		Storage:          storage,
+		HighAvailability: highAvailability,
 	}
 	return r
 }

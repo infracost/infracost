@@ -18,11 +18,11 @@ type PostgreSQLFlexibleServer struct {
 	Address string
 	Region  string
 
-	SKU             string
-	Tier            string
-	InstanceType    string
-	InstanceVersion string
-	Storage         int64
+	SKU              string
+	Tier             string
+	InstanceType     string
+	InstanceVersion  string
+	Storage          int64
 	HighAvailability bool
 
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
