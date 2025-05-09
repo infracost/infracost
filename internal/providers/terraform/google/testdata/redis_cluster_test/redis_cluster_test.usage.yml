@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  google_redis_cluster.backups_with_usage:
+    backup_storage_gb: 1000

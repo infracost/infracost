@@ -947,6 +947,8 @@ resource_type_default_usage:
     snapshot_storage_gb: 18 # Snapshot storage for unacknowledged messages in GB.
   google_pubsub_topic:
     monthly_message_data_tb: 0.125 # Monthly amount of message data published to the topic in TB.
+  google_redis_cluster:
+    backup_storage_gb: 61 # Amount of backup storage in GB.
   google_secret_manager_secret:
     active_secret_versions: 83 # Number of active secret versions in each month. NOTE: this is used only when secret versions are not defined.
     monthly_access_operations: 1666666 # Monthly number of access operations
