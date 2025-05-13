@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -117,23 +118,10 @@ func (cache *S3Cache) Get(key, destPath string, public bool) error {
 	if err != nil {
 		return fmt.Errorf("failed to download from S3: %w", err)
 	}
-	defer result.Body.Close()
-
-	// Create a temporary file for the downloaded archive
-	tmpFile, err := os.CreateTemp("", fmt.Sprintf("s3cache-%s.tar.gz", uuid.New().String()))
-	if err != nil {
-		return fmt.Errorf("failed to create temporary file: %w", err)
-	}
-	defer os.Remove(tmpFile.Name())
-	defer tmpFile.Close()
-
-	// Copy the S3 object to the temporary file
-	if _, err := io.Copy(tmpFile, result.Body); err != nil {
-		return fmt.Errorf("failed to save downloaded file: %w", err)
-	}
+	defer func() { _ = result.Body.Close() }()
 
 	// Ensure the destination directory exists
-	if err := os.MkdirAll(destPath, 0755); err != nil {
+	if err := os.MkdirAll(destPath, 0700); err != nil {
 		return fmt.Errorf("failed to create destination directory: %w", err)
 	}
 
@@ -144,38 +132,48 @@ func (cache *S3Cache) Get(key, destPath string, public bool) error {
 		Extraction:  archives.Tar{},
 	}
 
-	_, err = tmpFile.Seek(0, 0)
-	if err != nil {
-		return fmt.Errorf("failed to seek to start of file: %w", err)
-	}
-
 	// Extract the archive
-	err = format.Extract(ctx, tmpFile, func(ctx context.Context, f archives.FileInfo) error {
+	err = format.Extract(ctx, result.Body, func(_ context.Context, f archives.FileInfo) error {
+
+		// no symlinks thank you
+		if f.LinkTarget != "" {
+			return nil
+		}
+
+		// ensure the archive isn't maliciously pathing outside of the destination directory
+		name := filepath.Clean(f.NameInArchive)
+
+		// skip git files, we don't need them
+		if strings.HasPrefix(name, ".git/") {
+			return nil
+		}
+
 		// Determine where to create this file on disk
-		targetPath := filepath.Join(destPath, f.Name())
+		targetPath := filepath.Join(destPath, name)
 		// For directories, just create them
 		if f.IsDir() {
-			return os.MkdirAll(targetPath, 0755)
+			return os.MkdirAll(targetPath, 0700)
 		}
 
 		// Create parent directory if it doesn't exist
-		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(targetPath), 0700); err != nil {
 			return fmt.Errorf("failed to create parent directory: %w", err)
 		}
 
 		// Create the file
+		// #nosec G304
 		outFile, err := os.Create(targetPath)
 		if err != nil {
 			return fmt.Errorf("failed to create file: %w", err)
 		}
-		defer outFile.Close()
+		defer func() { _ = outFile.Close() }()
 
 		// Copy the contents
 		reader, err := f.Open()
 		if err != nil {
 			return fmt.Errorf("failed to open file in archive: %w", err)
 		}
-		defer reader.Close()
+		defer func() { _ = reader.Close() }()
 
 		_, err = io.Copy(outFile, reader)
 		return err
