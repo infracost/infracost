@@ -18,11 +18,12 @@ type PostgreSQLFlexibleServer struct {
 	Address string
 	Region  string
 
-	SKU             string
-	Tier            string
-	InstanceType    string
-	InstanceVersion string
-	Storage         int64
+	SKU              string
+	Tier             string
+	InstanceType     string
+	InstanceVersion  string
+	Storage          int64
+	HighAvailability bool
 
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
 }
@@ -66,11 +67,17 @@ func (r *PostgreSQLFlexibleServer) BuildResource() *schema.Resource {
 func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent {
 	attrs := getFlexibleServerFilterAttributes(r.Tier, r.InstanceType, r.InstanceVersion)
 
+	// Double the quantity if high availability is enabled
+	quantity := decimal.NewFromInt(1)
+	if r.HighAvailability {
+		quantity = quantity.Mul(decimal.NewFromInt(2))
+	}
+
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", r.SKU),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity: decimalPtr(quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
