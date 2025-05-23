@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
@@ -872,7 +873,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !hasSupportedProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedProvider(r.ResourceType) && !pulumi.HasSupportedProvider(r.ResourceType) {
 			continue
 		}
 
