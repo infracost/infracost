@@ -111,6 +111,9 @@ func (d *Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 	if err != nil {
 		return RegistryURL{}, false, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
 	}
+	if !strings.HasSuffix(serviceURL.Path, "/") {
+		serviceURL.Path += "/"
+	}
 
 	r := RegistryURL{
 		Host:      host,
@@ -136,6 +139,9 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	serviceURL, err := d.disco.DiscoverServiceURL(hostname, moduleServiceID)
 	if err != nil {
 		return "", fmt.Errorf("unable to discover registry service using host %s %w", moduleURL.Host, err)
+	}
+	if !strings.HasSuffix(serviceURL.Path, "/") {
+		serviceURL.Path += "/"
 	}
 
 	var u *url.URL
