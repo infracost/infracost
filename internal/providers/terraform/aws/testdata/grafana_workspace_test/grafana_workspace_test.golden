@@ -1,0 +1,25 @@
+
+ Name                              Monthly Qty  Unit   Monthly Cost   
+                                                                      
+ aws_grafana_workspace.default                                        
+ └─ Enterprise license                     730  hours     not found   
+                                                                      
+ aws_grafana_workspace.enterprise                                     
+ └─ Enterprise license                     730  hours     not found   
+                                                                      
+ aws_grafana_workspace.standard                                       
+ └─ Enterprise license                     730  hours     not found   
+                                                                      
+ OVERALL TOTAL                                               $0.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃           - ┃      $0.00 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
