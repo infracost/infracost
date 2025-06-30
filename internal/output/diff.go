@@ -49,8 +49,13 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		sortResources(project.Diff.Resources, "")
 
 		for _, diffResource := range project.Diff.Resources {
-			oldResource := findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
-			newResource := findResourceByName(project.Breakdown.Resources, diffResource.Name)
+			var oldResource, newResource *Resource
+			if project.PastBreakdown != nil {
+				oldResource = findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
+			}
+			if project.Breakdown != nil {
+				newResource = findResourceByName(project.Breakdown.Resources, diffResource.Name)
+			}
 
 			s += resourceToDiff(out.Currency, diffResource, oldResource, newResource, true)
 			s += "\n"
