@@ -1,0 +1,21 @@
+version: 0.1
+resource_usage:
+  my-golden-bucket:
+    standard:
+      storage_gb: 1000
+      monthly_tier_1_requests: 100000  # GET, SELECT, and all other requests
+      monthly_tier_2_requests: 200000  # PUT, COPY, POST, LIST requests
+      monthly_select_data_scanned_gb: 100
+      monthly_select_data_returned_gb: 50
+    standard_ia:
+      storage_gb: 2000
+      monthly_tier_1_requests: 150000
+      monthly_tier_2_requests: 250000
+      monthly_data_retrieval_gb: 700
+      monthly_select_data_scanned_gb: 200
+      monthly_select_data_returned_gb: 100
+    glacier:
+      storage_gb: 5000
+      monthly_tier_1_requests: 10000
+      monthly_tier_2_requests: 20000
+      monthly_data_retrieval_gb: 1000

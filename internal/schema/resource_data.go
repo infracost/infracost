@@ -29,6 +29,8 @@ type ResourceData struct {
 	// use this value instead of the deprecated d.Get("region").String() or
 	// lookupRegion method.
 	Region string
+	// PulumiUrn is the unique URN of the resource in Pulumi
+	PulumiUrn string
 }
 
 type TagPropagation struct {
@@ -49,6 +51,7 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		ReferencesMap:   make(map[string][]*ResourceData),
 		CFResource:      nil,
 		ProjectMetadata: make(map[string]string),
+		PulumiUrn:       "",
 	}
 }
 
@@ -61,6 +64,18 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 		RawValues:       gjson.Result{},
 		ReferencesMap:   make(map[string][]*ResourceData),
 		CFResource:      cfResource,
+		ProjectMetadata: make(map[string]string),
+		PulumiUrn:       "",
+	}
+}
+
+func NewResourceDataFromProviderPulumi(resourceType string, address string, rawValues gjson.Result) *ResourceData {
+	return &ResourceData{
+		Type:            resourceType,
+		ProviderName:    "pulumi",
+		Address:         address,
+		RawValues:       rawValues,
+		ReferencesMap:   make(map[string][]*ResourceData),
 		ProjectMetadata: make(map[string]string),
 	}
 }
@@ -114,6 +129,19 @@ func (d *ResourceData) IsEmpty(key string) bool {
 	return g.Type == gjson.Null || len(g.Raw) == 0 || g.Raw == "\"\"" || emptyObjectOrArray(g)
 }
 
+// emptyObjectOrArray returns true if the gjson.Result is an empty object or array
+func emptyObjectOrArray(g gjson.Result) bool {
+	if g.Type == gjson.JSON {
+		if g.IsObject() {
+			return len(g.Map()) == 0
+		}
+		if g.IsArray() {
+			return len(g.Array()) == 0
+		}
+	}
+	return false
+}
+
 func (d *ResourceData) References(keys ...string) []*ResourceData {
 	var data []*ResourceData
 
@@ -131,6 +159,7 @@ func (d *ResourceData) AddReference(k string, reference *ResourceData, reverseRe
 	if _, ok := d.ReferencesMap[key]; !ok {
 		d.ReferencesMap[key] = make([]*ResourceData, 0)
 	}
+
 	d.ReferencesMap[key] = append(d.ReferencesMap[key], reference)
 
 	// add any reverse references
