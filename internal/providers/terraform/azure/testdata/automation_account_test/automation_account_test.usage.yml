@@ -3,14 +3,11 @@ resource_usage:
   azurerm_automation_account.default: 
     non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
     monthly_job_run_mins: 0 # Monthly number of job run minutes.
-    monthly_watcher_hrs: 0 # Monthly number of watcher hours.
 
   azurerm_automation_account.allUsageEx: 
     non_azure_config_node_count: 2 # Number of non-Azure configuration nodes.
     monthly_job_run_mins: 5 # Monthly number of job run minutes.
-    monthly_watcher_hrs: 10 # Monthly number of watcher hours.  
 
   azurerm_automation_account.someUsageEx: 
     non_azure_config_node_count: 0 # Number of non-Azure configuration nodes.
     monthly_job_run_mins: 20 # Monthly number of job run minutes.
-    monthly_watcher_hrs: 15 # Monthly number of watcher hours.
