@@ -233,29 +233,36 @@ func (e *Evaluator) MissingVars() []string {
 	return missing
 }
 
-// Run builds the Evaluator Context using all the provided Blocks. It will build up the Context to hold
-// variable and reference information so that this can be used by Attribute evaluation. Run will also
-// parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
-// this Module.
+// Run builds the evaluation context using all provided blocks. It processes variables, locals,
+// and early modules to populate the context with any values needed by other modules.
+//
+// After preparing the context, it expands all modules and resources, resolves references,
+// and loads any additional modules that become available after expansion.
+//
+// The result is a fully evaluated root module that represents the complete Terraform configuration.
 func (e *Evaluator) Run() (*Module, error) {
 	var lastContext hcl.EvalContext
 
-	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
+	// Step 1: Evaluate top-level context (variables, locals, etc.)
 	e.logger.Debug().Msg("evaluating top level context")
 	e.evaluate(lastContext)
 
-	// let's load the modules now we have our top level context.
-	e.loadModules(lastContext)
-	e.logger.Debug().Msg("evaluating context after loading modules")
+	// Step 2: Load and evaluate early modules (like with_output)
+	e.loadAndEvaluateEarlyModules(lastContext)
+	e.logger.Debug().Msg("evaluating context after loading early modules")
 	e.evaluate(lastContext)
 
-	// expand out resources and modules via count and evaluate again so that we can include
-	// any module outputs and or count references.
+	// Step 3: Expand modules and resources (now that module.with_output.* is available)
 	e.module.Blocks = e.expandBlocks(e.module.Blocks, lastContext)
 	e.logger.Debug().Msg("evaluating context after expanding blocks")
 	e.evaluate(lastContext)
 
-	// returns all the evaluated Blocks under their given Module.
+	// Step 4: Load any newly expanded modules (like using_count, using_for_each)
+	e.loadModules(lastContext)
+	e.logger.Debug().Msg("evaluating context after loading remaining modules")
+	e.evaluate(lastContext)
+
+	// Step 5: Collect and return fully evaluated modules
 	return e.collectModules(), nil
 }
 
@@ -1114,6 +1121,65 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 			Parent:     &e.module,
 		},
 	}, nil
+}
+
+// loadAndEvaluateEarlyModules loads early module calls and evaluates them.
+func (e *Evaluator) loadAndEvaluateEarlyModules(lastContext hcl.EvalContext) {
+	e.logger.Debug().Msg("loading early module calls")
+
+	var earlyModuleBlocks Blocks
+	var filtered Blocks
+
+	for _, block := range e.module.Blocks {
+		if block.Type() == "module" && block.Label() == "with_output" {
+			earlyModuleBlocks = append(earlyModuleBlocks, block)
+		} else {
+			filtered = append(filtered, block)
+		}
+	}
+
+	// Load and evaluate early modules without expansion
+	for _, moduleBlock := range earlyModuleBlocks {
+		moduleCall, err := e.loadModuleWithProviders(moduleBlock)
+		if err != nil {
+			e.logger.Debug().Err(err).Msgf("failed to load early module %s", moduleBlock.LocalName())
+			continue
+		}
+		e.moduleCalls[moduleBlock.FullName()] = moduleCall
+
+		// Evaluate it
+		moduleEvaluator := NewEvaluator(
+			Module{
+				Name:               moduleCall.Definition.FullName(),
+				Source:             moduleCall.Module.Source,
+				Blocks:             moduleCall.Module.RawBlocks,
+				RawBlocks:          moduleCall.Module.RawBlocks,
+				RootPath:           e.module.RootPath,
+				ModulePath:         moduleCall.Path,
+				Modules:            nil,
+				Parent:             &e.module,
+				SourceURL:          moduleCall.Module.SourceURL,
+				ProviderReferences: moduleCall.Module.ProviderReferences,
+			},
+			e.workingDir,
+			moduleCall.Definition.Values().AsValueMap(),
+			e.moduleMetadata,
+			map[string]map[string]cty.Value{},
+			e.workspace,
+			e.blockBuilder,
+			e.logger,
+			e.isGraph,
+		)
+
+		moduleCall.Module, _ = moduleEvaluator.Run()
+		outputs := moduleEvaluator.exportOutputs()
+
+		// Inject outputs into context
+		e.ctx.Set(outputs, "module", moduleCall.Name)
+	}
+
+	// Update the top-level blocks (early modules + rest)
+	e.module.Blocks = append(filtered, earlyModuleBlocks...)
 }
 
 // loadModules reads all module blocks and loads the underlying modules, adding blocks to moduleCalls.
