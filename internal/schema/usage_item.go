@@ -9,6 +9,7 @@ const (
 	StringArray
 	SubResourceUsage
 	KeyValueMap
+	Bool
 )
 
 type UsageItem struct {

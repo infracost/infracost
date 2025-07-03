@@ -23,6 +23,7 @@ type ContainerCluster struct {
 	AutopilotVCPUCount          *float64 `infracost_usage:"autopilot_vcpu_count"`
 	AutopilotMemoryGB           *float64 `infracost_usage:"autopilot_memory_gb"`
 	AutopilotEphemeralStorageGB *float64 `infracost_usage:"autopilot_ephemeral_storage_gb"`
+	SkipManagementFee           *bool    `infracost_usage:"skip_management_fee"`
 }
 
 func (r *ContainerCluster) CoreType() string {
@@ -35,6 +36,7 @@ func (r *ContainerCluster) UsageSchema() []*schema.UsageItem {
 		{Key: "autopilot_vcpu_count", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "autopilot_memory_gb", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "autopilot_ephemeral_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "skip_management_fee", DefaultValue: false, ValueType: schema.Bool},
 	}
 }
 
@@ -56,6 +58,11 @@ func (r *ContainerCluster) PopulateUsage(u *schema.UsageData) {
 			Attributes: u.Get(nodePool.Address).Map(),
 		})
 	}
+
+	if u.Get("skip_management_fee").Type != 0 {
+		val := u.Get("skip_management_fee").Bool()
+		r.SkipManagementFee = &val
+	}
 }
 
 // BuildResource builds a schema.Resource from a valid ContainerCluster struct.
@@ -64,12 +71,20 @@ func (r *ContainerCluster) PopulateUsage(u *schema.UsageData) {
 func (r *ContainerCluster) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	costComponents = append(costComponents, r.managementFeeCostComponent())
+	if cc := r.managementFeeCostComponent(); cc != nil {
+		costComponents = append(costComponents, cc)
+	}
 
 	if r.AutopilotEnabled {
-		costComponents = append(costComponents, r.autopilotCPUCostComponent())
-		costComponents = append(costComponents, r.autopilotMemoryCostComponent())
-		costComponents = append(costComponents, r.autopilotStorageCostComponent())
+		if cc := r.autopilotCPUCostComponent(); cc != nil {
+			costComponents = append(costComponents, cc)
+		}
+		if cc := r.autopilotMemoryCostComponent(); cc != nil {
+			costComponents = append(costComponents, cc)
+		}
+		if cc := r.autopilotStorageCostComponent(); cc != nil {
+			costComponents = append(costComponents, cc)
+		}
 	}
 
 	subresources := []*schema.Resource{}
@@ -99,6 +114,10 @@ func (r *ContainerCluster) BuildResource() *schema.Resource {
 // managementFeeCostComponent returns a cost component for cluster management
 // fee.
 func (r *ContainerCluster) managementFeeCostComponent() *schema.CostComponent {
+	if r.SkipManagementFee != nil && *r.SkipManagementFee {
+		return nil
+	}
+
 	description := "Regional Kubernetes Clusters"
 	name := "Cluster management fee"
 

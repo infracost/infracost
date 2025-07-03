@@ -516,6 +516,30 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "google_container_cluster": {
+          "usage": {
+            "nodes": {
+              "type": "integer",
+              "description": "Number of nodes in the default node pool."
+            },
+            "autopilot_vcpu_count": {
+              "type": "number",
+              "description": "Number of vCPUs for Autopilot clusters."
+            },
+            "autopilot_memory_gb": {
+              "type": "number",
+              "description": "Amount of memory (GB) for Autopilot clusters."
+            },
+            "autopilot_ephemeral_storage_gb": {
+              "type": "number",
+              "description": "Amount of ephemeral storage (GB) for Autopilot clusters."
+            },
+            "skip_management_fee": {
+              "type": "boolean",
+              "description": "If true, the GKE cluster management fee will be skipped (set to $0). Use this for the free GKE cluster under GCP's free tier."
+            }
+          }
         }
       },
       "additionalProperties": false,
