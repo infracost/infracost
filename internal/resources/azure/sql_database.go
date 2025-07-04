@@ -218,10 +218,19 @@ func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 }
 
 func (r *SQLDatabase) elasticPoolCostComponents() []*schema.CostComponent {
-	return []*schema.CostComponent{
-		r.longTermRetentionCostComponent(),
-		r.pitrBackupCostComponent(),
+	// For databases in elastic pools, we only include backup-related costs
+	// since compute costs are billed at the elastic pool level
+	costComponents := []*schema.CostComponent{}
+
+	// Add backup-related costs if they are configured
+	if r.LongTermRetentionStorageGB != nil && *r.LongTermRetentionStorageGB > 0 {
+		costComponents = append(costComponents, r.longTermRetentionCostComponent())
 	}
+	if r.BackupStorageGB != nil && *r.BackupStorageGB > 0 {
+		costComponents = append(costComponents, r.pitrBackupCostComponent())
+	}
+
+	return costComponents
 }
 
 func (r *SQLDatabase) computeHoursCostComponents() []*schema.CostComponent {
