@@ -10,14 +10,14 @@
                                                                                                             
  azurerm_hdinsight_kafka_cluster.non_usage                                                                  
  ├─ Head node (Standard_NC24)                             1,460  hours                          $7,478.12   
- ├─ Worker node (Standard_D3)                               730  hours                            $215.35   
- ├─ Zookeeper node (Standard_D3)                          2,190  hours                            $646.05   
+ ├─ Worker node (Standard_D3_V2)                            730  hours                            $215.35   
+ ├─ Zookeeper node (Standard_D3_V2)                       2,190  hours                            $646.05   
  ├─ Managed OS disks                                          3  months                           $446.04   
  └─ Disk operations                         Monthly cost depends on usage: $0.00036 per 100K operations     
                                                                                                             
  azurerm_hdinsight_kafka_cluster.premium                                                                    
  ├─ Head node (Standard_F2s_V2)                           1,460  hours                            $197.10   
- ├─ Worker node (Standard_D3)                             2,190  hours                            $646.05   
+ ├─ Worker node (Standard_D3_V2)                          2,190  hours                            $646.05   
  ├─ Zookeeper node (Standard_F32s_V2)                     2,190  hours                          $4,730.40   
  ├─ Managed OS disks                                          9  months                         $1,338.12   
  └─ Disk operations                                         180  100K operations                    $0.06   
