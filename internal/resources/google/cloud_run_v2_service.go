@@ -48,15 +48,15 @@ func (r *CloudRunService) PopulateUsage(u *schema.UsageData) {
 func (r *CloudRunService) BuildResource() *schema.Resource {
 	regionTier := GetRegionTier(r.Region)
 	cpuName := "CPU allocation Time"
-	cpuDesc := "CPU Allocation time"
+	cpuDesc := "Services CPU (Instance-based billing) in " + r.Region
 	memoryName := "Memory allocation time"
-	memoryDesc := "Memory Allocation Time"
+	memoryDesc := "Services Memory (Instance-based billing) in " + r.Region
 
 	if regionTier == "Tier 2" {
 		cpuName = "CPU allocation time (tier 2)"
-		cpuDesc = "CPU Allocation Time (tier 2)"
+		cpuDesc = "Services CPU Tier 2  (Request-based billing)"
 		memoryName = "Memory allocation time (tier 2)"
-		memoryDesc = "Memory Allocation Time (tier 2)"
+		memoryDesc = "Services Memory Tier 2 (Request-based billing)"
 	}
 
 	var costComponents []*schema.CostComponent
@@ -143,7 +143,7 @@ func (r *CloudRunService) throttlingDisabledCostComponents(cpuName, memoryName s
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(fmt.Sprintf("CPU Allocation Time (Always-on CPU) in %s", r.Region))},
+					{Key: "description", Value: strPtr(fmt.Sprintf("Services CPU (Instance-based billing) in %s", r.Region))},
 				},
 			},
 		},
@@ -158,7 +158,7 @@ func (r *CloudRunService) throttlingDisabledCostComponents(cpuName, memoryName s
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(fmt.Sprintf("Memory Allocation Time (Always-on CPU) in %s", r.Region))},
+					{Key: "description", Value: strPtr(fmt.Sprintf("Services Memory (Instance-based billing) in %s", r.Region))},
 				},
 			},
 		},
