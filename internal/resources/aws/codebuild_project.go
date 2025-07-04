@@ -54,7 +54,7 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 					Service:       strPtr("CodeBuild"),
 					ProductFamily: strPtr("Compute"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), computeType))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/Build-Min:%s:%s/", r.mapEnvironmentType(), computeType))},
 					},
 				},
 				UsageBased: true,
