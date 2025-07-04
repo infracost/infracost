@@ -81,7 +81,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 					Service:       strPtr("Cloud Run Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) CPU Time")},
+						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) CPU")},
 					},
 				},
 				UsageBased: true,
@@ -97,7 +97,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 					Service:       strPtr("Cloud Run Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) Memory Time")},
+						{Key: "description", ValueRegex: regexPtr("\\(1st Gen\\) Memory")},
 					},
 				},
 				UsageBased: true,
