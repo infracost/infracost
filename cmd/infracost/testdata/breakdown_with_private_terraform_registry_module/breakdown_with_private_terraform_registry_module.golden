@@ -8,42 +8,18 @@ Project: main
  └─ root_block_device                                                                      
     └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80   
                                                                                            
- module.ec2_cluster.aws_instance.this[1]                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47   
- ├─ EC2 detailed monitoring                                     7  metrics         $2.10   
- └─ root_block_device                                                                      
-    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80   
-                                                                                           
- module.ec2_cluster.aws_instance.this[2]                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47   
- ├─ EC2 detailed monitoring                                     7  metrics         $2.10   
- └─ root_block_device                                                                      
-    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80   
-                                                                                           
- module.ec2_cluster.aws_instance.this[3]                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47   
- ├─ EC2 detailed monitoring                                     7  metrics         $2.10   
- └─ root_block_device                                                                      
-    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80   
-                                                                                           
- module.ec2_cluster.aws_instance.this[4]                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47   
- ├─ EC2 detailed monitoring                                     7  metrics         $2.10   
- └─ root_block_device                                                                      
-    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80   
-                                                                                           
- OVERALL TOTAL                                                                   $56.84 
+ OVERALL TOTAL                                                                   $11.37 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 5 were estimated
+1 cloud resource was detected:
+∙ 1 was estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃           $57 ┃           - ┃        $57 ┃
+┃ main                                               ┃           $11 ┃           - ┃        $11 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

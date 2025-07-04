@@ -7,11 +7,10 @@ provider "aws" {
 }
 
 module "ec2_cluster" {
-  source  = "app.terraform.io/infracost-test/ec2-instance/aws"
-  version = "~> 2.0"
+  source  = "app.terraform.io/infracost-test/module-example/private"
+  version = "~> 3.0"
 
-  name           = "my-cluster"
-  instance_count = 5
+  name = "my-instance"
 
   ami                    = "ami-ebd02392"
   instance_type          = "t2.micro"
