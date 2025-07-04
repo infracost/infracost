@@ -1,52 +1,43 @@
 
- Name                                      Monthly Qty  Unit   Monthly Cost   
-                                                                              
- aws_ecs_service.ecs_fargate5                                                 
- ├─ Per GB per hour                                 10  GB           $32.45   
- ├─ Per vCPU per hour                                5  CPU         $147.75   
- └─ Inference accelerator (eia2.medium)          3,650  hours       $438.00   
-                                                                              
- aws_ecs_service.ecs_fargate4                                                 
- ├─ Per GB per hour                                  8  GB           $25.96   
- ├─ Per vCPU per hour                                4  CPU         $118.20   
- └─ Inference accelerator (eia2.medium)          2,920  hours       $350.40   
-                                                                              
- aws_ecs_service.ecs_fargate3                                                 
- ├─ Per GB per hour                                  6  GB           $19.47   
- ├─ Per vCPU per hour                                3  CPU          $88.65   
- └─ Inference accelerator (eia2.medium)          2,190  hours       $262.80   
-                                                                              
- aws_ecs_service.task_set                                                     
- ├─ Per GB per hour                                  8  GB           $25.96   
- ├─ Per vCPU per hour                                4  CPU         $118.20   
- └─ Inference accelerator (eia2.medium)          1,460  hours       $175.20   
-                                                                              
- aws_ecs_service.ecs_fargate2                                                 
- ├─ Per GB per hour                                  4  GB           $12.98   
- ├─ Per vCPU per hour                                2  CPU          $59.10   
- └─ Inference accelerator (eia2.medium)          1,460  hours       $175.20   
-                                                                              
- aws_ecs_service.ecs_fargate_no_cluster_2                                     
- ├─ Per GB per hour                                  4  GB           $12.98   
- ├─ Per vCPU per hour                                2  CPU          $59.10   
- └─ Inference accelerator (eia2.medium)          1,460  hours       $175.20   
-                                                                              
- aws_ecs_service.ecs_fargate1                                                 
- ├─ Per GB per hour                                  2  GB            $6.49   
- ├─ Per vCPU per hour                                1  CPU          $29.55   
- └─ Inference accelerator (eia2.medium)            730  hours        $87.60   
-                                                                              
- aws_ecs_service.ecs_fargate11_family                                         
- ├─ Per GB per hour                                  2  GB            $6.49   
- ├─ Per vCPU per hour                                1  CPU          $29.55   
- └─ Inference accelerator (eia2.medium)            730  hours        $87.60   
-                                                                              
- aws_ecs_service.ecs_fargate_no_cluster_1                                     
- ├─ Per GB per hour                                  2  GB            $6.49   
- ├─ Per vCPU per hour                                1  CPU          $29.55   
- └─ Inference accelerator (eia2.medium)            730  hours        $87.60   
-                                                                              
- OVERALL TOTAL                                                   $2,668.52 
+ Name                                      Monthly Qty  Unit  Monthly Cost   
+                                                                             
+ aws_ecs_service.ecs_fargate5                                                
+ ├─ Per GB per hour                                 10  GB          $32.45   
+ └─ Per vCPU per hour                                5  CPU        $147.75   
+                                                                             
+ aws_ecs_service.ecs_fargate4                                                
+ ├─ Per GB per hour                                  8  GB          $25.96   
+ └─ Per vCPU per hour                                4  CPU        $118.20   
+                                                                             
+ aws_ecs_service.task_set                                                    
+ ├─ Per GB per hour                                  8  GB          $25.96   
+ └─ Per vCPU per hour                                4  CPU        $118.20   
+                                                                             
+ aws_ecs_service.ecs_fargate3                                                
+ ├─ Per GB per hour                                  6  GB          $19.47   
+ └─ Per vCPU per hour                                3  CPU         $88.65   
+                                                                             
+ aws_ecs_service.ecs_fargate2                                                
+ ├─ Per GB per hour                                  4  GB          $12.98   
+ └─ Per vCPU per hour                                2  CPU         $59.10   
+                                                                             
+ aws_ecs_service.ecs_fargate_no_cluster_2                                    
+ ├─ Per GB per hour                                  4  GB          $12.98   
+ └─ Per vCPU per hour                                2  CPU         $59.10   
+                                                                             
+ aws_ecs_service.ecs_fargate1                                                
+ ├─ Per GB per hour                                  2  GB           $6.49   
+ └─ Per vCPU per hour                                1  CPU         $29.55   
+                                                                             
+ aws_ecs_service.ecs_fargate11_family                                        
+ ├─ Per GB per hour                                  2  GB           $6.49   
+ └─ Per vCPU per hour                                1  CPU         $29.55   
+                                                                             
+ aws_ecs_service.ecs_fargate_no_cluster_1                                    
+ ├─ Per GB per hour                                  2  GB           $6.49   
+ └─ Per vCPU per hour                                1  CPU         $29.55   
+                                                                             
+ OVERALL TOTAL                                                    $828.92 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -58,5 +49,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $2,669 ┃           - ┃     $2,669 ┃
+┃ main                                               ┃          $829 ┃           - ┃       $829 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
