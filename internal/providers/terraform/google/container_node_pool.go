@@ -50,6 +50,8 @@ func newContainerNodePool(d *schema.ResourceData) schema.CoreResource {
 	var cluster *schema.ResourceData
 	if len(d.References("cluster")) > 0 {
 		cluster = d.References("cluster")[0]
+	} else if refs, ok := d.ReferencesMap["cluster"]; ok && len(refs) > 0 {
+		cluster = refs[0]
 	}
 
 	r := newNodePool(d.Address, d.RawValues, cluster)
@@ -82,14 +84,16 @@ func newNodePool(address string, d gjson.Result, cluster *schema.ResourceData) *
 		return nil
 	}
 
-	zones := int64(3)
-
-	if cluster != nil {
-		zones = int64(zoneCount(cluster.RawValues, ""))
-	}
+	var zones int64
 
 	if len(d.Get("node_locations").Array()) > 0 {
 		zones = int64(zoneCount(d, location))
+	} else if cluster != nil {
+		zones = int64(zoneCount(cluster.RawValues, ""))
+	} else if isZone(location) {
+		zones = 1
+	} else {
+		zones = 3
 	}
 
 	countPerZone := int64(3)
