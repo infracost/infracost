@@ -169,6 +169,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getFederatedIdentityCredentialRegistryItem(),
 	getCognitiveAccountRegistryItem(),
 	getCognitiveDeploymentRegistryItem(),
+	getIotHubDeviceUpdateAccountRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
