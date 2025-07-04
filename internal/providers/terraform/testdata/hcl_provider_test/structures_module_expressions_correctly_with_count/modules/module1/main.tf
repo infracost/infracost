@@ -10,10 +10,6 @@ resource "aws_ecs_task_definition" "ecs_task" {
   family                   = "ecs_task_module_1"
   memory                   = "2 GB"
   cpu                      = "1 vCPU"
-  inference_accelerator {
-    device_name = "device1"
-    device_type = "eia2.medium"
-  }
 
   container_definitions = <<TASK_DEFINITION
 			[

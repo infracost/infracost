@@ -65,7 +65,7 @@
     └─ Early delete (within 180 days)                  60,000  GB                            $59.40  * 
                                                                                                        
  aws_s3_bucket.bucket1                                                                                 
- ├─ Object tagging                          Monthly cost depends on usage: $0.01 per 10k tags          
+ ├─ Object tagging                          Monthly cost depends on usage: $0.0065 per 10k tags        
  ├─ Standard                                                                                           
  │  ├─ Storage                              Monthly cost depends on usage: $0.023 per GB               
  │  ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests      

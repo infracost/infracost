@@ -104,14 +104,6 @@ resource "aws_launch_template" "bar" {
 
   ebs_optimized = true
 
-  elastic_gpu_specifications {
-    type = "test"
-  }
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
-
   iam_instance_profile {
     name = "test"
   }
@@ -174,14 +166,6 @@ resource "aws_launch_template" "foo" {
   disable_api_termination = true
 
   ebs_optimized = true
-
-  elastic_gpu_specifications {
-    type = "test"
-  }
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
 
   iam_instance_profile {
     name = "test"
@@ -279,14 +263,6 @@ resource "aws_launch_template" "foo2" {
 
   ebs_optimized = true
 
-  elastic_gpu_specifications {
-    type = "test"
-  }
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
-
   iam_instance_profile {
     name = "test"
   }
@@ -375,14 +351,6 @@ resource "aws_launch_template" "prefix" {
 
   ebs_optimized = true
 
-  elastic_gpu_specifications {
-    type = "test"
-  }
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
-
   iam_instance_profile {
     name = "test"
   }
@@ -468,14 +436,6 @@ resource "aws_launch_template" "foo3" {
   disable_api_termination = true
 
   ebs_optimized = true
-
-  elastic_gpu_specifications {
-    type = "test"
-  }
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
 
   iam_instance_profile {
     name = "test"
