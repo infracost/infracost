@@ -7,7 +7,7 @@
  └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
                                                                                                              
  azurerm_postgresql_flexible_server.mo                                                                       
- ├─ Compute (MO_Standard_E4s_v3)                                      730  hours                  $382.52    
+ ├─ Compute (MO_Standard_E4s_v3)                                      730  hours                  $382.81    
  ├─ Storage                                                            64  GB                       $8.83    
  └─ Additional backup storage                                       5,000  GB                     $475.00  * 
                                                                                                              
@@ -41,7 +41,7 @@
  ├─ Storage                                                Monthly cost depends on usage: $0.12 per GB       
  └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
                                                                                                              
- OVERALL TOTAL                                                                                  $4,212.34 
+ OVERALL TOTAL                                                                                  $4,212.63 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -53,5 +53,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $2,312 ┃      $1,900 ┃     $4,212 ┃
+┃ main                                               ┃        $2,313 ┃      $1,900 ┃     $4,213 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
