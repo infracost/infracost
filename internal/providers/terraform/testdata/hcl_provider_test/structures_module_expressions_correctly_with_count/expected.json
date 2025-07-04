@@ -56,12 +56,6 @@
                   "cpu": "1 vCPU",
                   "family": "ecs_task_module_1",
                   "id": "task-1",
-                  "inference_accelerator": [
-                    {
-                      "device_name": "device1",
-                      "device_type": "eia2.medium"
-                    }
-                  ],
                   "memory": "2 GB",
                   "requires_compatibilities": [
                     "FARGATE"
@@ -148,12 +142,6 @@
                       "cpu": "1 vCPU",
                       "family": "ecs_task_module_2",
                       "id": "task-2",
-                      "inference_accelerator": [
-                        {
-                          "device_name": "device1",
-                          "device_type": "eia2.medium"
-                        }
-                      ],
                       "memory": "2 GB",
                       "requires_compatibilities": [
                         "FARGATE"
@@ -249,12 +237,6 @@
                 "cpu": "1 vCPU",
                 "family": "ecs_task_module_1",
                 "id": "task-1",
-                "inference_accelerator": [
-                  {
-                    "device_name": "device1",
-                    "device_type": "eia2.medium"
-                  }
-                ],
                 "memory": "2 GB",
                 "requires_compatibilities": [
                   "FARGATE"
@@ -341,12 +323,6 @@
                     "cpu": "1 vCPU",
                     "family": "ecs_task_module_2",
                     "id": "task-2",
-                    "inference_accelerator": [
-                      {
-                        "device_name": "device1",
-                        "device_type": "eia2.medium"
-                      }
-                    ],
                     "memory": "2 GB",
                     "requires_compatibilities": [
                       "FARGATE"
@@ -533,12 +509,6 @@
           "cpu": "1 vCPU",
           "family": "ecs_task_module_1",
           "id": "task-1",
-          "inference_accelerator": [
-            {
-              "device_name": "device1",
-              "device_type": "eia2.medium"
-            }
-          ],
           "memory": "2 GB",
           "requires_compatibilities": [
             "FARGATE"
@@ -586,12 +556,6 @@
           "cpu": "1 vCPU",
           "family": "ecs_task_module_2",
           "id": "task-2",
-          "inference_accelerator": [
-            {
-              "device_name": "device1",
-              "device_type": "eia2.medium"
-            }
-          ],
           "memory": "2 GB",
           "requires_compatibilities": [
             "FARGATE"
