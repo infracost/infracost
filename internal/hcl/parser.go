@@ -595,7 +595,7 @@ func (p *Parser) ProjectName() string {
 		return p.projectName
 	}
 
-	name := config.CleanProjectName(p.RelativePath())
+	name := filepath.Base(config.CleanProjectName(p.RelativePath()))
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
