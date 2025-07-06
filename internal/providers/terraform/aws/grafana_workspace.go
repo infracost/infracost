@@ -27,4 +27,4 @@ func NewGrafanaWorkspace(d *schema.ResourceData) schema.CoreResource {
 	}
 
 	return r
-} 
+}

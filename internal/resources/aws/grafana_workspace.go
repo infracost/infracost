@@ -112,4 +112,4 @@ func (r *GrafanaWorkspace) BuildResource() *schema.Resource {
 		CostComponents: costComponents,
 		UsageSchema:    r.UsageSchema(),
 	}
-} 
+}

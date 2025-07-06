@@ -49,4 +49,4 @@ resource "aws_grafana_workspace" "with_enterprise_license_and_usage" {
 resource "aws_grafana_license_association" "enterprise_usage" {
   license_type = "ENTERPRISE"
   workspace_id = aws_grafana_workspace.with_enterprise_license_and_usage.id
-} 
+}

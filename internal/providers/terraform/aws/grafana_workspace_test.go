@@ -13,4 +13,4 @@ func TestGrafanaWorkspace(t *testing.T) {
 	}
 
 	tftest.GoldenFileResourceTests(t, "grafana_workspace_test")
-} 
+}
