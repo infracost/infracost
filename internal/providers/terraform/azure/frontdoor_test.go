@@ -12,5 +12,7 @@ func TestFrontdoorGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "frontdoor_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "frontdoor_test", &tftest.GoldenFileOptions{
+		IgnoreCLI: true, // the creation of new Frontdoor resources is no longer permitted
+	})
 }

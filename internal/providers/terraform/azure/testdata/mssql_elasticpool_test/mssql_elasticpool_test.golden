@@ -2,12 +2,12 @@
  Name                                               Monthly Qty  Unit         Monthly Cost    
                                                                                               
  azurerm_mssql_elasticpool.bc_dc                                                              
- ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36    
+ ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,625.28    
  ├─ SQL license                                           5,840  vCore-hours     $2,190.00    
  └─ Storage                                                 100  GB                 $29.75    
                                                                                               
  azurerm_mssql_elasticpool.bc_dc_zone_redundant                                               
- ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36    
+ ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,625.28    
  ├─ SQL license                                           5,840  vCore-hours     $2,190.00    
  └─ Storage                                                 100  GB                 $29.75    
                                                                                               
@@ -37,7 +37,7 @@
  azurerm_mssql_elasticpool.basic_100                                                          
  └─ Compute (Basic, 100 DTUs)                               730  hours             $147.22    
                                                                                               
- OVERALL TOTAL                                                                  $19,551.88 
+ OVERALL TOTAL                                                                  $19,557.72 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -49,5 +49,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $19,409 ┃        $143 ┃    $19,552 ┃
+┃ main                                               ┃       $19,415 ┃        $143 ┃    $19,558 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
