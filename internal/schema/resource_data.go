@@ -81,7 +81,6 @@ func (d *ResourceData) GetChild(key string) gjson.Result {
 	return gjson.Result{}
 }
 
-
 // GetStringOrDefault returns the value of key within ResourceData as a string.
 // If the retrieved value is not set GetStringOrDefault will return def.
 func (d *ResourceData) GetStringOrDefault(key, def string) string {
