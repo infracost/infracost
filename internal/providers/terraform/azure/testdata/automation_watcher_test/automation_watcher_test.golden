@@ -1,16 +1,24 @@
-azurerm_automation_watcher.example
-  └─ Watcher (eastus): 730 hours × $0.0020 = $1.46
 
- OVERALL TOTAL                                                                       $1.46 
+ Name                                    Monthly Qty  Unit                Monthly Cost   
+                                                                                         
+ azurerm_automation_watcher.example                                                      
+ └─ Watcher                                      730  hours                      $1.46   
+                                                                                         
+ azurerm_automation_account.example                                                      
+ ├─ Job run time                     Monthly cost depends on usage: $0.002 per minutes   
+ └─ Non-azure config nodes           Monthly cost depends on usage: $6.00 per nodes      
+                                                                                         
+ OVERALL TOTAL                                                                  $1.46 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-1 cloud resource was detected:
-∙ 1 was estimated
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ automation_watcher_test                            ┃         $1.46 ┃           - ┃      $1.46 ┃
+┃ main                                               ┃            $1 ┃           - ┃         $1 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
