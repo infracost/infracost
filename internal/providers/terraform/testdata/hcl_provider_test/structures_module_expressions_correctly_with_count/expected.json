@@ -33,14 +33,14 @@
                     {
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                       "blockName": "aws_ecs_service.ecs_service",
-                      "startLine": 32,
-                      "endLine": 39
+                      "startLine": 28,
+                      "endLine": 35
                     }
                   ],
                   "checksum": "d3c2ce2c95dae9abc092f37146b8a5dab40afe96a7f613811fdf696174d90fe1",
-                  "endLine": 39,
+                  "endLine": 35,
                   "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                  "startLine": 32
+                  "startLine": 28
                 }
               },
               {
@@ -56,12 +56,6 @@
                   "cpu": "1 vCPU",
                   "family": "ecs_task_module_1",
                   "id": "task-1",
-                  "inference_accelerator": [
-                    {
-                      "device_name": "device1",
-                      "device_type": "eia2.medium"
-                    }
-                  ],
                   "memory": "2 GB",
                   "requires_compatibilities": [
                     "FARGATE"
@@ -79,11 +73,11 @@
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                       "blockName": "aws_ecs_task_definition.ecs_task",
                       "startLine": 6,
-                      "endLine": 30
+                      "endLine": 26
                     }
                   ],
-                  "checksum": "40f6429fb6ec11b145e9c44865ec17c1944c1a7cef0db118096f13cf29bfb8b0",
-                  "endLine": 30,
+                  "checksum": "f4ade2c99cd8f81a412a475915b694ec37cf1fedf83be96f49dfab3821115658",
+                  "endLine": 26,
                   "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                   "startLine": 6
                 }
@@ -119,20 +113,20 @@
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                           "blockName": "module.module2",
-                          "startLine": 41,
-                          "endLine": 44
+                          "startLine": 37,
+                          "endLine": 40
                         },
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
                           "blockName": "aws_ecs_service.ecs_service",
-                          "startLine": 32,
-                          "endLine": 39
+                          "startLine": 28,
+                          "endLine": 35
                         }
                       ],
                       "checksum": "24062f2b3bf4a6d41ca253d8e735ae757ee8886f2dd946e746fe87ca2763919f",
-                      "endLine": 39,
+                      "endLine": 35,
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                      "startLine": 32
+                      "startLine": 28
                     }
                   },
                   {
@@ -148,12 +142,6 @@
                       "cpu": "1 vCPU",
                       "family": "ecs_task_module_2",
                       "id": "task-2",
-                      "inference_accelerator": [
-                        {
-                          "device_name": "device1",
-                          "device_type": "eia2.medium"
-                        }
-                      ],
                       "memory": "2 GB",
                       "requires_compatibilities": [
                         "FARGATE"
@@ -170,18 +158,18 @@
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                           "blockName": "module.module2",
-                          "startLine": 41,
-                          "endLine": 44
+                          "startLine": 37,
+                          "endLine": 40
                         },
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
                           "blockName": "aws_ecs_task_definition.ecs_task",
                           "startLine": 6,
-                          "endLine": 30
+                          "endLine": 26
                         }
                       ],
-                      "checksum": "57c875c1fc903c5f6d5f63abde5e3c5b3ee2f368b7ce79f7eed17a16d710c658",
-                      "endLine": 30,
+                      "checksum": "b2bebac60b237b44e43d9a940a1d9ef98530c336c6a4cf28b54a582f05132df2",
+                      "endLine": 26,
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
                       "startLine": 6
                     }
@@ -226,14 +214,14 @@
                   {
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                     "blockName": "aws_ecs_service.ecs_service",
-                    "startLine": 32,
-                    "endLine": 39
+                    "startLine": 28,
+                    "endLine": 35
                   }
                 ],
                 "checksum": "d3c2ce2c95dae9abc092f37146b8a5dab40afe96a7f613811fdf696174d90fe1",
-                "endLine": 39,
+                "endLine": 35,
                 "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                "startLine": 32
+                "startLine": 28
               }
             },
             {
@@ -249,12 +237,6 @@
                 "cpu": "1 vCPU",
                 "family": "ecs_task_module_1",
                 "id": "task-1",
-                "inference_accelerator": [
-                  {
-                    "device_name": "device1",
-                    "device_type": "eia2.medium"
-                  }
-                ],
                 "memory": "2 GB",
                 "requires_compatibilities": [
                   "FARGATE"
@@ -272,11 +254,11 @@
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                     "blockName": "aws_ecs_task_definition.ecs_task",
                     "startLine": 6,
-                    "endLine": 30
+                    "endLine": 26
                   }
                 ],
-                "checksum": "40f6429fb6ec11b145e9c44865ec17c1944c1a7cef0db118096f13cf29bfb8b0",
-                "endLine": 30,
+                "checksum": "f4ade2c99cd8f81a412a475915b694ec37cf1fedf83be96f49dfab3821115658",
+                "endLine": 26,
                 "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                 "startLine": 6
               }
@@ -312,20 +294,20 @@
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                         "blockName": "module.module2",
-                        "startLine": 41,
-                        "endLine": 44
+                        "startLine": 37,
+                        "endLine": 40
                       },
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
                         "blockName": "aws_ecs_service.ecs_service",
-                        "startLine": 32,
-                        "endLine": 39
+                        "startLine": 28,
+                        "endLine": 35
                       }
                     ],
                     "checksum": "24062f2b3bf4a6d41ca253d8e735ae757ee8886f2dd946e746fe87ca2763919f",
-                    "endLine": 39,
+                    "endLine": 35,
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                    "startLine": 32
+                    "startLine": 28
                   }
                 },
                 {
@@ -341,12 +323,6 @@
                     "cpu": "1 vCPU",
                     "family": "ecs_task_module_2",
                     "id": "task-2",
-                    "inference_accelerator": [
-                      {
-                        "device_name": "device1",
-                        "device_type": "eia2.medium"
-                      }
-                    ],
                     "memory": "2 GB",
                     "requires_compatibilities": [
                       "FARGATE"
@@ -363,18 +339,18 @@
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
                         "blockName": "module.module2",
-                        "startLine": 41,
-                        "endLine": 44
+                        "startLine": 37,
+                        "endLine": 40
                       },
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
                         "blockName": "aws_ecs_task_definition.ecs_task",
                         "startLine": 6,
-                        "endLine": 30
+                        "endLine": 26
                       }
                     ],
-                    "checksum": "57c875c1fc903c5f6d5f63abde5e3c5b3ee2f368b7ce79f7eed17a16d710c658",
-                    "endLine": 30,
+                    "checksum": "b2bebac60b237b44e43d9a940a1d9ef98530c336c6a4cf28b54a582f05132df2",
+                    "endLine": 26,
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
                     "startLine": 6
                   }
@@ -533,12 +509,6 @@
           "cpu": "1 vCPU",
           "family": "ecs_task_module_1",
           "id": "task-1",
-          "inference_accelerator": [
-            {
-              "device_name": "device1",
-              "device_type": "eia2.medium"
-            }
-          ],
           "memory": "2 GB",
           "requires_compatibilities": [
             "FARGATE"
@@ -586,12 +556,6 @@
           "cpu": "1 vCPU",
           "family": "ecs_task_module_2",
           "id": "task-2",
-          "inference_accelerator": [
-            {
-              "device_name": "device1",
-              "device_type": "eia2.medium"
-            }
-          ],
           "memory": "2 GB",
           "requires_compatibilities": [
             "FARGATE"
