@@ -1,0 +1,34 @@
+
+ Name                                                        Monthly Qty  Unit              Monthly Cost    
+                                                                                                            
+ aws_grafana_workspace.with_enterprise_license_and_usage                                                    
+ ├─ Editor/administrator licenses                                      2  users                   $18.00    
+ └─ Viewer licenses                                                    3  users                   $15.00  * 
+                                                                                                            
+ aws_grafana_workspace.with_usage                                                                           
+ ├─ Editor/administrator licenses                                      2  users                   $18.00    
+ └─ Viewer licenses                                                    3  users                   $15.00  * 
+                                                                                                            
+ aws_grafana_workspace.no_license                                                                           
+ ├─ Editor/administrator licenses                                      1  users                    $9.00    
+ └─ Viewer licenses                                       Monthly cost depends on usage: $5.00 per users    
+                                                                                                            
+ aws_grafana_workspace.with_enterprise_license                                                              
+ ├─ Editor/administrator licenses                                      1  users                    $9.00    
+ └─ Viewer licenses                                       Monthly cost depends on usage: $5.00 per users    
+                                                                                                            
+ OVERALL TOTAL                                                                                    $84.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 4 were estimated
+∙ 2 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 2 x aws_grafana_license_association
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $54 ┃         $30 ┃        $84 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
