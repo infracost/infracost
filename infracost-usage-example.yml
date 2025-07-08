@@ -236,6 +236,10 @@ resource_usage:
   aws_glue_job.my_job:
     monthly_hours: 60 # Monthly number of hours the Glue job ran for.
 
+  aws_grafana_workspace.my_workspace:
+    editors_administrator_licenses: 2 # Number of editor/administrator licenses.
+    viewer_licenses: 3 # Number of viewer licenses.
+
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.

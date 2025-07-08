@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_grafana_workspace.with_usage:
+    editors_administrator_licenses: 2
+    viewer_licenses: 3
+  aws_grafana_workspace.with_enterprise_license_and_usage:
+    editors_administrator_licenses: 2
+    viewer_licenses: 3 

@@ -5,7 +5,6 @@
  └─ aws_launch_template.foo2                                                                                     
     ├─ Instance usage (Linux/UNIX, on-demand, m5.xlarge)                       2,190  hours            $420.48   
     ├─ EBS-optimized usage                                                     2,190  hours              $0.00   
-    ├─ Inference accelerator (eia1.medium)                                     2,190  hours            $284.70   
     └─ block_device_mapping[0]                                                                                   
        └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
                                                                                                                  
@@ -13,7 +12,6 @@
  └─ aws_launch_template.prefix                                                                                   
     ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                        2,190  hours            $210.24   
     ├─ EBS-optimized usage                                                     2,190  hours              $0.00   
-    ├─ Inference accelerator (eia1.medium)                                     2,190  hours            $284.70   
     └─ block_device_mapping[0]                                                                                   
        └─ Storage (general purpose SSD, gp3)                                     300  GB                $24.00   
                                                                                                                  
@@ -21,28 +19,19 @@
  └─ aws_launch_template.foo3                                                                                     
     ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                        2,190  hours            $210.24   
     ├─ EBS-optimized usage                                                     2,190  hours              $0.00   
-    ├─ Inference accelerator (eia1.medium)                                     2,190  hours            $284.70   
-    └─ block_device_mapping[0]                                                                                   
-       └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
-                                                                                                                 
- aws_eks_node_group.example_with_launch_template                                                                 
- └─ aws_launch_template.foo                                                                                      
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                       2,190  hours             $91.10   
-    ├─ Inference accelerator (eia1.medium)                                     2,190  hours            $284.70   
-    ├─ CPU credits                                                             2,100  vCPU-hours       $105.00   
-    └─ block_device_mapping[0]                                                                                   
-       └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
-                                                                                                                 
- aws_eks_node_group.example_with_launch_template_instance_types_default                                          
- └─ aws_launch_template.bar                                                                                      
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                       2,190  hours             $91.10   
-    ├─ Inference accelerator (eia1.medium)                                     2,190  hours            $284.70   
     └─ block_device_mapping[0]                                                                                   
        └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
                                                                                                                  
  aws_eks_node_group.lt_usage                                                                                     
  └─ aws_launch_template.lt_usage                                                                                 
     ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)                       4,380  hours            $203.23   
+    └─ block_device_mapping[0]                                                                                   
+       └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
+                                                                                                                 
+ aws_eks_node_group.example_with_launch_template                                                                 
+ └─ aws_launch_template.foo                                                                                      
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                       2,190  hours             $91.10   
+    ├─ CPU credits                                                             2,100  vCPU-hours       $105.00   
     └─ block_device_mapping[0]                                                                                   
        └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
                                                                                                                  
@@ -53,6 +42,12 @@
  aws_eks_node_group.example_defaultCpuCredits                                                                    
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                          2,190  hours             $91.10   
  └─ Storage (general purpose SSD, gp2)                                            60  GB                 $6.00   
+                                                                                                                 
+ aws_eks_node_group.example_with_launch_template_instance_types_default                                          
+ └─ aws_launch_template.bar                                                                                      
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                       2,190  hours             $91.10   
+    └─ block_device_mapping[0]                                                                                   
+       └─ Storage (general purpose SSD, gp2)                                      60  GB                 $6.00   
                                                                                                                  
  aws_eks_node_group.reserved                                                                                     
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                             730  hours             $19.05   
@@ -72,7 +67,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                            730  hours             $30.37   
  └─ Storage (general purpose SSD, gp2)                                            20  GB                 $2.00   
                                                                                                                  
- OVERALL TOTAL                                                                                      $3,281.31 
+ OVERALL TOTAL                                                                                      $1,857.81 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -84,5 +79,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $3,281 ┃           - ┃     $3,281 ┃
+┃ main                                               ┃        $1,858 ┃           - ┃     $1,858 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

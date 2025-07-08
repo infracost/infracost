@@ -1,0 +1,115 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "",
+    "vcsCommitSha": "",
+    "vcsCommitAuthorName": "",
+    "vcsCommitAuthorEmail": "",
+    "vcsCommitTimestamp": "0001-01-01T00:00:00Z",
+    "vcsCommitMessage": ""
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": ".",
+      "displayName": "main",
+      "metadata": {
+        "path": ".",
+        "type": "terraform_dir",
+        "remoteModuleCalls": [
+          "registry.terraform.io/terraform-aws-modules/ecr/aws"
+        ]
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "module.ecr.aws_ecr_repository.this[0]",
+            "resourceType": "aws_ecr_repository",
+            "tags": {
+              "Example1": "foo",
+              "Example2": "bar"
+            },
+            "providerSupportsDefaultTags": true,
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "module.ecr",
+                  "endLine": 12,
+                  "filename": "main.tf",
+                  "startLine": 2
+                },
+                {
+                  "blockName": "aws_ecr_repository.this",
+                  "endLine": 195,
+                  "filename": ".terraform/modules/ecr/main.tf",
+                  "startLine": 177
+                }
+              ],
+              "checksum": "293d23cb524c1f65b33332bc2217e68f5c38309ef60e9686ac4379aa82750654",
+              "endLine": 195,
+              "filename": ".terraform/modules/ecr/main.tf",
+              "startLine": 177
+            },
+            "costComponents": [
+              {
+                "name": "Storage",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.082",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true,
+                "priceNotFound": false
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 3,
+        "totalSupportedResources": 1,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 1,
+        "totalNoPriceResources": 2,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {
+          "aws_ecr_lifecycle_policy": 1,
+          "aws_ecr_repository_policy": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "totalMonthlyUsageCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "pastTotalMonthlyUsageCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
+  "timeGenerated": "2025-07-08T12:32:33.052444307Z",
+  "summary": {
+    "totalDetectedResources": 3,
+    "totalSupportedResources": 1,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 1,
+    "totalNoPriceResources": 2,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {
+      "aws_ecr_lifecycle_policy": 1,
+      "aws_ecr_repository_policy": 1
+    }
+  }
+}

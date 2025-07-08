@@ -277,23 +277,6 @@ resource "aws_autoscaling_group" "asg_lt_ebs_optimized" {
   min_size         = 1
 }
 
-resource "aws_launch_template" "lt_elastic_inference_accelerator" {
-  image_id      = "fake_ami"
-  instance_type = "t2.medium"
-  elastic_inference_accelerator {
-    type = "eia2.medium"
-  }
-}
-
-resource "aws_autoscaling_group" "asg_lt_elastic_inference_accelerator" {
-  launch_template {
-    id = aws_launch_template.lt_elastic_inference_accelerator.id
-  }
-  desired_capacity = 2
-  max_size         = 3
-  min_size         = 1
-}
-
 resource "aws_launch_template" "lt_monitoring" {
   image_id      = "fake_ami"
   instance_type = "t2.medium"
