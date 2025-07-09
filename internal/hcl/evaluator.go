@@ -243,26 +243,22 @@ func (e *Evaluator) MissingVars() []string {
 func (e *Evaluator) Run() (*Module, error) {
 	var lastContext hcl.EvalContext
 
-	// Step 1: Evaluate top-level context (variables, locals, etc.)
+	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.logger.Debug().Msg("evaluating top level context")
 	e.evaluate(lastContext)
 
-	// Step 2: Load and evaluate early modules (like with_output)
-	e.loadAndEvaluateEarlyModules(lastContext)
-	e.logger.Debug().Msg("evaluating context after loading early modules")
+	// let's load the modules now we have our top level context.
+	e.loadModules(lastContext)
+	e.logger.Debug().Msg("evaluating context after loading modules")
 	e.evaluate(lastContext)
 
-	// Step 3: Expand modules and resources (now that module.with_output.* is available)
+	// expand out resources and modules via count and evaluate again so that we can include
+	// any module outputs and or count references.
 	e.module.Blocks = e.expandBlocks(e.module.Blocks, lastContext)
 	e.logger.Debug().Msg("evaluating context after expanding blocks")
 	e.evaluate(lastContext)
 
-	// Step 4: Load any newly expanded modules (like using_count, using_for_each)
-	e.loadModules(lastContext)
-	e.logger.Debug().Msg("evaluating context after loading remaining modules")
-	e.evaluate(lastContext)
-
-	// Step 5: Collect and return fully evaluated modules
+	// returns all the evaluated Blocks under their given Module.
 	return e.collectModules(), nil
 }
 
@@ -1188,20 +1184,74 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 
 	var moduleBlocks Blocks
 	var filtered Blocks
+
 	for _, block := range e.module.Blocks {
 		if block.Type() == "module" {
-			moduleBlocks = append(moduleBlocks, block)
+			sourceAttr := block.GetAttribute("source")
+			evaluated := false
+
+			if sourceAttr != nil && sourceAttr.Value().IsKnown() && sourceAttr.Value().Type() == cty.String {
+				// Only evaluate early if:
+				// - all attributes are known
+				// - block does NOT use count or for_each
+				hasCount := block.GetAttribute("count") != nil
+				hasForEach := block.GetAttribute("for_each") != nil
+
+				if !e.blockHasUnknowns(block) && !hasCount && !hasForEach {
+					moduleCall, err := e.loadModuleWithProviders(block)
+					if err != nil {
+						e.logger.Debug().Err(err).Msgf("failed to evaluate module %s", block.FullName())
+					} else {
+						e.moduleCalls[block.FullName()] = moduleCall
+
+						moduleEvaluator := NewEvaluator(
+							Module{
+								Name:               moduleCall.Definition.FullName(),
+								Source:             moduleCall.Module.Source,
+								Blocks:             moduleCall.Module.RawBlocks,
+								RawBlocks:          moduleCall.Module.RawBlocks,
+								RootPath:           e.module.RootPath,
+								ModulePath:         moduleCall.Path,
+								Modules:            nil,
+								Parent:             &e.module,
+								SourceURL:          moduleCall.Module.SourceURL,
+								ProviderReferences: moduleCall.Module.ProviderReferences,
+							},
+							e.workingDir,
+							moduleCall.Definition.Values().AsValueMap(),
+							e.moduleMetadata,
+							map[string]map[string]cty.Value{},
+							e.workspace,
+							e.blockBuilder,
+							e.logger,
+							e.isGraph,
+						)
+
+						moduleCall.Module, _ = moduleEvaluator.Run()
+						outputs := moduleEvaluator.exportOutputs()
+						e.ctx.Set(outputs, "module", moduleCall.Name)
+
+						evaluated = true
+					}
+				}
+			}
+
+			// If not evaluated, queue for later expansion
+			if !evaluated {
+				moduleBlocks = append(moduleBlocks, block)
+			}
 		} else {
-			// remove the block from the top level blocks as we'll replace these with expanded blocks.
+			// Keep all non-module blocks
 			filtered = append(filtered, block)
 		}
 	}
 
+	// Expand module blocks with known count/for_each
 	expanded := e.expandBlocks(moduleBlocks.SortedByCaller(), lastContext)
 	filtered = append(filtered, expanded...)
 	e.module.Blocks = filtered
 
-	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
+	// Load the newly expanded module instances
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {
 			continue
@@ -1209,12 +1259,23 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 
 		moduleCall, err := e.loadModuleWithProviders(moduleBlock)
 		if err != nil {
-			e.logger.Debug().Err(err).Msgf("failed to load module %s ignoring", moduleBlock.LocalName())
+			e.logger.Debug().Err(err).Msgf("failed to load module %s ignoring", moduleBlock.FullName())
 			continue
 		}
 
 		e.moduleCalls[moduleBlock.FullName()] = moduleCall
 	}
+}
+
+func (e *Evaluator) blockHasUnknowns(block *Block) bool {
+	for _, attr := range block.GetAttributes() {
+		val := attr.Value()
+		if !val.IsKnown() {
+			e.logger.Debug().Msgf("attribute %s in block %s is not known", attr.Name(), block.FullName())
+			return true
+		}
+	}
+	return false
 }
 
 // ExpFunctions returns the set of functions that should be used to when evaluating
