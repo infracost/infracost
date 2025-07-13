@@ -1,0 +1,30 @@
+
+ Name                                            Monthly Qty  Unit                      Monthly Cost   
+                                                                                                       
+ azurerm_storage_account.test                                                                          
+ ├─ Capacity                              Monthly cost depends on usage: $0.0196 per GB                
+ ├─ Write operations                      Monthly cost depends on usage: $0.054 per 10k operations     
+ ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations     
+ ├─ Read operations                       Monthly cost depends on usage: $0.0043 per 10k operations    
+ ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations    
+ └─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags           
+                                                                                                       
+ azurerm_storage_table.test                                                                            
+ ├─ Capacity                              not found                                                    
+ ├─ Class 1 operations                    not found                                                    
+ └─ Class 2 operations                    not found                                                    
+                                                                                                       
+ OVERALL TOTAL                                                                                $0.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃           - ┃      $0.00 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

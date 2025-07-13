@@ -1,0 +1,4 @@
+version: 0.1
+monthly_storage_gb: 100
+monthly_class_1_operations: 200000
+monthly_class_2_operations: 50000 
