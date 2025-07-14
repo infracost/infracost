@@ -55,7 +55,9 @@ func (r *LinuxVirtualMachineScaleSet) BuildResource() *schema.Resource {
 
 	if r.OSDiskData != nil {
 		osDisk := osDiskSubResource(r.Region, r.OSDiskData.DiskType, r.OSDiskData.DiskSizeGB, r.OSDiskData.DiskIOPSReadWrite, r.OSDiskData.DiskMBPSReadWrite, monthlyDiskOperations)
-		subResources = append(subResources, osDisk)
+		if osDisk != nil {
+			subResources = append(subResources, osDisk)
+		}
 	}
 
 	instanceCount := decimal.NewFromInt(*r.Instances)
