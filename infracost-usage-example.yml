@@ -1264,6 +1264,16 @@ resource_usage:
     snapshots_storage_gb: 10000        # Total size of Snapshots in GB
     metadata_at_rest_storage_gb: 10000 # Total size of Metadata in GB
 
+
+  azurerm_storage_table.my_table:
+    monthly_storage_gb: 1000000             # Monthly amount of storage used in GB.
+    monthly_batch_write_operations: 1000000 # Monthly number of Batch Write operations.
+    monthly_write_operations: 1000000       # Monthly number of Write operations.
+    monthly_read_operations: 1000000        # Monthly number of Read operations.
+    monthly_scan_operations: 1000000        # Monthly number of Scan operations.
+    monthly_list_operations: 1000000        # Monthly number of List operations.
+    monthly_delete_operations: 1000000      # Monthly number of Delete operations.
+
   azurerm_sql_database.my_database:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
