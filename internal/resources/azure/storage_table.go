@@ -94,6 +94,8 @@ func (r *StorageTable) dataStorageCostComponent() *schema.CostComponent {
 		qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyStorageGB))
 	}
 
+	// There's no listed prices for the account encrypted GZRS or RA-GZRS.
+	// The prices are the same as GRS or RA-GRS so we just use those.
 	accountReplicationLookup := r.AccountReplicationType
 	if r.HasCustomerManagedKey && (r.AccountReplicationType == "GZRS") {
 		accountReplicationLookup = "GRS"
