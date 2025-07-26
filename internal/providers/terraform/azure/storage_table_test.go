@@ -12,4 +12,4 @@ func TestAzureStorageTable(t *testing.T) {
 	}
 	opts := tftest.DefaultGoldenFileOptions()
 	tftest.GoldenFileResourceTestsWithOpts(t, "storage_table_test", opts)
-} 
+}
