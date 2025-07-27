@@ -94,6 +94,19 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		s += "\n"
 	}
 
+	// Show missing prices warning prominently in table output
+	if out.MissingPricesCount > 0 {
+		if !hasUsageFootnote {
+			s += "\n"
+		}
+		warningMsg := ui.WarningString("WARNING:")
+		if out.MissingPricesCount == 1 {
+			s += fmt.Sprintf("\n%s 1 price missing, cost estimates may be incomplete.\n", warningMsg)
+		} else {
+			s += fmt.Sprintf("\n%s %d prices missing, cost estimates may be incomplete.\n", warningMsg, out.MissingPricesCount)
+		}
+	}
+
 	summaryMsg := out.summaryMessage(opts.ShowSkipped)
 
 	if summaryMsg != "" {
