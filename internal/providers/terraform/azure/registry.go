@@ -94,6 +94,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMRedisCacheRegistryItem(),
 	getAzureRMMSSQLManagedInstanceRegistryItem(),
 	getStorageAccountRegistryItem(),
+	getStorageAccountCustomerManagedKeyRegistryItem(),
 	getSQLDatabaseRegistryItem(),
 	getSQLManagedInstanceRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
@@ -607,7 +608,6 @@ var FreeResources = []string{
 	"azurerm_mssql_virtual_network_rule",
 
 	// Azure Storage
-	"azurerm_storage_account_customer_managed_key",
 	"azurerm_storage_account_local_user",
 	"azurerm_storage_account_network_rules",
 	"azurerm_storage_blob",

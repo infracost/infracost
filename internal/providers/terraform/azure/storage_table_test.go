@@ -10,6 +10,7 @@ func TestAzureStorageTable(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
+	
 	opts := tftest.DefaultGoldenFileOptions()
 	tftest.GoldenFileResourceTestsWithOpts(t, "storage_table_test", opts)
-} 
+}
