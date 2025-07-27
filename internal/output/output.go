@@ -814,7 +814,7 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		} else {
 			msg += fmt.Sprintf("\n\n%s %d prices missing, costs may be incomplete", warningMsg, r.MissingPricesCount)
 		}
-		
+
 		if showSkipped && len(r.MissingPricesComponents) > 0 {
 			msg += "\nMissing prices for:"
 			for _, component := range r.MissingPricesComponents {
