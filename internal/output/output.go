@@ -42,6 +42,8 @@ type Root struct {
 	Summary                   *Summary         `json:"summary"`
 	FullSummary               *Summary         `json:"-"`
 	IsCIRun                   bool             `json:"-"`
+	MissingPricesCount        int              `json:"missingPricesCount,omitempty"`
+	MissingPricesComponents   []string         `json:"missingPricesComponents,omitempty"`
 }
 
 // HasUnsupportedResources returns if the summary has any unsupported resources.
@@ -800,6 +802,25 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 			msg += fmt.Sprintf(", see %s:", ui.SecondaryLinkString("https://infracost.io/requested-resources"))
 			msg += formatCounts(r.Summary.UnsupportedResourceCounts)
 		} else {
+			msg += seeDetailsMessage
+		}
+	}
+
+	// Add missing prices warning - this is the key fix for the bug
+	if r.MissingPricesCount > 0 {
+		warningMsg := ui.WarningString("WARNING:")
+		if r.MissingPricesCount == 1 {
+			msg += fmt.Sprintf("\n\n%s 1 price missing, costs may be incomplete", warningMsg)
+		} else {
+			msg += fmt.Sprintf("\n\n%s %d prices missing, costs may be incomplete", warningMsg, r.MissingPricesCount)
+		}
+
+		if showSkipped && len(r.MissingPricesComponents) > 0 {
+			msg += "\nMissing prices for:"
+			for _, component := range r.MissingPricesComponents {
+				msg += fmt.Sprintf("\n  ∙ %s", component)
+			}
+		} else if len(r.MissingPricesComponents) > 0 {
 			msg += seeDetailsMessage
 		}
 	}
