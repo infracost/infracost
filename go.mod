@@ -37,7 +37,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/tidwall/gjson v1.17.0
-	github.com/zclconf/go-cty v1.14.1
+	github.com/zclconf/go-cty v1.16.3
 	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/mod v0.24.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
@@ -66,7 +66,7 @@ require (
 	github.com/aws/smithy-go v1.14.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
-	github.com/hashicorp/hcl/v2 v2.17.1
+	github.com/hashicorp/hcl/v2 v2.24.0
 	github.com/imdario/mergo v0.3.13
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -277,7 +277,6 @@ require (
 	cloud.google.com/go v0.116.0 // indirect
 	cloud.google.com/go/storage v1.49.0 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
-	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.122
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bmatcuk/doublestar v1.3.4
