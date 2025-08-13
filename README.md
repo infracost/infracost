@@ -8,6 +8,7 @@
 <img alt="Docker pulls" src="https://img.shields.io/docker/pulls/infracost/infracost?style=plastic"/>
 <a href="https://www.infracost.io/community-chat"><img alt="Community Slack channel" src="https://img.shields.io/badge/chat-slack-%234a154b"/></a>
 <a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20Terraform%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,terraform"><img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
+<a href="https://gurubase.io/g/infracost"><img alt="Gurubase" src="https://img.shields.io/badge/Gurubase-Ask%20Infracost%20Guru-006BFF"/></a>
 </p>
 
 ## Get started
