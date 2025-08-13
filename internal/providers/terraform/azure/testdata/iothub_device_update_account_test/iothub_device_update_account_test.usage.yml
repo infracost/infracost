@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_iothub_device_update_account.example_account:
+    has_standard_instance: true
