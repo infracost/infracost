@@ -24,14 +24,14 @@
  google_compute_address.standard_static                                                        
  └─ IP address (standard VM)                                        730  hours         $3.65   
                                                                                                
- google_compute_instance.preemptible_instance_with_ip                                          
- ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)              730  hours         $1.60   
- └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40   
-                                                                                               
  google_compute_address.preemptible_static                                                     
  └─ IP address (preemptible VM)                                     730  hours         $1.83   
                                                                                                
- OVERALL TOTAL                                                                       $46.71 
+ google_compute_instance.preemptible_instance_with_ip                                          
+ ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)              730  hours         $1.16   
+ └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40   
+                                                                                               
+ OVERALL TOTAL                                                                       $46.26 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -43,5 +43,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃           $47 ┃           - ┃        $47 ┃
+┃ main                                               ┃           $46 ┃           - ┃        $46 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
