@@ -750,7 +750,6 @@ github.com/apparentlymart/go-dump v0.0.0-20190214190832-042adf3cf4a0/go.mod h1:o
 github.com/apparentlymart/go-shquot v0.0.1/go.mod h1:lw58XsE5IgUXZ9h0cxnypdx31p9mPFIVEQ9P3c7MlrU=
 github.com/apparentlymart/go-textseg v1.0.0/go.mod h1:z96Txxhf3xSFMPmb5X/1W05FF/Nj9VFpLOpjS5yuumk=
 github.com/apparentlymart/go-textseg/v12 v12.0.0/go.mod h1:S/4uRK2UtaQttw1GenVJEynmyUenKwP++x/+DdGV/Ec=
-github.com/apparentlymart/go-textseg/v13 v13.0.0 h1:Y+KvPE1NYz0xl601PVImeQfFyEy6iT90AvPUL1NNfNw=
 github.com/apparentlymart/go-textseg/v13 v13.0.0/go.mod h1:ZK2fH7c4NqDTLtiYLvIkEghdlcqw7yxLeM89kiTRPUo=
 github.com/apparentlymart/go-textseg/v15 v15.0.0 h1:uYvfpb3DyLSCGWnctWKGj857c6ew1u1fNQOlOtuGxQY=
 github.com/apparentlymart/go-textseg/v15 v15.0.0/go.mod h1:K8XmNZdhEBkdlyDdvbmmsvpAG721bKi0joRfFdHIWJ4=
@@ -1293,8 +1292,8 @@ github.com/hashicorp/hcl v1.0.1-vault h1:UiJeEzCWAYdVaJr8Xo4lBkTozlW1+1yxVUnpbS1
 github.com/hashicorp/hcl v1.0.1-vault/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/hashicorp/hcl/v2 v2.0.0/go.mod h1:oVVDG71tEinNGYCxinCYadcmKU9bglqW9pV3txagJ90=
 github.com/hashicorp/hcl/v2 v2.10.0/go.mod h1:FwWsfWEjyV/CMj8s/gqAuiviY72rJ1/oayI9WftqcKg=
-github.com/hashicorp/hcl/v2 v2.17.1 h1:6dMVydtKPQ4NbmvTjHSb41qWvPu2pGMVD2MfqZr1G50=
-github.com/hashicorp/hcl/v2 v2.17.1/go.mod h1:gJyW2PTShkJqQBKpAmPO3yxMxIuoXkOF2TpqXzrQyx4=
+github.com/hashicorp/hcl/v2 v2.24.0 h1:2QJdZ454DSsYGoaE6QheQZjtKZSUs9Nh2izTWiwQxvE=
+github.com/hashicorp/hcl/v2 v2.24.0/go.mod h1:oGoO1FIQYfn/AgyOhlg9qLC6/nOJPX3qGbkZpYAcqfM=
 github.com/hashicorp/jsonapi v0.0.0-20210420151930-edf82c9774bf/go.mod h1:Yog5+CPEM3c99L1CL2CFCYoSzgWm5vTU58idbRUaLik=
 github.com/hashicorp/logutils v1.0.0 h1:dLEQVugN8vlakKOUE3ihGLTZJRB4j+M2cdTm/ORI65Y=
 github.com/hashicorp/logutils v1.0.0/go.mod h1:QIAnNjmIWmVIIkWDTG1z5v++HQmx9WQRO+LraFDTW64=
@@ -1761,10 +1760,11 @@ github.com/zclconf/go-cty v1.4.0/go.mod h1:nHzOclRkoj++EU9ZjSrZvRG0BXIWt8c7loYc0
 github.com/zclconf/go-cty v1.8.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uUAzyuvAk=
 github.com/zclconf/go-cty v1.8.3/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uUAzyuvAk=
 github.com/zclconf/go-cty v1.10.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uUAzyuvAk=
-github.com/zclconf/go-cty v1.14.1 h1:t9fyA35fwjjUMcmL5hLER+e/rEPqrbCK1/OSE4SI9KA=
-github.com/zclconf/go-cty v1.14.1/go.mod h1:VvMs5i0vgZdhYawQNq5kePSpLAoz8u1xvZgrPIxfnZE=
-github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b h1:FosyBZYxY34Wul7O/MSKey3txpPYyCqVO5ZyceuQJEI=
+github.com/zclconf/go-cty v1.16.3 h1:osr++gw2T61A8KVYHoQiFbFd1Lh3JOCXc/jFLJXKTxk=
+github.com/zclconf/go-cty v1.16.3/go.mod h1:VvMs5i0vgZdhYawQNq5kePSpLAoz8u1xvZgrPIxfnZE=
 github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b/go.mod h1:ZRKQfBXbGkpdV6QMzT3rU1kSTAnfu1dO8dPKjYprgj8=
+github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940 h1:4r45xpDWB6ZMSMNJFMOjqrGHynW3DIBuR2H9j0ug+Mo=
+github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940/go.mod h1:CmBdvvj3nqzfzJ6nTCIwDTPZ56aVGvDrmztiO5g3qrM=
 github.com/zclconf/go-cty-yaml v1.0.2/go.mod h1:IP3Ylp0wQpYm50IHK8OZWKMu6sPJIUgKa8XhiVHura0=
 github.com/zclconf/go-cty-yaml v1.0.3 h1:og/eOQ7lvA/WWhHGFETVWNduJM7Rjsv2RRpx1sdFMLc=
 github.com/zclconf/go-cty-yaml v1.0.3/go.mod h1:9YLUH4g7lOhVWqUbctnVlZ5KLpg7JAprQNgxSZ1Gyxs=
