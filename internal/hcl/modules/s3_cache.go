@@ -1,11 +1,13 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +17,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/mholt/archiver/v3"
+	"github.com/mholt/archives"
 )
 
 type S3Cache struct {
@@ -116,25 +118,68 @@ func (cache *S3Cache) Get(key, destPath string, public bool) error {
 	if err != nil {
 		return fmt.Errorf("failed to download from S3: %w", err)
 	}
-	defer result.Body.Close()
+	defer func() { _ = result.Body.Close() }()
 
-	// Create a temporary file for the downloaded archive
-	tmpFile, err := os.CreateTemp("", fmt.Sprintf("s3cache-%s.tar.gz", uuid.New().String()))
+	// Ensure the destination directory exists
+	if err := os.MkdirAll(destPath, 0700); err != nil {
+		return fmt.Errorf("failed to create destination directory: %w", err)
+	}
+
+	ctx := context.Background()
+
+	format := archives.CompressedArchive{
+		Compression: archives.Gz{},
+		Extraction:  archives.Tar{},
+	}
+
+	// Extract the archive
+	err = format.Extract(ctx, result.Body, func(_ context.Context, f archives.FileInfo) error {
+
+		// no symlinks thank you
+		if f.LinkTarget != "" {
+			return nil
+		}
+
+		// ensure the archive isn't maliciously pathing outside of the destination directory
+		name := filepath.Clean(f.NameInArchive)
+
+		// skip git files, we don't need them
+		if strings.HasPrefix(name, ".git/") {
+			return nil
+		}
+
+		// Determine where to create this file on disk
+		targetPath := filepath.Join(destPath, name)
+		// For directories, just create them
+		if f.IsDir() {
+			return os.MkdirAll(targetPath, 0700)
+		}
+
+		// Create parent directory if it doesn't exist
+		if err := os.MkdirAll(filepath.Dir(targetPath), 0700); err != nil {
+			return fmt.Errorf("failed to create parent directory: %w", err)
+		}
+
+		// Create the file
+		// #nosec G304
+		outFile, err := os.Create(targetPath)
+		if err != nil {
+			return fmt.Errorf("failed to create file: %w", err)
+		}
+		defer func() { _ = outFile.Close() }()
+
+		// Copy the contents
+		reader, err := f.Open()
+		if err != nil {
+			return fmt.Errorf("failed to open file in archive: %w", err)
+		}
+		defer func() { _ = reader.Close() }()
+
+		_, err = io.Copy(outFile, reader)
+		return err
+	})
+
 	if err != nil {
-		return fmt.Errorf("failed to create temporary file: %w", err)
-	}
-	defer os.Remove(tmpFile.Name())
-	defer tmpFile.Close()
-
-	// Copy the S3 object to the temporary file
-	if _, err := io.Copy(tmpFile, result.Body); err != nil {
-		return fmt.Errorf("failed to save downloaded file: %w", err)
-	}
-
-	// Extract using archiver
-	tgz := archiver.NewTarGz()
-	tgz.OverwriteExisting = true
-	if err := tgz.Unarchive(tmpFile.Name(), destPath); err != nil {
 		return fmt.Errorf("failed to extract archive: %w", err)
 	}
 
@@ -150,33 +195,47 @@ func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration, public bool) e
 
 	prefixedKey := cache.applyPrefix(key, public)
 
-	// Generate a temporary file path without creating the file
-	tmpPath := filepath.Join(os.TempDir(), fmt.Sprintf("s3cache-%s.tar.gz", uuid.New().String()))
-	defer os.Remove(tmpPath)
+	// Create a context for the archiving
+	ctx := context.Background()
 
-	tgz := archiver.NewTarGz()
-
-	// Get the contents of the source directory and create a list of paths to archive
+	// Get the contents of the source directory
 	entries, err := os.ReadDir(srcPath)
 	if err != nil {
 		return fmt.Errorf("failed to read source directory: %w", err)
 	}
 
-	sources := make([]string, 0, len(entries))
+	// Create a map of disk files to archive paths
+	fileMap := make(map[string]string)
 	for _, entry := range entries {
-		sources = append(sources, filepath.Join(srcPath, entry.Name()))
+		diskPath := filepath.Join(srcPath, entry.Name())
+		archivePath := entry.Name()
+		fileMap[diskPath] = archivePath
 	}
 
-	if err := tgz.Archive(sources, tmpPath); err != nil {
+	// Get a list of files to archive
+	files, err := archives.FilesFromDisk(ctx, nil, fileMap)
+	if err != nil {
+		return fmt.Errorf("failed to get files for archiving: %w", err)
+	}
+
+	format := archives.CompressedArchive{
+		Compression: archives.Gz{},
+		Archival:    archives.Tar{},
+	}
+
+	// Generate a temporary file path
+	tmpFile, err := os.CreateTemp("", fmt.Sprintf("s3cache-%s.tar.gz", uuid.New().String()))
+	if err != nil {
+		return fmt.Errorf("failed to create temporary file: %w", err)
+	}
+	tmpPath := tmpFile.Name()
+	defer os.Remove(tmpPath)
+	defer tmpFile.Close()
+
+	// Create the archive
+	if err := format.Archive(ctx, tmpFile, files); err != nil {
 		return fmt.Errorf("failed to create archive: %w", err)
 	}
-
-	// Upload the archive to S3
-	file, err := os.Open(tmpPath)
-	if err != nil {
-		return fmt.Errorf("failed to open archive: %w", err)
-	}
-	defer file.Close()
 
 	// Calculate expiration time and set it as metadata
 	expirationTime := time.Now().Add(ttl).Format(time.RFC3339)
@@ -184,10 +243,15 @@ func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration, public bool) e
 		"x-amz-meta-expires-at": aws.String(expirationTime),
 	}
 
+	_, err = tmpFile.Seek(0, 0)
+	if err != nil {
+		return fmt.Errorf("failed to seek to start of file: %w", err)
+	}
+
 	_, err = cache.s3Client.PutObject(&s3.PutObjectInput{
 		Bucket:   aws.String(cache.bucketName),
 		Key:      aws.String(prefixedKey),
-		Body:     file,
+		Body:     tmpFile,
 		Metadata: metadata,
 	})
 	if err != nil {

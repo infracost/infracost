@@ -22,6 +22,7 @@ type ResourceData struct {
 	CFResource                              cloudformation.Resource
 	UsageData                               *UsageData
 	Metadata                                map[string]gjson.Result
+	ProjectMetadata                         map[string]string
 	MissingVarsCausingUnknownTagKeys        []string
 	MissingVarsCausingUnknownDefaultTagKeys []string
 	// Region is the region of the resource. When building a resource callers should
@@ -40,25 +41,27 @@ type TagPropagation struct {
 
 func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {
 	return &ResourceData{
-		Type:          resourceType,
-		ProviderName:  providerName,
-		Address:       address,
-		Tags:          tags,
-		RawValues:     rawValues,
-		ReferencesMap: make(map[string][]*ResourceData),
-		CFResource:    nil,
+		Type:            resourceType,
+		ProviderName:    providerName,
+		Address:         address,
+		Tags:            tags,
+		RawValues:       rawValues,
+		ReferencesMap:   make(map[string][]*ResourceData),
+		CFResource:      nil,
+		ProjectMetadata: make(map[string]string),
 	}
 }
 
 func NewCFResourceData(resourceType string, providerName string, address string, tags *map[string]string, cfResource cloudformation.Resource) *ResourceData {
 	return &ResourceData{
-		Type:          resourceType,
-		ProviderName:  providerName,
-		Address:       address,
-		Tags:          tags,
-		RawValues:     gjson.Result{},
-		ReferencesMap: make(map[string][]*ResourceData),
-		CFResource:    cfResource,
+		Type:            resourceType,
+		ProviderName:    providerName,
+		Address:         address,
+		Tags:            tags,
+		RawValues:       gjson.Result{},
+		ReferencesMap:   make(map[string][]*ResourceData),
+		CFResource:      cfResource,
+		ProjectMetadata: make(map[string]string),
 	}
 }
 

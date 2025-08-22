@@ -2,6 +2,7 @@ version: 0.1
 resource_usage:
   azurerm_cognitive_deployment.eastus_with_usage[*]:
     monthly_language_input_tokens: 40_000_000
+    monthly_language_cached_input_tokens: 20_000_000
     monthly_language_output_tokens: 13_333_333
     monthly_code_interpreter_sessions: 667
     monthly_base_model_tokens: 2847
@@ -18,6 +19,7 @@ resource_usage:
     monthly_text_to_speech_hours: 55.6
   azurerm_cognitive_deployment.eastus2_with_usage[*]:
     monthly_language_input_tokens: 40_000_000
+    monthly_language_cached_input_tokens: 20_000_000
     monthly_language_output_tokens: 13_333_333
     monthly_code_interpreter_sessions: 667
     monthly_base_model_tokens: 2847
@@ -34,6 +36,7 @@ resource_usage:
     monthly_text_to_speech_hours: 55.6
   azurerm_cognitive_deployment.swedencentral_with_usage[*]:
     monthly_language_input_tokens: 40_000_000
+    monthly_language_cached_input_tokens: 20_000_000
     monthly_language_output_tokens: 13_333_333
     monthly_code_interpreter_sessions: 667
     monthly_base_model_tokens: 2847
@@ -48,4 +51,120 @@ resource_usage:
     monthly_text_embedding_tokens: 1_000_000_000
     monthly_text_to_speech_characters: 1_333_333
     monthly_text_to_speech_hours: 55.6
+  azurerm_cognitive_deployment.gpt4o_specific_tests["gpt4o_global"]:
+    monthly_language_input_tokens: 30_000_000
+    monthly_language_cached_input_tokens: 15_000_000
+    monthly_language_output_tokens: 10_000_000
+  azurerm_cognitive_deployment.gpt4o_specific_tests["gpt4o_regional"]:
+    monthly_language_input_tokens: 30_000_000
+    monthly_language_cached_input_tokens: 15_000_000
+    monthly_language_output_tokens: 10_000_000
+    monthly_fine_tuning_input_tokens: 10_000_000
+    monthly_fine_tuning_output_tokens: 5_000_000
+    monthly_fine_tuning_training_hours: 0.8
+    monthly_fine_tuning_hosting_hours: 10.5
+  azurerm_cognitive_deployment.gpt4o_specific_tests["gpt4o_us_eu_zones"]:
+    monthly_language_input_tokens: 30_000_000
+    monthly_language_cached_input_tokens: 15_000_000
+    monthly_language_output_tokens: 10_000_000
+  azurerm_cognitive_deployment.gpt4o_specific_tests["gpt4o_mini_global"]:
+    monthly_language_input_tokens: 25_000_000
+    monthly_language_cached_input_tokens: 12_500_000
+    monthly_language_output_tokens: 8_000_000
+  azurerm_cognitive_deployment.gpt4o_specific_tests["gpt4o_mini_regional"]:
+    monthly_language_input_tokens: 25_000_000
+    monthly_language_cached_input_tokens: 12_500_000
+    monthly_language_output_tokens: 8_000_000
+    monthly_fine_tuning_input_tokens: 8_000_000
+    monthly_fine_tuning_output_tokens: 4_000_000
+    monthly_fine_tuning_training_hours: 0.6
+    monthly_fine_tuning_hosting_hours: 8.2
+  azurerm_cognitive_deployment.gpt4o_specific_tests["gpt4o_mini_us_eu_zones"]:
+    monthly_language_input_tokens: 25_000_000
+    monthly_language_cached_input_tokens: 12_500_000
+    monthly_language_output_tokens: 8_000_000
+  azurerm_cognitive_deployment.fine_tuned_gpt4o_tests["fine_tuned_gpt4o"]:
+    monthly_language_input_tokens: 35_000_000
+    monthly_language_cached_input_tokens: 17_500_000
+    monthly_language_output_tokens: 12_000_000
+    monthly_fine_tuning_input_tokens: 12_000_000
+    monthly_fine_tuning_output_tokens: 7_000_000
+    monthly_fine_tuning_training_hours: 1.2
+    monthly_fine_tuning_hosting_hours: 12.6
+  azurerm_cognitive_deployment.fine_tuned_gpt4o_tests["fine_tuned_gpt4o_mini"]:
+    monthly_language_input_tokens: 28_000_000
+    monthly_language_cached_input_tokens: 14_000_000
+    monthly_language_output_tokens: 9_500_000
+    monthly_fine_tuning_input_tokens: 9_500_000
+    monthly_fine_tuning_output_tokens: 5_500_000
+    monthly_fine_tuning_training_hours: 0.9
+    monthly_fine_tuning_hosting_hours: 9.8
+
+  # Audio models usage
+  azurerm_cognitive_deployment.audio_models["gpt4o_audio"]:
+    monthly_language_input_tokens: 5_000_000
+    monthly_language_output_tokens: 2_500_000
+    monthly_audio_input_tokens: 5_000_000
+    monthly_audio_output_tokens: 2_500_000
+  
+  azurerm_cognitive_deployment.audio_models["gpt4o_mini_audio"]:
+    monthly_language_input_tokens: 3_000_000
+    monthly_language_output_tokens: 1_500_000
+    monthly_audio_input_tokens: 3_000_000
+    monthly_audio_output_tokens: 1_500_000
+  
+  # Realtime models usage
+  azurerm_cognitive_deployment.realtime_models["gpt4o_realtime_1217"]:
+    monthly_language_input_tokens: 6_000_000
+    monthly_language_cached_input_tokens: 3_000_000
+    monthly_language_output_tokens: 2_000_000
+    monthly_audio_input_tokens: 6_000_000
+    monthly_audio_output_tokens: 4_000_000
+  
+  azurerm_cognitive_deployment.realtime_models["gpt4o_realtime_1001"]:
+    monthly_language_input_tokens: 4_000_000
+    monthly_language_cached_input_tokens: 2_000_000
+    monthly_language_output_tokens: 1_500_000
+    monthly_audio_input_tokens: 4_000_000
+    monthly_audio_output_tokens: 2_500_000
+  
+  azurerm_cognitive_deployment.realtime_models["gpt4o_mini_realtime"]:
+    monthly_language_input_tokens: 3_500_000
+    monthly_language_cached_input_tokens: 1_750_000
+    monthly_language_output_tokens: 1_200_000
+    monthly_audio_input_tokens: 3_500_000
+    monthly_audio_output_tokens: 2_000_000
+
+  # Computer use model usage
+  azurerm_cognitive_deployment.computer_use_models:
+    monthly_language_input_tokens: 2_000_000
+    monthly_language_output_tokens: 1_000_000
+  
+  # New foundation models usage
+  azurerm_cognitive_deployment.new_foundation_models["gpt45_preview"]:
+    monthly_language_input_tokens: 8_000_000
+    monthly_language_cached_input_tokens: 4_000_000
+    monthly_language_output_tokens: 3_000_000
+  
+  azurerm_cognitive_deployment.new_foundation_models["o1_model"]:
+    monthly_language_input_tokens: 7_000_000
+    monthly_language_cached_input_tokens: 3_500_000
+    monthly_language_output_tokens: 2_500_000
+  
+  azurerm_cognitive_deployment.new_foundation_models["o1_mini_model"]:
+    monthly_language_input_tokens: 5_500_000
+    monthly_language_cached_input_tokens: 2_750_000
+    monthly_language_output_tokens: 2_000_000
+  
+  azurerm_cognitive_deployment.new_foundation_models["o3_mini_model"]:
+    monthly_language_input_tokens: 6_000_000
+    monthly_language_cached_input_tokens: 3_000_000
+    monthly_language_output_tokens: 2_200_000
+  
+  # File search functionality usage
+  azurerm_cognitive_deployment.eastus_with_usage["gpt-4o"]:
+    monthly_language_input_tokens: 40_000_000
+    monthly_language_output_tokens: 13_333_333
+    monthly_file_search_tool_calls: 5_000
+    monthly_file_search_storage_gb: 3.5
 

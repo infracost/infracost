@@ -64,19 +64,19 @@
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)                5,840  hours       $195.67   
  └─ Standard provisioned storage (pd-standard)                         800  GB           $32.00   
                                                                                                   
- google_container_node_pool.with_preemptible_instance                                             
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)        2,190  hours       $121.15   
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)          2,190  hours        $51.77   
- └─ Standard provisioned storage (pd-standard)                         300  GB           $12.00   
-                                                                                                  
- google_container_node_pool.with_spot_instance                                                    
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)        2,190  hours       $121.15   
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)          2,190  hours        $51.77   
- └─ Standard provisioned storage (pd-standard)                         300  GB           $12.00   
-                                                                                                  
  google_container_node_pool.autoscaling_zonal                                                     
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)                4,380  hours       $146.76   
  └─ Standard provisioned storage (pd-standard)                         600  GB           $24.00   
+                                                                                                  
+ google_container_node_pool.with_preemptible_instance                                             
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)        2,190  hours       $102.75   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)          2,190  hours        $43.89   
+ └─ Standard provisioned storage (pd-standard)                         300  GB           $12.00   
+                                                                                                  
+ google_container_node_pool.with_spot_instance                                                    
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)        2,190  hours       $102.75   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)          2,190  hours        $43.89   
+ └─ Standard provisioned storage (pd-standard)                         300  GB           $12.00   
                                                                                                   
  google_container_cluster.default_regional                                                        
  ├─ Cluster management fee                                             730  hours        $73.00   
@@ -122,7 +122,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)                1,460  hours        $48.92   
  └─ Standard provisioned storage (pd-standard)                         200  GB            $8.00   
                                                                                                   
- OVERALL TOTAL                                                                      $28,075.31 
+ OVERALL TOTAL                                                                      $28,022.75 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -133,5 +133,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $28,075 ┃           - ┃    $28,075 ┃
+┃ main                                               ┃       $28,023 ┃           - ┃    $28,023 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

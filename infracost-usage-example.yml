@@ -236,6 +236,10 @@ resource_usage:
   aws_glue_job.my_job:
     monthly_hours: 60 # Monthly number of hours the Glue job ran for.
 
+  aws_grafana_workspace.my_workspace:
+    editors_administrator_licenses: 2 # Number of editor/administrator licenses.
+    viewer_licenses: 3 # Number of viewer licenses.
+
   aws_instance.my_instance:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     reserved_instance_type: standard # Offering class for Reserved Instances, can be: convertible, standard.
@@ -718,6 +722,9 @@ resource_usage:
 
   google_pubsub_topic.my_topic:
     monthly_message_data_tb: 7.416 # Monthly amount of message data published to the topic in TB.
+
+  google_redis_cluster.my_redis_cluster:
+    backup_storage_gb: 1000 # Amount of backup storage in GB.
 
   google_secret_manager_secret.my_secret:
     active_secret_versions: 10000       # Number of active secret versions in each month. NOTE: this is used only when secret versions are not defined.

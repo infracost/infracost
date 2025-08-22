@@ -6,6 +6,7 @@ projects:
     terraform_var_files:
       - envs/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - apps/**
       - apps/envs/dev.tfvars
@@ -14,6 +15,7 @@ projects:
     terraform_var_files:
       - envs/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - apps/**
       - apps/envs/prod.tfvars

@@ -57,6 +57,7 @@ type SQLDatabase struct {
 	ReadReplicaCount  *int64
 	ZoneRedundant     bool
 	BackupStorageType string
+	IsDevTest         bool
 
 	// ExtraDataStorageGB represents a usage cost of additional backup storage used by the sql database.
 	ExtraDataStorageGB *float64 `infracost_usage:"extra_data_storage_gb"`
@@ -146,9 +147,16 @@ func (r *SQLDatabase) dtuCostComponents() []*schema.CostComponent {
 	// Use precision 24 to avoid rounding errors later since the default decimal precision is 16.
 	daysInMonth := schema.HourToMonthUnitMultiplier.DivRound(decimal.NewFromInt(24), 24)
 
+	name := fmt.Sprintf("Compute (%s)", strings.ToTitle(r.SKU))
+	purchaseOption := priceFilterConsumption
+	if r.IsDevTest {
+		name = fmt.Sprintf("Compute (dev/test, %s)", strings.ToTitle(r.SKU))
+		purchaseOption = priceFilterDevTestConsumption
+	}
+
 	costComponents := []*schema.CostComponent{
 		{
-			Name:            fmt.Sprintf("Compute (%s)", strings.ToTitle(r.SKU)),
+			Name:            name,
 			Unit:            "hours",
 			UnitMultiplier:  daysInMonth.DivRound(schema.HourToMonthUnitMultiplier, 24),
 			MonthlyQuantity: decimalPtr(daysInMonth),
@@ -157,7 +165,7 @@ func (r *SQLDatabase) dtuCostComponents() []*schema.CostComponent {
 				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", skuName))},
 				{Key: "meterName", ValueRegex: regexPtr("DTU(s)?$")},
 			}),
-			PriceFilter: priceFilterConsumption,
+			PriceFilter: purchaseOption,
 		},
 	}
 
@@ -233,6 +241,11 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 	}
 
 	name := fmt.Sprintf("Compute (serverless, %s)", r.SKU)
+	purchaseOption := priceFilterConsumption
+	if r.IsDevTest && strings.ToLower(r.LicenseType) != "licenseincluded" {
+		name = fmt.Sprintf("Compute (dev/test, serverless, %s)", r.SKU)
+		purchaseOption = priceFilterDevTestConsumption
+	}
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -245,7 +258,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 				{Key: "skuName", Value: strPtr("1 vCore")},
 				{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
 			}),
-			PriceFilter: priceFilterConsumption,
+			PriceFilter: purchaseOption,
 			UsageBased:  true,
 		},
 	}
@@ -277,6 +290,11 @@ func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent
 
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (provisioned, %s)", r.SKU)
+	purchaseOption := priceFilterConsumption
+	if r.IsDevTest && strings.ToLower(r.LicenseType) != "licenseincluded" {
+		name = fmt.Sprintf("Compute (dev/test, provisioned, %s)", r.SKU)
+		purchaseOption = priceFilterDevTestConsumption
+	}
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -288,7 +306,7 @@ func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent
 				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d vCore", cores))},
 			}),
-			PriceFilter: priceFilterConsumption,
+			PriceFilter: purchaseOption,
 		},
 	}
 

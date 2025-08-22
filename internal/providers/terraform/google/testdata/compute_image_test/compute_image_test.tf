@@ -14,12 +14,12 @@ resource "google_compute_disk" "disk" {
 }
 
 resource "google_compute_image" "image" {
-  name         = "image_source_image"
+  name         = "image-source-image"
   disk_size_gb = 100
 }
 
 resource "google_compute_snapshot" "snapshot" {
-  name        = "snapshot_source_disk"
+  name        = "snapshot-source-disk"
   source_disk = google_compute_disk.disk.self_link
 }
 

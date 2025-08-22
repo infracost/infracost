@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+{{- range $project := matchPaths ":name/main.tf" }}
+  {{- if isProduction $project.name }}
+  - path: {{ $project.name }}
+  {{- end}}
+{{- end }}

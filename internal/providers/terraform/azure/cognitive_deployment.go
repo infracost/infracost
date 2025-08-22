@@ -31,10 +31,12 @@ func newCognitiveDeployment(d *schema.ResourceData) schema.CoreResource {
 	region := d.Region
 
 	return &azure.CognitiveDeployment{
-		Address: d.Address,
-		Region:  region,
-		Model:   strings.ToLower(d.Get("model.0.name").String()),
-		Version: strings.ToLower(d.Get("model.0.version").String()),
-		Tier:    strings.ToLower(d.Get("scale.0.tier").String()),
+		Address:  d.Address,
+		Region:   region,
+		Model:    strings.ToLower(d.Get("model.0.name").String()),
+		Version:  strings.ToLower(d.Get("model.0.version").String()),
+		Tier:     strings.ToLower(d.Get("scale.0.tier").String()),
+		SKU:      strings.ToLower(d.Get("sku.0.name").String()),
+		Capacity: d.Get("sku.0.capacity").Int(),
 	}
 }

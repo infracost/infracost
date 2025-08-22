@@ -30,6 +30,10 @@
  ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
  └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00    
                                                                                                                                              
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-12"]                                                                           
+ ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
+ └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00    
+                                                                                                                                             
  aws_rds_cluster_instance.cluster_instance                                                                                                   
  └─ Database instance (on-demand, db.r4.large)                                              730  hours                            $211.70    
                                                                                                                                              
@@ -46,9 +50,6 @@
  └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
                                                                                                                                              
  aws_rds_cluster_instance.extended_support["aurora-mysql-8.0.36"]                                                                            
- └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
-                                                                                                                                             
- aws_rds_cluster_instance.extended_support["aurora-postgresql-12"]                                                                           
  └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72    
                                                                                                                                              
  aws_rds_cluster_instance.extended_support["aurora-postgresql-13"]                                                                           
@@ -107,7 +108,7 @@
  ├─ Aurora serverless v2                                                    Monthly cost depends on usage: $0.12 per ACU-hours               
  └─ Performance Insights API                                                Monthly cost depends on usage: $0.01 per 1000 requests           
                                                                                                                                              
- OVERALL TOTAL                                                                                                                  $6,987.11 
+ OVERALL TOTAL                                                                                                                  $7,133.11 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -118,5 +119,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $6,101 ┃        $886 ┃     $6,987 ┃
+┃ main                                               ┃        $6,247 ┃        $886 ┃     $7,133 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

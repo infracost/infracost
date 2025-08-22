@@ -17,6 +17,13 @@
             "$ref": "#/definitions/Project"
           },
           "type": "array"
+        },
+        "terraform_source_map": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/TerraformSourceMapRegexEntry"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -122,6 +129,30 @@
           "type": "object"
         },
         "yor_config_path": {
+          "type": "string"
+        },
+        "metadata": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TerraformSourceMapRegexEntry": {
+      "required": [
+        "match",
+        "replace"
+      ],
+      "properties": {
+        "match": {
+          "type": "string"
+        },
+        "replace": {
           "type": "string"
         }
       },

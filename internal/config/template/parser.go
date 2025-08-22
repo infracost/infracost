@@ -13,6 +13,7 @@ import (
 	pathToRegexp "github.com/soongo/path-to-regexp"
 	"gopkg.in/yaml.v2"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 )
 
@@ -49,36 +50,39 @@ type Parser struct {
 	repoDir   string
 	template  *template.Template
 	variables Variables
+	config    *config.Config
 }
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
 // Parser functions and sets the underlying default template name. Default variables can be passed to the parser which
 // will be passed to the template on execution.
-func NewParser(repoDir string, variables Variables) *Parser {
+func NewParser(repoDir string, variables Variables, config *config.Config) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
-	p := Parser{repoDir: absRepoDir, variables: variables}
+	p := Parser{repoDir: absRepoDir, variables: variables, config: config}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
-		"base":       p.base,
-		"stem":       p.stem,
-		"ext":        p.ext,
-		"lower":      p.lower,
-		"startsWith": p.startsWith,
-		"endsWith":   p.endsWith,
-		"contains":   p.contains,
-		"splitList":  p.splitList,
-		"trimPrefix": p.trimPrefix,
-		"trimSuffix": p.trimSuffix,
-		"replace":    p.replace,
-		"quote":      p.quote,
-		"squote":     p.squote,
-		"pathExists": p.pathExists,
-		"matchPaths": p.matchPaths,
-		"list":       p.list,
-		"relPath":    p.relPath,
-		"isDir":      p.isDir,
-		"readFile":   p.readFile,
-		"parseJson":  p.parseJson,
-		"parseYaml":  p.parseYaml,
+		"base":         p.base,
+		"stem":         p.stem,
+		"ext":          p.ext,
+		"lower":        p.lower,
+		"startsWith":   p.startsWith,
+		"endsWith":     p.endsWith,
+		"contains":     p.contains,
+		"splitList":    p.splitList,
+		"join":         p.join,
+		"trimPrefix":   p.trimPrefix,
+		"trimSuffix":   p.trimSuffix,
+		"replace":      p.replace,
+		"quote":        p.quote,
+		"squote":       p.squote,
+		"pathExists":   p.pathExists,
+		"matchPaths":   p.matchPaths,
+		"list":         p.list,
+		"relPath":      p.relPath,
+		"isDir":        p.isDir,
+		"readFile":     p.readFile,
+		"parseJson":    p.parseJson,
+		"parseYaml":    p.parseYaml,
+		"isProduction": p.isProduction,
 	})
 	p.template = t
 
@@ -169,6 +173,11 @@ func (p *Parser) contains(s, substr string) bool {
 // splitList splits the string s into a slice of substrings separated by sep.
 func (p *Parser) splitList(sep, s string) []string {
 	return strings.Split(s, sep)
+}
+
+// join joins the list of strings l into a single string separated by sep.
+func (p *Parser) join(sep string, l []string) string {
+	return strings.Join(l, sep)
 }
 
 // trimPrefix returns s without the provided prefix string.
@@ -366,6 +375,11 @@ func (p *Parser) parseJson(contents string) map[string]interface{} {
 	}
 
 	return out
+}
+
+// isProduction returns true if the project is production.
+func (p *Parser) isProduction(value string) bool {
+	return p.config.IsProduction(value)
 }
 
 func isSubdirectory(base, target string) bool {

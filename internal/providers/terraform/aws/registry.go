@@ -55,6 +55,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getElastiCacheClusterItem(),
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
+	getGrafanaWorkspaceRegistryItem(),
 	getOpensearchDomainRegistryItem(),
 	getELBRegistryItem(),
 	getFlowLogRegistryItem(),

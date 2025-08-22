@@ -17,6 +17,9 @@ var (
 	priceFilterConsumption = &schema.PriceFilter{
 		PurchaseOption: strPtr("Consumption"),
 	}
+	priceFilterDevTestConsumption = &schema.PriceFilter{
+		PurchaseOption: strPtr("DevTestConsumption"),
+	}
 )
 
 func strPtr(s string) *string {

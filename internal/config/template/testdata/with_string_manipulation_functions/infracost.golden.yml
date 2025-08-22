@@ -7,3 +7,5 @@ projects:
     name: base(terraform.tfvars)
   - path: .
     name: ext(.tfvars)
+  - path: .
+    name: name-of-project

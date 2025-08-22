@@ -69,6 +69,11 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	var buf bytes.Buffer
 
 	ctx := config.EmptyRunContext()
+	err := ctx.Config.LoadFromEnv()
+	if err != nil {
+		logging.Logger.Warn().Msgf("failed to load config from env: %s", err)
+	}
+
 	hasTemplate := g.template != "" || g.templatePath != ""
 	var definedProjects bool
 	if hasTemplate {
@@ -170,7 +175,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			variables.BaseBranch = m.PullRequest.BaseBranch
 		}
 
-		parser := template.NewParser(wd, variables)
+		parser := template.NewParser(wd, variables, ctx.Config)
 		if g.template != "" {
 			err := parser.Compile(g.template, &buf)
 			if err != nil {

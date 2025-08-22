@@ -126,6 +126,10 @@ type Project struct {
 	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
 	// YorConfigPath is the path to a Yor config file, which we can extract default tags from
 	YorConfigPath string `yaml:"yor_config_path,omitempty" ignored:"true"`
+	// Metadata is a map of key-value pairs that can be used to store additional information about the project.
+	// This is useful for storing flexible project information that needs to be accessed by other parts
+	// of the application.
+	Metadata map[string]string `yaml:"metadata,omitempty" ignored:"true"`
 }
 
 type Config struct {
@@ -171,6 +175,9 @@ type Config struct {
 
 	// TerraformSourceMap replaces any source URL with the provided value.
 	TerraformSourceMap TerraformSourceMap `envconfig:"TERRAFORM_SOURCE_MAP"`
+
+	// TerraformSourceMapRegex is a more flexible source mapping that supports regex patterns.
+	TerraformSourceMapRegex TerraformSourceMapRegex `yaml:"terraform_source_map,omitempty"`
 
 	S3ModuleCacheRegion  string `envconfig:"S3_MODULE_CACHE_REGION"`
 	S3ModuleCacheBucket  string `envconfig:"S3_MODULE_CACHE_BUCKET"`
@@ -299,6 +306,14 @@ func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
 	}
 
 	c.Projects = cfgFile.Projects
+
+	if len(cfgFile.TerraformSourceMapRegex) > 0 {
+		c.TerraformSourceMapRegex = cfgFile.TerraformSourceMapRegex
+		err = c.TerraformSourceMapRegex.Compile()
+		if err != nil {
+			return fmt.Errorf("error compiling terraform_source_map regex patterns: %w", err)
+		}
+	}
 
 	// Reload the environment and global flags to overwrite any of the config file configs
 	err = c.LoadFromEnv()
