@@ -1,4 +1,4 @@
-FROM cgr.dev/chainguard/go:latest-dev as builder
+FROM cgr.dev/chainguard/go:latest-dev AS builder
 
 ARG ARCH=linux
 ARG DEFAULT_TERRAFORM_VERSION=0.15.5
@@ -6,8 +6,8 @@ ARG TERRAGRUNT_VERSION=0.31.8
 
 # Set Environment Variables
 SHELL ["/bin/bash", "-c"]
-ENV HOME /app
-ENV CGO_ENABLED 0
+ENV HOME=/app
+ENV CGO_ENABLED=0
 
 RUN apk add bash wget
 # Install latest of each Terraform version after 0.12 as we don't support versions before that
@@ -42,7 +42,7 @@ RUN NO_DIRTY=true make build
 RUN chmod +x /app/build/infracost
 
 # Application
-FROM cgr.dev/chainguard/wolfi-base as app
+FROM cgr.dev/chainguard/wolfi-base AS app
 # Tools needed for running diffs in CI integrations
 RUN apk --no-cache add ca-certificates openssl openssh-client curl git bash jq
 

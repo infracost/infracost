@@ -566,6 +566,7 @@ func TestSpaceliftRemoteVariableLoader_Load(t *testing.T) {
 				}),
 				Metadata: tt.fields.Metadata,
 				cache:    &sync.Map{},
+				hitMap:   &sync.Map{},
 			}
 
 			got, err := s.Load(tt.args.options)
@@ -579,6 +580,71 @@ func TestSpaceliftRemoteVariableLoader_Load(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestSpaceliftRemoteVariableLoader_Load_ReturnsNilIfAlreadyLoaded(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// This server should only be called once
+		w.Header().Set("Content-Type", "application/json")
+		response := `{
+			"data": {
+				"searchStacks": {
+					"edges": [
+						{
+							"node": {
+								"id": "module-path-dev",
+								"name": "module-path:dev",
+								"projectRoot": "module/path",
+								"attachedContexts": [
+									{"id": "TF_VAR_test", "contextName": "test_value"}
+								],
+								"config": [],
+								"runtimeConfig": []
+							}
+						}
+					],
+					"pageInfo": {
+						"endCursor": null,
+						"hasNextPage": false,
+						"hasPreviousPage": false
+					}
+				}
+			}
+		}`
+		_, _ = w.Write([]byte(response))
+	}))
+	defer ts.Close()
+
+	s := &SpaceliftRemoteVariableLoader{
+		Client: client.New(http.DefaultClient, &stubSession{
+			token:    "test",
+			endpoint: ts.URL,
+		}),
+		Metadata: vcs.Metadata{
+			Remote: vcs.Remote{
+				Name: "test/test",
+			},
+		},
+		cache:  &sync.Map{},
+		hitMap: &sync.Map{},
+	}
+
+	options := RemoteVarLoaderOptions{
+		ModulePath:  "module/path",
+		Environment: "dev",
+	}
+
+	// First call should return variables
+	got, err := s.Load(options)
+	assert.NoError(t, err)
+	assert.Equal(t, map[string]cty.Value{
+		"test": cty.StringVal("test_value"),
+	}, got)
+
+	// Second call should return nil
+	got, err = s.Load(options)
+	assert.NoError(t, err)
+	assert.Nil(t, got)
 }
 
 type stubSession struct {

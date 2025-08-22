@@ -78,21 +78,19 @@ func (r *MySQLFlexibleServer) computeCostComponent() *schema.CostComponent {
 		tierName = "Business Critical"
 	}
 
-	// Dadsv5 is a valid series, but its pricing is not present in db.
-	// The pricing is the same as Ddsv4, so we use it instead.
 	series := attrs.Series
-	if attrs.Series == "Dadsv5" {
-		series = "Ddsv4"
-	}
-
 	// We've seen two spaces in the data in the past hence '\s+'
 	seriesSuffix := fmt.Sprintf("\\s+%s Series", series)
 	// This seems to be a special case where the series doesn't appear in the product name
 	if tierName == "Business Critical" && series == "Edsv4" {
+		seriesSuffix = " Compute"
+	}
+
+	if tierName == "General Purpose" && series == "Dadsv5" {
 		seriesSuffix = ""
 	}
 
-	productNameRegex := fmt.Sprintf("^Azure Database for MySQL Flexible Server %s%s Compute$", tierName, seriesSuffix)
+	productNameRegex := fmt.Sprintf("^Azure Database for MySQL Flexible Server %s%s", tierName, seriesSuffix)
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", r.SKU),

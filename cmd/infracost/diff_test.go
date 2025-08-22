@@ -1,12 +1,16 @@
 package main_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
@@ -134,6 +138,61 @@ func TestDiffWithCompareToWithPastProjectError(t *testing.T) {
 		}, &GoldenFileOptions{
 			IsJSON: true,
 		})
+}
+
+func TestDiffWithCompareToWithPastProjectErrorTerragrunt(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+
+	//// write a file to the terraform directory which the terragrunt projects will use
+	//// this will cause a module source error, meaning an underlying terraform evaluation error
+	//// this is to test that terragrunt evaluation properly treats this case as a project error
+	//// and not a warning.
+	f, err := os.Create(path.Join(dir, "us/modules/example/bad.tf"))
+	require.NoError(t, err)
+	_, err = f.WriteString("module \"example\" {\n  source = \"doesntexist\"\n}\n")
+	assert.NoError(t, err)
+	err = f.Close()
+	assert.NoError(t, err)
+
+	// now we create the prior.json file by running breakdown
+	GetCommandOutput(
+		t,
+		[]string{
+			"breakdown",
+			"--config-file",
+			path.Join(dir, "infracost.yml"),
+			"--format", "json",
+			"--output-file",
+			path.Join(dir, "prior.json"),
+		},
+		&GoldenFileOptions{},
+	)
+
+	err = os.Remove(path.Join(dir, "us/modules/example/bad.tf"))
+	require.NoError(t, err)
+
+	out, err := os.ReadFile(path.Join(dir, "prior.json"))
+	require.NoError(t, err)
+	out = bytes.ReplaceAll(out, []byte("REPLACED_PROJECT_PATH/"), []byte(""))
+	pretty := bytes.NewBuffer(nil)
+	err = json.Indent(pretty, out, "", "  ")
+	require.NoError(t, err)
+	re := regexp.MustCompile(`/.*/doesntexist`)
+	out = re.ReplaceAll(pretty.Bytes(), []byte("BAD_MODULE_PATH"))
+	err = os.WriteFile(path.Join(dir, "prior.json"), out, 0600)
+	require.NoError(t, err)
+
+	// and check the diff is correct
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--config-file",
+			path.Join(dir, "infracost.yml"),
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+		}, nil)
 }
 
 func TestDiffWithCompareToFormatJSON(t *testing.T) {

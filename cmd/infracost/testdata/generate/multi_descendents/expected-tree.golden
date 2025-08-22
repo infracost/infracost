@@ -1,0 +1,19 @@
+└── apps
+    ├── bar (terraform)
+    │   ├── envs
+    │   │   ├── dev.tfvars
+    │   │   └── staging.tfvars
+    │   └── us1 (terraform)
+    │       └── envs
+    │           ├── dev.tfvars
+    │           └── prod.tfvars
+    ├── envs
+    │   └── default.tfvars
+    └── foo (terraform)
+        ├── envs
+        │   ├── dev.tfvars
+        │   └── staging.tfvars
+        └── us1 (terraform)
+            └── envs
+                ├── dev.tfvars
+                └── prod.tfvars

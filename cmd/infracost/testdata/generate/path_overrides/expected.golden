@@ -7,6 +7,7 @@ projects:
       - ../../default.tfvars
       - ../../bip.tfvars
     skip_autodetect: true
+    terraform_workspace: bip
     dependency_paths:
       - infra/bip.tfvars
       - infra/components/bar/**
@@ -18,6 +19,7 @@ projects:
       - ../../network-bat.tfvars
       - ../../bat.tfvars
     skip_autodetect: true
+    terraform_workspace: bat
     dependency_paths:
       - infra/bat.tfvars
       - infra/components/blah/**
@@ -29,6 +31,7 @@ projects:
       - ../../default.tfvars
       - ../../bip.tfvars
     skip_autodetect: true
+    terraform_workspace: bip
     dependency_paths:
       - infra/bip.tfvars
       - infra/components/blah/**
@@ -41,6 +44,7 @@ projects:
       - ../../baz.tfvars
       - var.auto.tfvars
     skip_autodetect: true
+    terraform_workspace: baz
     dependency_paths:
       - infra/baz.tfvars
       - infra/components/foo/**

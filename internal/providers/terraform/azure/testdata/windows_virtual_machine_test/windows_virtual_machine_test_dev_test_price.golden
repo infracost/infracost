@@ -1,0 +1,58 @@
+
+ Name                                                                  Monthly Qty  Unit                      Monthly Cost    
+                                                                                                                              
+ azurerm_windows_virtual_machine.Standard_E16-8as_v4                                                                          
+ ├─ Instance usage (Windows, dev/test, Standard_E16-8as_v4)                    730  hours                          $735.84    
+ └─ os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                         1  months                           $1.54    
+    └─ Disk operations                                          Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                              
+ azurerm_windows_virtual_machine.standard_d2_v4_hybrid_benefit                                                                
+ ├─ Instance usage (Windows, dev/test, Standard_D2_v4)                         730  hours                           $70.08    
+ └─ os_disk                                                                                                                   
+    ├─ Storage (E30, LRS)                                                        1  months                          $76.80    
+    └─ Disk operations                                          Monthly cost depends on usage: $0.002 per 10k operations      
+                                                                                                                              
+ azurerm_windows_virtual_machine.standard_a2_v2_custom_disk                                                                   
+ ├─ Instance usage (Windows, dev/test, Standard_A2_v2)                         730  hours                           $65.92    
+ └─ os_disk                                                                                                                   
+    ├─ Storage (E30, LRS)                                                        1  months                          $76.80    
+    └─ Disk operations                                                           2  10k operations                   $0.00  * 
+                                                                                                                              
+ azurerm_windows_virtual_machine.standard_f2_premium_disk                                                                     
+ ├─ Instance usage (Windows, dev/test, Standard_F2)                            730  hours                           $72.27    
+ └─ os_disk                                                                                                                   
+    └─ Storage (P4, LRS)                                                         1  months                           $5.28    
+                                                                                                                              
+ azurerm_windows_virtual_machine.standard_a2_ultra_enabled                                                                    
+ ├─ Instance usage (Windows, dev/test, Standard_A2_v2)                         730  hours                           $65.92    
+ ├─ Ultra disk reservation (if unattached)                      Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ os_disk                                                                                                                   
+    ├─ Storage (E4, LRS)                                                         1  months                           $2.40    
+    └─ Disk operations                                          Monthly cost depends on usage: $0.002 per 10k operations      
+                                                                                                                              
+ azurerm_windows_virtual_machine.basic_a2                                                                                     
+ ├─ Instance usage (Windows, dev/test, Basic_A2)                               730  hours                           $57.67    
+ └─ os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                         1  months                           $1.54    
+    └─ Disk operations                                          Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                              
+ azurerm_windows_virtual_machine.basic_a2_withMonthlyHours                                                                    
+ ├─ Instance usage (Windows, dev/test, Basic_A2)                               100  hours                            $7.90    
+ └─ os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                         1  months                           $1.54    
+    └─ Disk operations                                          Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                              
+ OVERALL TOTAL                                                                                                   $1,241.49 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 7 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃        $1,241 ┃       $0.00 ┃     $1,241 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

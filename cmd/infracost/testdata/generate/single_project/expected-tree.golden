@@ -1,0 +1,3 @@
+└── . (terraform)
+    ├── dev.tfvars
+    └── prod.tfvars

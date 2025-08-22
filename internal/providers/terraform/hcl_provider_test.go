@@ -207,7 +207,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 				startingPath = "."
 			}
 
-			mods := pl.FindRootModules(startingPath)
+			mods, _ := pl.FindRootModules(startingPath)
 			options := []hcl.Option{hcl.OptionWithBlockBuilder(
 				hcl.BlockBuilder{
 					MockFunc: func(a *hcl.Attribute) cty.Value {
@@ -231,6 +231,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 					HCLParser:         moduleParser,
 					CredentialsSource: &modules.CredentialsSource{FetchToken: credentials.FindTerraformCloudToken},
 					SourceMap:         config.TerraformSourceMap{},
+					SourceMapRegex:    nil,
 					Logger:            logger,
 					ModuleSync:        &sync.KeyMutex{},
 				}),
@@ -292,29 +293,34 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 	}
 }
 
-func TestTransformSSHToHTTPS(t *testing.T) {
+func TestNormalizeModuleURL(t *testing.T) {
 	tests := []struct {
 		input    string
 		expected string
 	}{
-		{"git@github.com:user/repo.git", "https://github.com/user/repo.git"},
-		{"git@gitlab.com:group/project.git", "https://gitlab.com/group/project.git"},
-		{"git@bitbucket.org:team/repo.git", "https://bitbucket.org/team/repo.git"},
-		{"git@myserver.com:2222:user/repo.git", "https://myserver.com/user/repo.git"},                                    // with port
-		{"git@ssh.dev.azure.com:v3/organization/project/repo", "https://ssh.dev.azure.com/v3/organization/project/repo"}, // Azure Repos
-		{"invalid-url", "invalid-url"},                                     // invalid SSH URL
-		{"user@github.com:user/repo.git", "user@github.com:user/repo.git"}, // unexpected username
+		{"git@github.com:user/repo.git", "https://github.com/user/repo"},
+		{"git@gitlab.com:group/project.git", "https://gitlab.com/group/project"},
+		{"git@bitbucket.org:team/repo.git", "https://bitbucket.org/team/repo"},
+		{"git@ssh.dev.azure.com:v3/organization/project/repo", "https://dev.azure.com/organization/project/_git/repo"}, // Azure Repos
+		{"user@github.com:user/repo.git", "https://github.com/user/repo"},                                              // ssh with custom username
+		{"ssh://git@myserver.com:2222/user/repo.git", "https://myserver.com/user/repo"},                                // with port
+		{"git+ssh://git@myserver.com/user/repo.git", "https://myserver.com/user/repo"},                                 // with git+ssh
+		{"git::ssh://git@myserver.com/user/repo.git", "https://myserver.com/user/repo"},                                // with git::ssh
+		{"https://github.com/user/repo.git", "https://github.com/user/repo"},                                           // https
+		{"https://user@myserver.com/user/repo.git", "https://myserver.com/user/repo"},                                  // https with username
+		{"git::https://github.com/user/repo.git", "https://github.com/user/repo"},                                      // git::https
+		{"git::ssh://git@myserver.com/user/repo.git?ref=a094835", "https://myserver.com/user/repo?ref=a094835"},        // git::ssh with ref
 	}
 
 	for _, test := range tests {
-		output, err := transformSSHToHTTPS(test.input)
+		output, err := normalizeModuleURL(test.input)
 		if err != nil {
 			if test.expected != "" {
-				t.Errorf("transformSSHToHTTPS(%q) returned an error: %v", test.input, err)
+				t.Errorf("normalizeModuleURL(%q) returned an error: %v", test.input, err)
 			}
 		} else {
 			if !reflect.DeepEqual(output, test.expected) {
-				t.Errorf("transformSSHToHTTPS(%q) = %q, want %q", test.input, output, test.expected)
+				t.Errorf("normalizeModuleURL(%q) = %q, want %q", test.input, output, test.expected)
 			}
 		}
 	}

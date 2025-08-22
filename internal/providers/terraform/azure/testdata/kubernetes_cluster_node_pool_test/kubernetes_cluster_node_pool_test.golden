@@ -8,7 +8,7 @@
  └─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                     1,460  hours        $213.16   
                                                                                                              
  azurerm_kubernetes_cluster_node_pool.windows_sku                                                            
- ├─ Instance usage (Windows, pay as you go, Standard_DS2_v2)                     730  hours        $183.96   
+ ├─ Instance usage (Windows, pay as you go, Standard_DS2_v2)                     730  hours        $173.74   
  └─ os_disk                                                                                                  
     └─ Storage (P10, LRS)                                                          1  months        $19.71   
                                                                                                              
@@ -48,7 +48,7 @@
  └─ os_disk                                                                                                  
     └─ Storage (S10, LRS)                                                          1  months         $5.89   
                                                                                                              
- OVERALL TOTAL                                                                                  $1,320.42 
+ OVERALL TOTAL                                                                                  $1,310.20 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -60,5 +60,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $1,320 ┃           - ┃     $1,320 ┃
+┃ main                                               ┃        $1,310 ┃           - ┃     $1,310 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

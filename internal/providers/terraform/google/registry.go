@@ -48,6 +48,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getPubSubSubscriptionRegistryItem(),
 	getPubSubTopicRegistryItem(),
 	getRedisInstanceRegistryItem(),
+	getRedisClusterRegistryItem(),
 	getSecretManagerSecretRegistryItem(),
 	getSecretManagerSecretVersionRegistryItem(),
 	getServiceNetworkingConnectionRegistryItem(),

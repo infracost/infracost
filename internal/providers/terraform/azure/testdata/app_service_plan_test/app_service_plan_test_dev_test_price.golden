@@ -1,0 +1,47 @@
+
+ Name                                       Monthly Qty  Unit   Monthly Cost   
+                                                                               
+ azurerm_app_service_plan.pc3                                                  
+ └─ Instance usage (PC3)                         10,950  hours     $3,557.57   
+                                                                               
+ azurerm_app_service_plan.premium_v2                                           
+ └─ Instance usage (P1v2)                         7,300  hours       $737.30   
+                                                                               
+ azurerm_app_service_plan.isolated_v2                                          
+ └─ Instance usage (I1v2)                           730  hours       $281.78   
+                                                                               
+ azurerm_app_service_plan.isolated                                             
+ └─ Instance usage (I1)                             730  hours       $219.00   
+                                                                               
+ azurerm_app_service_plan.premium_v1                                           
+ └─ Instance usage (P1v1)                           730  hours       $219.00   
+                                                                               
+ azurerm_app_service_plan.standard_s2                                          
+ └─ Instance usage (dev/test, S1)                 3,650  hours       $219.00   
+                                                                               
+ azurerm_app_service_plan.pc2                                                  
+ └─ Instance usage (PC2)                            730  hours       $118.59   
+                                                                               
+ azurerm_app_service_plan.standard_s1                                          
+ └─ Instance usage (dev/test, S1)                   730  hours        $43.80   
+                                                                               
+ azurerm_app_service_plan.basic                                                
+ └─ Instance usage (B2)                             730  hours        $24.82   
+                                                                               
+ azurerm_app_service_plan.default_capacity                                     
+ └─ Instance usage (B2)                             730  hours        $24.82   
+                                                                               
+ OVERALL TOTAL                                                    $5,445.67 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+11 cloud resources were detected:
+∙ 10 were estimated
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃        $5,446 ┃           - ┃     $5,446 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

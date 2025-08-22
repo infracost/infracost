@@ -1,0 +1,4 @@
+├── dup (terraform)
+│   ├── dev.tfvars
+│   └── prod.tfvars
+└── nondup (terragrunt)

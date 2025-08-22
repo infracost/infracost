@@ -1,0 +1,6 @@
+└── infra (terraform)
+    └── envs
+        ├── qa
+        │   └── prod.tfvars
+        └── stg
+            └── dev.tfvars

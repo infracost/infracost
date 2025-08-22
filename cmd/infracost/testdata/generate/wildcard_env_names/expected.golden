@@ -7,6 +7,7 @@ projects:
       - env/other-uat.tfvars
       - env/conf-dev-foo.tfvars
     skip_autodetect: true
+    terraform_workspace: conf-dev-foo
     dependency_paths:
       - terraform/**
       - terraform/env/conf-dev-foo.tfvars
@@ -17,6 +18,7 @@ projects:
       - env/other-uat.tfvars
       - env/conf-prod-foo.tfvars
     skip_autodetect: true
+    terraform_workspace: conf-prod-foo
     dependency_paths:
       - terraform/**
       - terraform/env/conf-prod-foo.tfvars
@@ -27,6 +29,7 @@ projects:
       - env/other-uat.tfvars
       - env/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - terraform/**
       - terraform/env/dev.tfvars
@@ -37,6 +40,7 @@ projects:
       - env/other-uat.tfvars
       - env/ops-dev.tfvars
     skip_autodetect: true
+    terraform_workspace: ops-dev
     dependency_paths:
       - terraform/**
       - terraform/env/ops-dev.tfvars
@@ -47,6 +51,7 @@ projects:
       - env/other-uat.tfvars
       - env/ops-prod-bar.tfvars
     skip_autodetect: true
+    terraform_workspace: ops-prod-bar
     dependency_paths:
       - terraform/**
       - terraform/env/ops-prod-bar.tfvars
@@ -57,6 +62,7 @@ projects:
       - env/other-uat.tfvars
       - env/ops-prod-foo.tfvars
     skip_autodetect: true
+    terraform_workspace: ops-prod-foo
     dependency_paths:
       - terraform/**
       - terraform/env/ops-prod-foo.tfvars
@@ -67,6 +73,7 @@ projects:
       - env/other-uat.tfvars
       - env/uk-uat.tfvars
     skip_autodetect: true
+    terraform_workspace: uk-uat
     dependency_paths:
       - terraform/**
       - terraform/env/other-uat.tfvars
@@ -77,6 +84,7 @@ projects:
       - env/other-uat.tfvars
       - env/us-uat.tfvars
     skip_autodetect: true
+    terraform_workspace: us-uat
     dependency_paths:
       - terraform/**
       - terraform/env/other-uat.tfvars

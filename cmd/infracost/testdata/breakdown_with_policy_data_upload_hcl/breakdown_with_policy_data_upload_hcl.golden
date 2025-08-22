@@ -63,7 +63,7 @@
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 37,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 16
@@ -328,7 +328,7 @@
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 37,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 16

@@ -1,204 +1,199 @@
 
- Name                                                        Monthly Qty  Unit        Monthly Cost   
-                                                                                                     
- aws_autoscaling_group.asg_lc_ebs_optimized                                                          
- └─ aws_launch_configuration.lc_ebs_optimized                                                        
-    ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)           1,460  hours            $486.18   
-    ├─ EBS-optimized usage                                         1,460  hours             $29.20   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lt_ebs_optimized                                                          
- └─ aws_launch_template.lt_ebs_optimized                                                             
-    ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)           1,460  hours            $486.18   
-    └─ EBS-optimized usage                                         1,460  hours             $29.20   
-                                                                                                     
- aws_autoscaling_group.asg_lt_elastic_inference_accelerator                                          
- └─ aws_launch_template.lt_elastic_inference_accelerator                                             
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    └─ Inference accelerator (eia2.medium)                         1,460  hours            $175.20   
-                                                                                                     
- aws_autoscaling_group.asg_lc_usage                                                                  
- └─ aws_launch_configuration.lc_usage                                                                
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           4,380  hours            $203.23   
-    ├─ EC2 detailed monitoring                                        42  metrics           $12.60   
-    ├─ root_block_device                                                                             
-    │  └─ Storage (general purpose SSD, gp2)                          60  GB                 $6.00   
-    └─ ebs_block_device[0]                                                                           
-       └─ Storage (general purpose SSD, gp2)                          60  GB                 $6.00   
-                                                                                                     
- aws_autoscaling_group.asg_lt_usage                                                                  
- └─ aws_launch_template.lt_usage                                                                     
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           4,380  hours            $203.23   
-    └─ block_device_mapping[0]                                                                       
-       └─ Storage (general purpose SSD, gp2)                          60  GB                 $6.00   
-                                                                                                     
- aws_autoscaling_group.asg_mixed_instance_basic                                                      
- └─ aws_launch_template.lt_mixed_instance_basic                                                      
-    └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23   
-                                                                                                     
- aws_autoscaling_group.asg_mixed_instance_dynamic                                                    
- └─ aws_launch_template.lt_mixed_instance_dynamic                                                    
-    └─ Instance usage (Linux/UNIX, on-demand, t2.large)            2,190  hours            $203.23   
-                                                                                                     
- aws_autoscaling_group.asg_lt_cpu_credits                                                            
- └─ aws_launch_template.lt_cpu_credits                                                               
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours            $121.47   
-    └─ CPU credits                                                 1,400  vCPU-hours        $70.00   
-                                                                                                     
- aws_autoscaling_group.asg_lt_cpu_credits_noUsage                                                    
- └─ aws_launch_template.lt_cpu_credits_noUsage                                                       
-    └─ Instance usage (Linux/UNIX, on-demand, t3.large)            1,460  hours            $121.47   
-                                                                                                     
- aws_autoscaling_group.asg_lc_tenancy_dedicated                                                      
- └─ aws_launch_configuration.lc_tenancy_dedicated                                                    
-    ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours            $108.04   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lt_tenancy_dedicated                                                      
- └─ aws_launch_template.lt_tenancy_dedicated                                                         
-    └─ Instance usage (Linux/UNIX, on-demand, m3.medium)           1,460  hours            $108.04   
-                                                                                                     
- aws_autoscaling_group.asg_lc_cpu_credits                                                            
- └─ aws_launch_configuration.lc_cpu_credits                                                          
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           1,460  hours             $60.74   
-    ├─ CPU credits                                                   800  vCPU-hours        $40.00   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lt_basic                                                                  
- └─ aws_launch_template.lt_basic                                                                     
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    ├─ block_device_mapping[0]                                                                       
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    └─ block_device_mapping[1]                                                                       
-       ├─ Storage (provisioned IOPS SSD, io1)                         40  GB                 $5.00   
-       └─ Provisioned IOPS                                           400  IOPS              $26.00   
-                                                                                                     
- aws_autoscaling_group.asg_lt_min_size                                                               
- └─ aws_launch_template.lt_basic                                                                     
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    ├─ block_device_mapping[0]                                                                       
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    └─ block_device_mapping[1]                                                                       
-       ├─ Storage (provisioned IOPS SSD, io1)                         40  GB                 $5.00   
-       └─ Provisioned IOPS                                           400  IOPS              $26.00   
-                                                                                                     
- aws_autoscaling_group.asg_lc_basic                                                                  
- └─ aws_launch_configuration.lc_basic                                                                
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    ├─ EC2 detailed monitoring                                        14  metrics            $4.20   
-    ├─ root_block_device                                                                             
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    ├─ ebs_block_device[0]                                                                           
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    └─ ebs_block_device[1]                                                                           
-       └─ Storage (general purpose SSD, gp3)                          20  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lc_min_size                                                               
- └─ aws_launch_configuration.lc_basic                                                                
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    ├─ EC2 detailed monitoring                                        14  metrics            $4.20   
-    ├─ root_block_device                                                                             
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    ├─ ebs_block_device[0]                                                                           
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    └─ ebs_block_device[1]                                                                           
-       └─ Storage (general purpose SSD, gp3)                          20  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lc_min_size_name_ref                                                      
- └─ aws_launch_configuration.lc_basic                                                                
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    ├─ EC2 detailed monitoring                                        14  metrics            $4.20   
-    ├─ root_block_device                                                                             
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    ├─ ebs_block_device[0]                                                                           
-    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00   
-    └─ ebs_block_device[1]                                                                           
-       └─ Storage (general purpose SSD, gp3)                          20  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.test_count[1]                                                                 
- └─ aws_launch_configuration.test_count[1]                                                           
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    ├─ EC2 detailed monitoring                                        14  metrics            $4.20   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lt_monitoring                                                             
- └─ aws_launch_template.lt_monitoring                                                                
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74   
-    └─ EC2 detailed monitoring                                        14  metrics            $4.20   
-                                                                                                     
- aws_autoscaling_group.asg_lc_cpu_credits_noUsage                                                    
- └─ aws_launch_configuration.lc_cpu_credits_noUsage                                                  
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)           1,460  hours             $60.74   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lt_min_size_zero                                                          
- └─ aws_launch_template.lt_basic                                                                     
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)             730  hours             $33.87   
-    ├─ block_device_mapping[0]                                                                       
-    │  └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00   
-    └─ block_device_mapping[1]                                                                       
-       ├─ Storage (provisioned IOPS SSD, io1)                         20  GB                 $2.50   
-       └─ Provisioned IOPS                                           200  IOPS              $13.00   
-                                                                                                     
- aws_autoscaling_group.asg_lc_windows                                                                
- └─ aws_launch_configuration.lc_windows                                                              
-    ├─ Instance usage (Windows, on-demand, t3.medium)                730  hours             $43.80   
-    ├─ EC2 detailed monitoring                                         7  metrics            $2.10   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                           8  GB                 $0.80   
-                                                                                                     
- aws_autoscaling_group.asg_lc_min_size_zero                                                          
- └─ aws_launch_configuration.lc_basic                                                                
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)             730  hours             $33.87   
-    ├─ EC2 detailed monitoring                                         7  metrics            $2.10   
-    ├─ root_block_device                                                                             
-    │  └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00   
-    ├─ ebs_block_device[0]                                                                           
-    │  └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00   
-    └─ ebs_block_device[1]                                                                           
-       └─ Storage (general purpose SSD, gp3)                          10  GB                 $0.80   
-                                                                                                     
- aws_autoscaling_group.test_count[0]                                                                 
- └─ aws_launch_configuration.test_count[0]                                                           
-    ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)            1,460  hours             $16.94   
-    ├─ EC2 detailed monitoring                                        14  metrics            $4.20   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                          16  GB                 $1.60   
-                                                                                                     
- aws_autoscaling_group.asg_lc_reserved                                                               
- └─ aws_launch_configuration.lc_reserved                                                             
-    ├─ Instance usage (Linux/UNIX, reserved, t3.medium)              730  hours             $19.05   
-    ├─ EC2 detailed monitoring                                         7  metrics            $2.10   
-    └─ root_block_device                                                                             
-       └─ Storage (general purpose SSD, gp2)                           8  GB                 $0.80   
-                                                                                                     
- module.asg-lt.aws_autoscaling_group.this[0]                                                         
- └─ module.asg-lt.aws_launch_template.this[0]                                                        
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)              730  hours              $7.59   
-    ├─ EC2 detailed monitoring                                         7  metrics            $2.10   
-    └─ block_device_mapping[0]                                                                       
-       └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00   
-                                                                                                     
- OVERALL TOTAL                                                                          $3,584.96 
+ Name                                                     Monthly Qty  Unit        Monthly Cost   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_ebs_optimized                                                       
+ └─ aws_launch_configuration.lc_ebs_optimized                                                     
+    ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)        1,460  hours            $486.18   
+    ├─ EBS-optimized usage                                      1,460  hours             $29.20   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                       16  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_ebs_optimized                                                       
+ └─ aws_launch_template.lt_ebs_optimized                                                          
+    ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)        1,460  hours            $486.18   
+    └─ EBS-optimized usage                                      1,460  hours             $29.20   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_usage                                                               
+ └─ aws_launch_configuration.lc_usage                                                             
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        4,380  hours            $203.23   
+    ├─ EC2 detailed monitoring                                     42  metrics           $12.60   
+    ├─ root_block_device                                                                          
+    │  └─ Storage (general purpose SSD, gp2)                       60  GB                 $6.00   
+    └─ ebs_block_device[0]                                                                        
+       └─ Storage (general purpose SSD, gp2)                       60  GB                 $6.00   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_usage                                                               
+ └─ aws_launch_template.lt_usage                                                                  
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        4,380  hours            $203.23   
+    └─ block_device_mapping[0]                                                                    
+       └─ Storage (general purpose SSD, gp2)                       60  GB                 $6.00   
+                                                                                                  
+ aws_autoscaling_group.asg_mixed_instance_basic                                                   
+ └─ aws_launch_template.lt_mixed_instance_basic                                                   
+    └─ Instance usage (Linux/UNIX, on-demand, t2.large)         2,190  hours            $203.23   
+                                                                                                  
+ aws_autoscaling_group.asg_mixed_instance_dynamic                                                 
+ └─ aws_launch_template.lt_mixed_instance_dynamic                                                 
+    └─ Instance usage (Linux/UNIX, on-demand, t2.large)         2,190  hours            $203.23   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_cpu_credits                                                         
+ └─ aws_launch_template.lt_cpu_credits                                                            
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.large)         1,460  hours            $121.47   
+    └─ CPU credits                                              1,400  vCPU-hours        $70.00   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_cpu_credits_noUsage                                                 
+ └─ aws_launch_template.lt_cpu_credits_noUsage                                                    
+    └─ Instance usage (Linux/UNIX, on-demand, t3.large)         1,460  hours            $121.47   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_tenancy_dedicated                                                   
+ └─ aws_launch_configuration.lc_tenancy_dedicated                                                 
+    ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)        1,460  hours            $108.04   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                       16  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_tenancy_dedicated                                                   
+ └─ aws_launch_template.lt_tenancy_dedicated                                                      
+    └─ Instance usage (Linux/UNIX, on-demand, m3.medium)        1,460  hours            $108.04   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_cpu_credits                                                         
+ └─ aws_launch_configuration.lc_cpu_credits                                                       
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)        1,460  hours             $60.74   
+    ├─ CPU credits                                                800  vCPU-hours        $40.00   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                       16  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_basic                                                               
+ └─ aws_launch_template.lt_basic                                                                  
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    ├─ block_device_mapping[0]                                                                    
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    └─ block_device_mapping[1]                                                                    
+       ├─ Storage (provisioned IOPS SSD, io1)                      40  GB                 $5.00   
+       └─ Provisioned IOPS                                        400  IOPS              $26.00   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_min_size                                                            
+ └─ aws_launch_template.lt_basic                                                                  
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    ├─ block_device_mapping[0]                                                                    
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    └─ block_device_mapping[1]                                                                    
+       ├─ Storage (provisioned IOPS SSD, io1)                      40  GB                 $5.00   
+       └─ Provisioned IOPS                                        400  IOPS              $26.00   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_basic                                                               
+ └─ aws_launch_configuration.lc_basic                                                             
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    ├─ EC2 detailed monitoring                                     14  metrics            $4.20   
+    ├─ root_block_device                                                                          
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    ├─ ebs_block_device[0]                                                                        
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    └─ ebs_block_device[1]                                                                        
+       └─ Storage (general purpose SSD, gp3)                       20  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_min_size                                                            
+ └─ aws_launch_configuration.lc_basic                                                             
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    ├─ EC2 detailed monitoring                                     14  metrics            $4.20   
+    ├─ root_block_device                                                                          
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    ├─ ebs_block_device[0]                                                                        
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    └─ ebs_block_device[1]                                                                        
+       └─ Storage (general purpose SSD, gp3)                       20  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_min_size_name_ref                                                   
+ └─ aws_launch_configuration.lc_basic                                                             
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    ├─ EC2 detailed monitoring                                     14  metrics            $4.20   
+    ├─ root_block_device                                                                          
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    ├─ ebs_block_device[0]                                                                        
+    │  └─ Storage (general purpose SSD, gp2)                       20  GB                 $2.00   
+    └─ ebs_block_device[1]                                                                        
+       └─ Storage (general purpose SSD, gp3)                       20  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.test_count[1]                                                              
+ └─ aws_launch_configuration.test_count[1]                                                        
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    ├─ EC2 detailed monitoring                                     14  metrics            $4.20   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                       16  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_monitoring                                                          
+ └─ aws_launch_template.lt_monitoring                                                             
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)        1,460  hours             $67.74   
+    └─ EC2 detailed monitoring                                     14  metrics            $4.20   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_cpu_credits_noUsage                                                 
+ └─ aws_launch_configuration.lc_cpu_credits_noUsage                                               
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)        1,460  hours             $60.74   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                       16  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lt_min_size_zero                                                       
+ └─ aws_launch_template.lt_basic                                                                  
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)          730  hours             $33.87   
+    ├─ block_device_mapping[0]                                                                    
+    │  └─ Storage (general purpose SSD, gp2)                       10  GB                 $1.00   
+    └─ block_device_mapping[1]                                                                    
+       ├─ Storage (provisioned IOPS SSD, io1)                      20  GB                 $2.50   
+       └─ Provisioned IOPS                                        200  IOPS              $13.00   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_windows                                                             
+ └─ aws_launch_configuration.lc_windows                                                           
+    ├─ Instance usage (Windows, on-demand, t3.medium)             730  hours             $43.80   
+    ├─ EC2 detailed monitoring                                      7  metrics            $2.10   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                        8  GB                 $0.80   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_min_size_zero                                                       
+ └─ aws_launch_configuration.lc_basic                                                             
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)          730  hours             $33.87   
+    ├─ EC2 detailed monitoring                                      7  metrics            $2.10   
+    ├─ root_block_device                                                                          
+    │  └─ Storage (general purpose SSD, gp2)                       10  GB                 $1.00   
+    ├─ ebs_block_device[0]                                                                        
+    │  └─ Storage (general purpose SSD, gp2)                       10  GB                 $1.00   
+    └─ ebs_block_device[1]                                                                        
+       └─ Storage (general purpose SSD, gp3)                       10  GB                 $0.80   
+                                                                                                  
+ aws_autoscaling_group.test_count[0]                                                              
+ └─ aws_launch_configuration.test_count[0]                                                        
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)         1,460  hours             $16.94   
+    ├─ EC2 detailed monitoring                                     14  metrics            $4.20   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                       16  GB                 $1.60   
+                                                                                                  
+ aws_autoscaling_group.asg_lc_reserved                                                            
+ └─ aws_launch_configuration.lc_reserved                                                          
+    ├─ Instance usage (Linux/UNIX, reserved, t3.medium)           730  hours             $19.05   
+    ├─ EC2 detailed monitoring                                      7  metrics            $2.10   
+    └─ root_block_device                                                                          
+       └─ Storage (general purpose SSD, gp2)                        8  GB                 $0.80   
+                                                                                                  
+ module.asg-lt.aws_autoscaling_group.this[0]                                                      
+ └─ module.asg-lt.aws_launch_template.this[0]                                                     
+    ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)           730  hours              $7.59   
+    ├─ EC2 detailed monitoring                                      7  metrics            $2.10   
+    └─ block_device_mapping[0]                                                                    
+       └─ Storage (general purpose SSD, gp2)                       10  GB                 $1.00   
+                                                                                                  
+ OVERALL TOTAL                                                                       $3,342.02 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-53 cloud resources were detected:
-∙ 28 were estimated
-∙ 23 were free
+51 cloud resources were detected:
+∙ 27 were estimated
+∙ 22 were free
 ∙ 2 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 2 x aws_autoscaling_group
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $3,585 ┃           - ┃     $3,585 ┃
+┃ main                                               ┃        $3,342 ┃           - ┃     $3,342 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 

@@ -12,5 +12,7 @@ func TestAzureRMCDNEndpoint(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "cdn_endpoint_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "cdn_endpoint_test", &tftest.GoldenFileOptions{
+		IgnoreCLI: true, // the creation of new CDN resources is no longer permitted
+	})
 }

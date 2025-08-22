@@ -1,0 +1,7 @@
+└── apps
+    ├── bar (terraform)
+    ├── envs
+    │   ├── dev.tfvars
+    │   ├── prod.tfvars
+    │   └── shared.tfvars
+    └── foo (terraform)

@@ -1,0 +1,5 @@
+version: 0.1
+
+projects:
+  - name: us
+    path: "./testdata/diff_with_compare_to_with_past_project_error_terragrunt/us"

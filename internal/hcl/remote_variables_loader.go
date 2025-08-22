@@ -379,7 +379,8 @@ type SpaceliftRemoteVariableLoader struct {
 	Client   client.Client
 	Metadata vcs.Metadata
 
-	cache *sync.Map
+	cache  *sync.Map
+	hitMap *sync.Map
 }
 
 // NewSpaceliftRemoteVariableLoader creates a new SpaceliftRemoteVariableLoader, this function
@@ -396,6 +397,7 @@ func NewSpaceliftRemoteVariableLoader(metadata vcs.Metadata, apiKeyEndpoint, api
 		Client:   client.New(httpClient, session),
 		Metadata: metadata,
 		cache:    &sync.Map{},
+		hitMap:   &sync.Map{},
 	}, nil
 }
 
@@ -428,7 +430,7 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 	if options.Environment != "" {
 		var filteredStacks []stack
 		for _, stack := range stacks {
-			if strings.HasSuffix(stack.Name, fmt.Sprintf(":%s", options.Environment)) {
+			if strings.HasSuffix(stack.Name, fmt.Sprintf(":%s", options.Environment)) || strings.HasPrefix(stack.Name, fmt.Sprintf("%s/", options.Environment)) {
 				filteredStacks = append(filteredStacks, stack)
 			}
 		}
@@ -444,8 +446,16 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 		logging.Logger.Warn().Msgf("found multiple Spacelift stacks for module path %q with environment %q, skipping Spacelift remote variable loading", options.ModulePath, options.Environment)
 		return nil, nil
 	}
+	stack := stacks[0]
+	prevOptions, hit := s.hitMap.Load(stack.ID)
+	if hit {
+		logging.Logger.Debug().Msgf("spacelift stack %q already used for options %+v will not load remote variables", stack.ID, prevOptions)
+		return nil, nil
+	}
 
-	logging.Logger.Debug().Msgf("found Spacelift stack %q for module path %q with environment: %q", stacks[0].Name, options.ModulePath, options.Environment)
+	s.hitMap.Store(stack.ID, options)
+
+	logging.Logger.Debug().Msgf("found Spacelift stack %q for module path %q with environment: %q", stack.Name, options.ModulePath, options.Environment)
 
 	vars := map[string]cty.Value{}
 

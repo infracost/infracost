@@ -61,7 +61,7 @@
                 }
               ],
               "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 89,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 67
@@ -135,10 +135,12 @@
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
+              "ebs_block_device[0].DefaultNotOverride": "defaultnotoverride",
+              "ebs_block_device[0].DefaultOverride": "defaultoverride",
               "ebs_block_device[0].foo": "ebd",
-              "root_block_device.foo": "rbd",
-              "volume_tags.DefaultNotOverride": "defaultnotoverride",
-              "volume_tags.DefaultOverride": "defaultoverride"
+              "root_block_device.DefaultNotOverride": "defaultnotoverride",
+              "root_block_device.DefaultOverride": "defaultoverride",
+              "root_block_device.foo": "rbd"
             },
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride",
@@ -156,7 +158,7 @@
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 203,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 182
@@ -352,7 +354,7 @@
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 103,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 91
@@ -698,7 +700,7 @@
                 }
               ],
               "checksum": "3971020356e35708e0de7df3decdd615468f858c38205a99249dd4aa4e3ccf23",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 89,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 67
@@ -772,10 +774,12 @@
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride",
+              "ebs_block_device[0].DefaultNotOverride": "defaultnotoverride",
+              "ebs_block_device[0].DefaultOverride": "defaultoverride",
               "ebs_block_device[0].foo": "ebd",
-              "root_block_device.foo": "rbd",
-              "volume_tags.DefaultNotOverride": "defaultnotoverride",
-              "volume_tags.DefaultOverride": "defaultoverride"
+              "root_block_device.DefaultNotOverride": "defaultnotoverride",
+              "root_block_device.DefaultOverride": "defaultoverride",
+              "root_block_device.foo": "rbd"
             },
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride",
@@ -793,7 +797,7 @@
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 203,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 182
@@ -989,7 +993,7 @@
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
-              "defaultTagsChecksum": "4758f4f6da3f45b86f7b9d481e2181b234a33f98aca49d98ff65d4f8bc77f24c",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 103,
               "filename": "REPLACED_PROJECT_PATH/testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 91

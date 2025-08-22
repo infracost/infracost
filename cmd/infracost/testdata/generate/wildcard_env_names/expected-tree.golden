@@ -1,0 +1,11 @@
+└── terraform (terraform)
+    └── env
+        ├── conf-dev-foo.tfvars
+        ├── conf-prod-foo.tfvars
+        ├── dev.tfvars
+        ├── ops-dev.tfvars
+        ├── ops-prod-bar.tfvars
+        ├── ops-prod-foo.tfvars
+        ├── other-uat.tfvars
+        ├── uk-uat.tfvars
+        └── us-uat.tfvars

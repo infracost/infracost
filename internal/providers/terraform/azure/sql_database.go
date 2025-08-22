@@ -107,6 +107,7 @@ func newSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 		ReadReplicaCount:  readReplicas,
 		ZoneRedundant:     d.Get("zone_redundant").Bool(),
 		BackupStorageType: "Geo",
+		IsDevTest:         d.ProjectMetadata["isProduction"] == "false",
 	}
 	return r
 }

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/open-policy-agent/opa/ast"
-	"github.com/open-policy-agent/opa/rego"
+	"github.com/open-policy-agent/opa/ast"  //nolint:staticcheck // we need to use this deprecated package to support parsing of rego policies
+	"github.com/open-policy-agent/opa/rego" //nolint:staticcheck // we need to use this deprecated package to support parsing of rego policies
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"

@@ -10,10 +10,10 @@ import (
 	"text/template"
 
 	jsoniter "github.com/json-iterator/go"
-	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
 	"gopkg.in/yaml.v2"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 )
 
@@ -50,36 +50,39 @@ type Parser struct {
 	repoDir   string
 	template  *template.Template
 	variables Variables
+	config    *config.Config
 }
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
 // Parser functions and sets the underlying default template name. Default variables can be passed to the parser which
 // will be passed to the template on execution.
-func NewParser(repoDir string, variables Variables) *Parser {
+func NewParser(repoDir string, variables Variables, config *config.Config) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
-	p := Parser{repoDir: absRepoDir, variables: variables}
+	p := Parser{repoDir: absRepoDir, variables: variables, config: config}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
-		"base":       p.base,
-		"stem":       p.stem,
-		"ext":        p.ext,
-		"lower":      p.lower,
-		"startsWith": p.startsWith,
-		"endsWith":   p.endsWith,
-		"contains":   p.contains,
-		"splitList":  p.splitList,
-		"trimPrefix": p.trimPrefix,
-		"trimSuffix": p.trimSuffix,
-		"replace":    p.replace,
-		"quote":      p.quote,
-		"squote":     p.squote,
-		"pathExists": p.pathExists,
-		"matchPaths": p.matchPaths,
-		"list":       p.list,
-		"relPath":    p.relPath,
-		"isDir":      p.isDir,
-		"readFile":   p.readFile,
-		"parseJson":  p.parseJson,
-		"parseYaml":  p.parseYaml,
+		"base":         p.base,
+		"stem":         p.stem,
+		"ext":          p.ext,
+		"lower":        p.lower,
+		"startsWith":   p.startsWith,
+		"endsWith":     p.endsWith,
+		"contains":     p.contains,
+		"splitList":    p.splitList,
+		"join":         p.join,
+		"trimPrefix":   p.trimPrefix,
+		"trimSuffix":   p.trimSuffix,
+		"replace":      p.replace,
+		"quote":        p.quote,
+		"squote":       p.squote,
+		"pathExists":   p.pathExists,
+		"matchPaths":   p.matchPaths,
+		"list":         p.list,
+		"relPath":      p.relPath,
+		"isDir":        p.isDir,
+		"readFile":     p.readFile,
+		"parseJson":    p.parseJson,
+		"parseYaml":    p.parseYaml,
+		"isProduction": p.isProduction,
 	})
 	p.template = t
 
@@ -172,6 +175,11 @@ func (p *Parser) splitList(sep, s string) []string {
 	return strings.Split(s, sep)
 }
 
+// join joins the list of strings l into a single string separated by sep.
+func (p *Parser) join(sep string, l []string) string {
+	return strings.Join(l, sep)
+}
+
 // trimPrefix returns s without the provided prefix string.
 func (p *Parser) trimPrefix(s, prefix string) string {
 	return strings.TrimPrefix(s, prefix)
@@ -220,30 +228,19 @@ func (p *Parser) pathExists(base, path string) bool {
 	// Ensure the base path is within the repo directory
 	baseAbs, _ := filepath.Abs(base)
 	repoDirAbs, _ := filepath.Abs(p.repoDir)
+
 	// Add a file separator at the end to ensure we don't match a directory that starts with the same prefix
 	// e.g. `/path/to/infracost` shouldn't match `/path/to/infra`.
 	if !strings.HasPrefix(fmt.Sprintf("%s%s", baseAbs, string(filepath.Separator)), fmt.Sprintf("%s%s", repoDirAbs, string(filepath.Separator))) {
 		return false
 	}
 
-	var fileExists bool
-	_ = filepath.WalkDir(base, func(subpath string, d fs.DirEntry, err error) error {
-		if err != nil {
-			return err
-		}
+	targetPath := filepath.Join(base, path)
+	if _, err := os.Stat(targetPath); err == nil {
+		return true
+	}
 
-		rel, _ := filepath.Rel(base, subpath)
-		if rel == path {
-			fileExists = true
-
-			// exit the WalkDir tree evaluation early as we've found the file we're looking for
-			return errors.New("file found")
-		}
-
-		return nil
-	})
-
-	return fileExists
+	return false
 }
 
 // matchPaths returns a list of matches that in the project directory tree that match the pattern.
@@ -378,6 +375,11 @@ func (p *Parser) parseJson(contents string) map[string]interface{} {
 	}
 
 	return out
+}
+
+// isProduction returns true if the project is production.
+func (p *Parser) isProduction(value string) bool {
+	return p.config.IsProduction(value)
 }
 
 func isSubdirectory(base, target string) bool {

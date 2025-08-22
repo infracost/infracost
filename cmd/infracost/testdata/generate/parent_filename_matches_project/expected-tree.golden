@@ -1,0 +1,10 @@
+└── infra
+    ├── baz.tfvars
+    └── foo.tfvars
+    └── components
+        ├── bar.tfvars
+        ├── defaults.tfvars
+        └── foo.tfvars
+        ├── bar (terraform)
+        ├── baz (terraform)
+        └── foo (terraform)

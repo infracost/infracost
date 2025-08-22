@@ -2,17 +2,17 @@
  Name                                                     Monthly Qty  Unit                  Monthly Cost (CNY)    
                                                                                                                    
  aws_lambda_function.lambda_china_with_usage                                                                       
- └─ Requests                                                      0.1  1M requests                      0.02 元  * 
+ └─ Requests                                                      0.1  1M requests                      0.14 元  * 
                                                                                                                    
  aws_lambda_function.lambda_china_with_usage_arm                                                                   
- └─ Requests                                                      0.1  1M requests                      0.02 元  * 
+ └─ Requests                                                      0.1  1M requests                      0.14 元  * 
                                                                                                                    
  aws_lambda_function.lambda_china                                                                                  
- ├─ Requests                                      Monthly cost depends on usage: 0.19 元 per 1M requests           
- ├─ Ephemeral storage                             Monthly cost depends on usage: 0.0000000316 元 per GB-seconds    
- └─ Duration                                      Monthly cost depends on usage: 0.0000155804 元 per GB-seconds    
+ ├─ Requests                                      Monthly cost depends on usage: 1.36 元 per 1M requests           
+ ├─ Ephemeral storage                             Monthly cost depends on usage: 0.0000002303 元 per GB-seconds    
+ └─ Duration                                      Monthly cost depends on usage: 0.000113477 元 per GB-seconds     
                                                                                                                    
- OVERALL TOTAL (CNY)                                                                                     0.04 元 
+ OVERALL TOTAL (CNY)                                                                                     0.27 元 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -23,5 +23,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       0.00 元 ┃     0.04 元 ┃    0.04 元 ┃
+┃ main                                               ┃       0.00 元 ┃     0.27 元 ┃    0.27 元 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

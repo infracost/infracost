@@ -4,7 +4,9 @@ projects:
   - path: .infra/bat
     name: .infra-bat
     skip_autodetect: true
+    terraform_workspace: infra-bat
   - path: .infra/baz
     name: .infra-baz
     skip_autodetect: true
+    terraform_workspace: infra-baz
 

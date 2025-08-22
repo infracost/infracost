@@ -173,6 +173,9 @@ resource_type_default_usage:
     monthly_hours: 22 # Monthly number of hours the Glue crawler ran for.
   aws_glue_job:
     monthly_hours: 22 # Monthly number of hours the Glue job ran for.
+  aws_grafana_workspace:
+    editors_administrator_licenses: 1 # Number of editor/administrator licenses.
+    viewer_licenses: 2 # Number of viewer licenses.
   aws_kinesis_analytics_application:
     kinesis_processing_units: 0.105 # Number of Kinesis processing units.
     durable_application_backup_gb: 416 # Total amount of durable application backup in GB.
@@ -947,6 +950,8 @@ resource_type_default_usage:
     snapshot_storage_gb: 37 # Snapshot storage for unacknowledged messages in GB.
   google_pubsub_topic:
     monthly_message_data_tb: 0.25 # Monthly amount of message data published to the topic in TB.
+  google_redis_cluster:
+    backup_storage_gb: 123 # Amount of backup storage in GB.
   google_secret_manager_secret:
     active_secret_versions: 166 # Number of active secret versions in each month. NOTE: this is used only when secret versions are not defined.
     monthly_access_operations: 3333333 # Monthly number of access operations

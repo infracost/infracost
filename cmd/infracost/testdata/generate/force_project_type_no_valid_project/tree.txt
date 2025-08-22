@@ -1,0 +1,6 @@
+.
+└── dup
+    ├── terragrunt.hcl
+    ├── blank.tf
+    ├── prod.tfvars
+    └── dev.tfvars

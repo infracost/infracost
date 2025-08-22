@@ -1,0 +1,12 @@
+└── apps
+    ├── default.tfvars
+    ├── dev.tfvars
+    └── prod.tfvars
+    ├── .hidden (terraform)
+    ├── bar (terraform)
+    ├── bat (terraform)
+    ├── baz (terraform)
+    ├── foo (terraform)
+    └── wildcard
+        ├── one (terraform)
+        └── two (terraform)

@@ -58,7 +58,7 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(fmt.Sprintf("CPU Allocation Time (Jobs) in %s", r.Region))},
+					{Key: "description", Value: strPtr(fmt.Sprintf("Jobs CPU in %s", r.Region))},
 				},
 			},
 		},
@@ -73,7 +73,7 @@ func (r *CloudRunV2Job) BuildResource() *schema.Resource {
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr(fmt.Sprintf("Memory Allocation Time (Jobs) in %s", r.Region))},
+					{Key: "description", Value: strPtr(fmt.Sprintf("Jobs Memory in %s", r.Region))},
 				},
 			},
 		},

@@ -6,6 +6,7 @@ projects:
     terraform_var_files:
       - ../../variables/envs/dev/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - infra/components/foo/**
       - infra/variables/envs/dev/dev.tfvars
@@ -14,6 +15,7 @@ projects:
     terraform_var_files:
       - ../../variables/envs/prod/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - infra/components/foo/**
       - infra/variables/envs/prod/prod.tfvars
@@ -24,6 +26,7 @@ projects:
       - ../../../variables/envs/dev/dev.tfvars
       - ../../variables/envs/dev/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - infra/nested/components/baz/**
       - infra/nested/variables/envs/defaults.tfvars
@@ -35,6 +38,7 @@ projects:
       - ../../variables/envs/defaults.tfvars
       - ../../../variables/envs/prod/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - infra/nested/components/baz/**
       - infra/nested/variables/envs/defaults.tfvars
@@ -45,6 +49,7 @@ projects:
       - ../../variables/envs/defaults.tfvars
       - ../../variables/envs/stag/stag.tfvars
     skip_autodetect: true
+    terraform_workspace: stag
     dependency_paths:
       - infra/nested/components/baz/**
       - infra/nested/variables/envs/defaults.tfvars

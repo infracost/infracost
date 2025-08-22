@@ -28,6 +28,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	s += "──────────────────────────────────\n"
 	for _, project := range out.Projects {
+
 		if project.Metadata.HasErrors() && !project.Metadata.IsEmptyProjectError() {
 			erroredProjects = append(erroredProjects, project)
 			continue
@@ -49,8 +50,13 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		sortResources(project.Diff.Resources, "")
 
 		for _, diffResource := range project.Diff.Resources {
-			oldResource := findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
-			newResource := findResourceByName(project.Breakdown.Resources, diffResource.Name)
+			var oldResource, newResource *Resource
+			if project.PastBreakdown != nil {
+				oldResource = findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
+			}
+			if project.Breakdown != nil {
+				newResource = findResourceByName(project.Breakdown.Resources, diffResource.Name)
+			}
 
 			s += resourceToDiff(out.Currency, diffResource, oldResource, newResource, true)
 			s += "\n"
@@ -188,12 +194,21 @@ func tableForDiff(out Root, opts Options) string {
 			continue
 		}
 
+		var pastTotalMonthlyBaseline *decimal.Decimal
+		var pastTotalMonthlyUsageCost *decimal.Decimal
+		var pastTotalMonthlyCost *decimal.Decimal
+		if project.PastBreakdown != nil {
+			pastTotalMonthlyBaseline = project.PastBreakdown.TotalMonthlyBaselineCost()
+			pastTotalMonthlyUsageCost = project.PastBreakdown.TotalMonthlyUsageCost
+			pastTotalMonthlyCost = project.PastBreakdown.TotalMonthlyCost
+		}
+
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true, false),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true, !usageCostsEnabled(out)),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false, false),
+				formatMarkdownCostChange(out.Currency, pastTotalMonthlyBaseline, project.Breakdown.TotalMonthlyBaselineCost(), false, true, false),
+				formatMarkdownCostChange(out.Currency, pastTotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true, !usageCostsEnabled(out)),
+				formatMarkdownCostChange(out.Currency, pastTotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false, false),
 			},
 		)
 

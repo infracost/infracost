@@ -1,23 +1,18 @@
 
  Name                                           Monthly Qty  Unit              Monthly Cost    
                                                                                                
- azurerm_mysql_flexible_server.non_usage_gp                                                    
- ├─ Compute (GP_Standard_D16ds_v4)                      730  hours                $1,138.80    
- ├─ Storage                                              20  GB                       $2.76    
- └─ Additional backup storage                Monthly cost depends on usage: $0.095 per GB      
-                                                                                               
  azurerm_mysql_flexible_server.mo                                                              
- ├─ Compute (MO_Standard_E4ds_v4)                       730  hours                  $382.52    
+ ├─ Compute (MO_Standard_E4ds_v4)                       730  hours                  $382.81    
  ├─ Storage                                              20  GB                       $2.76    
  ├─ Additional IOPS                                     140  IOPS                     $8.40    
  └─ Additional backup storage                         3,000  GB                     $285.00  * 
                                                                                                
  azurerm_mysql_flexible_server.gp                                                              
- ├─ Compute (GP_Standard_D4ds_v4)                       730  hours                  $284.70    
+ ├─ Compute (GP_Standard_D2ads_v5)                      730  hours                  $142.35    
  ├─ Storage                                              20  GB                       $2.76    
  └─ Additional backup storage                         2,000  GB                     $190.00  * 
                                                                                                
- azurerm_mysql_flexible_server.gp_dXads                                                        
+ azurerm_mysql_flexible_server.non_usage_gp                                                    
  ├─ Compute (GP_Standard_D2ads_v5)                      730  hours                  $142.35    
  ├─ Storage                                              20  GB                       $2.76    
  └─ Additional backup storage                Monthly cost depends on usage: $0.095 per GB      
@@ -27,17 +22,17 @@
  ├─ Storage                                              30  GB                       $4.14    
  └─ Additional backup storage                         1,000  GB                      $95.00  * 
                                                                                                
- OVERALL TOTAL                                                                    $2,558.01 
+ OVERALL TOTAL                                                                    $1,274.39 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-6 cloud resources were detected:
-∙ 5 were estimated
+5 cloud resources were detected:
+∙ 4 were estimated
 ∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $1,988 ┃        $570 ┃     $2,558 ┃
+┃ main                                               ┃          $704 ┃        $570 ┃     $1,274 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

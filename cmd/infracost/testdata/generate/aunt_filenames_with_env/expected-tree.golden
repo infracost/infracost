@@ -1,0 +1,23 @@
+├── components
+│   ├── age (terraform)
+│   ├── airflow (terraform)
+│   └── apm-events (terraform)
+└── variables
+    └── default.tfvars
+    ├── cko-dev
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   ├── apm-events.tfvars
+    │   └── dev.tfvars
+    ├── cko-mgmt
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   └── apm-events.tfvars
+    ├── cko-playground
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   └── apm-events.tfvars
+    └── cko-prod
+        ├── age.tfvars
+        ├── airflow.tfvars
+        └── apm-events.tfvars

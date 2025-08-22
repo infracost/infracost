@@ -4,13 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/infracost/infracost/internal/util"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/infracost/infracost/internal/util"
 
 	"github.com/hashicorp/go-retryablehttp"
 	goversion "github.com/hashicorp/go-version"
@@ -52,9 +54,10 @@ type RegistryURL struct {
 // discovery rules. It caches the results by hostname to avoid repeated requests for the same information.
 // Therefore, it is advisable to use Disco per project and pass it to all required clients.
 type Disco struct {
-	disco      *disco.Disco
-	logger     zerolog.Logger
-	httpClient *retryablehttp.Client
+	disco           *disco.Disco
+	logger          zerolog.Logger
+	httpClient      *retryablehttp.Client
+	proxyHttpClient *retryablehttp.Client
 
 	locks sync.Map
 }
@@ -62,7 +65,23 @@ type Disco struct {
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
 func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *Disco {
-	return &Disco{disco: disco.NewWithCredentialsSource(credentialsSource), logger: logger, httpClient: newRetryableClient()}
+
+	innerDisco := disco.NewWithCredentialsSource(credentialsSource)
+
+	if proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxyURL != "" {
+		innerDisco.Transport = &ConditionalTransport{
+			ProxyHosts: []string{"terraform.io"},
+			ProxyURL:   proxyURL,
+			Inner:      innerDisco.Transport,
+		}
+	}
+
+	return &Disco{
+		disco:           innerDisco,
+		logger:          logger,
+		httpClient:      newRetryableClient(""),
+		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
+	}
 }
 
 // ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
@@ -92,6 +111,9 @@ func (d *Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 	if err != nil {
 		return RegistryURL{}, false, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
 	}
+	if !strings.HasSuffix(serviceURL.Path, "/") {
+		serviceURL.Path += "/"
+	}
 
 	r := RegistryURL{
 		Host:      host,
@@ -118,6 +140,9 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	if err != nil {
 		return "", fmt.Errorf("unable to discover registry service using host %s %w", moduleURL.Host, err)
 	}
+	if !strings.HasSuffix(serviceURL.Path, "/") {
+		serviceURL.Path += "/"
+	}
 
 	var u *url.URL
 	if version == "" {
@@ -136,7 +161,15 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	req, _ := http.NewRequest("GET", downloadURL.String(), nil)
 	moduleURL.Credentials.PrepareRequest(req)
 	retryReq, _ := retryablehttp.FromRequest(req)
-	resp, err := d.httpClient.Do(retryReq)
+
+	var client *retryablehttp.Client
+	if moduleURL.Host == defaultRegistryHost || strings.HasSuffix(moduleURL.Host, ".terraform.io") {
+		client = d.proxyHttpClient
+	} else {
+		client = d.httpClient
+	}
+
+	resp, err := client.Do(retryReq)
 
 	if err != nil {
 		return "", fmt.Errorf("error fetching download URL '%s': %w", util.RedactUrl(downloadURL.String()), err)
@@ -162,27 +195,36 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	return location, nil
 }
 
-func newRetryableClient() *retryablehttp.Client {
+func newRetryableClient(proxyURL string) *retryablehttp.Client {
 	httpClient := retryablehttp.NewClient()
 	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+	if proxyURL != "" {
+		if parsed, err := url.Parse(proxyURL); err == nil {
+			httpClient.HTTPClient.Transport = &http.Transport{
+				Proxy: http.ProxyURL(parsed),
+			}
+		}
+	}
 	return httpClient
 }
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
 type RegistryLoader struct {
-	packageFetcher *PackageFetcher
-	disco          *Disco
-	logger         zerolog.Logger
-	httpClient     *retryablehttp.Client
+	packageFetcher  *PackageFetcher
+	disco           *Disco
+	logger          zerolog.Logger
+	httpClient      *retryablehttp.Client
+	proxyHttpClient *retryablehttp.Client
 }
 
 // NewRegistryLoader constructs a registry loader
 func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zerolog.Logger) *RegistryLoader {
 	return &RegistryLoader{
-		packageFetcher: packageFetcher,
-		disco:          disco,
-		logger:         logger,
-		httpClient:     newRetryableClient(),
+		packageFetcher:  packageFetcher,
+		disco:           disco,
+		logger:          logger,
+		httpClient:      newRetryableClient(""),
+		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
 	}
 }
 
@@ -237,8 +279,13 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL RegistryURL) ([]string, e
 	moduleURL.Credentials.PrepareRequest(req)
 	retryReq, _ := retryablehttp.FromRequest(req)
 
-	resp, err := r.httpClient.Do(retryReq)
-
+	var client *retryablehttp.Client
+	if moduleURL.Host == defaultRegistryHost || strings.HasSuffix(moduleURL.Host, ".terraform.io") {
+		client = r.proxyHttpClient
+	} else {
+		client = r.httpClient
+	}
+	resp, err := client.Do(retryReq)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch registry module versions: %w", err)
 	}

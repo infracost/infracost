@@ -1,0 +1,8 @@
+├── .
+│   └── default.tfvars
+├── db
+│   ├── dev (terraform)
+│   └── prod (terraform)
+└── envs
+    ├── dev.tfvars
+    └── prod.tfvars

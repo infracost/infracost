@@ -1,0 +1,6 @@
+└── apps
+    └── foo (terraform)
+        └── envs
+            ├── default.tfvars
+            ├── dev.eu-west-1.tfvars
+            └── staging.eu-west-1.tfvars

@@ -7,12 +7,17 @@
  └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
                                                                                                              
  azurerm_postgresql_flexible_server.mo                                                                       
- ├─ Compute (MO_Standard_E4s_v3)                                      730  hours                  $382.52    
+ ├─ Compute (MO_Standard_E4s_v3)                                      730  hours                  $382.81    
  ├─ Storage                                                            64  GB                       $8.83    
  └─ Additional backup storage                                       5,000  GB                     $475.00  * 
                                                                                                              
  azurerm_postgresql_flexible_server.gp                                                                       
  ├─ Compute (GP_Standard_D4s_v3)                                      730  hours                  $284.70    
+ ├─ Storage                                                            32  GB                       $4.42    
+ └─ Additional backup storage                                       5,000  GB                     $475.00  * 
+                                                                                                             
+ azurerm_postgresql_flexible_server.high_availability                                                        
+ ├─ Compute (GP_Standard_D2ads_v5)                                    730  hours                  $148.19    
  ├─ Storage                                                            32  GB                       $4.42    
  └─ Additional backup storage                                       5,000  GB                     $475.00  * 
                                                                                                              
@@ -36,17 +41,17 @@
  ├─ Storage                                                Monthly cost depends on usage: $0.12 per GB       
  └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
                                                                                                              
- OVERALL TOTAL                                                                                  $3,584.74 
+ OVERALL TOTAL                                                                                  $4,212.63 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-8 cloud resources were detected:
-∙ 7 were estimated
+9 cloud resources were detected:
+∙ 8 were estimated
 ∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $2,160 ┃      $1,425 ┃     $3,585 ┃
+┃ main                                               ┃        $2,313 ┃      $1,900 ┃     $4,213 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

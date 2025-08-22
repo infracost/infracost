@@ -13,3 +13,6 @@ projects:
   - path: .
     name: ext({{ ext $project._path }})
 {{- end }}
+{{ $splitAndJoin := "name/of/project" | splitList "/" | join "-" }}
+  - path: .
+    name: {{ $splitAndJoin }}

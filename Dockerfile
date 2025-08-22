@@ -1,4 +1,4 @@
-FROM golang:1.22 as builder
+FROM golang:1.24 AS builder
 
 ARG ARCH=linux
 ARG DEFAULT_TERRAFORM_VERSION=0.15.5
@@ -6,8 +6,8 @@ ARG TERRAGRUNT_VERSION=0.31.8
 
 # Set Environment Variables
 SHELL ["/bin/bash", "-c"]
-ENV HOME /app
-ENV CGO_ENABLED 0
+ENV HOME=/app
+ENV CGO_ENABLED=0
 
 # Install Packages
 RUN apt-get update -q && apt-get -y install unzip
@@ -44,7 +44,7 @@ RUN NO_DIRTY=true make build
 RUN chmod +x /app/build/infracost
 
 # Application
-FROM alpine:3.16 as app
+FROM alpine:3.16 AS app
 # Tools needed for running diffs in CI integrations
 RUN apk --no-cache add ca-certificates openssl openssh-client curl git bash
 

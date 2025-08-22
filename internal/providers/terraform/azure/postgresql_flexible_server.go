@@ -53,14 +53,23 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 		}
 	}
 
+	// Check if high availability is enabled
+	highAvailability := false
+	if ha := d.Get("high_availability"); ha.Exists() {
+		if mode := ha.Get("mode"); mode.Exists() && mode.String() != "" {
+			highAvailability = true
+		}
+	}
+
 	r := &azure.PostgreSQLFlexibleServer{
-		Address:         d.Address,
-		Region:          region,
-		SKU:             sku,
-		Tier:            tier,
-		InstanceType:    size,
-		InstanceVersion: version,
-		Storage:         storage,
+		Address:          d.Address,
+		Region:           region,
+		SKU:              sku,
+		Tier:             tier,
+		InstanceType:     size,
+		InstanceVersion:  version,
+		Storage:          storage,
+		HighAvailability: highAvailability,
 	}
 	return r
 }

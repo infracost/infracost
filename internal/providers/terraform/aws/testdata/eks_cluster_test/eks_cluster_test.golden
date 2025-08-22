@@ -20,12 +20,12 @@
  └─ EKS cluster (extended support)                 730  hours       $438.00   
                                                                               
  aws_eks_cluster.extended_support["1.29"]                                     
- └─ EKS cluster                                    730  hours        $73.00   
+ └─ EKS cluster (extended support)                 730  hours       $438.00   
                                                                               
  aws_eks_cluster.my_aws_eks_cluster                                           
  └─ EKS cluster                                    730  hours        $73.00   
                                                                               
- OVERALL TOTAL                                                   $2,774.00 
+ OVERALL TOTAL                                                   $3,139.00 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -36,5 +36,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $2,774 ┃           - ┃     $2,774 ┃
+┃ main                                               ┃        $3,139 ┃           - ┃     $3,139 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

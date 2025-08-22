@@ -13,7 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-type parseTagFunc func(baseTags map[string]string, r *schema.ResourceData)
+type parseTagFunc func(baseTags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig)
 
 var tagProviders = map[string]parseTagFunc{
 	"aws_instance":          parseInstanceTags,
@@ -21,7 +21,7 @@ var tagProviders = map[string]parseTagFunc{
 	"aws_launch_template":   parseLaunchTemplateTags,
 }
 
-func parseLaunchTemplateTags(tags map[string]string, r *schema.ResourceData) {
+func parseLaunchTemplateTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
 	for _, s := range r.Get("tag_specifications").Array() {
 		for k, v := range s.Get("tags").Map() {
 			tags[fmt.Sprintf("tag_specifications.%s", k)] = v.String()
@@ -103,7 +103,36 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	tagsAllMissing := schema.ExtractMissingVarsCausingMissingAttributeKeys(r, "tags_all")
 	missing = append(missing, tagsAllMissing...)
 
-	rTags := r.Get("tags").Map()
+	rTagBlock := r.Get("tags")
+	var rTags map[string]gjson.Result
+
+	// If the tags attribute is a list, we need to handle it differently - this is the case with AutoScalingGroups
+	// where the tags are a slice of objects with details about propagation. When it is a list, we should parse it as such
+	switch t := rTagBlock.Value().(type) {
+	case []interface{}:
+		rTags = make(map[string]gjson.Result, len(t))
+		for _, el := range t {
+			tag, ok := el.(map[string]interface{})
+			if !ok {
+				// This should never happen, but if it does, we should skip it
+				continue
+			}
+			k, ok := tag["key"].(string)
+			if !ok {
+				// the key was forgotten, so we should skip it
+				continue
+			}
+			v, ok := tag["value"].(string)
+			if !ok {
+				// the value was forgotten, so we should skip it
+				continue
+			}
+			rTags[k] = gjson.Parse(fmt.Sprintf(`"%s"`, v))
+		}
+	default:
+		rTags = rTagBlock.Map()
+	}
+
 	rTagsAll := r.Get("tags_all").Map()
 	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil, missing
@@ -111,27 +140,12 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 
 	tags := make(map[string]string)
 
-	if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
-		for k, v := range defaultTags {
-			k = fmt.Sprintf("volume_tags.%s", k)
-			tags[k] = v
-		}
-	}
-
 	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[r.Type]
 	if supportsDefaultTags && defaultTags != nil {
 		keysAndValues := make([]string, 0, len(defaultTags)*2)
 		for k, v := range defaultTags {
 			tags[k] = v
 			keysAndValues = append(keysAndValues, k, v)
-		}
-
-		if r.Type == "aws_instance" && config.PropagateDefaultsToVolumeTags {
-			for k, v := range defaultTags {
-				k = fmt.Sprintf("volume_tags.%s", k)
-				tags[k] = v
-				keysAndValues = append(keysAndValues, k, v)
-			}
 		}
 
 		sort.Strings(keysAndValues)
@@ -178,13 +192,13 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	}
 
 	if f, ok := tagProviders[r.Type]; ok {
-		f(tags, r)
+		f(tags, defaultTags, r, config)
 	}
 
 	return tags, missing
 }
 
-func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {
+func parseAutoScalingTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
 	referencedTagSpecifications(r, func(resourceType string, specs map[string]gjson.Result) {
 		if resourceType == "instance" {
 			for k, v := range specs {
@@ -194,7 +208,28 @@ func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {
 	})
 }
 
-func parseInstanceTags(tags map[string]string, r *schema.ResourceData) {
+func parseInstanceTags(tags, defaultTags map[string]string, r *schema.ResourceData, config TagParsingConfig) {
+	if config.PropagateDefaultsToVolumeTags && len(defaultTags) > 0 {
+		// when propagating default tags, we add them to volume_tags if they already exist
+		// otherwise they are propogated to directly to the block devices.
+
+		if r.Get("volume_tags").Exists() {
+			for k, v := range defaultTags {
+				tags[fmt.Sprintf("volume_tags.%s", k)] = v
+			}
+		} else {
+			// a root_block_device is assumed even if not explicitly defined
+			for k, v := range defaultTags {
+				tags[fmt.Sprintf("root_block_device.%s", k)] = v
+			}
+			for i := range r.Get("ebs_block_device").Array() {
+				for k, v := range defaultTags {
+					tags[fmt.Sprintf("ebs_block_device[%d].%s", i, k)] = v
+				}
+			}
+		}
+	}
+
 	if rbd := r.Get("root_block_device"); rbd.Exists() {
 		for k, v := range rbd.Get("0.tags").Map() {
 			tags[fmt.Sprintf("root_block_device.%s", k)] = v.String()

@@ -22,6 +22,7 @@ func NewVirtualMachineScaleSet(d *schema.ResourceData) schema.CoreResource {
 		SKUName:     d.Get("sku.0.name").String(),
 		SKUCapacity: d.Get("sku.0.capacity").Int(),
 		LicenseType: d.Get("license_type").String(),
+		IsDevTest:   d.ProjectMetadata["isProduction"] == "false",
 	}
 
 	if !d.IsEmpty("os_profile_windows_config") {

@@ -2,8 +2,8 @@
  Name                               Monthly Qty  Unit               Monthly Cost (CNY)   
                                                                                          
  aws_rds_cluster.mysql_china                                                             
- ├─ Storage                   Monthly cost depends on usage: 0.091991 元 per GB          
- ├─ I/O requests              Monthly cost depends on usage: 0.18 元 per 1M requests     
+ ├─ Storage                   Monthly cost depends on usage: 0.67 元 per GB              
+ ├─ I/O requests              Monthly cost depends on usage: 1.33 元 per 1M requests     
  ├─ Backup storage            not found                                                  
  └─ Snapshot export           not found                                                  
                                                                                          

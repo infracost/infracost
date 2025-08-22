@@ -18,6 +18,7 @@ func NewAppServicePlan(d *schema.ResourceData) schema.CoreResource {
 		SKUSize:     d.Get("sku.0.size").String(),
 		SKUCapacity: d.Get("sku.0.capacity").Int(),
 		Kind:        d.Get("kind").String(),
+		IsDevTest:   d.ProjectMetadata["isProduction"] == "false",
 	}
 	return r
 }

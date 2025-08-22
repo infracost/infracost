@@ -1,0 +1,6 @@
+└── apps (terraform)
+    ├── bar (terraform)
+    ├── envs
+    │   ├── dev.tfvars
+    │   └── prod.tfvars
+    └── foo (terraform)

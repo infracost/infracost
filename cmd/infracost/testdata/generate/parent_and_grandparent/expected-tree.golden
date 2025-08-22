@@ -1,0 +1,16 @@
+└── apps
+    ├── default.tfvars
+    ├── dev.tfvars
+    └── prod.tfvars
+    ├── bar
+    │   ├── default.tfvars
+    │   ├── dev.tfvars
+    │   └── prod.tfvars
+    │   ├── us1 (terraform)
+    │   └── us2 (terraform)
+    └── foo
+        ├── default.tfvars
+        ├── dev.tfvars
+        └── prod.tfvars
+        ├── us1 (terraform)
+        └── us2 (terraform)

@@ -7,6 +7,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - infra/apps/bar/us1/**
       - infra/envs/default.tfvars
@@ -17,6 +18,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - infra/apps/bar/us1/**
       - infra/envs/default.tfvars
@@ -27,6 +29,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - infra/apps/bar/us2/**
       - infra/envs/default.tfvars
@@ -37,6 +40,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - infra/apps/bar/us2/**
       - infra/envs/default.tfvars
@@ -47,6 +51,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - infra/apps/foo/us1/**
       - infra/envs/default.tfvars
@@ -57,6 +62,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - infra/apps/foo/us1/**
       - infra/envs/default.tfvars
@@ -67,6 +73,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - infra/apps/foo/us2/**
       - infra/envs/default.tfvars
@@ -77,6 +84,7 @@ projects:
       - ../../../envs/default.tfvars
       - ../../../envs/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - infra/apps/foo/us2/**
       - infra/envs/default.tfvars

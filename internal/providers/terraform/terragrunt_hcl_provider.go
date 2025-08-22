@@ -32,7 +32,6 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/infracost/infracost/internal/metrics"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -40,12 +39,12 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
-	"github.com/infracost/infracost/internal/hcl/mock"
-
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/hcl/mock"
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/metrics"
 	"github.com/infracost/infracost/internal/schema"
 	infSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
@@ -55,6 +54,10 @@ var (
 	// terragruntSourceLock is the global lock which works across TerragrunHCLProviders to provide
 	// concurrency safe downloading.
 	terragruntSourceLock = infSync.KeyMutex{}
+
+	// terragruntWorkingDirLock is the global lock which works across TerragrunHCLProviders to provide
+	// concurrency safe downloading.
+	terragruntWorkingDirLock = infSync.KeyMutex{}
 
 	// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
 	// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
@@ -124,7 +127,7 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 	var remoteCache modules.RemoteCache
 	runCtx := ctx.RunContext
 	if runCtx.Config.S3ModuleCacheRegion != "" && runCtx.Config.S3ModuleCacheBucket != "" {
-		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix)
+		s3ModuleCache, err := modules.NewS3Cache(runCtx.Config.S3ModuleCacheRegion, runCtx.Config.S3ModuleCacheBucket, runCtx.Config.S3ModuleCachePrefix, runCtx.Config.S3ModuleCachePrivate)
 		if err != nil {
 			logger.Warn().Msgf("failed to initialize S3 module cache: %s", err)
 		} else {
@@ -133,9 +136,12 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 	}
 
 	fetcher := modules.NewPackageFetcher(remoteCache, logger, modules.WithGetters(map[string]getter.Getter{
-		"tfr":  &tgterraform.RegistryGetter{},
+		"tfr": &tgterraform.RegistryGetter{
+			ProxyForDomains: []string{".terraform.io"},
+			ProxyURL:        os.Getenv("INFRACOST_REGISTRY_PROXY"),
+		},
 		"file": &tgcliterraform.FileCopyGetter{},
-	}))
+	}), modules.WithPublicModuleChecker(modules.NewHttpPublicModuleChecker()))
 
 	return &TerragruntHCLProvider{
 		ctx:            ctx,
@@ -260,14 +266,9 @@ type terragruntWorkingDirInfo struct {
 	evaluatedOutputs cty.Value
 }
 
-func (i *terragruntWorkingDirInfo) addWarning(pd *schema.ProjectDiag) {
-	i.warnings = append(i.warnings, pd)
-}
-
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
 // process each with an HCLProvider.
 func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-
 	loadResourcesTimer := metrics.GetTimer("terragrunt.LoadResources", false, p.ctx.ProjectConfig.Path).Start()
 	defer loadResourcesTimer.Stop()
 
@@ -634,6 +635,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		}
 	}
 
+	unlock := terragruntWorkingDirLock.Lock(info.workingDir)
+	defer unlock()
+
 	if err = generateConfig(terragruntConfig, opts, info.workingDir); err != nil {
 		info.error = err
 		return
@@ -678,15 +682,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	}
 
 	mod := h.Module()
-	if mod.Error != nil {
-		path := ""
-		if mod.Module != nil {
-			path = mod.Module.RootPath
-		}
-		info.addWarning(schema.NewDiagTerragruntModuleEvaluationFailure(mod.Error))
-		p.logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
-	}
-
+	info.error = mod.Error
 	info.provider = h
 	info.evaluatedOutputs = mod.Module.Blocks.Outputs(true)
 	return info
@@ -803,7 +799,7 @@ func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return false
 	}
 
-	newUrl, err := modules.TransformSSHToHttps(u)
+	newUrl, err := modules.NormalizeGitURLToHTTPS(u)
 	if err != nil {
 		return false
 	}

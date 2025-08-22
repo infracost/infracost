@@ -7,6 +7,7 @@ projects:
       - variables/envs/defaults.tfvars
       - variables/envs/dev/dev.tfvars
     skip_autodetect: true
+    terraform_workspace: dev
     dependency_paths:
       - "**"
       - variables/envs/defaults.tfvars
@@ -17,6 +18,7 @@ projects:
       - variables/envs/defaults.tfvars
       - variables/envs/prod/prod.tfvars
     skip_autodetect: true
+    terraform_workspace: prod
     dependency_paths:
       - "**"
       - variables/envs/defaults.tfvars

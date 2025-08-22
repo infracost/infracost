@@ -64,6 +64,11 @@ func Load(p string) (Root, error) {
 			p.Metadata = &schema.ProjectMetadata{}
 			out.Projects[i] = p
 		}
+
+		if p.PastBreakdown == nil {
+			p.PastBreakdown = &Breakdown{}
+			out.Projects[i] = p
+		}
 	}
 
 	return out, nil

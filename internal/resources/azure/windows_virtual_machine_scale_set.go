@@ -14,6 +14,7 @@ type WindowsVirtualMachineScaleSet struct {
 	SKU                                   string
 	LicenseType                           string
 	AdditionalCapabilitiesUltraSSDEnabled bool
+	IsDevTest                             bool
 	OSDiskData                            *ManagedDiskData
 	Instances                             *int64       `infracost_usage:"instances"`
 	OSDisk                                *OSDiskUsage `infracost_usage:"os_disk"`
@@ -44,7 +45,7 @@ func (r *WindowsVirtualMachineScaleSet) BuildResource() *schema.Resource {
 	instanceType := r.SKU
 	licenseType := r.LicenseType
 
-	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil)}
+	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil, r.IsDevTest)}
 
 	if r.AdditionalCapabilitiesUltraSSDEnabled {
 		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
@@ -56,9 +57,12 @@ func (r *WindowsVirtualMachineScaleSet) BuildResource() *schema.Resource {
 	if r.OSDisk != nil && r.OSDisk.MonthlyDiskOperations != nil {
 		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(*r.OSDisk.MonthlyDiskOperations))
 	}
-	osDisk := osDiskSubResource(region, r.OSDiskData.DiskType, r.OSDiskData.DiskSizeGB, r.OSDiskData.DiskIOPSReadWrite, r.OSDiskData.DiskMBPSReadWrite, monthlyDiskOperations)
-	if osDisk != nil {
-		subResources = append(subResources, osDisk)
+
+	if r.OSDiskData != nil {
+		osDisk := osDiskSubResource(region, r.OSDiskData.DiskType, r.OSDiskData.DiskSizeGB, r.OSDiskData.DiskIOPSReadWrite, r.OSDiskData.DiskMBPSReadWrite, monthlyDiskOperations)
+		if osDisk != nil {
+			subResources = append(subResources, osDisk)
+		}
 	}
 
 	instanceCount := decimal.NewFromInt(*r.Instances)

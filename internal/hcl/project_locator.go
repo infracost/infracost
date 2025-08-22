@@ -578,6 +578,99 @@ func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher, preferFolderNameFor
 	})
 }
 
+// PrintTree prints a simplified tree of the detected projects and var files
+// similar to a linux tree command.
+func (t *TreeNode) PrintTree() string {
+	var sb strings.Builder
+	t.printTreeWithPrefix(&sb, "", true)
+	return sb.String()
+}
+
+// printTreeWithPrefix is a helper function that recursively prints the tree structure
+func (t *TreeNode) printTreeWithPrefix(sb *strings.Builder, prefix string, isLast bool) {
+	// Skip the root node as it's just a container
+	if t.Name != "root" {
+		if isLast {
+			sb.WriteString(prefix + "└── ")
+		} else {
+			sb.WriteString(prefix + "├── ")
+		}
+
+		sb.WriteString(t.Name)
+		if t.RootPath != nil {
+			if t.RootPath.IsTerragrunt {
+				sb.WriteString(" (terragrunt")
+			} else {
+				sb.WriteString(" (terraform")
+			}
+
+			if t.RootPath.IsParentTerragruntConfig {
+				sb.WriteString(", parent")
+			}
+			sb.WriteString(")")
+
+			if len(t.RootPath.TerraformVarFiles) > 0 {
+				t.printVarFiles(t.RootPath.TerraformVarFiles, sb, prefix, isLast)
+			}
+		}
+
+		if t.TerraformVarFiles != nil {
+			t.printVarFiles(t.TerraformVarFiles.Files, sb, prefix, isLast)
+		}
+		sb.WriteString("\n")
+	}
+
+	newPrefix := prefix
+	if t.Name != "root" {
+		if isLast {
+			newPrefix += "    "
+		} else {
+			newPrefix += "│   "
+		}
+	}
+
+	// Sort children alphabetically
+	sortedChildren := make([]*TreeNode, len(t.Children))
+	copy(sortedChildren, t.Children)
+	sort.Slice(sortedChildren, func(i, j int) bool {
+		return sortedChildren[i].Name < sortedChildren[j].Name
+	})
+
+	for i, child := range sortedChildren {
+		child.printTreeWithPrefix(sb, newPrefix, i == len(sortedChildren)-1)
+	}
+}
+
+func (t *TreeNode) printVarFiles(files []RootPathVarFile, sb *strings.Builder, prefix string, isLast bool) {
+	sb.WriteString("\n")
+	sortedFiles := make([]RootPathVarFile, len(files))
+	copy(sortedFiles, files)
+
+	sort.Slice(sortedFiles, func(i, j int) bool {
+		return sortedFiles[i].Name < sortedFiles[j].Name
+	})
+
+	for i, f := range sortedFiles {
+		lastVarFile := i == len(sortedFiles)-1
+
+		varFilePrefix := prefix + "│   "
+		if isLast {
+			varFilePrefix = prefix + "    "
+		}
+
+		suffix := "\n"
+
+		if lastVarFile {
+			suffix = ""
+			sb.WriteString(varFilePrefix + "└── ")
+		} else {
+			sb.WriteString(varFilePrefix + "├── ")
+		}
+
+		sb.WriteString(f.Name + suffix)
+	}
+}
+
 // AddPath adds a path to the tree, this will create any missing nodes in the tree.
 func (t *TreeNode) AddPath(path RootPath) {
 	dir, _ := filepath.Rel(path.StartingPath, path.DetectedPath)
@@ -1194,7 +1287,7 @@ func (r *RootPath) AddVarFiles(v *VarFiles) {
 // FindRootModules returns a list of all directories that contain a full
 // Terraform project under the given fullPath. This list excludes any Terraform
 // modules that have been found (if they have been called by a Module source).
-func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
+func (p *ProjectLocator) FindRootModules(startingPath string) ([]RootPath, string) {
 	p.basePath, _ = filepath.Abs(startingPath)
 	p.modules = make(map[string]struct{})
 	p.projectDuplicates = make(map[string]bool)
@@ -1224,7 +1317,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 				IsTerragrunt:      p.wdContainsTerragrunt,
 				TerraformVarFiles: p.discoveredVarFiles[startingPath],
 			},
-		}
+		}, ""
 	}
 
 	p.findTerragruntDirs(startingPath)
@@ -1279,6 +1372,8 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 	}
 
 	node := CreateTreeNode(startingPath, projects, p.discoveredVarFiles, p.envMatcher, p.preferFolderNameForEnv)
+	tree := node.PrintTree()
+
 	node.AssociateChildVarFiles()
 	node.AssociateSiblingVarFiles()
 	node.AssociateParentVarFiles()
@@ -1301,7 +1396,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 		return paths[i].DetectedPath < paths[j].DetectedPath
 	})
 
-	return paths
+	return paths, tree
 }
 
 // excludeEnvFromPaths filters car files from the paths based on the path overrides.
@@ -1372,16 +1467,17 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 		return false
 	}
 
-	if force {
-		return true
-	}
-
 	if p.shouldIncludeDir(dir.path) {
 		return true
 	}
 
 	if p.shouldRemoveDuplicateProject(dir) {
+		p.logger.Debug().Msgf("skipping directory %s as it has been flagged as a duplicate project", dir.path)
 		return false
+	}
+
+	if force {
+		return true
 	}
 
 	// we only include Terraform projects that have been found alongside Terragrunt
@@ -1393,6 +1489,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	// infer that the Terraform projects are not modules.
 	isForcedDupDir := p.projectDuplicates[dir.path] && p.forceProjectType != ""
 	if !isForcedDupDir && p.wdContainsTerragrunt && !dir.isTerragrunt {
+		p.logger.Debug().Msgf("skipping directory %s as we are within a Terragrunt workspace and the project is not a Terragrunt project", dir.path)
 		return false
 	}
 
@@ -1411,6 +1508,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	}
 
 	if !dir.hasRootModuleBlocks() && !dir.isTerragrunt {
+		p.logger.Debug().Msgf("skipping directory %s as it does not have a root module block and is not a Terragrunt project", dir.path)
 		return false
 	}
 

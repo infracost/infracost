@@ -33,7 +33,6 @@ var (
 
 type PricingAPIClient struct {
 	APIClient
-	Currency       string
 	EventsDisabled bool
 
 	cacheFile string
@@ -96,11 +95,6 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		return nil
 	}
 
-	currency := ctx.Config.Currency
-	if currency == "" {
-		currency = "USD"
-	}
-
 	tlsConfig := tls.Config{} // nolint: gosec
 
 	if ctx.Config.TLSCACertFile != "" {
@@ -141,7 +135,6 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 			apiKey:     ctx.Config.APIKey,
 			uuid:       ctx.UUID(),
 		},
-		Currency:       currency,
 		EventsDisabled: ctx.Config.EventsDisabled,
 	}
 
@@ -254,7 +247,11 @@ func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) err
 	return err
 }
 
-func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {
+func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter, currency string) GraphQLQuery {
+	if currency == "" {
+		currency = "USD"
+	}
+
 	v := map[string]interface{}{}
 	v["productFilter"] = product
 	v["priceFilter"] = price
@@ -268,14 +265,14 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 				}
 			}
 		}
-	`, c.Currency)
+	`, currency)
 
 	return GraphQLQuery{query, v}
 }
 
 // BatchRequests batches all the queries for these resources so we can use less GraphQL requests
 // Use PriceQueryKeys to keep track of which query maps to which sub-resource and price component.
-func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize int) []BatchRequest {
+func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize int, currency string) []BatchRequest {
 	reqs := make([]BatchRequest, 0)
 
 	keys := make([]PriceQueryKey, 0)
@@ -284,13 +281,13 @@ func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize
 	for _, r := range resources {
 		for _, component := range r.CostComponents {
 			keys = append(keys, PriceQueryKey{r, component})
-			queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter))
+			queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter, currency))
 		}
 
 		for _, subresource := range r.FlattenedSubResources() {
 			for _, component := range subresource.CostComponents {
 				keys = append(keys, PriceQueryKey{subresource, component})
-				queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter))
+				queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter, currency))
 			}
 		}
 	}
