@@ -68,6 +68,7 @@ type cloudfrontDistributionShieldRequestsUsage struct {
 	SouthKorea   *int64 `infracost_usage:"south_korea"`
 	Indonesia    *int64 `infracost_usage:"indonesia"`
 	India        *int64 `infracost_usage:"india"`
+	MiddleEast   *int64 `infracost_usage:"middle_east"`
 }
 
 func (r *CloudfrontDistribution) CoreType() string {
@@ -139,6 +140,7 @@ var cloudfrontDistributionShieldRequestsSchema = []*schema.UsageItem{
 	{Key: "singapore", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "south_korea", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "india", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "middle_east", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 func (r *CloudfrontDistribution) PopulateUsage(u *schema.UsageData) {
@@ -437,6 +439,7 @@ func (r *CloudfrontDistribution) httpsRequestsCostComponents(regionData *cloudfr
 	return costComponents
 }
 
+// See https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html#choose-origin-shield-region for the list of regions that are supported for Origin Shield.
 var regionShieldMapping = map[string]string{
 	"us-gov-west-1":   "us",
 	"us-gov-east-1":   "us",
@@ -445,23 +448,23 @@ var regionShieldMapping = map[string]string{
 	"us-west-1":       "us",
 	"us-west-2":       "us",
 	"us-west-2-lax-1": "us",
+	"ca-central-1":    "us",
+	"ap-south-1":      "india",
+	"me-south-1":      "india",
+	"ap-northeast-1":  "japan",
+	"ap-northeast-2":  "south_korea",
+	"ap-southeast-1":  "singapore",
+	"ap-east-1":       "singapore",
+	"ap-southeast-2":  "australia",
 	"eu-central-1":    "europe",
 	"eu-west-1":       "europe",
 	"eu-west-2":       "europe",
 	"eu-south-1":      "europe",
 	"eu-west-3":       "europe",
 	"eu-north-1":      "europe",
-	"il-central-1":    "europe",
-	"ap-northeast-1":  "japan",
-	"ap-northeast-2":  "south_korea",
-	"ap-southeast-1":  "singapore",
-	"ap-southeast-2":  "australia",
-	"ap-southeast-3":  "indonesia",
-	"ap-southeast-4":  "australia",
-	"ap-southeast-5":  "malaysia",
-	"ap-south-1":      "india",
-	"ap-south-2":      "india",
+	"af-south-1":      "europe",
 	"sa-east-1":       "south_america",
+	"me-central-1":    "middle_east",
 }
 
 func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostComponent {
@@ -505,6 +508,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 		"south_korea":   r.MonthlyShieldRequests.SouthKorea,
 		"indonesia":     r.MonthlyShieldRequests.Indonesia,
 		"india":         r.MonthlyShieldRequests.India,
+		"middle_east":   r.MonthlyShieldRequests.MiddleEast,
 	}
 
 	var quantity *decimal.Decimal

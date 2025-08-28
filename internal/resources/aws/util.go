@@ -117,6 +117,7 @@ var RegionMapping = map[string]string{
 	"us-west-2-lax-1": "US West (Los Angeles)",
 	"ca-central-1":    "Canada (Central)",
 	"ca-west-1":       "Canada West (Calgary)",
+	"mx-central-1":    "Mexico (Central)",
 	"cn-north-1":      "China (Beijing)",
 	"cn-northwest-1":  "China (Ningxia)",
 	"eu-central-1":    "EU (Frankfurt)",
@@ -129,6 +130,7 @@ var RegionMapping = map[string]string{
 	"eu-north-1":      "EU (Stockholm)",
 	"il-central-1":    "Israel (Tel Aviv)",
 	"ap-east-1":       "Asia Pacific (Hong Kong)",
+	"ap-east-2":       "Asia Pacific (Taipei)",
 	"ap-northeast-1":  "Asia Pacific (Tokyo)",
 	"ap-northeast-2":  "Asia Pacific (Seoul)",
 	"ap-northeast-3":  "Asia Pacific (Osaka)",
@@ -137,6 +139,7 @@ var RegionMapping = map[string]string{
 	"ap-southeast-3":  "Asia Pacific (Jakarta)",
 	"ap-southeast-4":  "Asia Pacific (Melbourne)",
 	"ap-southeast-5":  "Asia Pacific (Malaysia)",
+	"ap-southeast-7":  "Asia Pacific (Thailand)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
 	"ap-south-2":      "Asia Pacific (Hyderabad)",
 	"me-central-1":    "Middle East (UAE)",
@@ -179,13 +182,16 @@ type RegionsUsage struct {
 	CNNorth1     *float64 `infracost_usage:"cn_north_1"`
 	CNNorthwest1 *float64 `infracost_usage:"cn_northwest_1"`
 	EUCentral1   *float64 `infracost_usage:"eu_central_1"`
+	EUCentral2   *float64 `infracost_usage:"eu_central_2"`
 	EUWest1      *float64 `infracost_usage:"eu_west_1"`
 	EUWest2      *float64 `infracost_usage:"eu_west_2"`
 	EUSouth1     *float64 `infracost_usage:"eu_south_1"`
+	EUSouth2     *float64 `infracost_usage:"eu_south_2"`
 	EUWest3      *float64 `infracost_usage:"eu_west_3"`
 	EUNorth1     *float64 `infracost_usage:"eu_north_1"`
 	ILCentral1   *float64 `infracost_usage:"il_central_1"`
 	APEast1      *float64 `infracost_usage:"ap_east_1"`
+	APEast2      *float64 `infracost_usage:"ap_east_2"`
 	APNortheast1 *float64 `infracost_usage:"ap_northeast_1"`
 	APNortheast2 *float64 `infracost_usage:"ap_northeast_2"`
 	APNortheast3 *float64 `infracost_usage:"ap_northeast_3"`
@@ -194,7 +200,10 @@ type RegionsUsage struct {
 	APSoutheast3 *float64 `infracost_usage:"ap_southeast_3"`
 	APSoutheast4 *float64 `infracost_usage:"ap_southeast_4"`
 	APSoutheast5 *float64 `infracost_usage:"ap_southeast_5"`
+	APSoutheast7 *float64 `infracost_usage:"ap_southeast_7"`
 	APSouth1     *float64 `infracost_usage:"ap_south_1"`
+	APSouth2     *float64 `infracost_usage:"ap_south_2"`
+	MECentral1   *float64 `infracost_usage:"me_central_1"`
 	MESouth1     *float64 `infracost_usage:"me_south_1"`
 	SAEast1      *float64 `infracost_usage:"sa_east_1"`
 	AFSouth1     *float64 `infracost_usage:"af_south_1"`
@@ -249,22 +258,33 @@ var RegionUsageSchema = []*schema.UsageItem{
 	{Key: "us_west_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "us_west_2_lax_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ca_central_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ca_west_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "mx_central_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "cn_north_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "cn_northwest_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "eu_central_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_central_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "eu_west_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "eu_west_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "eu_south_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "eu_south_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "eu_west_3", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "eu_north_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "il_central_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_east_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_east_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_northeast_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_northeast_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_northeast_3", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_southeast_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_southeast_2", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_southeast_3", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_southeast_4", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_southeast_5", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_southeast_7", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "ap_south_1", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "ap_south_2", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "me_central_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "me_south_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "sa_east_1", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "af_south_1", DefaultValue: 0, ValueType: schema.Float64},

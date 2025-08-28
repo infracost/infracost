@@ -32,6 +32,7 @@ var globalAcceleratorRegionDataTransferUsageSchema = []*schema.UsageItem{
 	{Key: "australia", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "asia_pacific", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "india", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "middle_east", DefaultValue: 0, ValueType: schema.Float64},
 }
 var regionCodeMapping = map[string]string{
 	"us-gov-west-1":   "US",
@@ -176,8 +177,8 @@ func (r *GlobalacceleratorEndpointGroup) buildSubresources() []*schema.Resource 
 		{
 			awsGroupedName:                "Middle East",
 			codeRegion:                    "ME",
-			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.SouthKorea,
-			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.SouthKorea,
+			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.MiddleEast,
+			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.MiddleEast,
 		},
 		{
 			awsGroupedName:                "Australia, New Zealand",
