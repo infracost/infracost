@@ -152,7 +152,7 @@ func (r *ContainerCluster) autopilotCPUCostComponent() *schema.CostComponent {
 			Service:       strPtr("Kubernetes Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("^Autopilot Pod mCPU Requests")},
+				{Key: "description", ValueRegex: regexPtr("^Autopilot Pod CPU Requests")},
 			},
 		},
 		UsageBased: true,
