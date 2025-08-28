@@ -117,51 +117,32 @@ Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_sou
 Project: testdata-breakdown_terragrunt_with_remote_source-ref2
 Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_source/ref2
 
- Name                                                                         Monthly Qty  Unit                    Monthly Cost   
-                                                                                                                                  
- module.self_managed_node_group["one"].aws_autoscaling_group.this[0]                                                              
- └─ module.self_managed_node_group["one"].aws_launch_template.this[0]                                                             
-    ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                             1,460  hours                        $140.16   
-    └─ EC2 detailed monitoring                                                         14  metrics                        $4.20   
-                                                                                                                                  
- aws_eks_cluster.this[0]                                                                                                          
- └─ EKS cluster                                                                       730  hours                         $73.00   
-                                                                                                                                  
- module.eks_managed_node_group["blue"].aws_eks_node_group.this[0]                                                                 
- └─ module.eks_managed_node_group["blue"].aws_launch_template.this[0]                                                             
-    ├─ Instance usage (Linux/UNIX, on-demand, m6i.large)                              730  hours                         $70.08   
-    └─ EC2 detailed monitoring                                                          7  metrics                        $2.10   
-                                                                                                                                  
- module.eks_managed_node_group["green"].aws_eks_node_group.this[0]                                                                
- └─ module.eks_managed_node_group["green"].aws_launch_template.this[0]                                                            
-    ├─ Instance usage (Linux/UNIX, on-demand, t3.large)                               730  hours                         $60.74   
-    └─ EC2 detailed monitoring                                                          7  metrics                        $2.10   
-                                                                                                                                  
- module.fargate_profile["default"].aws_eks_fargate_profile.this[0]                                                                
- ├─ Per GB per hour                                                                     1  GB                             $3.24   
- └─ Per vCPU per hour                                                                   1  CPU                           $29.55   
-                                                                                                                                  
- module.kms.aws_kms_key.this[0]                                                                                                   
- ├─ Customer master key                                                                 1  months                         $1.00   
- ├─ Requests                                                            Monthly cost depends on usage: $0.03 per 10k requests     
- ├─ ECC GenerateDataKeyPair requests                                    Monthly cost depends on usage: $0.10 per 10k requests     
- └─ RSA GenerateDataKeyPair requests                                    Monthly cost depends on usage: $0.10 per 10k requests     
-                                                                                                                                  
- aws_cloudwatch_log_group.this[0]                                                                                                 
- ├─ Data ingested                                                       Monthly cost depends on usage: $0.50 per GB               
- ├─ Archival Storage                                                    Monthly cost depends on usage: $0.03 per GB               
- └─ Insights queries data scanned                                       Monthly cost depends on usage: $0.005 per GB              
-                                                                                                                                  
- Project total                                                                                                          $386.17   
+ Name                                       Monthly Qty  Unit                    Monthly Cost   
+                                                                                                
+ aws_eks_cluster.this[0]                                                                        
+ └─ EKS cluster                                     730  hours                         $73.00   
+                                                                                                
+ module.kms.aws_kms_key.this[0]                                                                 
+ ├─ Customer master key                               1  months                         $1.00   
+ ├─ Requests                          Monthly cost depends on usage: $0.03 per 10k requests     
+ ├─ ECC GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests     
+ └─ RSA GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests     
+                                                                                                
+ aws_cloudwatch_log_group.this[0]                                                               
+ ├─ Data ingested                     Monthly cost depends on usage: $0.50 per GB               
+ ├─ Archival Storage                  Monthly cost depends on usage: $0.03 per GB               
+ └─ Insights queries data scanned     Monthly cost depends on usage: $0.005 per GB              
+                                                                                                
+ Project total                                                                         $74.00   
 
- OVERALL TOTAL                                                                                                       $5,290.62 
+ OVERALL TOTAL                                                                     $4,978.45 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-117 cloud resources were detected:
-∙ 21 were estimated
-∙ 95 were free
+95 cloud resources were detected:
+∙ 17 were estimated
+∙ 77 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
@@ -172,7 +153,7 @@ Module path: REPLACED_PROJECT_PATH/testdata/breakdown_terragrunt_with_remote_sou
 ┃ testdata-breakdown_terragrunt_with_remote_source-submod-ref3   ┃        $1,308 ┃           - ┃     $1,308 ┃
 ┃ testdata-breakdown_terragrunt_with_remote_source-ref1          ┃          $386 ┃           - ┃       $386 ┃
 ┃ testdata-breakdown_terragrunt_with_remote_source-ref1-submod   ┃           $33 ┃           - ┃        $33 ┃
-┃ testdata-breakdown_terragrunt_with_remote_source-ref2          ┃          $386 ┃           - ┃       $386 ┃
+┃ testdata-breakdown_terragrunt_with_remote_source-ref2          ┃           $74 ┃           - ┃        $74 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

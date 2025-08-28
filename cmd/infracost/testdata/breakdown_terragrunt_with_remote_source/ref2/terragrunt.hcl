@@ -3,114 +3,42 @@ terraform {
 }
 
 inputs = {
-  cluster_name    = "my-cluster"
-  cluster_version = "1.30"
+  name               = "my-cluster"
+  kubernetes_version = "1.33"
 
-  cluster_endpoint_public_access = true
-
-  cluster_addons = {
-    coredns = {
-      most_recent = true
+  addons = {
+    coredns                = {}
+    eks-pod-identity-agent = {
+      before_compute = true
     }
-    kube-proxy = {
-      most_recent = true
-    }
-    vpc-cni = {
-      most_recent = true
+    kube-proxy             = {}
+    vpc-cni                = {
+      before_compute = true
     }
   }
+
+  # Optional
+  endpoint_public_access = true
+
+  # Optional: Adds the current caller identity as an administrator via cluster access entry
+  enable_cluster_creator_admin_permissions = true
 
   vpc_id                   = "vpc-1234556abcdef"
   subnet_ids               = ["subnet-abcde012", "subnet-bcde012a", "subnet-fghi345a"]
   control_plane_subnet_ids = ["subnet-xyzde987", "subnet-slkjf456", "subnet-qeiru789"]
 
-  # Self Managed Node Group(s)
-  self_managed_node_group_defaults = {
-    instance_type                          = "m6i.large"
-    update_launch_template_default_version = true
-    iam_role_additional_policies           = {
-      AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-    }
-  }
-
-  self_managed_node_groups = {
-    one = {
-      name         = "mixed-1"
-      max_size     = 5
-      desired_size = 2
-
-      use_mixed_instances_policy = true
-      mixed_instances_policy     = {
-        override = [
-          {
-            instance_type     = "m5.large"
-            weighted_capacity = "1"
-          },
-          {
-            instance_type     = "m6i.large"
-            weighted_capacity = "2"
-          },
-        ]
-      }
-    }
-  }
-
   # EKS Managed Node Group(s)
-  eks_managed_node_group_defaults = {
-    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
-  }
-
   eks_managed_node_groups = {
-    blue  = {}
-    green = {
-      min_size     = 1
+    example = {
+      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
+      ami_type       = "AL2023_x86_64_STANDARD"
+      instance_types = ["m5.xlarge"]
+
+      min_size     = 2
       max_size     = 10
-      desired_size = 1
-
-      instance_types = ["t3.large"]
+      desired_size = 2
     }
   }
-
-  # Fargate Profile(s)
-  fargate_profiles = {
-    default = {
-      name      = "default"
-      selectors = [
-        {
-          namespace = "default"
-        }
-      ]
-    }
-  }
-
-  # aws-auth configmap
-  manage_aws_auth_configmap = true
-
-  aws_auth_roles = [
-    {
-      rolearn  = "arn:aws:iam::66666666666:role/role1"
-      username = "role1"
-      groups   = ["system:masters"]
-    },
-  ]
-
-  aws_auth_users = [
-    {
-      userarn  = "arn:aws:iam::66666666666:user/user1"
-      username = "user1"
-      groups   = ["system:masters"]
-    },
-    {
-      userarn  = "arn:aws:iam::66666666666:user/user2"
-      username = "user2"
-      groups   = ["system:masters"]
-    },
-  ]
-
-  aws_auth_accounts = [
-    "777777777777",
-    "888888888888",
-  ]
 
   tags = {
     Environment = "dev"
