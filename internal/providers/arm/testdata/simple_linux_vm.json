@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+      {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2023-09-01",
+        "name": "basic_b1",
+        "location": "francecentral",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "standard_b1s"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "Canonical",
+              "offer": "UbuntuServer",
+              "sku": "16.04-LTSr",
+              "version": "latest"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              }
+            }
+          },
+          "osProfile": {
+            "computerName": "standard_b1s",
+            "adminUsername": "fakeuser",
+            "adminPassword": "Password1234!"
+          }
+        }
+      }
+    ]
+  }
