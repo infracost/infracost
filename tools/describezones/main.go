@@ -167,6 +167,7 @@ func writeOutput(provider string, input []byte) {
 	if err != nil {
 		logging.Logger.Fatal().Msgf("could not create output file: %s", err)
 	}
+	defer f.Close()
 
 	formatted, err := format.Source(input)
 	if err != nil {
