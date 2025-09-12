@@ -130,7 +130,8 @@ func TestS3Bucket(t *testing.T) {
 	}
 
 	args := resources.S3Bucket{
-		Name: "test-bucket",
+		Name:   "test-bucket",
+		Region: "us-east-1",
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
@@ -184,7 +185,8 @@ func TestS3BucketNoFilter(t *testing.T) {
 	}
 
 	args := resources.S3Bucket{
-		Name: "test-bucket",
+		Name:   "test-bucket",
+		Region: "us-east-1",
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
@@ -239,7 +241,8 @@ func TestS3BucketNoStandard(t *testing.T) {
 	}
 
 	args := resources.S3Bucket{
-		Name: "test-bucket",
+		Name:   "test-bucket",
+		Region: "us-east-1",
 	}
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)

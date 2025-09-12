@@ -46,7 +46,16 @@ func DynamoDBGetStorageBytes(ctx context.Context, region string, table string) (
 	if err != nil {
 		return 0, err
 	}
-	return result.Table.TableSizeBytes, nil
+
+	if result.Table == nil {
+		return 0, nil
+	}
+
+	if result.Table.TableSizeBytes == nil {
+		return 0, nil
+	}
+
+	return *result.Table.TableSizeBytes, nil
 }
 
 func DynamoDBGetRRU(ctx context.Context, region string, table string) (float64, error) {
