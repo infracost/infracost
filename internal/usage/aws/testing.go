@@ -9,16 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-type testResolver struct {
-	URL string
-}
-
-func (tr *testResolver) ResolveEndpoint(service, region string, options ...interface{}) (aws.Endpoint, error) {
-	return aws.Endpoint{
-		URL: tr.URL,
-	}, nil
-}
-
 type testCredentials struct {
 }
 
@@ -27,9 +17,8 @@ func (tc *testCredentials) Retrieve(ctx context.Context) (aws.Credentials, error
 }
 
 func WithTestEndpoint(ctx context.Context, url string) context.Context {
-	resolver := &testResolver{URL: url}
 	opts := []func(*config.LoadOptions) error{
-		config.WithEndpointResolverWithOptions(resolver),
+		config.WithBaseEndpoint(url),
 		config.WithCredentialsProvider(&testCredentials{}),
 		// config.WithClientLogMode(aws.LogRequestWithBody | aws.LogResponseWithBody),
 	}

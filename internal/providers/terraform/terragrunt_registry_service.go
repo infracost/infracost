@@ -73,17 +73,9 @@ func (tfrGetter *TerraformRegistryGetter) SetClient(client *getter.Client) {
 	tfrGetter.client = client
 }
 
-// Context returns the go context to use for the underlying fetch routines. This depends on what client is set.
-func (tfrGetter *TerraformRegistryGetter) Context() context.Context {
-	if tfrGetter == nil || tfrGetter.client == nil {
-		return context.Background()
-	}
-	return tfrGetter.client.Ctx
-}
-
 // ClientMode returns the download mode based on the given URL. Since this getter is designed around the Terraform
 // module registry, we always use Dir mode so that we can download the full Terraform module.
-func (tfrGetter *TerraformRegistryGetter) ClientMode(u *url.URL) (getter.ClientMode, error) {
+func (tfrGetter *TerraformRegistryGetter) ClientMode(ctx context.Context, u *url.URL) (getter.ClientMode, error) {
 	return getter.ClientModeDir, nil
 }
 
@@ -91,9 +83,7 @@ func (tfrGetter *TerraformRegistryGetter) ClientMode(u *url.URL) (getter.ClientM
 // This routine assumes that the srcURL points to the Terraform registry URL, with the Path configured to the module
 // path encoded as `:namespace/:name/:system` as expected by the Terraform registry. Note that the URL query parameter
 // must have the `version` key to specify what version to download.
-func (tfrGetter *TerraformRegistryGetter) Get(dstPath string, srcURL *url.URL) error {
-	ctx := tfrGetter.Context()
-
+func (tfrGetter *TerraformRegistryGetter) Get(ctx context.Context, dstPath string, srcURL *url.URL) error {
 	registryDomain := srcURL.Host
 	if registryDomain == "" {
 		registryDomain = defaultRegistryDomain
@@ -139,7 +129,7 @@ func (tfrGetter *TerraformRegistryGetter) Get(dstPath string, srcURL *url.URL) e
 		if tfrGetter.client != nil {
 			opts = tfrGetter.client.Options
 		}
-		return getter.Get(dstPath, source, opts...)
+		return getter.Get(ctx, dstPath, source, opts...)
 	}
 
 	// We have a subdir, time to jump some hoops
@@ -166,7 +156,7 @@ func (tfrGetter *TerraformRegistryGetter) getSubdir(ctx context.Context, dstPath
 		opts = tfrGetter.client.Options
 	}
 	// Download that into the given directory
-	if err := getter.Get(tempdirPath, sourceURL, opts...); err != nil {
+	if err := getter.Get(ctx, tempdirPath, sourceURL, opts...); err != nil {
 		return errors.WithStackTrace(err)
 	}
 
