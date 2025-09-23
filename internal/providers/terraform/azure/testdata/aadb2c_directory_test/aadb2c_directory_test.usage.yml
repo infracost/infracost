@@ -1,0 +1,2 @@
+azurerm_aadb2c_directory.test:
+  monthly_active_users: 60000 
