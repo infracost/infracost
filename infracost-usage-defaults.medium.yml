@@ -778,6 +778,14 @@ resource_type_default_usage:
     monthly_data_retrieval_gb: 1000 # Monthly number of data retrieval in GB.
     snapshots_storage_gb: 440 # Total size of Snapshots in GB
     metadata_at_rest_storage_gb: 335 # Total size of Metadata in GB
+  azurerm_storage_table:
+    monthly_storage_gb: 222 # Monthly amount of storage used in GB.
+    monthly_batch_write_operations: 277777777 # Monthly number of Batch Write operations.
+    monthly_write_operations: 277777777 # Monthly number of Write operations.
+    monthly_read_operations: 277777777 # Monthly number of Read operations.
+    monthly_scan_operations: 277777777 # Monthly number of Scan operations.
+    monthly_list_operations: 277777777 # Monthly number of List operations.
+    monthly_delete_operations: 277777777 # Monthly number of Delete operations.
   azurerm_synapse_sql_pool:
     storage_tb: 0 # Total storage size, including snapshots, in TB.
   #
