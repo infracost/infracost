@@ -14,6 +14,22 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
+func findTerraformDir(startDir string) (string, bool) {
+	dir := startDir
+	for {
+		if IsTerraformDir(dir) {
+			return dir, true
+		}
+		parent := filepath.Dir(dir)
+		// Stop when reaching root or no further parent
+		if parent == dir || parent == "." || parent == "/" {
+			break
+		}
+		dir = parent
+	}
+	return "", false
+}
+
 type PlanProvider struct {
 	*DirProvider
 	Path                 string
@@ -95,29 +111,43 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	if p.cachedPlanJSON != nil {
 		return p.cachedPlanJSON, nil
 	}
+	if p.cachedPlanJSON != nil {
+		logging.Logger.Debug().Msg("Using cached plan JSON")
+		return p.cachedPlanJSON, nil
+	}
 
 	dir := filepath.Dir(p.Path)
 	planPath := filepath.Base(p.Path)
 
 	if !IsTerraformDir(dir) {
-		logging.Logger.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
-		dir, err := os.Getwd()
-		if err != nil {
-			return []byte{}, err
-		}
-		planPath = p.Path
+		logging.Logger.Debug().Msgf("%s is not a Terraform directory; attempting to find a Terraform directory in parent paths", dir)
 
-		if !IsTerraformDir(dir) {
-			m := fmt.Sprintf("%s %s.\n%s\n\n%s\n%s\n%s %s",
-				"Could not detect Terraform directory for",
-				p.Path,
-				"Either the current working directory or the plan file's parent directory must be a Terraform directory.",
-				"If the above does not work you can generate the plan JSON file with:",
-				ui.PrimaryString("terraform show -json tfplan.binary > plan.json"),
-				"and then run Infracost with",
-				ui.PrimaryString("--path=plan.json"),
-			)
-			return []byte{}, clierror.NewCLIError(errors.New(m), "Could not detect Terraform directory for plan file")
+		// Try parent directories of the plan file path.
+		if parentDir, ok := findTerraformDir(dir); ok {
+			logging.Logger.Debug().Msgf("Found Terraform directory in parent path: %s", parentDir)
+			dir = parentDir
+		} else {
+			// Fallback to current working directory (original behaviour)
+			cwd, err := os.Getwd()
+			if err != nil {
+				return []byte{}, err
+			}
+			logging.Logger.Debug().Msgf("Checking current working directory: %s", cwd)
+			planPath = p.Path
+			if !IsTerraformDir(cwd) {
+				m := fmt.Sprintf("%s %s.\n%s\n\n%s\n%s\n%s %s\n\n%s",
+					"Could not detect Terraform directory for",
+					p.Path,
+					"Either the current working directory, the plan file's parent directory, or one of its parent directories must be a Terraform directory.",
+					"If the above does not work you can generate the plan JSON file with:",
+					ui.PrimaryString("terraform show -json tfplan.binary > plan.json"),
+					"and then run Infracost with",
+					ui.PrimaryString("--path=plan.json"),
+					"Hint: Ensure the path points to a directory containing Terraform config files (e.g., *.tf) or a plan JSON file.",
+				)
+				return []byte{}, clierror.NewCLIError(errors.New(m), "Could not detect Terraform directory for plan file")
+			}
+			dir = cwd
 		}
 	}
 
