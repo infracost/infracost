@@ -81,6 +81,12 @@ var awsZones = map[string]cty.Value{
 		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("apse5-az1"), cty.StringVal("apse5-az2"), cty.StringVal("apse5-az3")}),
 		"group_names": cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-5"), cty.StringVal("ap-southeast-5"), cty.StringVal("ap-southeast-5")}),
 	}),
+	"ap-southeast-6": cty.ObjectVal(map[string]cty.Value{
+		"id":          cty.StringVal("ap-southeast-6"),
+		"names":       cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-6a"), cty.StringVal("ap-southeast-6b"), cty.StringVal("ap-southeast-6c")}),
+		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("apse6-az1"), cty.StringVal("apse6-az2"), cty.StringVal("apse6-az3")}),
+		"group_names": cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-6"), cty.StringVal("ap-southeast-6"), cty.StringVal("ap-southeast-6")}),
+	}),
 	"ap-southeast-7": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("ap-southeast-7"),
 		"names":       cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-7a"), cty.StringVal("ap-southeast-7b"), cty.StringVal("ap-southeast-7c")}),
