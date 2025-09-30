@@ -456,6 +456,7 @@ var regionShieldMapping = map[string]string{
 	"ap-southeast-1":  "singapore",
 	"ap-east-1":       "singapore",
 	"ap-southeast-2":  "australia",
+	"ap-southeast-6":  "australia",
 	"eu-central-1":    "europe",
 	"eu-west-1":       "europe",
 	"eu-west-2":       "europe",

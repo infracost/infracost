@@ -64,6 +64,7 @@ var regionCodeMapping = map[string]string{
 	"ap-southeast-3":  "AP",
 	"ap-southeast-4":  "AP",
 	"ap-southeast-5":  "AP",
+	"ap-southeast-6":  "AP",
 	"ap-southeast-7":  "AP",
 	"ap-south-1":      "AP",
 	"ap-south-2":      "AP",
