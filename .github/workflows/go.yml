@@ -27,7 +27,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6.1.1
         with:
-          version: latest
+          version: v2.4.0
           args: --timeout 5m
 
       - name: Install Terragrunt v0.31.8
