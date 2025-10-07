@@ -1,6 +1,6 @@
 module github.com/infracost/infracost
 
-go 1.24.6
+go 1.25.1
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect

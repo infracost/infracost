@@ -23,9 +23,7 @@ import (
 	"github.com/gruntwork-io/terragrunt/codegen"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
 	tgconfigstack "github.com/gruntwork-io/terragrunt/configstack"
-	"github.com/gruntwork-io/terragrunt/options"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
-	tfsource "github.com/gruntwork-io/terragrunt/terraform"
 	tgterraform "github.com/gruntwork-io/terragrunt/terraform"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/hashicorp/go-getter"
@@ -727,7 +725,7 @@ func loadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragr
 		sourceURL = parsedSourceURL.String()
 	}
 
-	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
+	source, err := tgterraform.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
 	if err != nil {
 		return "", err
 	}
@@ -808,7 +806,7 @@ func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 	return err == nil
 }
 
-func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *options.TerragruntOptions, workingDir string) error {
+func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *tgoptions.TerragruntOptions, workingDir string) error {
 	unlock := terragruntSourceLock.Lock(opts.DownloadDir)
 	defer unlock()
 
@@ -1191,7 +1189,7 @@ type terragruntDependency struct {
 
 // Find all the Terraform modules in the folders that contain the given Terragrunt config files and assemble those
 // modules into a Stack object
-func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []string, terragruntOptions *options.TerragruntOptions, howThesePathsWereFound string) (*tgconfigstack.Stack, error) {
+func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []string, terragruntOptions *tgoptions.TerragruntOptions, howThesePathsWereFound string) (*tgconfigstack.Stack, error) {
 	if len(terragruntConfigPaths) == 0 {
 		return nil, tgerrors.WithStackTrace(tgconfigstack.NoTerraformModulesFound)
 	}

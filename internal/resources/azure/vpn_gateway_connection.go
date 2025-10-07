@@ -29,8 +29,8 @@ func (r *VPNGatewayConnection) UsageSchema() []*schema.UsageItem {
 
 // PopulateUsage parses the u schema.UsageData into the VPNGatewayConnection.
 // It uses the `infracost_usage` struct tags to populate data into the VPNGatewayConnection.
-func (v *VPNGatewayConnection) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(v, u)
+func (r *VPNGatewayConnection) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
 // BuildResource builds a schema.Resource from a valid VPNGatewayConnection.
@@ -39,10 +39,10 @@ func (v *VPNGatewayConnection) PopulateUsage(u *schema.UsageData) {
 //
 // This method is called after the resource is initialised by an iac provider.
 // See providers folder for more information.
-func (v *VPNGatewayConnection) BuildResource() *schema.Resource {
+func (r *VPNGatewayConnection) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name:        v.Address,
-		UsageSchema: v.UsageSchema(),
+		Name:        r.Address,
+		UsageSchema: r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "S2S Connections",
@@ -51,7 +51,7 @@ func (v *VPNGatewayConnection) BuildResource() *schema.Resource {
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("azure"),
-					Region:        strPtr(v.Region),
+					Region:        strPtr(r.Region),
 					Service:       strPtr("Virtual WAN"),
 					ProductFamily: strPtr("Networking"),
 					AttributeFilters: []*schema.AttributeFilter{
