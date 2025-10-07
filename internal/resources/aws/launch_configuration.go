@@ -48,54 +48,54 @@ func (r *LaunchConfiguration) UsageSchema() []*schema.UsageItem {
 	return LaunchConfigurationUsageSchema
 }
 
-func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(a, u)
+func (r *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (a *LaunchConfiguration) BuildResource() *schema.Resource {
-	if strings.ToLower(a.Tenancy) == "host" {
-		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", a.Address)
+func (r *LaunchConfiguration) BuildResource() *schema.Resource {
+	if strings.ToLower(r.Tenancy) == "host" {
+		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", r.Address)
 		return nil
-	} else if strings.ToLower(a.Tenancy) == "dedicated" {
-		a.Tenancy = "Dedicated"
+	} else if strings.ToLower(r.Tenancy) == "dedicated" {
+		r.Tenancy = "Dedicated"
 	} else {
-		a.Tenancy = "Shared"
+		r.Tenancy = "Shared"
 	}
 
 	instance := &Instance{
-		Region:                          a.Region,
-		Tenancy:                         a.Tenancy,
-		PurchaseOption:                  a.PurchaseOption,
-		AMI:                             a.AMI,
-		InstanceType:                    a.InstanceType,
-		EBSOptimized:                    a.EBSOptimized,
-		EnableMonitoring:                a.EnableMonitoring,
-		CPUCredits:                      a.CPUCredits,
-		ElasticInferenceAcceleratorType: a.ElasticInferenceAcceleratorType,
-		OperatingSystem:                 a.OperatingSystem,
-		RootBlockDevice:                 a.RootBlockDevice,
-		EBSBlockDevices:                 a.EBSBlockDevices,
-		ReservedInstanceType:            a.ReservedInstanceType,
-		ReservedInstanceTerm:            a.ReservedInstanceTerm,
-		ReservedInstancePaymentOption:   a.ReservedInstancePaymentOption,
-		MonthlyCPUCreditHours:           a.MonthlyCPUCreditHours,
-		VCPUCount:                       a.VCPUCount,
+		Region:                          r.Region,
+		Tenancy:                         r.Tenancy,
+		PurchaseOption:                  r.PurchaseOption,
+		AMI:                             r.AMI,
+		InstanceType:                    r.InstanceType,
+		EBSOptimized:                    r.EBSOptimized,
+		EnableMonitoring:                r.EnableMonitoring,
+		CPUCredits:                      r.CPUCredits,
+		ElasticInferenceAcceleratorType: r.ElasticInferenceAcceleratorType,
+		OperatingSystem:                 r.OperatingSystem,
+		RootBlockDevice:                 r.RootBlockDevice,
+		EBSBlockDevices:                 r.EBSBlockDevices,
+		ReservedInstanceType:            r.ReservedInstanceType,
+		ReservedInstanceTerm:            r.ReservedInstanceTerm,
+		ReservedInstancePaymentOption:   r.ReservedInstancePaymentOption,
+		MonthlyCPUCreditHours:           r.MonthlyCPUCreditHours,
+		VCPUCount:                       r.VCPUCount,
 	}
 	instanceResource := instance.BuildResource()
 
-	r := &schema.Resource{
-		Name:           a.Address,
-		UsageSchema:    a.UsageSchema(),
+	res := &schema.Resource{
+		Name:           r.Address,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: instanceResource.CostComponents,
 		SubResources:   instanceResource.SubResources,
 		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
 	qty := int64(1)
-	if a.InstanceCount != nil {
-		qty = *a.InstanceCount
+	if r.InstanceCount != nil {
+		qty = *r.InstanceCount
 	}
-	schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
+	schema.MultiplyQuantities(res, decimal.NewFromInt(qty))
 
-	return r
+	return res
 }

@@ -25,9 +25,9 @@ jobs:
         run: make tf_fmt_check
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6.1.1
+        uses: golangci/golangci-lint-action@v8.0.0
         with:
-          version: v2.4.0
+          version: latest
           args: --timeout 5m
 
       - name: Install Terragrunt v0.31.8

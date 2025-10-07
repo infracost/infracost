@@ -49,39 +49,39 @@ func (r *LaunchTemplate) UsageSchema() []*schema.UsageItem {
 	return LaunchTemplateUsageSchema
 }
 
-func (a *LaunchTemplate) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(a, u)
+func (r *LaunchTemplate) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (a *LaunchTemplate) BuildResource() *schema.Resource {
-	if strings.ToLower(a.Tenancy) == "host" {
-		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", a.Address)
+func (r *LaunchTemplate) BuildResource() *schema.Resource {
+	if strings.ToLower(r.Tenancy) == "host" {
+		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", r.Address)
 		return nil
-	} else if strings.ToLower(a.Tenancy) == "dedicated" {
-		a.Tenancy = "Dedicated"
+	} else if strings.ToLower(r.Tenancy) == "dedicated" {
+		r.Tenancy = "Dedicated"
 	} else {
-		a.Tenancy = "Shared"
+		r.Tenancy = "Shared"
 	}
 
 	costComponents := make([]*schema.CostComponent, 0)
 
 	instance := &Instance{
-		Region:                          a.Region,
-		Tenancy:                         a.Tenancy,
-		AMI:                             a.AMI,
-		InstanceType:                    a.InstanceType,
-		EBSOptimized:                    a.EBSOptimized,
-		EnableMonitoring:                a.EnableMonitoring,
-		CPUCredits:                      a.CPUCredits,
-		ElasticInferenceAcceleratorType: a.ElasticInferenceAcceleratorType,
-		OperatingSystem:                 a.OperatingSystem,
-		RootBlockDevice:                 a.RootBlockDevice,
-		EBSBlockDevices:                 a.EBSBlockDevices,
-		ReservedInstanceType:            a.ReservedInstanceType,
-		ReservedInstanceTerm:            a.ReservedInstanceTerm,
-		ReservedInstancePaymentOption:   a.ReservedInstancePaymentOption,
-		MonthlyCPUCreditHours:           a.MonthlyCPUCreditHours,
-		VCPUCount:                       a.VCPUCount,
+		Region:                          r.Region,
+		Tenancy:                         r.Tenancy,
+		AMI:                             r.AMI,
+		InstanceType:                    r.InstanceType,
+		EBSOptimized:                    r.EBSOptimized,
+		EnableMonitoring:                r.EnableMonitoring,
+		CPUCredits:                      r.CPUCredits,
+		ElasticInferenceAcceleratorType: r.ElasticInferenceAcceleratorType,
+		OperatingSystem:                 r.OperatingSystem,
+		RootBlockDevice:                 r.RootBlockDevice,
+		EBSBlockDevices:                 r.EBSBlockDevices,
+		ReservedInstanceType:            r.ReservedInstanceType,
+		ReservedInstanceTerm:            r.ReservedInstanceTerm,
+		ReservedInstancePaymentOption:   r.ReservedInstancePaymentOption,
+		MonthlyCPUCreditHours:           r.MonthlyCPUCreditHours,
+		VCPUCount:                       r.VCPUCount,
 	}
 	instanceResource := instance.BuildResource()
 
@@ -92,49 +92,49 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 		}
 	}
 
-	r := &schema.Resource{
-		Name:           a.Address,
-		UsageSchema:    a.UsageSchema(),
+	res := &schema.Resource{
+		Name:           r.Address,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   instanceResource.SubResources,
 		EstimateUsage:  instanceResource.EstimateUsage,
 	}
 
 	instanceCount := int64(1)
-	if a.InstanceCount != nil {
-		instanceCount = *a.InstanceCount
+	if r.InstanceCount != nil {
+		instanceCount = *r.InstanceCount
 	}
 
-	schema.MultiplyQuantities(r, decimal.NewFromInt(instanceCount))
+	schema.MultiplyQuantities(res, decimal.NewFromInt(instanceCount))
 
-	onDemandCount, spotCount := a.calculateOnDemandAndSpotInstanceCounts()
+	onDemandCount, spotCount := r.calculateOnDemandAndSpotInstanceCounts()
 
 	if spotCount > 0 {
 		instance.PurchaseOption = "spot"
 		c := instance.computeCostComponent()
 		c.MonthlyQuantity = decimalPtr(c.MonthlyQuantity.Mul(decimal.NewFromInt(spotCount)))
-		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
+		res.CostComponents = append([]*schema.CostComponent{c}, res.CostComponents...)
 	}
 
 	if onDemandCount > 0 {
 		instance.PurchaseOption = "on_demand"
 		c := instance.computeCostComponent()
 		c.MonthlyQuantity = decimalPtr(c.MonthlyQuantity.Mul(decimal.NewFromInt(onDemandCount)))
-		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
+		res.CostComponents = append([]*schema.CostComponent{c}, res.CostComponents...)
 	}
 
-	return r
+	return res
 }
 
-func (a *LaunchTemplate) calculateOnDemandAndSpotInstanceCounts() (int64, int64) {
+func (r *LaunchTemplate) calculateOnDemandAndSpotInstanceCounts() (int64, int64) {
 	instanceCount := int64(1)
-	if a.InstanceCount != nil {
-		instanceCount = *a.InstanceCount
+	if r.InstanceCount != nil {
+		instanceCount = *r.InstanceCount
 	}
 
-	onDemandInstanceCount := a.OnDemandBaseCount
+	onDemandInstanceCount := r.OnDemandBaseCount
 	remainingCount := instanceCount - onDemandInstanceCount
-	percMultiplier := decimal.NewFromInt(a.OnDemandPercentageAboveBaseCount).Div(decimal.NewFromInt(100))
+	percMultiplier := decimal.NewFromInt(r.OnDemandPercentageAboveBaseCount).Div(decimal.NewFromInt(100))
 	onDemandInstanceCount += decimal.NewFromInt(remainingCount).Mul(percMultiplier).Ceil().IntPart()
 	spotInstanceCount := instanceCount - onDemandInstanceCount
 

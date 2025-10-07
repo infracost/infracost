@@ -195,7 +195,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	}
 
 	// Write the generated YAML
-	var out io.Writer = cmd.OutOrStderr()
+	out := cmd.OutOrStderr()
 	if g.outFile != "" {
 		var err error
 		out, err = os.Create(g.outFile)

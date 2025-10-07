@@ -1,27 +1,45 @@
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - bodyclose
     - errcheck
     - gocritic
-    - gofmt
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - misspell
+    - prealloc
     - revive
     - staticcheck
-    - typecheck
     - unused
-    - prealloc
-
-linters-settings:
-  gocritic:
-    disabled-checks:
-      - ifElseChain
-  revive:
-    rules:
-      - name: error-strings
-        disabled: true
-
+  settings:
+    staticcheck:
+      checks: ["all", "-ST1005", "-ST1003", "-QF*"]
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+    revive:
+      rules:
+        - name: error-strings
+          disabled: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
