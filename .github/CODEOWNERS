@@ -1,2 +1,2 @@
-/.github/workflows/*.yml @infracost/security
+/.github/workflows/*.yml 
 /tools/release/*.go @infracost/security

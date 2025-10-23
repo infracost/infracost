@@ -1,0 +1,17 @@
+name: ARM Template Provider Tests
+on: [push, workflow_dispatch]
+jobs:
+    test:
+        runs-on: ubuntu-latest
+    
+        steps:
+        - uses: actions/checkout@v4
+    
+        - name: Set up Go 1.22
+          uses: actions/setup-go@v4
+          with:
+              go-version: 1.22
+          id: go
+        
+        - name: Run ARM Template Tests
+          run: go test ./internal/providers/arm -run ./internal/providers/arm/template_provider_test.go

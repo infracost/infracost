@@ -846,7 +846,8 @@ func hasSupportedProvider(rType string) bool {
 	return strings.HasPrefix(rType, "aws_") || // tf
 		strings.HasPrefix(rType, "google_") || // tf
 		strings.HasPrefix(rType, "azurerm_") || // tf
-		strings.HasPrefix(rType, "AWS::") // cf
+		strings.HasPrefix(rType, "AWS::") || // cf
+		strings.HasPrefix(rType, "Microsoft.") // arm
 }
 
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
