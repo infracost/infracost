@@ -196,6 +196,12 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		qty = decimal.NewFromFloat(*a.MonthlyHours)
 	}
 
+	// metal instances have a different ProductFamily in AWS pricing data
+	productFamily := "Compute Instance"
+	if strings.Contains(strings.ToLower(a.InstanceType), "metal") {
+		productFamily = "Compute Instance (bare metal)"
+	}
+
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, a.InstanceType),
 		Unit:            "hours",
@@ -205,7 +211,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(a.Region),
 			Service:       strPtr("AmazonEC2"),
-			ProductFamily: strPtr("Compute Instance"),
+			ProductFamily: strPtr(productFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(a.InstanceType)},
 				{Key: "tenancy", Value: strPtr(a.Tenancy)},
