@@ -1593,11 +1593,11 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
 		name := info.Name()
 
-		if strings.HasSuffix(name, ".tf") {
+		if strings.HasSuffix(name, ".tf") || strings.HasSuffix(name, ".tofu") {
 			parseFunc = hclParser.ParseHCLFile
 		}
 
-		if strings.HasSuffix(name, ".tf.json") {
+		if strings.HasSuffix(name, ".tf.json") || strings.HasSuffix(name, ".tofu.json") {
 			parseFunc = hclParser.ParseJSONFile
 		}
 

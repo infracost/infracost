@@ -808,22 +808,47 @@ func loadDirectory(hclParser *modules.SharedHCLParser, logger zerolog.Logger, fu
 
 	files := make([]file, 0)
 
+	opentofuOverrides := make(map[string]struct{})
+
+	for _, info := range fileInfos {
+		if info.IsDir() {
+			continue
+		}
+
+		if modules.HasOpenTofuExtension(info.Name()) {
+			name := strings.TrimSuffix(info.Name(), ".json")
+			name = strings.TrimSuffix(name, ".tofu")
+			opentofuOverrides[name] = struct{}{}
+		}
+	}
+
 	for _, info := range fileInfos {
 		if info.IsDir() {
 			continue
 		}
 
 		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
-		if strings.HasSuffix(info.Name(), ".tf") {
+
+		switch {
+		case strings.HasSuffix(info.Name(), ".tf"):
+			// skip tf file if there's an opentofu override
+			if _, ok := opentofuOverrides[strings.TrimSuffix(info.Name(), ".tf")]; ok {
+				continue
+			}
 			parseFunc = hclParser.ParseHCLFile
-		}
 
-		if strings.HasSuffix(info.Name(), ".tf.json") {
+		case strings.HasSuffix(info.Name(), ".tf.json"):
+			// skip tf file if there's an opentofu override
+			if _, ok := opentofuOverrides[strings.TrimSuffix(info.Name(), ".tf.json")]; ok {
+				continue
+			}
 			parseFunc = hclParser.ParseJSONFile
-		}
-
-		// this is not a file we can parse:
-		if parseFunc == nil {
+		case strings.HasSuffix(info.Name(), ".tofu"):
+			parseFunc = hclParser.ParseHCLFile
+		case strings.HasSuffix(info.Name(), ".tofu.json"):
+			parseFunc = hclParser.ParseJSONFile
+		default:
+			// this is not a file we can parse:
 			continue
 		}
 
