@@ -24,6 +24,7 @@ type azureReposComment struct {
 	content       string
 	publishedDate string
 	href          string
+	threadID      int64
 }
 
 // Body returns the body of the comment
@@ -68,6 +69,9 @@ type AzureReposExtra struct {
 	// Tag is used to identify the Infracost comment.
 	Tag        string
 	InitActive bool
+	// Status is the desired comment thread status: "active" (unresolved) or "closed" (resolved).
+	// If empty, defaults to "closed" unless InitActive is true.
+	Status string
 }
 
 // azureAPIComment represents API response structure of Azure Repos comment.
@@ -139,6 +143,7 @@ type azureReposPRHandler struct {
 	repoAPIURL   string
 	prNumber     int
 	initAsActive bool
+	status       string
 }
 
 // NewAzureReposPRHandler creates a new PlatformHandler for Azure Repos pull requests.
@@ -163,6 +168,7 @@ func NewAzureReposPRHandler(ctx context.Context, repoURL string, targetRef strin
 		repoAPIURL:   apiURL,
 		prNumber:     prNumber,
 		initAsActive: extra.InitActive,
+		status:       extra.Status,
 	}
 
 	return NewCommentHandler(ctx, h, extra.Tag), nil
@@ -199,6 +205,7 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	var resData = struct {
 		Value []struct {
+			ID        int64             `json:"id"`
 			IsDeleted bool              `json:"isDeleted"`
 			Comments  []azureAPIComment `json:"comments"`
 		} `json:"value"`
@@ -228,6 +235,7 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 				content:       comment.Content,
 				href:          comment.Links.Self.Href,
 				publishedDate: comment.PublishedDate,
+				threadID:      thread.ID,
 			})
 
 			break
@@ -237,12 +245,21 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 	return topLevelComments, nil
 }
 
+// getThreadStatus determines the thread status to use, prioritizing the explicit status flag
+// over the legacy initAsActive flag.
+func (h *azureReposPRHandler) getThreadStatus() string {
+	if h.status != "" {
+		return h.status
+	}
+	if h.initAsActive {
+		return "active"
+	}
+	return "closed"
+}
+
 // CallCreateComment calls the Azure Repos API to create a new comment on the pull request.
 func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
-	status := "closed"
-	if h.initAsActive {
-		status = "active"
-	}
+	status := h.getThreadStatus()
 	reqData, err := json.Marshal(map[string]interface{}{
 		"comments": []map[string]interface{}{
 			{
@@ -289,6 +306,7 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 	}
 
 	var resData = struct {
+		ID       int64             `json:"id"`
 		Comments []azureAPIComment `json:"comments"`
 	}{}
 
@@ -309,7 +327,42 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 		content:       firstComment.Content,
 		href:          firstComment.Links.Self.Href,
 		publishedDate: firstComment.PublishedDate,
+		threadID:      resData.ID,
 	}, nil
+}
+
+// updateThreadStatus updates the status of a comment thread.
+func (h *azureReposPRHandler) updateThreadStatus(ctx context.Context, threadID int64, status string) error {
+	reqData, err := json.Marshal(map[string]interface{}{
+		"status": status,
+	})
+	if err != nil {
+		return errors.Wrap(err, "Error marshaling thread status update")
+	}
+
+	url := fmt.Sprintf("%spullRequests/%d/threads/%d?api-version=6.0", h.repoAPIURL, h.prNumber, threadID)
+
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(reqData))
+	if err != nil {
+		return errors.Wrap(err, "Error creating thread status update request")
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := h.httpClient.Do(req)
+	if err != nil {
+		return errors.Wrap(err, "Error updating thread status")
+	}
+
+	if res.Body != nil {
+		defer res.Body.Close()
+	}
+
+	if res.StatusCode != http.StatusOK {
+		resBody, _ := io.ReadAll(res.Body)
+		return fmt.Errorf("Error updating thread status: %s\n%s", res.Status, string(resBody))
+	}
+
+	return nil
 }
 
 // CallUpdateComment calls the Azure Repos API to update the body of a comment on the pull request.
@@ -337,7 +390,22 @@ func (h *azureReposPRHandler) CallUpdateComment(ctx context.Context, comment Com
 		defer res.Body.Close()
 	}
 
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Update thread status if a status is specified
+	if h.status != "" {
+		azureComment, ok := comment.(*azureReposComment)
+		if ok {
+			err = h.updateThreadStatus(ctx, azureComment.threadID, h.getThreadStatus())
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // CallDeleteComment calls the Azure Repos API to delete the pull request comment.

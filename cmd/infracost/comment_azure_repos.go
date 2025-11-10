@@ -25,7 +25,15 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 		Long:  "Post an Infracost comment to Azure Repos",
 		Example: `  Update comment on a pull request:
 
-      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN`,
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN
+
+  Create a new unresolved comment:
+
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN --behavior new --status active
+
+  Update comment and mark thread as resolved:
+
+      infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN --status closed`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.ContextValues.SetValue("platform", "azure-repos")
@@ -42,10 +50,12 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 			token, _ := cmd.Flags().GetString("azure-access-token")
 			tag, _ := cmd.Flags().GetString("tag")
 			initActive, _ := cmd.Flags().GetBool("init-active")
+			status, _ := cmd.Flags().GetString("status")
 			extra := comment.AzureReposExtra{
 				Token:      token,
 				Tag:        tag,
 				InitActive: initActive,
+				Status:     status,
 			}
 
 			prNumber, _ := cmd.Flags().GetInt("pull-request")
@@ -70,6 +80,13 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 				return fmt.Errorf("--behavior only supports %s", strings.Join(validCommentAzureReposBehaviors, ", "))
 			}
 			ctx.ContextValues.SetValue("behavior", behavior)
+
+			status, _ = cmd.Flags().GetString("status")
+			validStatuses := []string{"active", "closed"}
+			if status != "" && !contains(validStatuses, status) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--status only supports %s", strings.Join(validStatuses, ", "))
+			}
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
@@ -152,6 +169,10 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to Azure Repos")
 	cmd.Flags().String("format", "", "Output format: json")
 	cmd.Flags().Bool("init-active", false, "Initialize the comment as active instead of the default: closed")
+	cmd.Flags().String("status", "", "Set comment thread status (Azure DevOps only): active (unresolved) or closed (resolved)")
+	_ = cmd.RegisterFlagCompletionFunc("status", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		return []string{"active", "closed"}, cobra.ShellCompDirectiveDefault
+	})
 
 	return cmd
 }
