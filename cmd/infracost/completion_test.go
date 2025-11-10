@@ -1,8 +1,9 @@
 package main_test
 
 import (
-	"github.com/infracost/infracost/internal/testutil"
 	"testing"
+
+	"github.com/infracost/infracost/internal/testutil"
 )
 
 func TestCompletionHelpFlag(t *testing.T) {
