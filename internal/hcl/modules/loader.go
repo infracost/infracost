@@ -691,6 +691,14 @@ func ResolveSymLinkedDirs(repoRoot, dir string) ([]string, error) {
 	return dirs, nil
 }
 
+func HasTerraformExtension(name string) bool {
+	return filepath.Ext(name) == ".tf" || strings.HasSuffix(name, ".tf.json")
+}
+
+func HasOpenTofuExtension(name string) bool {
+	return filepath.Ext(name) == ".tofu" || strings.HasSuffix(name, ".tofu.json")
+}
+
 func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, error) {
 	mod := tfconfig.NewModule(fullPath)
 
@@ -699,22 +707,47 @@ func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, er
 		return nil, err
 	}
 
+	opentofuOverrides := make(map[string]struct{})
+
+	for _, info := range fileInfos {
+		if info.IsDir() {
+			continue
+		}
+
+		if HasOpenTofuExtension(info.Name()) {
+			name := strings.TrimSuffix(info.Name(), ".json")
+			name = strings.TrimSuffix(name, ".tofu")
+			opentofuOverrides[name] = struct{}{}
+		}
+	}
+
 	for _, info := range fileInfos {
 		if info.IsDir() {
 			continue
 		}
 
 		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
-		if strings.HasSuffix(info.Name(), ".tf") {
+
+		switch {
+		case strings.HasSuffix(info.Name(), ".tf"):
+			// skip tf file if there's an opentofu override
+			if _, ok := opentofuOverrides[strings.TrimSuffix(info.Name(), ".tf")]; ok {
+				continue
+			}
 			parseFunc = m.hclParser.ParseHCLFile
-		}
 
-		if strings.HasSuffix(info.Name(), ".tf.json") {
+		case strings.HasSuffix(info.Name(), ".tf.json"):
+			// skip tf file if there's an opentofu override
+			if _, ok := opentofuOverrides[strings.TrimSuffix(info.Name(), ".tf.json")]; ok {
+				continue
+			}
 			parseFunc = m.hclParser.ParseJSONFile
-		}
-
-		// this is not a file we can parse:
-		if parseFunc == nil {
+		case strings.HasSuffix(info.Name(), ".tofu"):
+			parseFunc = m.hclParser.ParseHCLFile
+		case strings.HasSuffix(info.Name(), ".tofu.json"):
+			parseFunc = m.hclParser.ParseJSONFile
+		default:
+			// this is not a file we can parse:
 			continue
 		}
 
