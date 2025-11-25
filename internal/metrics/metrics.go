@@ -20,7 +20,7 @@ type Metric interface {
 
 type Result struct {
 	Unit  string
-	Value interface{}
+	Value any
 }
 
 type registeredMetric struct {
@@ -76,8 +76,8 @@ type OutputMetric struct {
 }
 
 type OutputValue struct {
-	Context []string    `json:"context,omitempty"`
-	Value   interface{} `json:"value"`
+	Context []string `json:"context,omitempty"`
+	Value   any      `json:"value"`
 }
 
 func WriteMetrics(path string) error {

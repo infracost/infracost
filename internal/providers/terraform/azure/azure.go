@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"maps"
+
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -15,8 +17,8 @@ func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
 	return []string{}
 }
 
-func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
-	return map[string]interface{}{}
+func GetSpecialContext(d *schema.ResourceData) map[string]any {
+	return map[string]any{}
 }
 
 func ParseTags(externalTags map[string]string, r *schema.ResourceData) (map[string]string, []string) {
@@ -30,8 +32,6 @@ func ParseTags(externalTags map[string]string, r *schema.ResourceData) (map[stri
 	for k, v := range rTags {
 		tags[k] = v.String()
 	}
-	for k, v := range externalTags {
-		tags[k] = v
-	}
+	maps.Copy(tags, externalTags)
 	return tags, missing
 }

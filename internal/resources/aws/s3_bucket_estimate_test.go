@@ -136,27 +136,27 @@ func TestS3Bucket(t *testing.T) {
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
-	assert.Equal(t, map[string]interface{}{
-		"standard": map[string]interface{}{
+	assert.Equal(t, map[string]any{
+		"standard": map[string]any{
 			"storage_gb":                      2.1,
 			"monthly_tier_1_requests":         int64(600),
 			"monthly_tier_2_requests":         int64(1500),
 			"monthly_select_data_scanned_gb":  1.1,
 			"monthly_select_data_returned_gb": 1.2,
 		},
-		"intelligent_tiering": map[string]interface{}{
+		"intelligent_tiering": map[string]any{
 			"frequent_access_storage_gb":     2.2,
 			"infrequent_access_storage_gb":   2.3,
 			"archive_access_storage_gb":      2.4,
 			"deep_archive_access_storage_gb": 2.5,
 		},
-		"standard_infrequent_access": map[string]interface{}{
+		"standard_infrequent_access": map[string]any{
 			"storage_gb": 2.6,
 		},
-		"one_zone_infrequent_access": map[string]interface{}{
+		"one_zone_infrequent_access": map[string]any{
 			"storage_gb": 2.7,
 		},
-		"glacier_flexible_retrieval": map[string]interface{}{
+		"glacier_flexible_retrieval": map[string]any{
 			"storage_gb": 2.8,
 		},
 	}, estimates.usage)
@@ -191,7 +191,7 @@ func TestS3BucketNoFilter(t *testing.T) {
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
-	assert.Equal(t, map[string]interface{}{
+	assert.Equal(t, map[string]any{
 		"storage_gb": 2.1,
 	}, estimates.usage["standard"])
 }
@@ -247,15 +247,15 @@ func TestS3BucketNoStandard(t *testing.T) {
 	resource := args.BuildResource()
 	estimates := newEstimates(stub.ctx, t, resource)
 
-	assert.Equal(t, map[string]interface{}{
-		"standard": map[string]interface{}{
+	assert.Equal(t, map[string]any{
+		"standard": map[string]any{
 			"storage_gb":                      float64(0),
 			"monthly_tier_1_requests":         int64(600),
 			"monthly_tier_2_requests":         int64(1500),
 			"monthly_select_data_scanned_gb":  1.1,
 			"monthly_select_data_returned_gb": 1.2,
 		},
-		"intelligent_tiering": map[string]interface{}{
+		"intelligent_tiering": map[string]any{
 			"frequent_access_storage_gb": 2.2,
 		},
 	}, estimates.usage)

@@ -29,14 +29,14 @@ func TestChinaDataTransfer(t *testing.T) {
 
 	tf := ``
 
-	usage := schema.NewUsageMapFromInterface(map[string]interface{}{
-		"aws_data_transfer.cn-north-1": map[string]interface{}{
+	usage := schema.NewUsageMapFromInterface(map[string]any{
+		"aws_data_transfer.cn-north-1": map[string]any{
 			"region":                            "cn-north-1",
 			"monthly_intra_region_gb":           10,
 			"monthly_outbound_other_regions_gb": 20,
 			"monthly_outbound_internet_gb":      30,
 		},
-		"aws_data_transfer.cn-northwest-1": map[string]interface{}{
+		"aws_data_transfer.cn-northwest-1": map[string]any{
 			"region":                            "cn-northwest-1",
 			"monthly_intra_region_gb":           10,
 			"monthly_outbound_other_regions_gb": 20,

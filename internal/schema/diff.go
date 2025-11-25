@@ -280,7 +280,7 @@ func diffName(current string, past string) string {
 	labelCount := len(currentLabels)
 	labels := make([]string, 0, labelCount)
 
-	for i := 0; i < labelCount; i++ {
+	for i := range labelCount {
 		if i > len(pastLabels)-1 {
 			labels = append(labels, currentLabels[i])
 		} else if i > len(currentLabels)-1 {

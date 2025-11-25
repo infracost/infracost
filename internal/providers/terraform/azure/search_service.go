@@ -55,8 +55,8 @@ func NewAzureRMSearchService(d *schema.ResourceData, u *schema.UsageData) *schem
 	units := decimalPtr(partitionCount.Mul(replicaCount))
 
 	var skuName string
-	skuElems := strings.Split(sku, " ")
-	for _, v := range skuElems {
+	skuElems := strings.SplitSeq(sku, " ")
+	for v := range skuElems {
 		skuName += cases.Title(language.English).String(v) + " "
 	}
 	unitName := "unit"

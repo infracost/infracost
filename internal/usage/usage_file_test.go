@@ -94,7 +94,6 @@ resource_usage:
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.key, func(t *testing.T) {
 			assert.Equal(t, tt.want, u.IsEmpty(tt.key))
 		})

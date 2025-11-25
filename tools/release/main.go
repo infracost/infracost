@@ -149,7 +149,7 @@ func uploadAssets(toUpload []string, cli *github.Client, release *github.Reposit
 
 	id := release.GetID()
 
-	for i := 0; i < 4; i++ {
+	for range 4 {
 		errGroup.Go(func() error {
 			for file := range ch {
 				err := uploadAsset(file, cli, id)

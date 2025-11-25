@@ -3,6 +3,7 @@ package modules
 import (
 	"context"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
 	"os"
@@ -73,9 +74,7 @@ func (t *ConditionalTransport) RoundTrip(req *http.Request) (*http.Response, err
 // NewPackageFetcher constructs a new package fetcher
 func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...PackageFetcherOpts) *PackageFetcher {
 	getters := make(map[string]getter.Getter, len(getter.Getters))
-	for k, g := range getter.Getters {
-		getters[k] = g
-	}
+	maps.Copy(getters, getter.Getters)
 	getters["git"] = &CustomGitGetter{
 		&getter.GitGetter{},
 	}
@@ -109,9 +108,7 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 
 func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
 	return func(p *PackageFetcher) {
-		for k, g := range getters {
-			p.getters[k] = g
-		}
+		maps.Copy(p.getters, getters)
 	}
 }
 
@@ -260,9 +257,7 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	}
 
 	decompressors := map[string]getter.Decompressor{}
-	for k, decompressor := range getter.Decompressors {
-		decompressors[k] = decompressor
-	}
+	maps.Copy(decompressors, getter.Decompressors)
 	// This one is added by Terraform here: https://github.com/hashicorp/terraform/blob/affe2c329561f40f13c0e94f4570321977527a77/internal/getmodules/getter.go#L64
 	// But is not in the list of default compressors here: https://github.com/hashicorp/go-getter/blob/main/decompress.go#L32
 	// I'm not sure if we really need it, but added it just in case/

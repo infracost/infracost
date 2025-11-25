@@ -980,8 +980,8 @@ func MapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapRes
 	})
 
 	for _, prefix := range sourceMapKeys {
-		if strings.HasPrefix(moduleAddr, prefix) {
-			withoutPrefix := strings.TrimPrefix(moduleAddr, prefix)
+		if after, ok := strings.CutPrefix(moduleAddr, prefix); ok {
+			withoutPrefix := after
 			mapped := sourceMap[prefix] + withoutPrefix
 			destSource = joinModuleSubDir(mapped, submodulePath)
 			break

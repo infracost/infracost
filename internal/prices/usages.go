@@ -58,7 +58,7 @@ func popResourcesConcurrent(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 	}
 
 	// Get the result of the jobs
-	for i := 0; i < numJobs; i++ {
+	for range numJobs {
 		err := <-resultErrors
 		if err != nil {
 			return err
@@ -187,7 +187,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.Usa
 	}
 
 	// Get the result of the jobs
-	for i := 0; i < numJobs; i++ {
+	for range numJobs {
 		res := <-responses
 		if res.Error != nil {
 			return schema.NewUsageMap(usageMap), res.Error

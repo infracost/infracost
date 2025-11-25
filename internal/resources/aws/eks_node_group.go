@@ -137,7 +137,7 @@ func (a *EKSNodeGroup) BuildResource() *schema.Resource {
 		schema.MultiplyQuantities(r, decimal.NewFromInt(qty))
 	}
 
-	estimate := func(ctx context.Context, u map[string]interface{}) error {
+	estimate := func(ctx context.Context, u map[string]any) error {
 		err := estimateInstanceQualities(ctx, u)
 		if err != nil {
 			return err

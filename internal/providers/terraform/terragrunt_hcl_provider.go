@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -161,13 +162,13 @@ func getEnvVars(ctx *config.ProjectContext) map[string]string {
 	if v, ok := os.LookupEnv("INFRACOST_SAFE_ENVS"); ok {
 		filterSafe = true
 
-		keys := strings.Split(v, ",")
-		for _, key := range keys {
+		keys := strings.SplitSeq(v, ",")
+		for key := range keys {
 			safe[strings.ToLower(strings.TrimSpace(key))] = struct{}{}
 		}
 	}
 
-	for i := 0; i < len(environment); i++ {
+	for i := range environment {
 		variableSplit := strings.SplitN(environment[i], "=", 2)
 
 		if len(variableSplit) != 2 {
@@ -412,11 +413,9 @@ func (p *TerragruntHCLProvider) initTerraformVarFiles(tfVarFiles []string, extra
 	return v
 }
 
-func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]interface{}, inputs map[string]interface{}) map[string]interface{} {
-	m := make(map[string]interface{}, len(tfVars)+len(inputs))
-	for k, v := range tfVars {
-		m[k] = v
-	}
+func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]any, inputs map[string]any) map[string]any {
+	m := make(map[string]any, len(tfVars)+len(inputs))
+	maps.Copy(m, tfVars)
 	for k, v := range inputs {
 		m[k] = fmt.Sprintf("%v", v)
 	}
@@ -495,7 +494,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		},
 		Parallelism: 1,
 		GetOutputs:  p.terragruntPathToValue,
-		DiagnosticsFunc: func(_ error, filename string, config interface{}, evalContext *hcl2.EvalContext) {
+		DiagnosticsFunc: func(_ error, filename string, config any, evalContext *hcl2.EvalContext) {
 			configFile := config.(*tgconfig.TerragruntConfigFile)
 			f, err := hclparse.NewParser().ParseHCLFile(filename)
 			if err != nil {
@@ -819,7 +818,7 @@ func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *tgoptions
 	return nil
 }
 
-func convertToCtyWithJson(val interface{}) (cty.Value, error) {
+func convertToCtyWithJson(val any) (cty.Value, error) {
 	jsonBytes, err := json.Marshal(val)
 	if err != nil {
 		return cty.DynamicVal, fmt.Errorf("could not marshal terragrunt inputs %w", err)
@@ -1033,13 +1032,10 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 	if v, ok := valueMap[key]; ok && isList(v) {
 		existing := v.AsValueSlice()
 
-		s := index + 1
-		if len(existing) > s {
-			s = len(existing)
-		}
+		s := max(len(existing), index+1)
 		vals := make([]cty.Value, s)
 
-		for i := 0; i < len(existing); i++ {
+		for i := range existing {
 			existingVal := existing[i]
 			if i != index && existingVal.IsKnown() {
 				vals[i] = existingVal
@@ -1258,7 +1254,6 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 
 	if trackInclude != nil {
 		for _, includeConfig := range trackInclude.CurrentList {
-			includeConfig := includeConfig
 			strategy, _ := includeConfig.GetMergeStrategy()
 			if strategy != tgconfig.NoMerge {
 				rawPath := getCleanedTargetConfigPath(includeConfig.Path, filename)

@@ -263,7 +263,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("  Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
-			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: config.NewProjectContext(r.runCtx, p, map[string]interface{}{})})
+			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: config.NewProjectContext(r.runCtx, p, map[string]any{})})
 			i++
 			continue
 		}
@@ -888,12 +888,12 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	return nil
 }
 
-func tfVarsToMap(vars []string) map[string]interface{} {
+func tfVarsToMap(vars []string) map[string]any {
 	if len(vars) == 0 {
 		return nil
 	}
 
-	m := make(map[string]interface{}, len(vars))
+	m := make(map[string]any, len(vars))
 	for _, v := range vars {
 		pieces := strings.SplitN(v, "=", 2)
 
@@ -901,7 +901,7 @@ func tfVarsToMap(vars []string) map[string]interface{} {
 			continue
 		}
 
-		var v interface{}
+		var v any
 		err := json.Unmarshal([]byte(pieces[1]), &v)
 		if err != nil {
 			// If there's an error it could just be a raw string value, so we use that
@@ -943,7 +943,7 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func (r *parallelRunner) buildRunEnv(projectContexts []*config.ProjectContext, or output.Root) map[string]interface{} {
+func (r *parallelRunner) buildRunEnv(projectContexts []*config.ProjectContext, or output.Root) map[string]any {
 	env := r.runCtx.EventEnvWithProjectContexts(projectContexts)
 
 	env["runId"] = or.RunID

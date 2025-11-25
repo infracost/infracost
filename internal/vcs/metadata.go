@@ -66,7 +66,7 @@ func getEnvList(key string) []string {
 
 	list := make([]string, 0)
 
-	for _, v := range strings.Split(val, ",") {
+	for v := range strings.SplitSeq(val, ",") {
 		v = strings.TrimSpace(v)
 		if v != "" {
 			list = append(list, v)

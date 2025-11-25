@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"os"
 	"path/filepath"
 	"strings"
@@ -197,7 +198,7 @@ func (p *Parser) replace(old, new, s string) string {
 
 // quote wraps the provided strings in double quotes.
 // Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L83
-func (p *Parser) quote(str ...interface{}) string {
+func (p *Parser) quote(str ...any) string {
 	out := make([]string, 0, len(str))
 	for _, s := range str {
 		if s != nil {
@@ -209,7 +210,7 @@ func (p *Parser) quote(str ...interface{}) string {
 
 // squote wraps the provided strings in single quotes.
 // Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L93C1-L101C2
-func (p *Parser) squote(str ...interface{}) string {
+func (p *Parser) squote(str ...any) string {
 	out := make([]string, 0, len(str))
 	for _, s := range str {
 		if s != nil {
@@ -267,27 +268,25 @@ func (p *Parser) pathExists(base, path string) bool {
 //
 //		- { _path: environment/dev/terraform.tfvars, _dir: environment/dev, env: dev }
 //		- { _path: environment/prod/terraform.tfvars, _dir: environment/prod, env: prod }
-func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
+func (p *Parser) matchPaths(pattern string) []map[any]any {
 	match := pathToRegexp.MustMatch(pattern, nil)
-	var parserVariables map[string]interface{}
+	var parserVariables map[string]any
 	b, _ := jsoniter.Marshal(p.variables)
 	_ = jsoniter.Unmarshal(b, &parserVariables)
 
-	var matches []map[interface{}]interface{}
+	var matches []map[any]any
 	_ = filepath.WalkDir(p.repoDir, func(path string, d fs.DirEntry, err error) error {
 		rel, _ := filepath.Rel(p.repoDir, path)
 		res, _ := match(rel)
 		if res != nil {
 			// create a map of only the size of the parser variables and the special params
 			// from the match (_path and _dir).
-			params := make(map[interface{}]interface{}, len(parserVariables)+2)
+			params := make(map[any]any, len(parserVariables)+2)
 
 			for k, v := range parserVariables {
 				params[k] = v
 			}
-			for k, v := range res.Params {
-				params[k] = v
-			}
+			maps.Copy(params, res.Params)
 
 			params["_path"] = rel
 			dir := filepath.Dir(rel)
@@ -309,7 +308,7 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 //	{{- range $my_list }}
 //		{{ . }}
 //	{{- end }}
-func (p *Parser) list(v ...interface{}) []interface{} {
+func (p *Parser) list(v ...any) []any {
 	return v
 }
 
@@ -354,8 +353,8 @@ func (p *Parser) readFile(path string) string {
 // parseYaml decodes provided yaml contents and assigns decoded values into a
 // generic out value. This can be used as a simple object in the templates.
 // This returns an empty map if the yaml is invalid.
-func (p *Parser) parseYaml(contents string) map[string]interface{} {
-	var out map[string]interface{}
+func (p *Parser) parseYaml(contents string) map[string]any {
+	var out map[string]any
 	err := yaml.Unmarshal([]byte(contents), &out)
 	if err != nil {
 		logging.Logger.Error().Err(err).Msg("failed to unmarshal yaml when calling parseYaml in the config template")
@@ -367,8 +366,8 @@ func (p *Parser) parseYaml(contents string) map[string]interface{} {
 // parseJson decodes the provided json contents and assigns decoded values into a
 // generic out value. This can be used as a simple object in the templates.
 // This returns an empty map if the json is invalid.
-func (p *Parser) parseJson(contents string) map[string]interface{} {
-	var out map[string]interface{}
+func (p *Parser) parseJson(contents string) map[string]any {
+	var out map[string]any
 	err := jsoniter.Unmarshal([]byte(contents), &out)
 	if err != nil {
 		logging.Logger.Error().Err(err).Msg("failed to unmarshal json when calling parseJson in the config template")
@@ -409,7 +408,7 @@ func isSubdirectory(base, target string) bool {
 
 // strval returns the string representation of v.
 // Taken from https://github.com/Masterminds/sprig/blob/581758eb7d96ae4d113649668fa96acc74d46e7f/strings.go#L174
-func strval(v interface{}) string {
+func strval(v any) string {
 	switch v := v.(type) {
 	case string:
 		return v

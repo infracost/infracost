@@ -25,8 +25,8 @@ type APIClient struct {
 }
 
 type GraphQLQuery struct {
-	Query     string                 `json:"query"`
-	Variables map[string]interface{} `json:"variables"`
+	Query     string         `json:"query"`
+	Variables map[string]any `json:"variables"`
 }
 
 var (
@@ -66,7 +66,7 @@ func (c *APIClient) DoQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 	return gjson.ParseBytes(respBody).Array(), err
 }
 
-func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte, error) {
+func (c *APIClient) doRequest(method string, path string, d any) ([]byte, error) {
 	logging.Logger.Debug().Msgf("'%s' request to '%s' using trace_id: '%s'", method, path, c.uuid.String())
 
 	reqBody, err := json.Marshal(d)

@@ -117,7 +117,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, a.storageCostComponent(storageGBSeconds, storageType))
 
 		usageTier := 0
-		for i := 0; i < len(gbSecondQuantities); i++ {
+		for i := range gbSecondQuantities {
 			// Always add the first one
 			if i == 0 || gbSecondQuantities[i].GreaterThan(decimal.NewFromInt(0)) {
 				costComponents = append(costComponents, a.durationCostComponent(displayNameList[i], strconv.Itoa(usageTier), &gbSecondQuantities[i], durationType))
@@ -131,7 +131,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", gbSeconds, durationType))
 	}
 
-	estimate := func(ctx context.Context, values map[string]interface{}) error {
+	estimate := func(ctx context.Context, values map[string]any) error {
 		inv, err := aws.LambdaGetInvocations(ctx, a.Region, a.Name)
 		if err != nil {
 			return err

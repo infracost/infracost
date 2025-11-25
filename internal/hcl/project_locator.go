@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -143,13 +144,7 @@ func createWildcardGlobPaths(dirs []string) []string {
 }
 
 func isDefaultExcluded(name string) bool {
-	for _, dir := range defaultExcludedDirs {
-		if dir == name {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(defaultExcludedDirs, name)
 
 }
 
@@ -1745,13 +1740,7 @@ func hasVarFileExtension(fileName string, extensions []string) bool {
 
 	// Check if a "" extension is allowed. This means we allowed var files to be in files
 	// without an extension such as `prod` or `dev`.
-	blankExtensionAllowed := false
-	for _, e := range extensions {
-		if e == "" {
-			blankExtensionAllowed = true
-			break
-		}
-	}
+	blankExtensionAllowed := slices.Contains(extensions, "")
 
 	// If the file has no extension and we allow blank extensions we return true.
 	// When checking if the extension is blank we also remove any leading dots from
@@ -1988,12 +1977,6 @@ func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
 		}
 
 		base := filepath.Base(dir)
-		for _, match := range rawMatches {
-			if match == base {
-				return true
-			}
-		}
-
-		return false
+		return slices.Contains(rawMatches, base)
 	}
 }

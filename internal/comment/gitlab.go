@@ -155,7 +155,7 @@ func (h *gitlabPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 			} `graphql:"mergeRequest(iid: $mrNumber)"`
 		} `graphql:"project(fullPath: $project)"`
 	}
-	variables := map[string]interface{}{
+	variables := map[string]any{
 		"project":  graphql.ID(h.project),
 		"mrNumber": graphql.String(strconv.Itoa(h.mrNumber)),
 		"after":    (*graphql.String)(nil), // Null after argument to get first page.
@@ -195,7 +195,7 @@ func (h *gitlabPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 // CallCreateComment calls the GitLab API to create a new comment on the merge request.
 func (h *gitlabPRHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
 	// Use the REST API here. We'd have to do 2 requests for GraphQL to get the Merge Request ID as well
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"body": body,
 	})
 	if err != nil {
@@ -262,7 +262,7 @@ func (h *gitlabPRHandler) CallUpdateComment(ctx context.Context, comment Comment
 		Body graphql.String `json:"body"`
 	}
 
-	variables := map[string]interface{}{
+	variables := map[string]any{
 		"input": UpdateNoteInput{
 			ID:   graphql.String(comment.(*gitlabComment).id),
 			Body: graphql.String(body),
@@ -284,7 +284,7 @@ func (h *gitlabPRHandler) CallDeleteComment(ctx context.Context, comment Comment
 		ID graphql.ID `json:"id"`
 	}
 
-	variables := map[string]interface{}{
+	variables := map[string]any{
 		"input": DestroyNoteInput{
 			ID: graphql.String(comment.(*gitlabComment).id),
 		},
@@ -429,7 +429,7 @@ func (h *gitlabCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 // CallCreateComment calls the GitLab API to create a new comment on the commit.
 func (h *gitlabCommitHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"note": body,
 	})
 	if err != nil {
@@ -483,7 +483,7 @@ func (h *gitlabCommitHandler) CallCreateComment(ctx context.Context, body string
 
 // CallUpdateComment calls the GitLab API to update the body of a comment on the commit.
 func (h *gitlabCommitHandler) CallUpdateComment(ctx context.Context, comment Comment, body string) error {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"body": body,
 	})
 	if err != nil {

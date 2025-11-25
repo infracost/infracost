@@ -13,20 +13,20 @@ func TestParseAttributes(t *testing.T) {
 
 	tests := []struct {
 		name string
-		args interface{}
+		args any
 		want map[string]gjson.Result
 	}{
 		{
 			name: "nested attributes are returned as nested gjson",
-			args: map[interface{}]interface{}{
-				"standard": map[interface{}]interface{}{
+			args: map[any]any{
+				"standard": map[any]any{
 					"storage_gb":              1000,
 					"monthly_tier_1_requests": 200,
 				},
-				"intelligent_tiering": map[string]interface{}{
+				"intelligent_tiering": map[string]any{
 					"monitored_objects":       500,
 					"monthly_tier_2_requests": "a test string",
-					"some_more_nesting": map[interface{}]interface{}{
+					"some_more_nesting": map[any]any{
 						"so_nested": true,
 					},
 				},
@@ -44,7 +44,7 @@ func TestParseAttributes(t *testing.T) {
 		},
 		{
 			name: "single attributes are returned as gjson values",
-			args: map[interface{}]interface{}{
+			args: map[any]any{
 				"num":    100,
 				"bool":   true,
 				"null":   nil,
@@ -84,7 +84,6 @@ func TestParseAttributes(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -123,7 +122,7 @@ func TestUsageMap_Get(t *testing.T) {
 	}{
 		{
 			address: "aws_lambda_function.hello_world",
-			usage: NewUsageMapFromInterface(map[string]interface{}{"aws_lambda_function.hello_world": map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{"aws_lambda_function.hello_world": map[string]any{
 				"test": "this",
 			}, "aws_lambda_function.hello_world2": ""}),
 			want: &UsageData{
@@ -135,7 +134,7 @@ func TestUsageMap_Get(t *testing.T) {
 		},
 		{
 			address: `aws_lambda_function.hello_world["foo"]`,
-			usage: NewUsageMapFromInterface(map[string]interface{}{`aws_lambda_function.hello_world["foo"]`: map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{`aws_lambda_function.hello_world["foo"]`: map[string]any{
 				"test": "this",
 			}, `aws_lambda_function.hello_world["bar"]`: ""}),
 			want: &UsageData{
@@ -147,7 +146,7 @@ func TestUsageMap_Get(t *testing.T) {
 		},
 		{
 			address: `aws_lambda_function.hello_world["foo"]`,
-			usage: NewUsageMapFromInterface(map[string]interface{}{`aws_lambda_function.hello_world[*]`: map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{`aws_lambda_function.hello_world[*]`: map[string]any{
 				"test": "this",
 			}, `aws_lambda_function.bar`: ""}),
 			want: &UsageData{
@@ -159,7 +158,7 @@ func TestUsageMap_Get(t *testing.T) {
 		},
 		{
 			address: `module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`,
-			usage: NewUsageMapFromInterface(map[string]interface{}{`module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`: map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{`module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`: map[string]any{
 				"test": "this",
 			}, `aws_lambda_function.hello_world`: ""}),
 			want: &UsageData{
@@ -171,7 +170,7 @@ func TestUsageMap_Get(t *testing.T) {
 		},
 		{
 			address: `module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`,
-			usage: NewUsageMapFromInterface(map[string]interface{}{`module.some_mod["foo"].aws_lambda_function.hello_world[*]`: map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{`module.some_mod["foo"].aws_lambda_function.hello_world[*]`: map[string]any{
 				"test": "this",
 			}, `aws_lambda_function.hello_world`: ""}),
 			want: &UsageData{
@@ -183,7 +182,7 @@ func TestUsageMap_Get(t *testing.T) {
 		},
 		{
 			address: `module.some_mod["foo"].module.some_bar["baz"].aws_lambda_function.hello_world["bar"]`,
-			usage: NewUsageMapFromInterface(map[string]interface{}{`module.some_mod["foo"].module.some_bar[*].aws_lambda_function.hello_world[*]`: map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{`module.some_mod["foo"].module.some_bar[*].aws_lambda_function.hello_world[*]`: map[string]any{
 				"test": "this",
 			}, `aws_lambda_function.hello_world`: ""}),
 			want: &UsageData{
@@ -195,7 +194,7 @@ func TestUsageMap_Get(t *testing.T) {
 		},
 		{
 			address: `module.mod["test2"].aws_lambda_function.test["foo"]`,
-			usage: NewUsageMapFromInterface(map[string]interface{}{`module.mod["test2"].aws_lambda_function.test["foo"]`: map[string]interface{}{
+			usage: NewUsageMapFromInterface(map[string]any{`module.mod["test2"].aws_lambda_function.test["foo"]`: map[string]any{
 				"test": "this",
 			}, `module.mod[*].aws_lambda_function.test[*]`: ""}),
 			want: &UsageData{

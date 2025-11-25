@@ -32,10 +32,7 @@ func (r *ComputeRouterNAT) PopulateUsage(u *schema.UsageData) {
 func (r *ComputeRouterNAT) BuildResource() *schema.Resource {
 	var assignedVMs int64
 	if r.AssignedVMs != nil {
-		assignedVMs = *r.AssignedVMs
-		if assignedVMs > 32 {
-			assignedVMs = 32
-		}
+		assignedVMs = min(*r.AssignedVMs, 32)
 	}
 
 	var dataProcessedGB *decimal.Decimal

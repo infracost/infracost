@@ -501,7 +501,7 @@ func (attr *Attribute) graphValue() (ctyVal cty.Value) {
 		// call the mock function in a loop to try and resolve all the bad expressions.
 		// This is done because one bad expression replacement could cause another
 		// expression to fail.
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			exp = mockExpressionCalls(exp, diag, mockedVal)
 			val, diag = exp.Value(ctx)
 			if !diag.HasErrors() {
@@ -1011,7 +1011,7 @@ func (attr *Attribute) Name() string {
 }
 
 // Equals checks that val matches the underlying Attribute cty.Type.
-func (attr *Attribute) Equals(val interface{}) bool {
+func (attr *Attribute) Equals(val any) bool {
 	if attr.Value().Type() == cty.String {
 		result := strings.EqualFold(attr.Value().AsString(), fmt.Sprintf("%v", val))
 		return result
