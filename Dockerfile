@@ -1,4 +1,4 @@
-FROM golang:1.25 AS builder
+FROM golang:1.25.4 AS builder
 
 ARG ARCH=linux
 ARG DEFAULT_TERRAFORM_VERSION=0.15.5

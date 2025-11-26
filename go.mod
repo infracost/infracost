@@ -1,6 +1,8 @@
 module github.com/infracost/infracost
 
-go 1.25.1
+go 1.25
+
+toolchain go1.25.4
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -278,7 +280,6 @@ require (
 	cloud.google.com/go v0.116.0 // indirect
 	cloud.google.com/go/storage v1.49.0 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
-	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.122
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bmatcuk/doublestar v1.3.4
