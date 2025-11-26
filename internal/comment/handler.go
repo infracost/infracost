@@ -107,7 +107,7 @@ func (h *CommentHandler) CommentWithBehavior(ctx context.Context, behavior, body
 	backoff := time.Second
 
 	const maxRetries = 5
-	for i := 0; i < maxRetries; i++ {
+	for i := range maxRetries {
 		result, err = h.commentWithBehaviour(ctx, behavior, body, opts)
 		if err == nil {
 			return result, nil

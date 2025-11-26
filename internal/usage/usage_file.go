@@ -185,7 +185,7 @@ See https://infracost.io/usage-file/ for docs`,
 }
 
 func (u *UsageFile) ToUsageDataMap() schema.UsageMap {
-	m := make(map[string]interface{})
+	m := make(map[string]any)
 
 	for _, resourceUsage := range u.ResourceTypeUsages {
 		m[resourceUsage.Name] = resourceUsage.Map()
@@ -268,14 +268,14 @@ func removeDuplicateStr(strSlice []string) []string {
 }
 
 // findInvalidKeys recursively searches for invalid keys in the provided item
-func findInvalidKeys(item *schema.UsageItem, refMap map[string]interface{}) []string {
+func findInvalidKeys(item *schema.UsageItem, refMap map[string]any) []string {
 	invalidKeys := make([]string, 0)
 
 	if refVal, ok := refMap[item.Key]; !ok {
 		invalidKeys = append(invalidKeys, item.Key)
 	} else if item.ValueType == schema.SubResourceUsage && item.Value != nil {
 		for _, subItem := range item.Value.(*ResourceUsage).Items {
-			invalidKeys = append(invalidKeys, findInvalidKeys(subItem, refVal.(map[string]interface{}))...)
+			invalidKeys = append(invalidKeys, findInvalidKeys(subItem, refVal.(map[string]any))...)
 		}
 	}
 

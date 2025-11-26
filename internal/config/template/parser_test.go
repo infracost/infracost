@@ -113,15 +113,15 @@ func TestParser_Compile(t *testing.T) {
 			err = p.Compile(string(contents), wrr)
 			require.NoError(t, err)
 
-			var actualFileOutput interface{}
+			var actualFileOutput any
 			err = yaml.NewDecoder(wr).Decode(&actualFileOutput)
 			require.NoError(t, err)
 
-			var actualStringOutput interface{}
+			var actualStringOutput any
 			err = yaml.NewDecoder(wrr).Decode(&actualStringOutput)
 			require.NoError(t, err)
 
-			var expected interface{}
+			var expected any
 			err = yaml.NewDecoder(f).Decode(&expected)
 			require.NoError(t, err)
 			assert.Equal(t, expected, actualFileOutput)

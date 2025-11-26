@@ -10,7 +10,7 @@ import (
 func TestParseVariable(t *testing.T) {
 	tests := []struct {
 		name    string
-		input   interface{}
+		input   any
 		want    cty.Value
 		wantErr bool
 	}{
@@ -40,31 +40,31 @@ func TestParseVariable(t *testing.T) {
 		},
 		{
 			name:    "map with string keys input",
-			input:   map[string]interface{}{"key": "value"},
+			input:   map[string]any{"key": "value"},
 			want:    cty.ObjectVal(map[string]cty.Value{"key": cty.StringVal("value")}),
 			wantErr: false,
 		},
 		{
 			name:    "map with integer keys input",
-			input:   map[interface{}]interface{}{1: "one", 2: "two"},
+			input:   map[any]any{1: "one", 2: "two"},
 			want:    cty.ObjectVal(map[string]cty.Value{"1": cty.StringVal("one"), "2": cty.StringVal("two")}),
 			wantErr: false,
 		},
 		{
 			name:    "nested map",
-			input:   map[string]interface{}{"outer": map[string]interface{}{"inner": "value"}},
+			input:   map[string]any{"outer": map[string]any{"inner": "value"}},
 			want:    cty.ObjectVal(map[string]cty.Value{"outer": cty.ObjectVal(map[string]cty.Value{"inner": cty.StringVal("value")})}),
 			wantErr: false,
 		},
 		{
 			name:    "list input",
-			input:   []interface{}{"one", "two"},
+			input:   []any{"one", "two"},
 			want:    cty.TupleVal([]cty.Value{cty.StringVal("one"), cty.StringVal("two")}),
 			wantErr: false,
 		},
 		{
 			name:    "nested list",
-			input:   []interface{}{[]interface{}{"one", "two"}, "three"},
+			input:   []any{[]any{"one", "two"}, "three"},
 			want:    cty.TupleVal([]cty.Value{cty.TupleVal([]cty.Value{cty.StringVal("one"), cty.StringVal("two")}), cty.StringVal("three")}),
 			wantErr: false,
 		},
@@ -105,23 +105,23 @@ func TestParseVariable(t *testing.T) {
 func TestConvertToStringKeyMap(t *testing.T) {
 	tests := []struct {
 		name  string
-		input interface{}
-		want  interface{}
+		input any
+		want  any
 	}{
 		{
 			name:  "map with interface{} keys",
-			input: map[interface{}]interface{}{1: "one", "two": 2},
-			want:  map[string]interface{}{"1": "one", "two": 2},
+			input: map[any]any{1: "one", "two": 2},
+			want:  map[string]any{"1": "one", "two": 2},
 		},
 		{
 			name:  "nested map with interface{} keys",
-			input: map[interface{}]interface{}{"outer": map[interface{}]interface{}{1: "one"}},
-			want:  map[string]interface{}{"outer": map[string]interface{}{"1": "one"}},
+			input: map[any]any{"outer": map[any]any{1: "one"}},
+			want:  map[string]any{"outer": map[string]any{"1": "one"}},
 		},
 		{
 			name:  "slice of interface{}",
-			input: []interface{}{map[interface{}]interface{}{1: "one"}},
-			want:  []interface{}{map[string]interface{}{"1": "one"}},
+			input: []any{map[any]any{1: "one"}},
+			want:  []any{map[string]any{"1": "one"}},
 		},
 		{
 			name:  "non-map and non-slice input",

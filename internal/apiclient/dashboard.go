@@ -52,10 +52,10 @@ type QueryCLISettingsResponse struct {
 }
 
 type runInput struct {
-	ProjectResults []projectResultInput   `json:"projectResults"`
-	Currency       string                 `json:"currency"`
-	TimeGenerated  time.Time              `json:"timeGenerated"`
-	Metadata       map[string]interface{} `json:"metadata"`
+	ProjectResults []projectResultInput `json:"projectResults"`
+	Currency       string               `json:"currency"`
+	TimeGenerated  time.Time            `json:"timeGenerated"`
+	Metadata       map[string]any       `json:"metadata"`
 }
 
 type projectResultInput struct {
@@ -96,7 +96,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 
 	ctxValues := ctx.ContextValues.Values()
 
-	var metadata map[string]interface{}
+	var metadata map[string]any
 	b, err := json.Marshal(out.Metadata)
 	if err != nil {
 		return nil, fmt.Errorf("dashboard client failed to marshal output metadata %w", err)
@@ -124,7 +124,7 @@ func (c *DashboardAPIClient) SavePostedPrComment(ctx *config.RunContext, runId, 
 	q := `mutation SavePostedPrComment($runId: String!, $comment: String!) {
 			savePostedPrComment(runId: $runId, comment: $comment) 
 }`
-	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{"runId": runId, "comment": comment}}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]any{"runId": runId, "comment": comment}}})
 	if err != nil {
 		return err
 	}
@@ -144,7 +144,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		return response, err
 	}
 
-	v := map[string]interface{}{
+	v := map[string]any{
 		"run": *ri,
 	}
 
@@ -244,7 +244,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
         	}
     	}
 	`
-	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]any{}}})
 	if err != nil {
 		return response, fmt.Errorf("query failed when requesting org settings %w", err)
 	}

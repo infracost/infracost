@@ -542,7 +542,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block, moduleSourceURL string
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
 	p.marshalBlock(block, jsonValues)
 	calls := block.CallDetails()
-	metadata := map[string]interface{}{
+	metadata := map[string]any{
 		"filename":  block.Filename,
 		"startLine": block.StartLine,
 		"endLine":   block.EndLine,
@@ -673,7 +673,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 
 	region := block.GetAttribute("region").AsString()
 
-	metadata := map[string]interface{}{
+	metadata := map[string]any{
 		"filename":   block.Filename,
 		"start_line": block.StartLine,
 		"end_line":   block.EndLine,
@@ -685,8 +685,8 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 
 	p.schema.Configuration.ProviderConfig[providerConfigKey] = ProviderConfig{
 		Name: name,
-		Expressions: map[string]interface{}{
-			"region": map[string]interface{}{
+		Expressions: map[string]any{
+			"region": map[string]any{
 				"constant_value": region,
 			},
 		},
@@ -696,7 +696,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 	switch providerType {
 	case "aws":
 		if defaultTags := p.marshalAWSDefaultTagsBlock(block); defaultTags != nil {
-			p.schema.Configuration.ProviderConfig[providerConfigKey].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
+			p.schema.Configuration.ProviderConfig[providerConfigKey].Expressions["default_tags"] = []map[string]any{defaultTags}
 		}
 	case "google":
 		if defaultLabels := p.marshalGoogleDefaultTagsBlock(block); defaultLabels != nil {
@@ -707,7 +707,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 	return name
 }
 
-func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
+func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[string]any {
 	b := providerBlock.GetChildBlock("default_tags")
 	if b == nil {
 		return nil
@@ -719,7 +719,7 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		}
 	}()
 
-	marshalledTags := make(map[string]interface{})
+	marshalledTags := make(map[string]any)
 
 	tags := b.GetAttribute("tags")
 	if tags == nil {
@@ -771,7 +771,7 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		marshalledTags[tag] = tagValue
 	}
 
-	tagsVal := map[string]interface{}{
+	tagsVal := map[string]any{
 		"constant_value": marshalledTags,
 	}
 
@@ -779,12 +779,12 @@ func (p *HCLProvider) marshalAWSDefaultTagsBlock(providerBlock *hcl.Block) map[s
 		tagsVal["missing_attributes_causing_unknown_keys"] = refs
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"tags": tagsVal,
 	}
 }
 
-func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
+func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) map[string]any {
 	tags := providerBlock.GetAttribute("default_labels")
 	if tags == nil {
 		return nil
@@ -796,7 +796,7 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 		}
 	}()
 
-	marshalledTags := make(map[string]interface{})
+	marshalledTags := make(map[string]any)
 
 	value := tags.Value()
 	if value.IsNull() || !value.IsKnown() || !value.CanIterateElements() {
@@ -843,7 +843,7 @@ func (p *HCLProvider) marshalGoogleDefaultTagsBlock(providerBlock *hcl.Block) ma
 		marshalledTags[tag] = tagValue
 	}
 
-	tagsVal := map[string]interface{}{
+	tagsVal := map[string]any{
 		"constant_value": marshalledTags,
 	}
 	if refs := tags.ReferencesCausingUnknownKeys(); len(refs) > 0 {
@@ -884,8 +884,8 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
 var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
 
-func generateChecksum(value map[string]interface{}) string {
-	filtered := make(map[string]interface{})
+func generateChecksum(value map[string]any) string {
+	filtered := make(map[string]any)
 	for k, v := range value {
 		if !ignoredAttrs[k] {
 			filtered[k] = v
@@ -903,8 +903,8 @@ func generateChecksum(value map[string]interface{}) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func blockToReferences(block *hcl.Block) map[string]interface{} {
-	expressionValues := make(map[string]interface{})
+func blockToReferences(block *hcl.Block) map[string]any {
+	expressionValues := make(map[string]any)
 
 	for _, attribute := range block.GetAttributes() {
 		references := attribute.AllReferences()
@@ -924,7 +924,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 			expressionValues[name] = r
 		}
 
-		childExpressions := make(map[string][]interface{})
+		childExpressions := make(map[string][]any)
 		for _, child := range block.Children() {
 			vals := childExpressions[child.Type()]
 			childReferences := blockToReferences(child)
@@ -944,7 +944,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 	return expressionValues
 }
 
-func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
+func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]any) {
 	for _, b := range block.Children() {
 		key := b.Type()
 		if key == "dynamic" {
@@ -966,19 +966,19 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 				continue
 			}
 
-			jsonValues[key] = append(v.([]interface{}), childValues)
+			jsonValues[key] = append(v.([]any), childValues)
 			continue
 		}
 
-		jsonValues[key] = []interface{}{childValues}
+		jsonValues[key] = []any{childValues}
 	}
 }
 
-func marshalAttributeValues(blockType string, value cty.Value) map[string]interface{} {
+func marshalAttributeValues(blockType string, value cty.Value) map[string]any {
 	if value.IsNull() {
 		return nil
 	}
-	ret := make(map[string]interface{})
+	ret := make(map[string]any)
 
 	it := value.ElementIterator()
 	for it.Next() {
@@ -1008,14 +1008,14 @@ type ResourceOutput struct {
 }
 
 type ResourceJSON struct {
-	Address           string                 `json:"address"`
-	Mode              string                 `json:"mode"`
-	Type              string                 `json:"type"`
-	Name              string                 `json:"name"`
-	Index             *int64                 `json:"index,omitempty"`
-	SchemaVersion     int                    `json:"schema_version"`
-	Values            map[string]interface{} `json:"values"`
-	InfracostMetadata map[string]interface{} `json:"infracost_metadata"`
+	Address           string         `json:"address"`
+	Mode              string         `json:"mode"`
+	Type              string         `json:"type"`
+	Name              string         `json:"name"`
+	Index             *int64         `json:"index,omitempty"`
+	SchemaVersion     int            `json:"schema_version"`
+	Values            map[string]any `json:"values"`
+	InfracostMetadata map[string]any `json:"infracost_metadata"`
 }
 
 type ResourceChangesJSON struct {
@@ -1029,9 +1029,9 @@ type ResourceChangesJSON struct {
 }
 
 type ResourceChange struct {
-	Actions []string               `json:"actions"`
-	Before  interface{}            `json:"before"`
-	After   map[string]interface{} `json:"after"`
+	Actions []string       `json:"actions"`
+	Before  any            `json:"before"`
+	After   map[string]any `json:"after"`
 }
 
 type PlanValues struct {
@@ -1039,9 +1039,9 @@ type PlanValues struct {
 }
 
 type PlanSchema struct {
-	FormatVersion    string      `json:"format_version"`
-	TerraformVersion string      `json:"terraform_version"`
-	Variables        interface{} `json:"variables,omitempty"`
+	FormatVersion    string `json:"format_version"`
+	TerraformVersion string `json:"terraform_version"`
+	Variables        any    `json:"variables,omitempty"`
 	PriorState       struct {
 		Values PlanValues `json:"values"`
 	} `json:"prior_state"`
@@ -1078,20 +1078,20 @@ type ModuleOut struct {
 }
 
 type ProviderConfig struct {
-	Name              string                 `json:"name"`
-	Expressions       map[string]interface{} `json:"expressions,omitempty"`
-	InfracostMetadata map[string]interface{} `json:"infracost_metadata"`
+	Name              string         `json:"name"`
+	Expressions       map[string]any `json:"expressions,omitempty"`
+	InfracostMetadata map[string]any `json:"infracost_metadata"`
 }
 
 type ResourceData struct {
-	Address           string                 `json:"address"`
-	Mode              string                 `json:"mode"`
-	Type              string                 `json:"type"`
-	Name              string                 `json:"name"`
-	ProviderConfigKey string                 `json:"provider_config_key"`
-	Expressions       map[string]interface{} `json:"expressions,omitempty"`
-	SchemaVersion     int                    `json:"schema_version"`
-	CountExpression   *countExpression       `json:"count_expression,omitempty"`
+	Address           string           `json:"address"`
+	Mode              string           `json:"mode"`
+	Type              string           `json:"type"`
+	Name              string           `json:"name"`
+	ProviderConfigKey string           `json:"provider_config_key"`
+	Expressions       map[string]any   `json:"expressions,omitempty"`
+	SchemaVersion     int              `json:"schema_version"`
+	CountExpression   *countExpression `json:"count_expression,omitempty"`
 }
 
 type ModuleCall struct {

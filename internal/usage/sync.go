@@ -3,6 +3,7 @@ package usage
 import (
 	"context"
 	"fmt"
+	"maps"
 	"runtime"
 	"sort"
 	"strings"
@@ -29,13 +30,11 @@ type ReplaceResourceUsagesOpts struct {
 func (s *SyncResult) Merge(other *SyncResult) {
 	s.ResourceCount += other.ResourceCount
 	s.EstimationCount += other.EstimationCount
-	for k, v := range other.EstimationErrors {
-		s.EstimationErrors[k] = v
-	}
+	maps.Copy(s.EstimationErrors, other.EstimationErrors)
 }
 
-func (s *SyncResult) ProjectContext() map[string]interface{} {
-	r := make(map[string]interface{})
+func (s *SyncResult) ProjectContext() map[string]any {
+	r := make(map[string]any)
 
 	r["usageSyncs"] = s.ResourceCount
 	r["usageEstimates"] = s.EstimationCount
@@ -154,7 +153,7 @@ func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile,
 	}
 
 	// Get the result of the jobs
-	for i := 0; i < numJobs; i++ {
+	for range numJobs {
 		result := <-results
 		resourceUsages = append(resourceUsages, result.ru)
 		syncResult.Merge(result.sr)
@@ -349,7 +348,7 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 	}
 
 	for _, item := range resourceUsage.Items {
-		var val interface{}
+		var val any
 
 		switch item.ValueType {
 		case schema.Int64:

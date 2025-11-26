@@ -57,9 +57,9 @@ func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
 	return ids
 }
 
-func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
+func GetSpecialContext(d *schema.ResourceData) map[string]any {
 
-	specialContexts := make(map[string]interface{})
+	specialContexts := make(map[string]any)
 
 	if strings.HasPrefix(d.Get("region").String(), "cn-") {
 		specialContexts["isAWSChina"] = true

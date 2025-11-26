@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"maps"
 	"sort"
 	"strings"
 
@@ -109,10 +110,10 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	// If the tags attribute is a list, we need to handle it differently - this is the case with AutoScalingGroups
 	// where the tags are a slice of objects with details about propagation. When it is a list, we should parse it as such
 	switch t := rTagBlock.Value().(type) {
-	case []interface{}:
+	case []any:
 		rTags = make(map[string]gjson.Result, len(t))
 		for _, el := range t {
-			tag, ok := el.(map[string]interface{})
+			tag, ok := el.(map[string]any)
 			if !ok {
 				// This should never happen, but if it does, we should skip it
 				continue
@@ -187,9 +188,7 @@ func ParseTags(externalTags, defaultTags map[string]string, r *schema.ResourceDa
 	}
 
 	// external tags (e.g. yor)
-	for k, v := range externalTags {
-		tags[k] = v
-	}
+	maps.Copy(tags, externalTags)
 
 	if f, ok := tagProviders[r.Type]; ok {
 		f(tags, defaultTags, r, config)

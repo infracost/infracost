@@ -10,7 +10,7 @@ import (
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 )
 
-func ParseVariable(val interface{}) (cty.Value, error) {
+func ParseVariable(val any) (cty.Value, error) {
 	switch v := val.(type) {
 	case string:
 		// Try to parse the string as an HCL expression. This will handle expressions
@@ -57,16 +57,16 @@ func ParseVariable(val interface{}) (cty.Value, error) {
 	}
 }
 
-func convertToStringKeyMap(value interface{}) interface{} {
+func convertToStringKeyMap(value any) any {
 	switch v := value.(type) {
-	case map[interface{}]interface{}:
-		result := make(map[string]interface{})
+	case map[any]any:
+		result := make(map[string]any)
 		for key, val := range v {
 			strKey := fmt.Sprintf("%v", key)
 			result[strKey] = convertToStringKeyMap(val)
 		}
 		return result
-	case []interface{}:
+	case []any:
 		for i, elem := range v {
 			v[i] = convertToStringKeyMap(elem)
 		}

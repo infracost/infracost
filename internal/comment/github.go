@@ -205,7 +205,7 @@ func (h *githubPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 			} `graphql:"pullRequest(number: $prNumber)"`
 		} `graphql:"repository(owner: $owner, name: $repo)"`
 	}
-	variables := map[string]interface{}{
+	variables := map[string]any{
 		"owner":    githubv4.String(h.owner),
 		"repo":     githubv4.String(h.repo),
 		"prNumber": githubv4.Int(h.prNumber), // nolint:gosec // ignore G115: integer overflow conversion int -> int32
@@ -387,7 +387,7 @@ func (h *githubCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 		} `graphql:"repository(owner: $owner, name: $repo)"`
 	}
 
-	variables := map[string]interface{}{
+	variables := map[string]any{
 		"owner":     githubv4.String(h.owner),
 		"repo":      githubv4.String(h.repo),
 		"commitSha": githubv4.GitObjectID(h.commitSHA),
