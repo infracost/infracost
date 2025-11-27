@@ -1,0 +1,486 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub",
+    "vcsCommitSha": "stub",
+    "vcsCommitAuthorName": "stub",
+    "vcsCommitAuthorEmail": "stub",
+    "vcsCommitTimestamp": "stub",
+    "vcsCommitMessage": "stub",
+    "vcsRepositoryUrl": "stub"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "memorydb_cluster_test",
+      "metadata": {
+        "path": "memorydb_cluster_test",
+        "type": "terraform_dir",
+        "vcsSubPath": "stub"
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_memorydb_cluster.autoscaling",
+            "metadata": {},
+            "hourlyCost": "2.4",
+            "monthlyCost": "1752",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, on-demand, db.r6g.large, autoscaling)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.4",
+                "hourlyCost": "2.4",
+                "monthlyCost": "1752"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.redis",
+            "metadata": {},
+            "hourlyCost": "2.4",
+            "monthlyCost": "1752",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.4",
+                "hourlyCost": "2.4",
+                "monthlyCost": "1752"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.redis_reserved",
+            "metadata": {},
+            "hourlyCost": "0",
+            "monthlyCost": "1022",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, reserved, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.233333",
+                "hourlyCost": "1.4",
+                "monthlyCost": "1022"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.redis_with_usage",
+            "metadata": {},
+            "hourlyCost": "2.4",
+            "monthlyCost": "1954.1",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.4",
+                "hourlyCost": "2.4",
+                "monthlyCost": "1752"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "1.3698630137",
+                "monthlyQuantity": "1000",
+                "price": "0.2",
+                "hourlyCost": "0.2739726027",
+                "monthlyCost": "200"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0.1369863014",
+                "monthlyQuantity": "100",
+                "price": "0.021",
+                "hourlyCost": "0.0028767123",
+                "monthlyCost": "2.1"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.valkey",
+            "metadata": {},
+            "hourlyCost": "1.68",
+            "monthlyCost": "1226.4",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (valkey, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.28",
+                "hourlyCost": "1.68",
+                "monthlyCost": "1226.4"
+              },
+              {
+                "name": "Data written (free up to 10TB)",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.valkey_with_usage",
+            "metadata": {},
+            "hourlyCost": "1.68",
+            "monthlyCost": "1426.5",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (valkey, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.28",
+                "hourlyCost": "1.68",
+                "monthlyCost": "1226.4"
+              },
+              {
+                "name": "Data written (over 10TB)",
+                "unit": "GB",
+                "hourlyQuantity": "6.5068493151",
+                "monthlyQuantity": "4760",
+                "price": "0.04",
+                "hourlyCost": "0.2602739726",
+                "monthlyCost": "190.4"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0.2739726027",
+                "monthlyQuantity": "200",
+                "price": "0.021",
+                "hourlyCost": "0.0057534247",
+                "monthlyCost": "4.2"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "10.56",
+        "totalMonthlyCost": "7711"
+      },
+      "diff": {
+        "resources": [
+          {
+            "name": "aws_memorydb_cluster.autoscaling",
+            "metadata": {},
+            "hourlyCost": "2.4",
+            "monthlyCost": "1752",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, on-demand, db.r6g.large, autoscaling)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.4",
+                "hourlyCost": "2.4",
+                "monthlyCost": "1752"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.redis",
+            "metadata": {},
+            "hourlyCost": "2.4",
+            "monthlyCost": "1752",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.4",
+                "hourlyCost": "2.4",
+                "monthlyCost": "1752"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.redis_reserved",
+            "metadata": {},
+            "hourlyCost": "0",
+            "monthlyCost": "1022",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, reserved, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.233333",
+                "hourlyCost": "1.4",
+                "monthlyCost": "1022"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.redis_with_usage",
+            "metadata": {},
+            "hourlyCost": "2.4",
+            "monthlyCost": "1954.1",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (redis, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.4",
+                "hourlyCost": "2.4",
+                "monthlyCost": "1752"
+              },
+              {
+                "name": "Data written",
+                "unit": "GB",
+                "hourlyQuantity": "1.3698630137",
+                "monthlyQuantity": "1000",
+                "price": "0.2",
+                "hourlyCost": "0.2739726027",
+                "monthlyCost": "200"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0.1369863014",
+                "monthlyQuantity": "100",
+                "price": "0.021",
+                "hourlyCost": "0.0028767123",
+                "monthlyCost": "2.1"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.valkey",
+            "metadata": {},
+            "hourlyCost": "1.68",
+            "monthlyCost": "1226.4",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (valkey, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.28",
+                "hourlyCost": "1.68",
+                "monthlyCost": "1226.4"
+              },
+              {
+                "name": "Data written (free up to 10TB)",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.021",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "aws_memorydb_cluster.valkey_with_usage",
+            "metadata": {},
+            "hourlyCost": "1.68",
+            "monthlyCost": "1426.5",
+            "costComponents": [
+              {
+                "name": "MemoryDB instance (valkey, on-demand, db.r6g.large)",
+                "unit": "hours",
+                "hourlyQuantity": "6",
+                "monthlyQuantity": "4380",
+                "price": "0.28",
+                "hourlyCost": "1.68",
+                "monthlyCost": "1226.4"
+              },
+              {
+                "name": "Data written (over 10TB)",
+                "unit": "GB",
+                "hourlyQuantity": "6.5068493151",
+                "monthlyQuantity": "4760",
+                "price": "0.04",
+                "hourlyCost": "0.2602739726",
+                "monthlyCost": "190.4"
+              },
+              {
+                "name": "Backup storage",
+                "unit": "GB",
+                "hourlyQuantity": "0.2739726027",
+                "monthlyQuantity": "200",
+                "price": "0.021",
+                "hourlyCost": "0.0057534247",
+                "monthlyCost": "4.2"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "10.56",
+        "totalMonthlyCost": "7711"
+      },
+      "summary": {
+        "totalDetectedResources": 8,
+        "totalSupportedResources": 6,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 6,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "10.56",
+  "totalMonthlyCost": "7711",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "10.56",
+  "diffTotalMonthlyCost": "7711",
+  "timeGenerated": "REPLACED_TIME",
+  "summary": {
+    "totalDetectedResources": 8,
+    "totalSupportedResources": 6,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 6,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
