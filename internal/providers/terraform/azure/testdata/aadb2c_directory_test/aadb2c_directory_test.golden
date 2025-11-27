@@ -1,0 +1,10 @@
+project:
+  name: infracost-test
+  resources:
+    - name: azurerm_aadb2c_directory.test
+      cost_components:
+        - name: Monthly active users (over free tier)
+          unit: users
+          quantity: 10000
+          price: 0.00 # TODO: Replace with actual price from Azure pricing API
+          monthly_cost: 0.00 # TODO: Replace with actual cost 
