@@ -270,6 +270,9 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 						Value: item,
 					})
 				}
+			case schema.Bool:
+				tag = "!!bool"
+				value = fmt.Sprintf("%v", rawValue)
 			}
 
 			itemKeyNode := &yamlv3.Node{
@@ -402,10 +405,10 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 		switch valNode.ShortTag() {
 		case "!!int":
 			usageValueType = schema.Int64
-
 		case "!!float":
 			usageValueType = schema.Float64
-
+		case "!!bool":
+			usageValueType = schema.Bool
 		default:
 			usageValueType = schema.String
 		}

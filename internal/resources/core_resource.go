@@ -14,6 +14,7 @@ var floatPtr *float64
 var strPtr *string
 var strType = reflect.TypeOf("")
 var float64Type = reflect.TypeOf(float64(0))
+var boolPtr *bool
 
 func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 	if u == nil {
@@ -64,6 +65,14 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 
 			if f.Type() == reflect.TypeOf(strPtr) {
 				f.Set(reflect.ValueOf(u.GetString(usageKey)))
+				continue
+			}
+
+			if f.Type() == reflect.TypeOf(boolPtr) {
+				if u.Get(usageKey).Exists() {
+					val := u.Get(usageKey).Bool()
+					f.Set(reflect.ValueOf(&val))
+				}
 				continue
 			}
 
