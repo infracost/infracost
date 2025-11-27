@@ -1,0 +1,243 @@
+
+ Name                                                  Monthly Qty  Unit                      Monthly Cost    
+                                                                                                              
+ azurerm_storage_table.usage                                                                                  
+ ├─ Capacity                                                   100  GB                               $4.50  * 
+ ├─ Batch Write operations                                     100  10k operations                   $0.04  * 
+ ├─ Write operations                                           200  10k operations                   $0.07  * 
+ ├─ Read operations                                            300  10k operations                   $0.11  * 
+ ├─ Scan operations                                            400  10k operations                   $0.14  * 
+ ├─ List operations                                            500  10k operations                   $0.18  * 
+ └─ Delete operations                                          600  10k operations                   $0.22  * 
+                                                                                                              
+ azurerm_storage_account.external_key                                                                         
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0196 per GB                 
+ ├─ Write operations                            Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ List and create container operations        Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.inline_key["GRS"]                                                                    
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0392 per GB                 
+ ├─ Write operations                            Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ List and create container operations        Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.inline_key["GZRS"]                                                                   
+ ├─ Capacity                                    Monthly cost depends on usage: $0.046 per GB                  
+ ├─ Write operations                            Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List and create container operations        Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.inline_key["LRS"]                                                                    
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0196 per GB                 
+ ├─ Write operations                            Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ List and create container operations        Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.inline_key["RA-GRS"]                                                                 
+ ├─ Capacity                                    Monthly cost depends on usage: $0.049 per GB                  
+ ├─ Write operations                            Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ List and create container operations        Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.inline_key["RA-GZRS"]                                                                
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0575 per GB                 
+ ├─ List and create container operations        Monthly cost depends on usage: $0.06786 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.inline_key["ZRS"]                                                                    
+ ├─ Capacity                                    Monthly cost depends on usage: $0.024 per GB                  
+ ├─ List and create container operations        Monthly cost depends on usage: $0.0675 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.standard["GRS"]                                                                      
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0392 per GB                 
+ ├─ Write operations                            Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ List and create container operations        Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.standard["GZRS"]                                                                     
+ ├─ Capacity                                    Monthly cost depends on usage: $0.046 per GB                  
+ ├─ Write operations                            Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List and create container operations        Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.standard["LRS"]                                                                      
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0196 per GB                 
+ ├─ Write operations                            Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ List and create container operations        Monthly cost depends on usage: $0.054 per 10k operations      
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.standard["RA-GRS"]                                                                   
+ ├─ Capacity                                    Monthly cost depends on usage: $0.049 per GB                  
+ ├─ Write operations                            Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ List and create container operations        Monthly cost depends on usage: $0.11 per 10k operations       
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.standard["RA-GZRS"]                                                                  
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0575 per GB                 
+ ├─ List and create container operations        Monthly cost depends on usage: $0.06786 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.075 per 10k tags            
+                                                                                                              
+ azurerm_storage_account.standard["ZRS"]                                                                      
+ ├─ Capacity                                    Monthly cost depends on usage: $0.024 per GB                  
+ ├─ List and create container operations        Monthly cost depends on usage: $0.0675 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0043 per 10k operations     
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations     
+ └─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags            
+                                                                                                              
+ azurerm_storage_table.external_key                                                                           
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0585 per GB                 
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.0975 per 10k operations     
+ ├─ Write operations                            Monthly cost depends on usage: $0.0325 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.inline_key["GRS"]                                                                      
+ ├─ Capacity                                    Monthly cost depends on usage: $0.12 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.20 per 10k operations       
+ ├─ Write operations                            Monthly cost depends on usage: $0.065 per 10k operations      
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.inline_key["GZRS"]                                                                     
+ ├─ Capacity                                    Monthly cost depends on usage: $0.12 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.19 per 10k operations       
+ ├─ Write operations                            Monthly cost depends on usage: $0.0625 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.inline_key["LRS"]                                                                      
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0585 per GB                 
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.0975 per 10k operations     
+ ├─ Write operations                            Monthly cost depends on usage: $0.0325 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.inline_key["RA-GRS"]                                                                   
+ ├─ Capacity                                    Monthly cost depends on usage: $0.15 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.20 per 10k operations       
+ ├─ Write operations                            Monthly cost depends on usage: $0.065 per 10k operations      
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.inline_key["RA-GZRS"]                                                                  
+ ├─ Capacity                                    Monthly cost depends on usage: $0.15 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.19 per 10k operations       
+ ├─ Write operations                            Monthly cost depends on usage: $0.0625 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.inline_key["ZRS"]                                                                      
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0731 per GB                 
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.0975 per 10k operations     
+ ├─ Write operations                            Monthly cost depends on usage: $0.0325 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
+ ├─ Scan operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ ├─ List operations                             Monthly cost depends on usage: $0.12 per 10k operations       
+ └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
+                                                                                                              
+ azurerm_storage_table.standard["GRS"]                                                                        
+ ├─ Capacity                                    Monthly cost depends on usage: $0.06 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Write operations                            Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Scan operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ List operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ └─ Delete operations                           Monthly cost depends on usage: $0.00036 per 10k operations    
+                                                                                                              
+ azurerm_storage_table.standard["GZRS"]                                                                       
+ ├─ Capacity                                    Monthly cost depends on usage: $0.10 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Write operations                            Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Scan operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ List operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ └─ Delete operations                           Monthly cost depends on usage: $0.00036 per 10k operations    
+                                                                                                              
+ azurerm_storage_table.standard["LRS"]                                                                        
+ ├─ Capacity                                    Monthly cost depends on usage: $0.045 per GB                  
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Write operations                            Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Scan operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ List operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ └─ Delete operations                           Monthly cost depends on usage: $0.00036 per 10k operations    
+                                                                                                              
+ azurerm_storage_table.standard["RA-GRS"]                                                                     
+ ├─ Capacity                                    Monthly cost depends on usage: $0.075 per GB                  
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Write operations                            Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Scan operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ List operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ └─ Delete operations                           Monthly cost depends on usage: $0.00036 per 10k operations    
+                                                                                                              
+ azurerm_storage_table.standard["RA-GZRS"]                                                                    
+ ├─ Capacity                                    Monthly cost depends on usage: $0.13 per GB                   
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Write operations                            Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Scan operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ List operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ └─ Delete operations                           Monthly cost depends on usage: $0.00036 per 10k operations    
+                                                                                                              
+ azurerm_storage_table.standard["ZRS"]                                                                        
+ ├─ Capacity                                    Monthly cost depends on usage: $0.0562 per GB                 
+ ├─ Batch Write operations                      Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Write operations                            Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Read operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ Scan operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ ├─ List operations                             Monthly cost depends on usage: $0.00036 per 10k operations    
+ └─ Delete operations                           Monthly cost depends on usage: $0.00036 per 10k operations    
+                                                                                                              
+ OVERALL TOTAL                                                                                       $5.26 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+31 cloud resources were detected:
+∙ 27 were estimated
+∙ 4 were free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃          $5 ┃         $5 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
