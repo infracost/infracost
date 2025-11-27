@@ -15,37 +15,38 @@ func newSearchDomain(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.SearchDomain{
 		Address:                       d.Address,
 		Region:                        d.Get("region").String(),
-		ClusterInstanceType:           d.Get("cluster_config.0.instance_type").String(),
-		EBSEnabled:                    d.Get("ebs_options.0.ebs_enabled").Bool(),
-		EBSVolumeType:                 d.Get("ebs_options.0.volume_type").String(),
-		ClusterDedicatedMasterEnabled: d.Get("cluster_config.0.dedicated_master_enabled").Bool(),
-		ClusterDedicatedMasterType:    d.Get("cluster_config.0.dedicated_master_type").String(),
-		ClusterWarmEnabled:            d.Get("cluster_config.0.warm_enabled").Bool(),
-		ClusterWarmType:               d.Get("cluster_config.0.warm_type").String(),
+		ClusterInstanceType:           d.GetChild("cluster_config").Get("instance_type").String(),
+		EBSEnabled:                    d.GetChild("ebs_options").Get("ebs_enabled").Bool(),
+		EBSVolumeType:                 d.GetChild("ebs_options").Get("volume_type").String(),
+		ClusterDedicatedMasterEnabled: d.GetChild("cluster_config").Get("dedicated_master_enabled").Bool(),
+		ClusterDedicatedMasterType:    d.GetChild("cluster_config").Get("dedicated_master_type").String(),
+		ClusterWarmEnabled:            d.GetChild("cluster_config").Get("warm_enabled").Bool(),
+		ClusterWarmType:               d.GetChild("cluster_config").Get("warm_type").String(),
 	}
 
-	if !d.IsEmpty("cluster_config.0.instance_count") {
-		r.ClusterInstanceCount = intPtr(d.Get("cluster_config.0.instance_count").Int())
+	if !d.IsEmpty("cluster_config.instance_count") {
+		r.ClusterInstanceCount = intPtr(d.GetChild("cluster_config").Get("instance_count").Int())
 	}
 
-	if !d.IsEmpty("ebs_options.0.volume_size") {
-		r.EBSVolumeSize = floatPtr(d.Get("ebs_options.0.volume_size").Float())
+	if !d.IsEmpty("ebs_options.volume_size") {
+		r.EBSVolumeSize = floatPtr(d.GetChild("ebs_options").Get("volume_size").Float())
 	}
 
-	if !d.IsEmpty("ebs_options.0.iops") {
-		r.EBSIOPS = floatPtr(d.Get("ebs_options.0.iops").Float())
+	if !d.IsEmpty("ebs_options.iops") {
+		r.EBSIOPS = floatPtr(d.GetChild("ebs_options").Get("iops").Float())
 	}
 
-	if !d.IsEmpty("ebs_options.0.throughput") {
-		r.EBSThroughput = floatPtr(d.Get("ebs_options.0.throughput").Float())
+	if !d.IsEmpty("ebs_options.throughput") {
+		r.EBSThroughput = floatPtr(d.GetChild("ebs_options").Get("throughput").Float())
 	}
 
-	if !d.IsEmpty("cluster_config.0.dedicated_master_count") {
-		r.ClusterDedicatedMasterCount = intPtr(d.Get("cluster_config.0.dedicated_master_count").Int())
+	if !d.IsEmpty("cluster_config.dedicated_master_count") {
+		r.ClusterDedicatedMasterCount = intPtr(d.GetChild("cluster_config").Get("dedicated_master_count").Int())
 	}
 
-	if !d.IsEmpty("cluster_config.0.warm_count") {
-		r.ClusterWarmCount = intPtr(d.Get("cluster_config.0.warm_count").Int())
+	if !d.IsEmpty("cluster_config.warm_count") {
+		r.ClusterWarmCount = intPtr(d.GetChild("cluster_config").Get("warm_count").Int())
 	}
+
 	return r
 }

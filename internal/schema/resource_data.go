@@ -69,6 +69,18 @@ func (d *ResourceData) Get(key string) gjson.Result {
 	return gjson.Parse(strings.Clone(d.RawValues.Get(key).Raw))
 }
 
+func (d *ResourceData) GetChild(key string) gjson.Result {
+	val := d.RawValues.Get(key)
+	if val.IsArray() {
+		if val.Get("0").Exists() {
+			return val.Get("0")
+		}
+	} else if val.IsObject() {
+		return val
+	}
+	return gjson.Result{}
+}
+
 // GetStringOrDefault returns the value of key within ResourceData as a string.
 // If the retrieved value is not set GetStringOrDefault will return def.
 func (d *ResourceData) GetStringOrDefault(key, def string) string {
