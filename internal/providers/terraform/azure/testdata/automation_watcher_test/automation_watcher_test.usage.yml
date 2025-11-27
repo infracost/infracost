@@ -1,0 +1,3 @@
+version: 0.1
+resource_usage:
+  azurerm_automation_watcher.example: {}

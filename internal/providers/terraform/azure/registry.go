@@ -19,6 +19,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getApplicationInsightsWebTestRegistryItem(),
 	getApplicationInsightsRegistryItem(),
 	getAutomationAccountRegistryItem(),
+	getAutomationWatcherRegistryItem(),
 	getAutomationDSCConfigurationRegistryItem(),
 	getAutomationDSCNodeConfigurationRegistryItem(),
 	getAutomationJobScheduleRegistryItem(),
