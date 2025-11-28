@@ -12,8 +12,6 @@
  │  └─ Inbound DT-premium fee                     42,340,000  GB    $1,820,620.00  * 
  ├─ South Korea                                                                      
  │  └─ Inbound DT-premium fee                     52,340,000  GB    $1,831,900.00  * 
- ├─ Middle East                                                                      
- │  └─ Inbound DT-premium fee                     52,340,000  GB    $1,831,900.00  * 
  ├─ Australia, New Zealand                                                           
  │  └─ Inbound DT-premium fee                     62,340,000  GB    $6,545,700.00  * 
  ├─ Asia Pacific                                                                     
@@ -27,7 +25,7 @@
  └─ Asia Pacific                                                                     
     └─ Outbound DT-premium fee                         1,000  GB           $35.00  * 
                                                                                      
- OVERALL TOTAL                                                     $19,161,650.00 
+ OVERALL TOTAL                                                     $17,329,750.00 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -38,5 +36,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost  ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━┫
-┃ main                                               ┃         $0.00 ┃ $19,161,650 ┃ $19,161,650 ┃
+┃ main                                               ┃         $0.00 ┃ $17,329,750 ┃ $17,329,750 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━┛
