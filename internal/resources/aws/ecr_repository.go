@@ -48,6 +48,9 @@ func (r *ECRRepository) BuildResource() *schema.Resource {
 					Region:        strPtr(r.Region),
 					Service:       strPtr("AmazonECR"),
 					ProductFamily: strPtr("EC2 Container Registry"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "usagetype", Value: strPtr("TimedStorage-ByteHrs")},
+					},
 				},
 				UsageBased: true,
 			},
