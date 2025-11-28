@@ -133,7 +133,7 @@ func (r *MySQLFlexibleServer) storageCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Az DB for MySQL Flexible Server Storage")},
+				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Storage")},
 				{Key: "meterName", Value: strPtr("Storage Data Stored")},
 			},
 		},
@@ -169,7 +169,7 @@ func (r *MySQLFlexibleServer) iopsCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Az DB for MySQL Flexible Server Storage")},
+				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Storage")},
 				{Key: "skuName", Value: strPtr("Additional IOPS")},
 			},
 		},
@@ -194,7 +194,7 @@ func (r *MySQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Az DB for MySQL Flex Svr Backup Storage")},
+				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Backup Storage")},
 				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
