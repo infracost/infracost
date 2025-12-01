@@ -1,4 +1,4 @@
-FROM golang:1.25 AS builder
+FROM golang:1.25.4 AS builder
 
 ARG ARCH=linux
 ARG DEFAULT_TERRAFORM_VERSION=0.15.5
@@ -10,7 +10,7 @@ ENV HOME=/app
 ENV CGO_ENABLED=0
 
 # Install Packages
-RUN apt-get update -q && apt-get -y install unzip
+RUN apt-get update -q && apt-get -y install unzip && rm -rf /var/lib/apt/lists/*
 
 # Install latest of each Terraform version after 0.12 as we don't support versions before that
 RUN AVAILABLE_TERRAFORM_VERSIONS="0.12.31 0.13.7 0.14.11 ${DEFAULT_TERRAFORM_VERSION} 1.0.2 1.0.10" && \
