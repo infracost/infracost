@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -37,18 +35,6 @@ func (r *PrivateDnsResolverDnsForwardingRuleset) PopulateUsage(u *schema.UsageDa
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *PrivateDnsResolverDnsForwardingRuleset) BuildResource() *schema.Resource {
-	region := r.Region
-	switch {
-	case strings.HasPrefix(strings.ToLower(region), "usgov"):
-		region = "US Gov Zone 1"
-	case strings.HasPrefix(strings.ToLower(region), "germany"):
-		region = "DE Zone 1"
-	case strings.HasPrefix(strings.ToLower(region), "china"):
-		region = "Zone 1 (China)"
-	default:
-		region = "Zone 1"
-	}
-
 	return &schema.Resource{
 		Name:        r.Address,
 		UsageSchema: r.UsageSchema(),
@@ -60,7 +46,7 @@ func (r *PrivateDnsResolverDnsForwardingRuleset) BuildResource() *schema.Resourc
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("azure"),
-					Region:        strPtr(region),
+					Region:        strPtr(dnsZoneRegion(r.Region)),
 					Service:       strPtr("Azure DNS"),
 					ProductFamily: strPtr("Networking"),
 					AttributeFilters: []*schema.AttributeFilter{
