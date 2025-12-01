@@ -12,5 +12,7 @@ func TestNetworkWatcherFlowLog(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "network_watcher_flow_log_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "network_watcher_flow_log_test", &tftest.GoldenFileOptions{
+		IgnoreCLI: true, // Azure deprecated NSG flow logs June 2025
+	})
 }
