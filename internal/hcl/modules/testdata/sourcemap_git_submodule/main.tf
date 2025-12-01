@@ -7,11 +7,9 @@ provider "aws" {
 }
 
 module "git-submodule" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=v2.5.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/delegation-sets?ref=v2.5.0"
 
-  zones = {
-    "example.com" = {
-      comment = "example.com"
-    }
+  delegation_sets = {
+    "example.com" = {}
   }
 }
