@@ -13,5 +13,6 @@ func TestLogAnalyticsWorkspaceGoldenFile(t *testing.T) {
 
 	tftest.GoldenFileResourceTestsWithOpts(t, "log_analytics_workspace_test", &tftest.GoldenFileOptions{
 		CaptureLogs: true,
+		IgnoreCLI:   true, // Azure no longer supports Standard/Premium SKUs
 	})
 }
