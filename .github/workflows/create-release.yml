@@ -58,8 +58,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           push: true
 
-      - name: Clean Docker image
-        run: docker rmi ${{ steps.build_push_docker.outputs.imageid }} -f
+      - name: Clean Docker build cache
+        run: docker builder prune -af
 
       - name: Docker meta (CI)
         id: meta-ci
