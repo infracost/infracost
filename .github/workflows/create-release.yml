@@ -12,6 +12,15 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Free up disk space
+        run: |
+          # GitHub runners have ~30GB of pre-installed software we don't need
+          sudo rm -rf /usr/local/lib/android  # ~12GB Android SDK
+          sudo rm -rf /usr/local/.ghcup       # ~6GB Haskell toolchain
+          sudo rm -rf /usr/share/dotnet       # ~4GB .NET SDK
+          sudo rm -rf /usr/share/swift        # ~3GB Swift toolchain
+          sudo rm -rf /opt/hostedtoolcache    # ~6GB cached tool versions
+
       - uses: actions/checkout@v4
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
@@ -59,7 +68,7 @@ jobs:
           push: true
 
       - name: Clean Docker build cache
-        run: docker builder prune -af
+        run: docker system prune -af --volumes
 
       - name: Docker meta (CI)
         id: meta-ci
