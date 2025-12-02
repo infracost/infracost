@@ -15,12 +15,16 @@ jobs:
         run: |
           echo "=== Initial Disk Space ==="
           df -h
-          echo ""
-          echo "=== Docker disk usage ==="
-          docker system df
-          echo ""
-          echo "=== Large directories ==="
-          sudo du -h /usr/local /usr/share /opt 2>/dev/null | sort -rh | head -20
+
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /opt/hostedtoolcache
+          echo "=== Disk Space After Cleanup ==="
+          df -h
 
       - uses: actions/checkout@v4
       - name: Set up Go 1.x
@@ -81,7 +85,7 @@ jobs:
           docker system df
 
       - name: Clean Docker build cache
-        run: docker builder prune -af
+        run: docker system prune -af --volumes
 
       - name: Check disk space after prune
         run: |
