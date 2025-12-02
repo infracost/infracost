@@ -11,6 +11,17 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Check initial disk space
+        run: |
+          echo "=== Initial Disk Space ==="
+          df -h
+          echo ""
+          echo "=== Docker disk usage ==="
+          docker system df
+          echo ""
+          echo "=== Large directories ==="
+          sudo du -h /usr/local /usr/share /opt 2>/dev/null | sort -rh | head -20
+
       - uses: actions/checkout@v4
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
@@ -28,6 +39,11 @@ jobs:
 
       - name: Remove build assets
         run: rm -rf build
+
+      - name: Check disk space after Go build
+        run: |
+          echo "=== Disk Space After Go Build ==="
+          df -h
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -56,8 +72,24 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           push: true
 
+      - name: Check disk space after first Docker build
+        run: |
+          echo "=== Disk Space After First Docker Build ==="
+          df -h
+          echo ""
+          echo "=== Docker disk usage ==="
+          docker system df
+
       - name: Clean Docker build cache
         run: docker builder prune -af
+
+      - name: Check disk space after prune
+        run: |
+          echo "=== Disk Space After Docker Prune ==="
+          df -h
+          echo ""
+          echo "=== Docker disk usage ==="
+          docker system df
 
       - name: Docker meta (CI)
         id: meta-ci
@@ -78,3 +110,9 @@ jobs:
           platforms: linux/amd64
           tags: ${{ steps.meta-ci.outputs.tags }}
           push: true
+
+      - name: Check final disk space
+        if: always()
+        run: |
+          echo "=== Final Disk Space ==="
+          df -h
