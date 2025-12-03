@@ -129,7 +129,7 @@ jobs:
           make build
           ./build/infracost fig-autocomplete > fig-spec.ts
       - name: Create Autocomplete PR
-        uses: withfig/push-to-fig-autocomplete-action@v1
+        uses: withfig/push-to-fig-autocomplete-action@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           autocomplete-spec-name: infracost
