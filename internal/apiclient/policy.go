@@ -92,7 +92,7 @@ func (c *PolicyAPIClient) uploadProjectPolicyData(p2rs []policy2Resource) (strin
 	}
 	`
 
-	v := map[string]interface{}{
+	v := map[string]any{
 		"policyResources": p2rs,
 	}
 
@@ -304,8 +304,8 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	}
 }
 
-func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string]interface{} {
-	values := make(map[string]interface{}, len(allowList))
+func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string]any {
+	values := make(map[string]any, len(allowList))
 	for k, v := range rd.Map() {
 		if allow, ok := allowList[k]; ok {
 			if allow.IsBool() {
@@ -316,7 +316,7 @@ func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string
 				nestedAllow := allow.Map()
 				if v.IsArray() {
 					vArray := v.Array()
-					nestedVals := make([]interface{}, 0, len(vArray))
+					nestedVals := make([]any, 0, len(vArray))
 					for _, el := range vArray {
 						nestedVals = append(nestedVals, filterValues(el, nestedAllow))
 					}
@@ -364,7 +364,7 @@ func (c *PolicyAPIClient) getPolicyResourceAllowList() (map[string]allowList, er
 			}
 		}
 	`
-	v := map[string]interface{}{}
+	v := map[string]any{}
 
 	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {

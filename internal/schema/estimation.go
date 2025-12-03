@@ -4,7 +4,7 @@ import "context"
 
 // EstimateFunc queries cloud providers to gather past usage information, then
 // projects future usage based on the results.
-type EstimateFunc func(context.Context, map[string]interface{}) error
+type EstimateFunc func(context.Context, map[string]any) error
 
 // Remediater allows correction of cloud configuration issues
 // so that future runs of Infracost will provide more accurate results.

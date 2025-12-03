@@ -4,6 +4,7 @@ import (
 	"bytes"
 	stdJson "encoding/json"
 	"fmt"
+	"maps"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -455,17 +456,13 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
 		data.Metadata = gjson.ParseBytes([]byte(r.Get("infracost_metadata").Raw)).Map()
-		for k, v := range p.ctx.ProjectConfig.Metadata {
-			data.ProjectMetadata[k] = v
-		}
+		maps.Copy(data.ProjectMetadata, p.ctx.ProjectConfig.Metadata)
 		resources[strings.Clone(addr)] = data
 	}
 
 	// Recursively add any resources for child modules
 	for _, m := range planVals.Get("child_modules").Array() {
-		for addr, d := range p.parseResourceData(isState, confLoader, providerConf, m, vars) {
-			resources[addr] = d
-		}
+		maps.Copy(resources, p.parseResourceData(isState, confLoader, providerConf, m, vars))
 	}
 
 	return resources
@@ -492,7 +489,7 @@ func (p *Parser) getRegion(confLoader *ConfLoader, d *schema.ResourceData, provi
 	return strings.Clone(region)
 }
 
-func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
+func getSpecialContext(d *schema.ResourceData) map[string]any {
 	providerPrefix := getProviderPrefix(d.Type)
 
 	switch providerPrefix {
@@ -504,7 +501,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 		return google.GetSpecialContext(d)
 	default:
 		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
-		return map[string]interface{}{}
+		return map[string]any{}
 	}
 }
 
@@ -1013,13 +1010,7 @@ func (p *Parser) getTagPropagationInfo(resource *schema.ResourceData) *schema.Ta
 }
 
 func isInfracostResource(res *schema.ResourceData) bool {
-	for _, p := range infracostProviderNames {
-		if res.ProviderName == p {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(infracostProviderNames, res.ProviderName)
 }
 
 // addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
@@ -1121,13 +1112,7 @@ func splitAddress(addr string) []string {
 }
 
 func containsString(a []string, s string) bool {
-	for _, i := range a {
-		if i == s {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(a, s)
 }
 
 func gjsonEscape(s string) string {

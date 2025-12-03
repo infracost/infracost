@@ -182,7 +182,7 @@ func (r *TFCRemoteVariablesLoader) Load(options RemoteVarLoaderOptions) (map[str
 	varsets := []tfcVarset{}
 	varsMap := map[string]tfcVar{}
 
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		endpoint = fmt.Sprintf("/api/v2/workspaces/%s/varsets?include=vars&page[number]=%d&page[size]=50", workspaceID, pageNumber)
 		body, err = r.client.Get(endpoint)
 		if err != nil {
@@ -461,20 +461,20 @@ func (s *SpaceliftRemoteVariableLoader) Load(options RemoteVarLoaderOptions) (ma
 
 	// Spacelift precedence is runtime config > config > attached contexts
 	for _, env := range stacks[0].AttachedContexts {
-		if strings.HasPrefix(env.ID, "TF_VAR_") {
-			vars[strings.TrimPrefix(env.ID, "TF_VAR_")] = cty.StringVal(env.ContextName)
+		if after, ok := strings.CutPrefix(env.ID, "TF_VAR_"); ok {
+			vars[after] = cty.StringVal(env.ContextName)
 		}
 	}
 
 	for _, env := range stacks[0].Config {
-		if strings.HasPrefix(env.ID, "TF_VAR_") {
-			vars[strings.TrimPrefix(env.ID, "TF_VAR_")] = cty.StringVal(env.Value)
+		if after, ok := strings.CutPrefix(env.ID, "TF_VAR_"); ok {
+			vars[after] = cty.StringVal(env.Value)
 		}
 	}
 
 	for _, env := range stacks[0].RuntimeConfig {
-		if strings.HasPrefix(env.Element.ID, "TF_VAR_") {
-			vars[strings.TrimPrefix(env.Element.ID, "TF_VAR_")] = cty.StringVal(env.Element.Value)
+		if after, ok := strings.CutPrefix(env.Element.ID, "TF_VAR_"); ok {
+			vars[after] = cty.StringVal(env.Element.Value)
 		}
 	}
 
@@ -506,7 +506,7 @@ type stackConfig struct {
 }
 
 type runtimeConfig struct {
-	Element stackConfig `graphql:"element" json:"element,omitempty"`
+	Element stackConfig `graphql:"element" json:"element"`
 }
 
 type attachedContext struct {
@@ -557,7 +557,7 @@ func (s *SpaceliftRemoteVariableLoader) getStacks(ctx context.Context, p *getSta
 		Predicates: &conditions,
 	}
 
-	variables := map[string]interface{}{"input": input}
+	variables := map[string]any{"input": input}
 
 	if err := s.Client.Query(
 		ctx,

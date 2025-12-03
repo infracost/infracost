@@ -31,7 +31,7 @@ type subUsageResource struct {
 }
 
 type args struct {
-	args interface{}
+	args any
 	u    *schema.UsageData
 }
 
@@ -39,7 +39,7 @@ func TestPopulateArgsWithUsage(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want interface{}
+		want any
 	}{
 		{
 			name: "parses float usage",

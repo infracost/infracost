@@ -3,6 +3,7 @@ package funcs
 import (
 	"errors"
 	"fmt"
+	"maps"
 
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
@@ -87,9 +88,7 @@ var MergeFunc = function.New(&function.Spec{
 
 			switch {
 			case ty.IsObjectType() && !arg.IsNull():
-				for attr, aty := range ty.AttributeTypes() {
-					attrs[attr] = aty
-				}
+				maps.Copy(attrs, ty.AttributeTypes())
 			case ty.IsMapType():
 				switch {
 				case arg.IsNull():

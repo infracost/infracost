@@ -40,10 +40,10 @@ const (
 // ProjectDiag holds information about all diagnostics associated with a project.
 // This can be both critical or warnings.
 type ProjectDiag struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-	IsError bool        `json:"isError"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+	IsError bool   `json:"isError"`
 
 	// FriendlyMessage should be used to display a readable message to the CLI user.
 	FriendlyMessage string `json:"-"`
@@ -115,7 +115,7 @@ func NewPrivateRegistryDiag(source string, moduleLocation *string, err error) *P
 		diagPrivateRegistryModuleDownloadFailure,
 		fmt.Sprintf("Failed to lookup module %q - %s", source, errorString),
 		true,
-		map[string]interface{}{
+		map[string]any{
 			"moduleLocation": moduleLocation,
 			"moduleSource":   source,
 		},
@@ -137,7 +137,7 @@ func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
 		diagPrivateModuleDownloadFailure,
 		fmt.Sprintf("Failed to download module %q - %s", source, errorString),
 		true,
-		map[string]interface{}{
+		map[string]any{
 			"source":       sourceType,
 			"moduleSource": source,
 		},
@@ -145,7 +145,7 @@ func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
 	)
 }
 
-func newDiag(code int, message string, isError bool, data interface{}, err error) *ProjectDiag {
+func newDiag(code int, message string, isError bool, data any, err error) *ProjectDiag {
 	// if the error is already a ProjectDiag, return it rather than creating a new
 	// one. This is to avoid collision of diagnostics.
 	var diag *ProjectDiag

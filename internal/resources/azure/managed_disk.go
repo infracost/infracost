@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"slices"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -330,13 +332,7 @@ func mapDiskName(diskType string, requestedSize int) string {
 }
 
 func mapStorageReplicationType(storageReplicationType string) bool {
-	for _, b := range storageReplicationTypes {
-		if storageReplicationType == b {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(storageReplicationTypes, storageReplicationType)
 }
 
 func mapUltraDiskSize(requestedSize int) int {

@@ -13,8 +13,8 @@ const (
 
 type UsageItem struct {
 	Key          string
-	DefaultValue interface{}
-	Value        interface{}
+	DefaultValue any
+	Value        any
 	ValueType    UsageVariableType
 	Description  string
 }

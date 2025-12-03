@@ -2,6 +2,7 @@ package aws_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	resources "github.com/infracost/infracost/internal/resources/aws"
@@ -33,20 +34,20 @@ func stubCloudWatchASGQuery(stub *stubbedAWS, name string, value float64) {
 }
 
 func stubEC2DescribeAutoscalingGroups(stub *stubbedAWS, name string, count int64) {
-	var instanceMembers string
+	var instanceMembers strings.Builder
 	var groupMember string
 
 	// shoddy stub: woefully incomplete compared to real response
 	if count > 0 {
-		for i := int64(0); i < count; i++ {
-			instanceMembers += `
-					<member></member>`
+		for range count {
+			instanceMembers.WriteString(`
+					<member></member>`)
 		}
 
 		groupMember = `
 			<member>
 				<Instances>
-				` + instanceMembers +
+				` + instanceMembers.String() +
 			`</Instances>
 			</member>`
 	}

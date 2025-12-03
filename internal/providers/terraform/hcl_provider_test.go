@@ -263,7 +263,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			exp := bytes.NewBuffer([]byte{})
-			err = tmpl.Execute(exp, map[string]interface{}{"attrs": tt.attrs})
+			err = tmpl.Execute(exp, map[string]any{"attrs": tt.attrs})
 			require.NoError(t, err)
 
 			expected := exp.String()

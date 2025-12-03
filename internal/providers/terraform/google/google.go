@@ -1,6 +1,8 @@
 package google
 
 import (
+	"maps"
+
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -22,8 +24,8 @@ func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
 	return []string{}
 }
 
-func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
-	return map[string]interface{}{}
+func GetSpecialContext(d *schema.ResourceData) map[string]any {
+	return map[string]any{}
 }
 
 func GetResourceRegion(d *schema.ResourceData) string {
@@ -60,9 +62,7 @@ func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]st
 
 	tags := make(map[string]string)
 
-	for k, v := range defaultLabels {
-		tags[k] = v
-	}
+	maps.Copy(tags, defaultLabels)
 	for k, v := range rLabels {
 		tags[k] = v.String()
 	}
@@ -72,9 +72,7 @@ func ParseTags(r *schema.ResourceData, externalTags, defaultLabels map[string]st
 	for k, v := range rSettingsUserLabels {
 		tags[k] = v.String()
 	}
-	for k, v := range externalTags {
-		tags[k] = v
-	}
+	maps.Copy(tags, externalTags)
 
 	return tags, missing
 }

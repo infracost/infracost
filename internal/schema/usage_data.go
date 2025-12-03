@@ -3,6 +3,7 @@ package schema
 import (
 	"encoding/json"
 	"fmt"
+	"maps"
 	"math"
 	"regexp"
 	"sort"
@@ -39,9 +40,7 @@ func (u *UsageData) Copy() *UsageData {
 		Attributes: map[string]gjson.Result{},
 	}
 
-	for k, v := range u.Attributes {
-		c.Attributes[k] = v
-	}
+	maps.Copy(c.Attributes, u.Attributes)
 
 	return c
 }
@@ -61,9 +60,7 @@ func (u *UsageData) Merge(other *UsageData) *UsageData {
 		Attributes: make(map[string]gjson.Result, len(u.Attributes)),
 	}
 
-	for k, v := range u.Attributes {
-		newU.Attributes[k] = v
-	}
+	maps.Copy(newU.Attributes, u.Attributes)
 
 	if other != nil {
 		for k, v := range other.Attributes {
@@ -184,7 +181,7 @@ type UsageMap struct {
 }
 
 // NewUsageMapFromInterface returns an initialised UsageMap from interface map.
-func NewUsageMapFromInterface(m map[string]interface{}) UsageMap {
+func NewUsageMapFromInterface(m map[string]any) UsageMap {
 	data := make(map[string]*UsageData)
 
 	for addr, v := range m {
@@ -361,8 +358,8 @@ func mergeUsage(dst *UsageData, src *UsageData) {
 			dst.Attributes[key] = srcAttr
 		case gjson.JSON:
 			var err error
-			var destJson map[string]interface{}
-			var srcJson map[string]interface{}
+			var destJson map[string]any
+			var srcJson map[string]any
 			err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
 			if err != nil {
 				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not unmarshal dst attribute key: %q", key)
@@ -391,18 +388,18 @@ func mergeUsage(dst *UsageData, src *UsageData) {
 	dst.Address = src.Address
 }
 
-func ParseAttributes(i interface{}) map[string]gjson.Result {
+func ParseAttributes(i any) map[string]gjson.Result {
 	a := make(map[string]gjson.Result)
 
 	switch attrs := i.(type) {
-	case map[string]interface{}:
+	case map[string]any:
 		for k, v := range attrs {
 			// we use the jsoniter lib here as the std lib json
 			// cannot handle marshalling map[interface{}]interface{}
 			j, _ := jsoniter.Marshal(v)
 			a[k] = gjson.ParseBytes(j)
 		}
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, v := range attrs {
 			j, _ := jsoniter.Marshal(v)
 			a[fmt.Sprintf("%s", k)] = gjson.ParseBytes(j)

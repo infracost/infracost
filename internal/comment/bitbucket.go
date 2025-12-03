@@ -242,7 +242,7 @@ func (h *bitbucketPRHandler) CallFindMatchingComments(ctx context.Context, tag s
 
 // CallCreateComment calls the Bitbucket API to create a new comment on the pull request.
 func (h *bitbucketPRHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"content": map[string]string{
 			"raw": body,
 		},
@@ -294,7 +294,7 @@ func (h *bitbucketPRHandler) CallCreateComment(ctx context.Context, body string)
 
 // CallUpdateComment calls the Bitbucket API to update the body of a comment on the pull request.
 func (h *bitbucketPRHandler) CallUpdateComment(ctx context.Context, comment Comment, body string) error {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"content": map[string]string{
 			"raw": body,
 		},
@@ -447,7 +447,7 @@ func (h *bitbucketCommitHandler) CallFindMatchingComments(ctx context.Context, t
 
 // CallCreateComment calls the Bitbucket API to create a new comment on the pull request.
 func (h *bitbucketCommitHandler) CallCreateComment(ctx context.Context, body string) (Comment, error) {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"content": map[string]string{
 			"raw": body,
 		},
@@ -499,7 +499,7 @@ func (h *bitbucketCommitHandler) CallCreateComment(ctx context.Context, body str
 
 // CallUpdateComment calls the Bitbucket API to update the body of a comment on the pull request.
 func (h *bitbucketCommitHandler) CallUpdateComment(ctx context.Context, comment Comment, body string) error {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"content": map[string]string{
 			"raw": body,
 		},

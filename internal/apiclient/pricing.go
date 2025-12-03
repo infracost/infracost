@@ -224,12 +224,12 @@ func (c *PricingAPIClient) FlushCache() error {
 	return gob.NewEncoder(f).Encode(storedCached)
 }
 
-func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) error {
+func (c *PricingAPIClient) AddEvent(name string, env map[string]any) error {
 	if c.EventsDisabled {
 		return nil
 	}
 
-	filtered := make(map[string]interface{})
+	filtered := make(map[string]any)
 	for k, v := range env {
 		if _, ok := excludedEnv[k]; ok {
 			continue
@@ -238,7 +238,7 @@ func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) err
 		filtered[k] = v
 	}
 
-	d := map[string]interface{}{
+	d := map[string]any{
 		"event": name,
 		"env":   filtered,
 	}
@@ -252,7 +252,7 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 		currency = "USD"
 	}
 
-	v := map[string]interface{}{}
+	v := map[string]any{}
 	v["productFilter"] = product
 	v["priceFilter"] = price
 

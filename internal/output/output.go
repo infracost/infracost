@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -181,7 +183,7 @@ func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
 	return actualCosts
 }
 
-func convertMetadata(metadata map[string]interface{}) map[string]gjson.Result {
+func convertMetadata(metadata map[string]any) map[string]gjson.Result {
 	result := make(map[string]gjson.Result)
 	for k, v := range metadata {
 		jsonBytes, err := json.Marshal(v)
@@ -308,22 +310,22 @@ type ActualCosts struct {
 }
 
 type Resource struct {
-	Name                                    string                 `json:"name"`
-	ResourceType                            string                 `json:"resourceType,omitempty"`
-	Tags                                    *map[string]string     `json:"tags,omitempty"`
-	DefaultTags                             *map[string]string     `json:"defaultTags,omitempty"`
-	TagPropagation                          *TagPropagation        `json:"tagPropagation,omitempty"`
-	ProviderSupportsDefaultTags             bool                   `json:"providerSupportsDefaultTags,omitempty"`
-	ProviderLink                            string                 `json:"providerLink,omitempty"`
-	Metadata                                map[string]interface{} `json:"metadata"`
-	HourlyCost                              *decimal.Decimal       `json:"hourlyCost,omitempty"`
-	MonthlyCost                             *decimal.Decimal       `json:"monthlyCost,omitempty"`
-	MonthlyUsageCost                        *decimal.Decimal       `json:"monthlyUsageCost,omitempty"`
-	CostComponents                          []CostComponent        `json:"costComponents,omitempty"`
-	ActualCosts                             []ActualCosts          `json:"actualCosts,omitempty"`
-	SubResources                            []Resource             `json:"subresources,omitempty"`
-	MissingVarsCausingUnknownTagKeys        []string               `json:"missingVarsCausingUnknownTagKeys,omitempty"`
-	MissingVarsCausingUnknownDefaultTagKeys []string               `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
+	Name                                    string             `json:"name"`
+	ResourceType                            string             `json:"resourceType,omitempty"`
+	Tags                                    *map[string]string `json:"tags,omitempty"`
+	DefaultTags                             *map[string]string `json:"defaultTags,omitempty"`
+	TagPropagation                          *TagPropagation    `json:"tagPropagation,omitempty"`
+	ProviderSupportsDefaultTags             bool               `json:"providerSupportsDefaultTags,omitempty"`
+	ProviderLink                            string             `json:"providerLink,omitempty"`
+	Metadata                                map[string]any     `json:"metadata"`
+	HourlyCost                              *decimal.Decimal   `json:"hourlyCost,omitempty"`
+	MonthlyCost                             *decimal.Decimal   `json:"monthlyCost,omitempty"`
+	MonthlyUsageCost                        *decimal.Decimal   `json:"monthlyUsageCost,omitempty"`
+	CostComponents                          []CostComponent    `json:"costComponents,omitempty"`
+	ActualCosts                             []ActualCosts      `json:"actualCosts,omitempty"`
+	SubResources                            []Resource         `json:"subresources,omitempty"`
+	MissingVarsCausingUnknownTagKeys        []string           `json:"missingVarsCausingUnknownTagKeys,omitempty"`
+	MissingVarsCausingUnknownDefaultTagKeys []string           `json:"missingVarsCausingUnknownDefaultTagKeys,omitempty"`
 }
 
 type TagPropagation struct {
@@ -543,7 +545,7 @@ func outputResource(r *schema.Resource) Resource {
 }
 
 func newResource(r *schema.Resource, comps []CostComponent, actualCosts []ActualCosts, subresources []Resource) Resource {
-	metadata := make(map[string]interface{})
+	metadata := make(map[string]any)
 	for k, v := range r.Metadata {
 		metadata[k] = v.Value()
 	}
@@ -1052,12 +1054,7 @@ func sortResources(resources []Resource, groupKey string) {
 }
 
 func contains(arr []string, e string) bool {
-	for _, a := range arr {
-		if a == e {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(arr, e)
 }
 
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
@@ -1072,9 +1069,7 @@ func mergeCounts(c1 *map[string]int, c2 *map[string]int) *map[string]int {
 	res := make(map[string]int)
 
 	if c1 != nil {
-		for k, v := range *c1 {
-			res[k] = v
-		}
+		maps.Copy(res, *c1)
 	}
 
 	if c2 != nil {

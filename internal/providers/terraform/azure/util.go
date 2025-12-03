@@ -3,6 +3,7 @@ package azure
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -365,10 +366,5 @@ func intPtr(i int64) *int64 {
 }
 
 func contains(arr []string, e string) bool {
-	for _, a := range arr {
-		if a == e {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(arr, e)
 }

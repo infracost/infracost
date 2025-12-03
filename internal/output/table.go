@@ -22,7 +22,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		}
 	}
 
-	s := ""
+	var s strings.Builder
 
 	// Don't show the project total if there's only one project result
 	// since we will show the overall total anyway
@@ -34,17 +34,17 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		}
 
 		if i != 0 {
-			s += "──────────────────────────────────\n"
+			s.WriteString("──────────────────────────────────\n")
 		}
 
-		s += projectTitle(project)
-		s += "\n"
+		s.WriteString(projectTitle(project))
+		s.WriteString("\n")
 
 		if project.Metadata.HasErrors() {
-			s += erroredProject(project)
+			s.WriteString(erroredProject(project))
 
 			if len(out.Projects) == 1 {
-				s += "\n"
+				s.WriteString("\n")
 			}
 		} else {
 			fields := opts.Fields
@@ -61,18 +61,18 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 				}
 			}
 
-			s += tableOut
+			s.WriteString(tableOut)
 
-			s += "\n"
+			s.WriteString("\n")
 		}
 
 		if i != len(out.Projects)-1 {
-			s += "\n"
+			s.WriteString("\n")
 		}
 	}
 
 	if includeProjectTotals {
-		s += "\n"
+		s.WriteString("\n")
 	}
 
 	totalOut := FormatCost2DP(out.Currency, out.TotalMonthlyCost)
@@ -83,48 +83,49 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		padding = tableLen - (len(overallTitle) + 1)
 	}
 
-	s += fmt.Sprintf("%s%s",
+	s.WriteString(fmt.Sprintf("%s%s",
 		ui.BoldString(overallTitle),
 		fmt.Sprintf("%*s ", padding, totalOut), // pad based on the last line length
-	)
+	))
 
 	if hasUsageFootnote {
-		s += "\n\n"
-		s += usageCostsMessage(out, false)
-		s += "\n"
+		s.WriteString("\n\n")
+		s.WriteString(usageCostsMessage(out, false))
+		s.WriteString("\n")
 	}
 
 	summaryMsg := out.summaryMessage(opts.ShowSkipped)
 
 	if summaryMsg != "" {
-		s += "\n──────────────────────────────────\n" + summaryMsg
+		s.WriteString("\n──────────────────────────────────\n" + summaryMsg)
 	}
 
 	if len(out.Projects) > 0 {
-		s += "\n\n"
-		s += breakdownSummaryTable(out, opts)
+		s.WriteString("\n\n")
+		s.WriteString(breakdownSummaryTable(out, opts))
 	}
 
-	return []byte(s), nil
+	return []byte(s.String()), nil
 }
 
 func erroredProject(project Project) string {
-	s := ui.BoldString("Errors:") + "\n"
+	var s strings.Builder
+	s.WriteString(ui.BoldString("Errors:") + "\n")
 
 	for _, diag := range project.Metadata.Errors {
 		pieces := strings.Split(diag.Message, ": ")
 		for x, piece := range pieces {
-			s += strings.Repeat("  ", x+1) + piece
+			s.WriteString(strings.Repeat("  ", x+1) + piece)
 
 			if len(pieces)-1 == x {
-				s += "\n"
+				s.WriteString("\n")
 			} else {
-				s += ":\n"
+				s.WriteString(":\n")
 			}
 		}
 	}
 
-	return s
+	return s.String()
 }
 
 func tableForBreakdown(currency string, breakdown Breakdown, fields []string, includeTotal bool) string {

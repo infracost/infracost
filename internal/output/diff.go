@@ -218,7 +218,7 @@ func tableForDiff(out Root, opts Options) string {
 }
 
 func resourceToDiff(currency string, diffResource Resource, oldResource *Resource, newResource *Resource, isTopLevel bool) string {
-	s := ""
+	var s strings.Builder
 
 	op := UPDATED
 	if oldResource == nil {
@@ -242,16 +242,16 @@ func resourceToDiff(currency string, diffResource Resource, oldResource *Resourc
 		nameLabel = ui.BoldString(nameLabel)
 	}
 
-	s += fmt.Sprintf("%s %s\n", opChar(op), nameLabel)
+	s.WriteString(fmt.Sprintf("%s %s\n", opChar(op), nameLabel))
 
 	if isTopLevel {
 		if oldCost == nil && newCost == nil {
-			s += "  Monthly cost depends on usage\n"
+			s.WriteString("  Monthly cost depends on usage\n")
 		} else {
-			s += fmt.Sprintf("  %s%s\n",
+			s.WriteString(fmt.Sprintf("  %s%s\n",
 				formatCostChange(currency, diffResource.MonthlyCost),
 				ui.FaintString(formatCostChangeDetails(currency, oldCost, newCost)),
-			)
+			))
 		}
 	}
 
@@ -270,8 +270,8 @@ func resourceToDiff(currency string, diffResource Resource, oldResource *Resourc
 			continue
 		}
 
-		s += "\n"
-		s += ui.Indent(costComponentToDiff(currency, diffComponent, oldComponent, newComponent), "    ")
+		s.WriteString("\n")
+		s.WriteString(ui.Indent(costComponentToDiff(currency, diffComponent, oldComponent, newComponent), "    "))
 	}
 
 	for _, diffSubResource := range diffResource.SubResources {
@@ -289,11 +289,11 @@ func resourceToDiff(currency string, diffResource Resource, oldResource *Resourc
 			continue
 		}
 
-		s += "\n"
-		s += ui.Indent(resourceToDiff(currency, diffSubResource, oldSubResource, newSubResource, false), "    ")
+		s.WriteString("\n")
+		s.WriteString(ui.Indent(resourceToDiff(currency, diffSubResource, oldSubResource, newSubResource, false), "    "))
 	}
 
-	return s
+	return s.String()
 }
 
 func zeroDiffComponent(diff CostComponent, old, new *CostComponent, resourceName string) bool {

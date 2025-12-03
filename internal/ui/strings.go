@@ -24,7 +24,7 @@ func PrimaryString(msg string) string {
 	return primary.Sprint(msg)
 }
 
-func PrimaryStringf(msg string, a ...interface{}) string {
+func PrimaryStringf(msg string, a ...any) string {
 	return PrimaryString(fmt.Sprintf(msg, a...))
 }
 
@@ -32,7 +32,7 @@ func SuccessString(msg string) string {
 	return green.Sprint(msg)
 }
 
-func SuccessStringf(msg string, a ...interface{}) string {
+func SuccessStringf(msg string, a ...any) string {
 	return SuccessString(fmt.Sprintf(msg, a...))
 }
 
@@ -40,7 +40,7 @@ func ErrorString(msg string) string {
 	return red.Sprint(msg)
 }
 
-func ErrorStringf(msg string, a ...interface{}) string {
+func ErrorStringf(msg string, a ...any) string {
 	return ErrorString(fmt.Sprintf(msg, a...))
 }
 
@@ -48,7 +48,7 @@ func WarningString(msg string) string {
 	return yellow.Sprint(msg)
 }
 
-func WarningStringf(msg string, a ...interface{}) string {
+func WarningStringf(msg string, a ...any) string {
 	return WarningString(fmt.Sprintf(msg, a...))
 }
 
@@ -56,7 +56,7 @@ func LinkString(msg string) string {
 	return primaryLink.Sprint(msg)
 }
 
-func LinkStringf(msg string, a ...interface{}) string {
+func LinkStringf(msg string, a ...any) string {
 	return LinkString(fmt.Sprintf(msg, a...))
 }
 
@@ -64,7 +64,7 @@ func SecondaryLinkString(msg string) string {
 	return underline.Sprint(msg)
 }
 
-func SecondaryLinkStringf(msg string, a ...interface{}) string {
+func SecondaryLinkStringf(msg string, a ...any) string {
 	return SecondaryLinkString(fmt.Sprintf(msg, a...))
 }
 
@@ -72,7 +72,7 @@ func BoldString(msg string) string {
 	return bold.Sprint(msg)
 }
 
-func BoldStringf(msg string, a ...interface{}) string {
+func BoldStringf(msg string, a ...any) string {
 	return BoldString(fmt.Sprintf(msg, a...))
 }
 
@@ -80,7 +80,7 @@ func FaintString(msg string) string {
 	return faint.Sprint(msg)
 }
 
-func FaintStringf(msg string, a ...interface{}) string {
+func FaintStringf(msg string, a ...any) string {
 	return FaintString(fmt.Sprintf(msg, a...))
 }
 
@@ -88,7 +88,7 @@ func UnderlineString(msg string) string {
 	return underline.Sprint(msg)
 }
 
-func UnderlineStringf(msg string, a ...interface{}) string {
+func UnderlineStringf(msg string, a ...any) string {
 	return UnderlineString(fmt.Sprintf(msg, a...))
 }
 

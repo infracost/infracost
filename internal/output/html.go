@@ -22,7 +22,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 	tmpl := template.New("html.tmpl")
 	tmpl.Funcs(sprig.FuncMap())
 	tmpl.Funcs(template.FuncMap{
-		"safeHTML": func(s interface{}) template.HTML {
+		"safeHTML": func(s any) template.HTML {
 			return template.HTML(fmt.Sprint(s)) // nolint:gosec
 		},
 		"replaceNewLines": func(s string) template.HTML {

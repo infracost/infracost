@@ -165,11 +165,11 @@ func Test_metadataFetcher_GetGitlabMetadata(t *testing.T) {
 		t.Helper()
 
 		assert.Equal(t, token, r.Header.Get("Private-Token"))
-		_, err := w.Write([]byte(fmt.Sprintf(`{
+		_, err := w.Write(fmt.Appendf(nil, `{
 			"author": {
 				"username": %q
 			}
-		}`, username)))
+		}`, username))
 		assert.NoError(t, err)
 	})
 

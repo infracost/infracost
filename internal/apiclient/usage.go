@@ -190,12 +190,12 @@ func (c *UsageAPIClient) ListUsageQuantities(vars []*UsageQuantitiesQueryVariabl
 		return nil, fmt.Errorf("graphql error: %s", results[0].Get("errors").String())
 	}
 
-	attribsByAddress := make(map[string]map[string]interface{})
+	attribsByAddress := make(map[string]map[string]any)
 	for _, result := range results {
 		for _, q := range result.Get("data.usageQuantities").Array() {
 			address := q.Get("address").String()
 			if attribsByAddress[address] == nil {
-				attribsByAddress[address] = make(map[string]interface{})
+				attribsByAddress[address] = make(map[string]any)
 			}
 
 			usageKey := q.Get("usageKey").String()
@@ -244,19 +244,19 @@ func (c *UsageAPIClient) ListUsageQuantities(vars []*UsageQuantitiesQueryVariabl
 //	   },
 //	   ...
 //	}
-func unflattenUsageKey(attribs map[string]interface{}, usageKey string, value string) {
+func unflattenUsageKey(attribs map[string]any, usageKey string, value string) {
 	split := strings.SplitN(usageKey, ".", 2)
 	if len(split) <= 1 {
 		attribs[usageKey] = value
 		return
 	}
 
-	var childAttribs map[string]interface{}
+	var childAttribs map[string]any
 	if val, ok := attribs[split[0]]; ok {
-		childAttribs = val.(map[string]interface{})
+		childAttribs = val.(map[string]any)
 	} else {
 		// sub attrib map doesn't already exist so add it to the parent
-		childAttribs = make(map[string]interface{})
+		childAttribs = make(map[string]any)
 		attribs[split[0]] = childAttribs
 	}
 
@@ -335,8 +335,8 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 	return nil
 }
 
-func interfaceToMap(in interface{}) map[string]interface{} {
-	out := map[string]interface{}{}
+func interfaceToMap(in any) map[string]any {
+	out := map[string]any{}
 	b, _ := json.Marshal(in)
 	_ = json.Unmarshal(b, &out)
 	return out

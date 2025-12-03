@@ -399,11 +399,11 @@ func TestParseJSONResources(t *testing.T) {
 
 	parsed := gjson.Parse(testData)
 
-	usage := schema.NewUsageMapFromInterface(map[string]interface{}{
-		"aws_cloudwatch_log_group.array_resource[*]": map[string]interface{}{
+	usage := schema.NewUsageMapFromInterface(map[string]any{
+		"aws_cloudwatch_log_group.array_resource[*]": map[string]any{
 			"monthly_data_ingested_gb": 0,
 		},
-		"aws_cloudwatch_log_group.each_resource[*]": map[string]interface{}{
+		"aws_cloudwatch_log_group.each_resource[*]": map[string]any{
 			"monthly_data_ingested_gb": 0,
 		},
 	})
@@ -412,7 +412,7 @@ func TestParseJSONResources(t *testing.T) {
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]any{}), true)
 
 	parsedResources := p.parseJSONResources(false, nil, usage, NewConfLoader(conf), parsed, providerConf, vars)
 	actual := make([]*schema.Resource, len(parsedResources))
@@ -484,7 +484,7 @@ func TestCreateResource(t *testing.T) {
 		},
 	}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]any{}), true)
 
 	for _, test := range tests {
 		parsed := p.createParsedResource(test.data, nil)
@@ -668,7 +668,7 @@ func TestParseResourceData(t *testing.T) {
 		"module.module1.aws_nat_gateway.nat2": "eu-west-2",
 	}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]any{}), true)
 	loader := NewConfLoader(conf)
 	actual := p.parseResourceData(false, loader, providerConf, planVals, vars)
 
@@ -728,7 +728,7 @@ func TestParseReferences_plan(t *testing.T) {
 		}`,
 	}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]any{}), true)
 	p.parseReferences(resData, NewConfLoader(conf))
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
@@ -756,7 +756,7 @@ func TestParseReferences_state(t *testing.T) {
 
 	conf := gjson.Result{}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]any{}), true)
 	p.parseReferences(resData, NewConfLoader(conf))
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))

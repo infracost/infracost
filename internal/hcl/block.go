@@ -416,7 +416,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 	if len(clone.HCLBlock.Labels) > 0 {
 		position := len(clone.HCLBlock.Labels) - 1
 		labels := make([]string, len(clone.HCLBlock.Labels))
-		for i := 0; i < len(labels); i++ {
+		for i := range labels {
 			labels[i] = clone.HCLBlock.Labels[i]
 		}
 		if index.IsKnown() && !index.IsNull() {

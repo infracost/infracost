@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 
@@ -20,13 +21,7 @@ func stripModuleCallPrefix(id string) string {
 }
 
 func attrIsVarInput(name string) bool {
-	for _, arg := range moduleCallArgs {
-		if name == arg {
-			return false
-		}
-	}
-
-	return true
+	return !slices.Contains(moduleCallArgs, name)
 }
 
 type VertexModuleCall struct {

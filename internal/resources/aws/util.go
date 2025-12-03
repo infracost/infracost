@@ -5,6 +5,7 @@ import (
 	"math"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -89,12 +90,7 @@ func ceil64(f float64) int64 {
 }
 
 func stringInSlice(slice []string, s string) bool {
-	for _, b := range slice {
-		if b == s {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, s)
 }
 
 func sliceOfKeysFromMap[K comparable, V any](m map[K]V) []K {
@@ -223,7 +219,7 @@ type RegionUsage struct {
 // product filters and cost lookups.
 func (r RegionsUsage) Values() []RegionUsage {
 	s := reflect.ValueOf(r)
-	t := reflect.TypeOf(r)
+	t := reflect.TypeFor[RegionsUsage]()
 
 	var regions []RegionUsage
 	for i := 0; i < s.NumField(); i++ {

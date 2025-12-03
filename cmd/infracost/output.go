@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -212,10 +213,5 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 }
 
 func contains(arr []string, e string) bool {
-	for _, a := range arr {
-		if a == e {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(arr, e)
 }
