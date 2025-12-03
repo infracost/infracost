@@ -232,6 +232,8 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 	out.Summary = current.Summary
 	out.FullSummary = current.FullSummary
 	out.Currency = current.Currency
+	out.MissingPricesCount = current.MissingPricesCount
+	out.MissingPricesComponents = current.MissingPricesComponents
 	return out, nil
 }
 

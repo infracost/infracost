@@ -140,6 +140,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	r.Currency = runCtx.Config.Currency
 	r.Metadata = output.NewMetadata(runCtx)
 
+	// Add missing prices information to the output for better user warnings
+	r.MissingPricesCount = pr.pricingFetcher.MissingPricesLen()
+	r.MissingPricesComponents = pr.pricingFetcher.MissingPricesComponents()
+
 	if runCtx.IsCloudUploadExplicitlyEnabled() {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 		result, err := dashboardClient.AddRun(runCtx, r)

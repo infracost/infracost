@@ -133,6 +133,17 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "\n"
 	}
 
+	// Show missing prices warning prominently in diff output
+	if out.MissingPricesCount > 0 {
+		s += "\n"
+		warningMsg := ui.WarningString("WARNING:")
+		if out.MissingPricesCount == 1 {
+			s += fmt.Sprintf("%s 1 price missing, cost estimates may be incomplete or inaccurate.\n", warningMsg)
+		} else {
+			s += fmt.Sprintf("%s %d prices missing, cost estimates may be incomplete or inaccurate.\n", warningMsg, out.MissingPricesCount)
+		}
+	}
+
 	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
 	if unsupportedMsg != "" {
 		s += "\n"
