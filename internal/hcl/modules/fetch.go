@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -76,9 +77,7 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 		getters[k] = g
 	}
 	getters["git"] = &CustomGitGetter{
-		&getter.GitGetter{
-			Timeout: defaultModuleRetrieveTimeout,
-		},
+		&getter.GitGetter{},
 	}
 	if proxy := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxy != "" {
 		httpGetter := &getter.HttpGetter{
@@ -278,7 +277,10 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 		Getters:       p.getters,
 	}
 
-	err := client.Get()
+	ctx, cancel := context.WithTimeout(context.Background(), defaultModuleRetrieveTimeout)
+	defer cancel()
+
+	err := client.Get(ctx)
 	if err != nil {
 		errorCache.Store(moduleAddr, err)
 		return false, err
@@ -322,17 +324,17 @@ type CustomGitGetter struct {
 // Get overrides the standard Get method to normalize SSH and HTTPS URLs before
 // attempting a Get. If the normalized URL fails it falls back to the original
 // URL.
-func (g *CustomGitGetter) Get(dst string, u *url.URL) error {
+func (g *CustomGitGetter) Get(ctx context.Context, dst string, u *url.URL) error {
 	httpsURL, err := NormalizeGitURLToHTTPS(u)
 	if err != nil {
 		logging.Logger.Debug().Err(err).Msgf("failed to transform %s to https", u)
-		return g.GitGetter.Get(dst, u)
+		return g.GitGetter.Get(ctx, dst, u)
 	}
 
-	err = g.GitGetter.Get(dst, httpsURL)
+	err = g.GitGetter.Get(ctx, dst, httpsURL)
 	if err != nil {
 		logging.Logger.Debug().Err(err).Msgf("failed to get transformed ssh url %s, retrying with ssh", httpsURL)
-		return g.GitGetter.Get(dst, u)
+		return g.GitGetter.Get(ctx, dst, u)
 	}
 
 	return nil

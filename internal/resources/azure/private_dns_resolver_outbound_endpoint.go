@@ -46,12 +46,12 @@ func (r *PrivateDnsResolverOutboundEndpoint) BuildResource() *schema.Resource {
 				MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("azure"),
-					Region:        strPtr(r.Region),
+					Region:        strPtr(dnsZoneRegion(r.Region)),
 					Service:       strPtr("Azure DNS"),
 					ProductFamily: strPtr("Networking"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "skuName", Value: strPtr("Azure DNS Private Resolver")},
-						{Key: "meterName", Value: strPtr("Azure DNS Private Resolver Outbound Endpoint")},
+						{Key: "skuName", ValueRegex: regexPtr("Private Resolver")},
+						{Key: "meterName", ValueRegex: regexPtr("Private Resolver Outbound Endpoint")},
 					},
 				},
 			},

@@ -119,8 +119,12 @@ func (r *Cloudtrail) eventCostComponent(name string, quantity *decimal.Decimal) 
 		productFamily = "Management Tools - AWS CloudTrail Data Events Recorded"
 	}
 
+	var attrFilters []*schema.AttributeFilter
 	if name == cloudTrailInsightEvent {
 		productFamily = "Management Tools - AWS CloudTrail Insights Events"
+		attrFilters = []*schema.AttributeFilter{
+			{Key: "usagetype", ValueRegex: regexPtr(".*-InsightsEvents$")},
+		}
 	}
 
 	return &schema.CostComponent{
@@ -129,10 +133,11 @@ func (r *Cloudtrail) eventCostComponent(name string, quantity *decimal.Decimal) 
 		UnitMultiplier:  cloudTrailBillingMultiplier,
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:    vendorName,
-			Region:        strPtr(r.Region),
-			Service:       cloudTrailServiceName,
-			ProductFamily: strPtr(productFamily),
+			VendorName:       vendorName,
+			Region:           strPtr(r.Region),
+			Service:          cloudTrailServiceName,
+			ProductFamily:    strPtr(productFamily),
+			AttributeFilters: attrFilters,
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),

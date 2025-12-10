@@ -11,11 +11,12 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
-	"github.com/infracost/infracost/internal/metrics"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
+
+	"github.com/infracost/infracost/internal/metrics"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -24,9 +25,12 @@ import (
 )
 
 var (
-	minOutputVersion     = "0.2"
-	maxOutputVersion     = "0.2"
-	GitHubMaxMessageSize = 262144 // bytes
+	minOutputVersion = "0.2"
+	maxOutputVersion = "0.2"
+	// Technically Github allows 66536 characters, which we interpreted as 262144 bytes, but
+	// we were still seeing 422 "Body is too long (maximum is 65536 characters)" errors so limit
+	// more.
+	GitHubMaxMessageSize = 200000 // bytes
 )
 
 type ReportInput struct {

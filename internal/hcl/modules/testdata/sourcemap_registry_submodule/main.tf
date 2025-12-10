@@ -7,12 +7,10 @@ provider "aws" {
 }
 
 module "registry-submodule" {
-  source  = "terraform-aws-modules/route53/aws//modules/zones"
+  source  = "terraform-aws-modules/route53/aws//modules/delegation-sets"
   version = "2.5.0"
 
-  zones = {
-    "example.com" = {
-      comment = "example.com"
-    }
+  delegation_sets = {
+    "example.com" = {}
   }
 }

@@ -124,6 +124,10 @@ func formatTitleWithCurrency(title, currency string) string {
 }
 
 func truncateMiddle(s string, maxLen int, fill string) string {
+	if maxLen <= 0 {
+		return ""
+	}
+
 	r := []rune(s)
 
 	if len(r) <= maxLen {

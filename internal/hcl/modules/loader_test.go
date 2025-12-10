@@ -148,9 +148,9 @@ func TestSubmodules(t *testing.T) {
 	testLoaderE2E(t, "./testdata/submodules", []*ManifestModule{
 		{
 			Key:         "registry-submodule",
-			Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+			Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/delegation-sets",
 			Version:     "2.5.0",
-			Dir:         ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/zones",
+			Dir:         ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/delegation-sets",
 			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=97dfbae914056b1a06c213be5d5834bc7eea8433",
 		},
 		{
@@ -162,8 +162,8 @@ func TestSubmodules(t *testing.T) {
 		},
 		{
 			Key:    "git-submodule",
-			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
-			Dir:    ".infracost/terraform_modules/03c49f2fce2b8552355561b7ac4f2c94/modules/zones",
+			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/delegation-sets",
+			Dir:    ".infracost/terraform_modules/03c49f2fce2b8552355561b7ac4f2c94/modules/delegation-sets",
 		},
 	}, TestLoaderE2EOpts{Cleanup: true})
 }
@@ -583,7 +583,7 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:         "registry-submodule",
-					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/delegation-sets",
 					Version:     "2.5.0",
 					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=97dfbae914056b1a06c213be5d5834bc7eea8433",
 				},
@@ -597,7 +597,7 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:    "registry-submodule",
-					Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
+					Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/delegation-sets",
 					// We can't map the version here when going from registry to git, since we don't know which tag it should be.
 					// Some modules are prefixed with v and some aren't.
 					Version: "",
@@ -612,7 +612,7 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:     "registry-submodule",
-					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=v2.10.2",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/delegation-sets?ref=v2.10.2",
 					Version: "",
 				},
 			},
@@ -626,7 +626,7 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:         "registry-submodule",
-					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/delegation-sets",
 					Version:     "2.5.0",
 					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=97dfbae914056b1a06c213be5d5834bc7eea8433",
 				},
@@ -640,7 +640,7 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:         "registry-submodule",
-					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/delegation-sets",
 					Version:     "2.5.0",
 					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=97dfbae914056b1a06c213be5d5834bc7eea8433",
 				},
@@ -769,7 +769,7 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:     "git-submodule",
-					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/delegation-sets?ref=v2.5.0",
 					Version: "",
 				},
 			},
@@ -782,7 +782,7 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:     "git-submodule",
-					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/delegation-sets?ref=v2.5.0",
 					Version: "",
 				},
 			},
@@ -795,7 +795,7 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:     "git-submodule",
-					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/delegation-sets?ref=v2.5.0",
 					Version: "",
 				},
 			},
@@ -809,7 +809,7 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:     "git-submodule",
-					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=master",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/delegation-sets?ref=master",
 					Version: "",
 				},
 			},
@@ -823,7 +823,7 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:     "git-submodule",
-					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/delegation-sets?ref=v2.5.0",
 					Version: "",
 				},
 			},
@@ -836,7 +836,7 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			want: []*ManifestModule{
 				{
 					Key:         "git-submodule",
-					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/delegation-sets",
 					Version:     "2.5.0",
 					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=97dfbae914056b1a06c213be5d5834bc7eea8433",
 				},

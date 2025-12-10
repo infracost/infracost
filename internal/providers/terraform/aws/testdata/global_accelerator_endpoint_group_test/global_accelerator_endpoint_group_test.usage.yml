@@ -7,6 +7,7 @@ resource_usage:
       south_africa: 32340000 # South Africa, Kenya
       south_america: 42340000 # South America
       south_korea: 52340000 # South Korea
+      middle_east: 52340000 # Middle East
       australia: 62340000 # Australia, New Zealand
       asia_pacific: 62340000 # Asia Pacific
       india: 72340000 # India, Indonesia, Philippines, Thailand

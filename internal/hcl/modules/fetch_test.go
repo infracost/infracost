@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/url"
@@ -193,7 +194,7 @@ func (m *mockRemoteCache) Get(key string, dest string, public bool) error {
 		Mode: getter.ClientModeDir,
 	}
 
-	return client.Get()
+	return client.Get(context.Background())
 }
 
 func (m *mockRemoteCache) Put(key string, src string, ttl time.Duration, public bool) error {

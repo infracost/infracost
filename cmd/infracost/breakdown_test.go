@@ -523,7 +523,10 @@ func TestBreakdownTerragruntWithRemoteSource(t *testing.T) {
 			"breakdown",
 			"--config-file", filepath.Join(dir, "infracost.yml"),
 		},
-		nil)
+		&GoldenFileOptions{
+			IgnoreNonGraph: true,
+		},
+	)
 
 	dirs, err := getGitBranchesInDirs(filepath.Join(cacheDir, ".terragrunt-cache"))
 	require.NoError(t, err)

@@ -42,6 +42,9 @@ func (r *VPNConnection) BuildResource() *schema.Resource {
 				Region:        strPtr(region),
 				Service:       strPtr("AmazonVPC"),
 				ProductFamily: strPtr("Cloud Connectivity"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "vpnType", ValueRegex: regexPtr("^VPN Standard")},
+				},
 			},
 		},
 	}

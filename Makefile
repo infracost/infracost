@@ -1,7 +1,7 @@
 BINARY := infracost
 PKG := github.com/infracost/infracost/cmd/infracost
 VERSION := $(shell scripts/get_version.sh HEAD $(NO_DIRTY))
-LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
+LD_FLAGS := -ldflags="-s -X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -v
 
 DEV_ENV := dev

@@ -237,7 +237,7 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 		if !containsInt64(validSpeechCommitmentTierChars, *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars) {
 			logging.Logger.Warn().Msgf("Invalid commitment tier amount %d for %s", *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars, r.Address)
 		} else {
-			costComponents = append(costComponents, r.commitmentTierCostComponents("Text to speech neural", connectedContainerCommitmentTier, "Commitment Tier Neural Text to Speech Connected", *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars, intPtrToDecimalPtr(r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralOverageChars), "1M chars", 1_000_000)...)
+			costComponents = append(costComponents, r.commitmentTierCostComponents("Text to speech neural", connectedContainerCommitmentTier, "Commit Tier Neural TTS Connected", *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars, intPtrToDecimalPtr(r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralOverageChars), "1M chars", 1_000_000)...)
 		}
 	}
 	if (r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars == nil && r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars == nil) || r.MonthlyTextToSpeechNeuralChars != nil {

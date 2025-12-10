@@ -82,6 +82,12 @@
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
+ azurerm_cognitive_deployment.swedencentral_provisioned["o3_mini_regional"]                                                                                     
+ ├─ Provisioned throughput units (o3-mini)                                                                        1,460  hours                      $3,212.00   
+ ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
+ ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
+ └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
+                                                                                                                                                                
  azurerm_cognitive_deployment.eastus2_provisioned["gpt4o_regional"]                                                                                             
  ├─ Provisioned throughput units (gpt-4o)                                                                         1,460  hours                      $2,920.00   
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
@@ -103,12 +109,6 @@
  ├─ Fine tuning hosting (gpt-35-turbo)                                                                Monthly cost depends on usage: $3.00 per hours            
  ├─ Fine tuning input (gpt-35-turbo)                                                                  Monthly cost depends on usage: $0.0015 per 1K tokens      
  └─ Fine tuning output (gpt-35-turbo)                                                                 Monthly cost depends on usage: $0.002 per 1K tokens       
-                                                                                                                                                                
- azurerm_cognitive_deployment.swedencentral_provisioned["o3_mini_regional"]                                                                                     
- ├─ Provisioned throughput units (o3-mini)                                                                        1,460  hours                      $2,920.00   
- ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
- ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
- └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus2_provisioned["gpt4_global"]                                                                                                
  ├─ Provisioned throughput units (gpt-4)                                                                          2,190  hours                      $2,190.00   
@@ -311,6 +311,20 @@
  ├─ Audio input tokens (gpt-4o-realtime-preview)                                                      Monthly cost depends on usage: $0.11 per 1k tokens        
  └─ Audio output tokens (gpt-4o-realtime-preview)                                                     Monthly cost depends on usage: $0.22 per 1k tokens        
                                                                                                                                                                 
+ azurerm_cognitive_deployment.swedencentral_with_usage["gpt-4o"]                                                                                                
+ ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $242.00   
+ ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $242.00   
+ ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
+ ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
+ └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
+                                                                                                                                                                
+ azurerm_cognitive_deployment.swedencentral_with_usage["gpt-4o-2024-05-13"]                                                                                     
+ ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $242.00   
+ ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $242.00   
+ ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
+ ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
+ └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
+                                                                                                                                                                
  azurerm_cognitive_deployment.audio_models["gpt4o_audio"]                                                                                                       
  ├─ Text input (gpt-4o-audio-preview)                                                                             5,000  1K tokens                     $13.75   
  ├─ Text output (gpt-4o-audio-preview)                                                                            2,500  1K tokens                     $27.50   
@@ -321,43 +335,29 @@
  └─ Audio output tokens (gpt-4o-audio-preview)                                                                    2,500  1k tokens                    $220.00   
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus_with_usage["gpt-4o"]                                                                                                       
- ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $200.00   
- ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $200.00   
+ ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $220.00   
+ ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $220.00   
  ├─ File search tool calls                                                                                            5  1k calls                      $12.50   
  ├─ File search vector storage                                                                                      3.5  GB                             $0.35   
  └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus2_with_usage["gpt-4o"]                                                                                                      
- ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $200.00   
- ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $200.00   
+ ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $220.00   
+ ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $220.00   
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus2_with_usage["gpt-4o-2024-05-13"]                                                                                           
- ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $200.00   
- ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $200.00   
+ ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $220.00   
+ ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $220.00   
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus_with_usage["gpt-4o-2024-05-13"]                                                                                            
- ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $200.00   
- ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $200.00   
- ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
- ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
- └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
-                                                                                                                                                                
- azurerm_cognitive_deployment.swedencentral_with_usage["gpt-4o"]                                                                                                
- ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $200.00   
- ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $200.00   
- ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
- ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
- └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
-                                                                                                                                                                
- azurerm_cognitive_deployment.swedencentral_with_usage["gpt-4o-2024-05-13"]                                                                                     
- ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $200.00   
- ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $200.00   
+ ├─ Text input (gpt-4o)                                                                                          40,000  1K tokens                    $220.00   
+ ├─ Text output (gpt-4o)                                                                                     13,333.333  1K tokens                    $220.00   
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                                       667  sessions                      $20.01   
@@ -1057,15 +1057,15 @@
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus2_without_usage["gpt-4o"]                                                                                                   
- ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.005 per 1K tokens       
- ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.015 per 1K tokens       
+ ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.0055 per 1K tokens      
+ ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.0165 per 1K tokens      
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus2_without_usage["gpt-4o-2024-05-13"]                                                                                        
- ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.005 per 1K tokens       
- ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.015 per 1K tokens       
+ ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.0055 per 1K tokens      
+ ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.0165 per 1K tokens      
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
@@ -1327,15 +1327,15 @@
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus_without_usage["gpt-4o"]                                                                                                    
- ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.005 per 1K tokens       
- ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.015 per 1K tokens       
+ ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.0055 per 1K tokens      
+ ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.0165 per 1K tokens      
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.eastus_without_usage["gpt-4o-2024-05-13"]                                                                                         
- ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.005 per 1K tokens       
- ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.015 per 1K tokens       
+ ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.0055 per 1K tokens      
+ ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.0165 per 1K tokens      
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
@@ -1590,15 +1590,15 @@
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.swedencentral_without_usage["gpt-4o"]                                                                                             
- ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.005 per 1K tokens       
- ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.015 per 1K tokens       
+ ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.00605 per 1K tokens     
+ ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.01815 per 1K tokens     
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
                                                                                                                                                                 
  azurerm_cognitive_deployment.swedencentral_without_usage["gpt-4o-2024-05-13"]                                                                                  
- ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.005 per 1K tokens       
- ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.015 per 1K tokens       
+ ├─ Text input (gpt-4o)                                                                               Monthly cost depends on usage: $0.00605 per 1K tokens     
+ ├─ Text output (gpt-4o)                                                                              Monthly cost depends on usage: $0.01815 per 1K tokens     
  ├─ File search tool calls                                                                            Monthly cost depends on usage: $2.50 per 1k calls         
  ├─ File search vector storage                                                                        Monthly cost depends on usage: $0.10 per GB               
  └─ Code interpreter sessions                                                                         Monthly cost depends on usage: $0.03 per sessions         
@@ -1770,7 +1770,7 @@
  azurerm_cognitive_deployment.swedencentral_without_usage["tts-hd"]                                                                                             
  └─ Text to speech (tts-hd)                                                                           Monthly cost depends on usage: $30.00 per 1M characters   
                                                                                                                                                                 
- OVERALL TOTAL                                                                                                                                   $122,666.83 
+ OVERALL TOTAL                                                                                                                                   $123,286.83 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -1784,7 +1784,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃      $122,667 ┃           - ┃   $122,667 ┃
+┃ main                                               ┃      $123,287 ┃           - ┃   $123,287 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 

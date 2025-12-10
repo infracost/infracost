@@ -1,0 +1,27 @@
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - errcheck
+    - gocritic
+    - gofmt
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - revive
+    - staticcheck
+    - typecheck
+    - unused
+    - prealloc
+
+linters-settings:
+  gocritic:
+    disabled-checks:
+      - ifElseChain
+  revive:
+    rules:
+      - name: error-strings
+        disabled: true
+

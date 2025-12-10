@@ -7,13 +7,11 @@ provider "aws" {
 }
 
 module "registry-submodule" {
-  source  = "terraform-aws-modules/route53/aws//modules/zones"
+  source  = "terraform-aws-modules/route53/aws//modules/delegation-sets"
   version = "2.5.0"
 
-  zones = {
-    "example.com" = {
-      comment = "example.com"
-    }
+  delegation_sets = {
+    "example.com" = {}
   }
 }
 
@@ -23,11 +21,9 @@ module "registry-submodule-records" {
 }
 
 module "git-submodule" {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/delegation-sets"
 
-  zones = {
-    "example.com" = {
-      comment = "example.com"
-    }
+  delegation_sets = {
+    "example.com" = {}
   }
 }

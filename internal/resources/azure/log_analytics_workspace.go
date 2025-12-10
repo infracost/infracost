@@ -19,7 +19,7 @@ const (
 	skuCapacityReservation = "CapacityReservation"
 	skuPerGB2018           = "PerGB2018"
 	skuFree                = "Free"
-	skuFilterPAYG          = "Pay-as-you-go"
+	skuFilterAnalyticsLogs = "Analytics Logs"
 	skuBasicLogsIngest     = "Basic Logs"
 	skuBasicLogsSearch     = "Search Queries"
 	skuArchive             = "Data Archive"
@@ -290,7 +290,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float
 			Service:       strPtr(logAnalyticsServiceName),
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
+				{Key: "skuName", Value: strPtr(skuFilterAnalyticsLogs)},
 				{Key: "meterName", ValueRegex: regexPtr("Data Ingestion$")},
 			},
 		},
@@ -319,7 +319,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			Service:       strPtr(logAnalyticsServiceName),
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
+				{Key: "skuName", Value: strPtr(skuFilterAnalyticsLogs)},
 				{Key: "meterName", ValueRegex: regexPtr("Data Retention$")},
 			},
 		},

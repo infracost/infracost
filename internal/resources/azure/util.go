@@ -79,3 +79,16 @@ func convertRegion(region string) string {
 		return "Global"
 	}
 }
+
+func dnsZoneRegion(region string) string {
+	switch {
+	case strings.HasPrefix(strings.ToLower(region), "usgov"):
+		return "US Gov Zone 1"
+	case strings.HasPrefix(strings.ToLower(region), "germany"):
+		return "DE Zone 1"
+	case strings.HasPrefix(strings.ToLower(region), "china"):
+		return "Zone 1 (China)"
+	default:
+		return "Zone 1"
+	}
+}

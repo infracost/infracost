@@ -72,7 +72,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().Bool("sync-usage-file", false, "Sync usage-file with missing resources, needs usage-file too (experimental)")
 
-	_ = cmd.MarkFlagFilename("path", "json", "tf")
+	_ = cmd.MarkFlagFilename("path", "json", "tf", "tofu")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
 

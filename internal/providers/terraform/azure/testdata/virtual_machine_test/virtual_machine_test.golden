@@ -1303,6 +1303,13 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
+ azurerm_virtual_machine.windows_vms["Standard_F8s_v2"]                                                                               
+ ├─ Instance usage (Windows, pay as you go, Standard_F8s_v2)                           730  hours                          $516.84    
+ ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ storage_os_disk                                                                                                                   
+    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
+    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                      
  azurerm_virtual_machine.linux_vms["Standard_L8s_v3"]                                                                                 
  ├─ Instance usage (Linux, pay as you go, Standard_L8s_v3)                             730  hours                          $508.08    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
@@ -1326,13 +1333,6 @@
                                                                                                                                       
  azurerm_virtual_machine.windows_vms["Standard_D8plds_v5"]                                                                            
  ├─ Instance usage (Windows, pay as you go, Standard_D8plds_v5)                        730  hours                          $492.75    
- ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
- └─ storage_os_disk                                                                                                                   
-    ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
-    └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                                                      
- azurerm_virtual_machine.windows_vms["Standard_F8s_v2"]                                                                               
- ├─ Instance usage (Windows, pay as you go, Standard_F8s_v2)                           730  hours                          $475.23    
  ├─ Ultra disk reservation (if unattached)                              Monthly cost depends on usage: $4.38 per vCPU                 
  └─ storage_os_disk                                                                                                                   
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
@@ -1693,7 +1693,7 @@
     ├─ Storage (S4, LRS)                                                                 1  months                           $1.54    
     └─ Disk operations                                                  Monthly cost depends on usage: $0.0005 per 10k operations     
                                                                                                                                       
- OVERALL TOTAL                                                                                                       $1,053,430.95 
+ OVERALL TOTAL                                                                                                       $1,053,472.56 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -1705,5 +1705,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃    $1,053,430 ┃       $0.55 ┃ $1,053,431 ┃
+┃ main                                               ┃    $1,053,472 ┃       $0.55 ┃ $1,053,473 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
