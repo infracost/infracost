@@ -257,7 +257,7 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 		return nil, errors.Wrap(err, "Error marshaling comment body")
 	}
 
-	url := fmt.Sprintf("%spullRequests/%d/threads?api-version=6.0", h.repoAPIURL, h.prNumber)
+	url := fmt.Sprintf("%spullRequests/%d/threads?api-version=7.1", h.repoAPIURL, h.prNumber)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqData))
 	if err != nil {
