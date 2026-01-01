@@ -41,7 +41,7 @@ require (
 	github.com/tidwall/gjson v1.17.0
 	github.com/zclconf/go-cty v1.17.0
 	golang.org/x/crypto v0.45.0 // indirect
-	golang.org/x/mod v0.29.0
+	golang.org/x/mod v0.30.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -81,15 +81,15 @@ require (
 	github.com/slack-go/slack v0.12.3
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
-	golang.org/x/text v0.31.0
-	golang.org/x/tools v0.38.0 // indirect
+	golang.org/x/text v0.32.0
+	golang.org/x/tools v0.39.0 // indirect
 )
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.1 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.7 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	golang.org/x/sync v0.18.0
+	golang.org/x/sync v0.19.0
 )
 
 require (
