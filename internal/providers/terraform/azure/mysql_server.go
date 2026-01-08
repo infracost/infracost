@@ -21,7 +21,7 @@ func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	region := d.Region
 
 	serviceName := "Azure Database for MySQL"
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 3)
 
 	sku := d.Get("sku_name").String()
 	var tier, family, cores string

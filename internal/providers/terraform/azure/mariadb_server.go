@@ -20,7 +20,7 @@ func GetAzureRMMariaDBServerRegistryItem() *schema.RegistryItem {
 func NewAzureRMMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 3)
 	serviceName := "Azure Database for MariaDB"
 
 	sku := d.Get("sku_name").String()

@@ -60,7 +60,7 @@ func (r *CloudFormationStack) costComponents() []*schema.CostComponent {
 		monthlyDurationSecs = decimalPtr(decimal.NewFromInt(*r.MonthlyDurationSecs))
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	costComponents = append(costComponents, r.cloudFormationCostComponent("Handler operations", "operations", "Resource-Invocation-Count", monthlyHandlerOperations))
 	costComponents = append(costComponents, r.cloudFormationCostComponent("Durations above 30s", "seconds", "Resource-Processing-Time", monthlyDurationSecs))

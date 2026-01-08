@@ -52,7 +52,7 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	name := fmt.Sprintf("IP address (%s, %s)", strings.ToLower(allocationMethod), strings.ToLower(skuTier))
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	costComponents = append(costComponents, PublicIPCostComponent(name, region, sku, meterName))
 

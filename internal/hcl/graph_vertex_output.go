@@ -58,11 +58,14 @@ func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
 
 			var parentKeyParts []string
 			if v := modCall.Module.Key(); v != nil {
-				parentKeyParts = []string{"module", stripCount(modCall.Name), *v}
+				parentKeyParts = make([]string, 0, 4)
+				parentKeyParts = append(parentKeyParts, "module", stripCount(modCall.Name), *v)
 			} else if v := modCall.Module.Index(); v != nil {
-				parentKeyParts = []string{"module", stripCount(modCall.Name), fmt.Sprintf("%d", *v)}
+				parentKeyParts = make([]string, 0, 4)
+				parentKeyParts = append(parentKeyParts, "module", stripCount(modCall.Name), fmt.Sprintf("%d", *v))
 			} else {
-				parentKeyParts = []string{"module", modCall.Name}
+				parentKeyParts = make([]string, 0, 3)
+				parentKeyParts = append(parentKeyParts, "module", modCall.Name)
 			}
 
 			parentKeyParts = append(parentKeyParts, blockInstance.Label())

@@ -26,7 +26,7 @@ func GetAzureRMSynapseSparkPoolRegistryItem() *schema.RegistryItem {
 
 func NewAzureRMSynapseSparkPool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	nodeSize := "Small"
 	if d.Get("node_size").Type != gjson.Null {

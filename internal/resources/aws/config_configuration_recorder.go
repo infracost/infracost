@@ -40,7 +40,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 		monthlyCustomConfigItems = decimalPtr(decimal.NewFromInt(*r.MonthlyCustomConfigItems))
 	}
 
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Config items",

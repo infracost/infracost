@@ -42,7 +42,7 @@ func (r *DMSReplicationInstance) BuildResource() *schema.Resource {
 	instanceType := strings.Join(instanceTypeParts[1:], ".")
 	instanceFamily := instanceTypeParts[1]
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 2)
 	costComponents = append(costComponents, r.instanceCostComponent(instanceType))
 	costComponents = append(costComponents, r.storageCostComponent(instanceFamily))
 

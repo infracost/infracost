@@ -101,7 +101,7 @@ func (r *StorageAccount) BuildResource() *schema.Resource {
 		r.AccessTier = "Standard"
 	}
 
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 30)
 
 	costComponents = append(costComponents, r.storageCostComponents()...)
 
