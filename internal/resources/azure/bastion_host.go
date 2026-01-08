@@ -63,7 +63,7 @@ func (r *BastionHost) BuildResource() *schema.Resource {
 }
 
 func (r *BastionHost) outboundDataTransferComponents(productType string) []*schema.CostComponent {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	name := "Outbound data transfer "
 
 	type dataTier struct {

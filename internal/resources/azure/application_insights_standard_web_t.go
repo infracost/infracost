@@ -39,7 +39,7 @@ func (r *ApplicationInsightsStandardWebTest) PopulateUsage(u *schema.UsageData) 
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ApplicationInsightsStandardWebTest) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.Enabled {
 		secondsPerMonth := int64(730 * 60 * 60) // 730 hours * 60 minutes * 60 seconds

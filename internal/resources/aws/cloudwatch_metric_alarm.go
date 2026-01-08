@@ -30,7 +30,7 @@ func (r *CloudwatchMetricAlarm) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *CloudwatchMetricAlarm) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	costComponents = append(costComponents, r.cloudwatchMetricAlarmCostComponent())
 

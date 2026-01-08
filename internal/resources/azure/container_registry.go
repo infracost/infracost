@@ -57,7 +57,7 @@ func (r *ContainerRegistry) BuildResource() *schema.Resource {
 
 	locationsCount = r.GeoReplicationLocations
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if locationsCount > 0 {
 		suffix := fmt.Sprintf("%d locations", locationsCount)

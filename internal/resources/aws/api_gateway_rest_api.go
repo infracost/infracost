@@ -30,7 +30,7 @@ func (r *APIGatewayRestAPI) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *APIGatewayRestAPI) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	var monthlyRequests *decimal.Decimal
 
 	if r.MonthlyRequests != nil {

@@ -73,7 +73,7 @@ const (
 )
 
 func (r *SQLDatabaseInstance) costComponents(replica bool) *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.AvailabilityType == "" || replica {
 		r.AvailabilityType = "ZONAL"

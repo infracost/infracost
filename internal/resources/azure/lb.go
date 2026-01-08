@@ -31,7 +31,7 @@ func (r *LB) PopulateUsage(u *schema.UsageData) {
 func (r *LB) BuildResource() *schema.Resource {
 	region := convertRegion(r.Region)
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	sku := "Basic"
 	var monthlyDataProcessedGb *decimal.Decimal
 

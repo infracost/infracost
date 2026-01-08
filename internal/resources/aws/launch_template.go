@@ -63,7 +63,7 @@ func (r *LaunchTemplate) BuildResource() *schema.Resource {
 		r.Tenancy = "Shared"
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	instance := &Instance{
 		Region:                          r.Region,

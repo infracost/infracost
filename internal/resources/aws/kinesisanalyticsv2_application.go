@@ -33,7 +33,7 @@ func (r *KinesisAnalyticsV2Application) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *KinesisAnalyticsV2Application) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	var kinesisProcessingUnits *decimal.Decimal
 	if r.KinesisProcessingUnits != nil {

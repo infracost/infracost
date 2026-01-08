@@ -196,7 +196,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 		}
 	}
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.SKU == skuPerGB2018 {
 		costComponents = append(costComponents, r.logDataIngestion("Log data ingestion", r.MonthlyLogDataIngestionGB))

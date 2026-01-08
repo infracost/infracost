@@ -35,7 +35,7 @@ func (r *KinesisFirehoseDeliveryStream) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *KinesisFirehoseDeliveryStream) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.MonthlyDataIngestedGB != nil {
 		tierLimits := []int{512_000, 1_536_000}

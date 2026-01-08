@@ -36,7 +36,7 @@ func (r *ApplicationGateway) PopulateUsage(u *schema.UsageData) {
 
 func (r *ApplicationGateway) BuildResource() *schema.Resource {
 	var sku, tier string
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	skuNameParts := strings.Split(r.SKUName, "_")
 	if len(skuNameParts) > 1 {
@@ -72,7 +72,7 @@ func (r *ApplicationGateway) BuildResource() *schema.Resource {
 }
 
 func (r *ApplicationGateway) v1CostComponents(tier, sku string, capacityUnits int64) []*schema.CostComponent {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	var monthlyDataProcessedGb *decimal.Decimal
 	tierLimits := []int{10240, 30720}
 
@@ -118,7 +118,7 @@ func (r *ApplicationGateway) v1CostComponents(tier, sku string, capacityUnits in
 }
 
 func (r *ApplicationGateway) v2CostComponents(skuNameParts []string, capacityUnits int64) []*schema.CostComponent {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	var tier string
 	if len(skuNameParts) > 0 && strings.ToLower(skuNameParts[0]) == "standard" {

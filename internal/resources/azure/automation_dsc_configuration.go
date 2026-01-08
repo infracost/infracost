@@ -42,7 +42,7 @@ func automationDSCNodesCostComponent(location *string, nonAzureConfigNodeCount *
 		nonAzureConfigNodeCountDec = decimalPtr(decimal.NewFromInt(*nonAzureConfigNodeCount))
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	costComponents = append(costComponents, nonautomationDSCNodesCostComponent(*location, "5", "Non-Azure Node", "Non-Azure", nonAzureConfigNodeCountDec))
 
 	return costComponents

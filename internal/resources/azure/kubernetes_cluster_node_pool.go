@@ -54,7 +54,7 @@ func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
 }
 
 func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64, isDevTest bool) *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	var subResources []*schema.Resource
 
 	mainResource := &schema.Resource{

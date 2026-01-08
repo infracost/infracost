@@ -28,7 +28,7 @@ func (r *GlobalAccelerator) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *GlobalAccelerator) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	costComponent := &schema.CostComponent{
 		Name:           "Fixed fee",
 		Unit:           "hours",

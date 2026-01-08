@@ -28,7 +28,7 @@ func (r *DocDBClusterSnapshot) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *DocDBClusterSnapshot) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	var backupStorage *decimal.Decimal
 	if r.BackupStorageGB != nil {

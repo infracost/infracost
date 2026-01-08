@@ -85,7 +85,7 @@ func (r *NetworkConnectionMonitor) testsCostComponents() []*schema.CostComponent
 
 	tierLimits := []int{10, 240000, 510000, 250000}
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if len(tierData) == 0 {
 		return costComponents

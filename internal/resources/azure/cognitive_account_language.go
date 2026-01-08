@@ -111,7 +111,7 @@ func (r *CognitiveAccountLanguage) BuildResource() *schema.Resource {
 		return nil
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.MonthlyCommitmentLanguageTextAnalyticsRecords != nil {
 		costComponents = append(costComponents, r.commitmentTextAnalyticsCostComponents(standardCommitmentTier, *r.MonthlyCommitmentLanguageTextAnalyticsRecords, intPtrToDecimalPtr(r.MonthlyCommitmentLanguageTextAnalyticsOverageRecords))...)
@@ -149,7 +149,7 @@ func (r *CognitiveAccountLanguage) BuildResource() *schema.Resource {
 }
 
 func (r *CognitiveAccountLanguage) textAnalyticsCostComponents() []*schema.CostComponent {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	tierLimits := []int{500, 2_000, 7_500}
 	tierData := []struct {
@@ -464,7 +464,7 @@ func (r *CognitiveAccountLanguage) customizedSummarizationCostComponent() *schem
 }
 
 func (r *CognitiveAccountLanguage) customizedQuestionAnsweringCostComponents() []*schema.CostComponent {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	tierLimits := []int{2_500}
 	tierData := []struct {
@@ -545,7 +545,7 @@ func (r *CognitiveAccountLanguage) customizedTrainingCostComponent() *schema.Cos
 }
 
 func (r *CognitiveAccountLanguage) textAnalyticsForHealthCostComponents() []*schema.CostComponent {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	tierLimits := []int{5, 495, 2_000, 7_500}
 	tierData := []struct {

@@ -41,7 +41,7 @@ func (r *CloudfrontFunction) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *CloudfrontFunction) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	costComponents = append(costComponents, r.monthlyRequestsCostComponent())
 

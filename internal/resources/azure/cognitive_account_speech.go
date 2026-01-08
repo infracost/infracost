@@ -178,7 +178,7 @@ func (r *CognitiveAccountSpeech) BuildResource() *schema.Resource {
 }
 
 func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	// Speech to text
 	if r.MonthlyCommitmentSpeechToTextHrs != nil {

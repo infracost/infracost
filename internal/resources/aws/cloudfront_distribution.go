@@ -540,7 +540,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 }
 
 func (r *CloudfrontDistribution) invalidationRequestsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	var freeQuantity *decimal.Decimal
 	var paidQuantity *decimal.Decimal
@@ -657,7 +657,7 @@ func (r *CloudfrontDistribution) realtimeLogsCostComponents() []*schema.CostComp
 }
 
 func (r *CloudfrontDistribution) customSSLCertificateCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.IsSSLSupportMethodVIP {
 		return costComponents

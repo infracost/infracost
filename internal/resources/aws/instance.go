@@ -92,7 +92,7 @@ func (a *Instance) BuildResource() *schema.Resource {
 		a.PurchaseOption = "on_demand"
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	subResources := make([]*schema.Resource, 0)
 
 	if a.RootBlockDevice != nil {

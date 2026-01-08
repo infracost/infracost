@@ -120,7 +120,7 @@ func (r *ServiceBusNamespace) messagingOperationsCostComponents() []*schema.Cost
 
 	tierLimits := []int{13_000_000, 87_000_000, 2_400_000_000}
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if qty == nil {
 		costComponents = append(costComponents, r.buildMessagingOperationsCostComponent(tierData[1].suffix, tierData[1].startUsage, nil))
@@ -206,7 +206,7 @@ func (r *ServiceBusNamespace) brokeredConnectionsCostComponents() []*schema.Cost
 
 	tierLimits := []int{1000, 99000, 400000}
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if qty == nil {
 		costComponents = append(costComponents, r.buildBrokeredConnectionsCostComponent(tierData[1].suffix, tierData[1].startUsage, nil))

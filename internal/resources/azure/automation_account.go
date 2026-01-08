@@ -36,7 +36,7 @@ func (r *AutomationAccount) PopulateUsage(u *schema.UsageData) {
 func (r *AutomationAccount) BuildResource() *schema.Resource {
 	var monthlyJobRunMins, nonAzureConfigNodeCount *decimal.Decimal
 	location := r.Region
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.MonthlyJobRunMins != nil {
 		monthlyJobRunMins = decimalPtr(decimal.NewFromInt(*r.MonthlyJobRunMins))

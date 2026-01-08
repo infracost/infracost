@@ -44,7 +44,7 @@ func (r *MonitorDiagnosticSetting) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *MonitorDiagnosticSetting) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.EventHubTarget || r.PartnerSolutionTarget || r.StorageAccountTarget {
 		costComponents = []*schema.CostComponent{r.platformLogComponent(r.MonthlyPlatformLogGB)}

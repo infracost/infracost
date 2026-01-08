@@ -39,7 +39,7 @@ func (r *DNSZone) BuildResource() *schema.Resource {
 		region = "Zone 1"
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	costComponents = append(costComponents, hostedPublicZoneCostComponent(region))
 	return &schema.Resource{

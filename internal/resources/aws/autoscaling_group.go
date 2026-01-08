@@ -73,7 +73,7 @@ func (a *AutoscalingGroup) getUsageSchemaWithDefaultInstanceCount() []*schema.Us
 }
 
 func (a *AutoscalingGroup) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	subResources := make([]*schema.Resource, 0)
 	var estimateInstanceQualities schema.EstimateFunc
 

@@ -154,7 +154,7 @@ func (r *Frontdoor) routingRulesCostComponents() []*schema.CostComponent {
 // frontendHostsCostComponents returns a cost component for frontend hosts.
 // Only additional hosts above free limit are billed.
 func (r *Frontdoor) frontendHostsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	freeQuantity := 100
 	quantity := r.FrontendHosts
@@ -273,7 +273,7 @@ func (r *Frontdoor) outboundDataTransferCostComponents() []*schema.CostComponent
 // govOutboundDataTransferCostComponents returns a cost component for outbound
 // data transfer in US Gov zone. This zone doesn't have tiers.
 func (r *Frontdoor) govOutboundDataTransferCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	var quantity *decimal.Decimal
 

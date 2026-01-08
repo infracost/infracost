@@ -219,7 +219,7 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 //
 // FileStorage: see dataAtRestCostComponents()
 func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.isFileStorage() {
 		return costComponents
@@ -297,7 +297,7 @@ func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 //
 // FileStorage: n/a
 func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.isStorageV2() || !r.NFSv3 || r.isPremium() {
 		return costComponents
@@ -362,7 +362,7 @@ func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.Cost
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.isFileStorage() && r.isPremium() {
 		return costComponents
@@ -431,7 +431,7 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.isFileStorage() && r.isPremium() {
 		return costComponents
@@ -492,7 +492,7 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 //
 // FileStorage: n/a
 func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.isStorageV2() || !r.NFSv3 || r.isPremium() {
 		return costComponents
@@ -551,7 +551,7 @@ func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostC
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.isFileStorage() && r.isPremium() {
 		return costComponents
@@ -625,7 +625,7 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.isFileStorage() && r.isPremium() {
 		return costComponents
@@ -694,7 +694,7 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.isCool() {
 		return costComponents
@@ -755,7 +755,7 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 //	Standard Cool: no cost
 //	Premium:       no cost
 func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !(r.isBlockBlobStorage() && !r.isBlobStorage()) || !r.isCool() {
 		return costComponents
@@ -817,7 +817,7 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 //	Standard Cool: no cost
 //	Premium:       no cost
 func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	isBlockPremium := r.isBlockBlobStorage() && r.isPremium()
 	isBlobPremium := r.isBlobStorage() && r.isPremium()
@@ -869,7 +869,7 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.isFileStorage() {
 		return costComponents
@@ -918,7 +918,7 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.isFileStorage() {
 		return costComponents
@@ -967,7 +967,7 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.isFileStorage() || r.isPremium() {
 		return costComponents
@@ -1020,7 +1020,7 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 //	Standard Cool: cost exists
 //	Premium:       no cost
 func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.isStorageV1() || r.isBlockBlobStorage() || r.isBlobStorage() || !r.isCool() {
 		return costComponents

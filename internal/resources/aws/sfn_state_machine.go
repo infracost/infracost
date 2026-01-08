@@ -39,7 +39,7 @@ func (r *SFnStateMachine) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *SFnStateMachine) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	tier := r.Type
 	if tier == "" {

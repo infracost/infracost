@@ -89,7 +89,7 @@ func (r *SecurityCenterSubscriptionPricing) BuildResource() *schema.Resource {
 		}
 	}
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	switch strings.ToLower(r.ResourceType) {
 	case "appservices":
 		costComponents = []*schema.CostComponent{r.addAppServiceCostComponent()}

@@ -39,7 +39,7 @@ func (r *EFSFileSystem) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *EFSFileSystem) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	var storageGB *decimal.Decimal
 	if r.StorageGB != nil {

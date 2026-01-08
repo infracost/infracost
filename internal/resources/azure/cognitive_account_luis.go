@@ -80,7 +80,7 @@ func (r *CognitiveAccountLUIS) BuildResource() *schema.Resource {
 		return nil
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.MonthlyCommitmentLUISTextRequests != nil {
 		costComponents = append(costComponents, r.commitmentTextRequestsCostComponents()...)

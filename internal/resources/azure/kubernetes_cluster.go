@@ -67,7 +67,7 @@ func (r *KubernetesCluster) PopulateUsage(u *schema.UsageData) {
 
 func (r *KubernetesCluster) BuildResource() *schema.Resource {
 	region := r.Region
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	var subResources []*schema.Resource
 
 	skuTier := "Free"

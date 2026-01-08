@@ -779,7 +779,7 @@ func (r *CognitiveDeployment) BuildResource() *schema.Resource {
 		}
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if _, ok := languageModelSKUs[r.Model]; ok {
 		costComponents = append(costComponents, r.languageCostComponents()...)

@@ -37,7 +37,7 @@ func (r *SSMParameter) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *SSMParameter) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	throughputLimit := ""
 

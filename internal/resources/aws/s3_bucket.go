@@ -88,7 +88,7 @@ func (a *S3Bucket) PopulateUsage(u *schema.UsageData) {
 }
 
 func (a *S3Bucket) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	if a.ObjectTagsEnabled {
 		costComponents = append(costComponents, a.objectTagsCostComponent())
 	}

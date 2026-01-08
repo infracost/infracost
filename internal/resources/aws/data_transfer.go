@@ -194,7 +194,7 @@ func (r *DataTransfer) buildOutboundInternetCostComponent(name string, networkUs
 // outboundUsEastCostComponents returns a cost component for outbound data
 // transfer to US East regions only when its usage is specified.
 func (r *DataTransfer) outboundUsEastCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.MonthlyOutboundUsEastToUsEastGB == nil {
 		return costComponents
@@ -221,7 +221,7 @@ func (r *DataTransfer) outboundUsEastCostComponents() []*schema.CostComponent {
 // outboundOtherRegionsCostComponents returns a cost component for outbound data
 // transfer to other regions only when its usage is specified.
 func (r *DataTransfer) outboundOtherRegionsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.MonthlyOutboundOtherRegionsGB == nil {
 		return costComponents

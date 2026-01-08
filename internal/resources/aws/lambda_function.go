@@ -67,7 +67,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 	var monthlyRequests *decimal.Decimal
 	var gbSeconds *decimal.Decimal
 	var storageGBSeconds *decimal.Decimal
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if a.MonthlyRequests != nil {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*a.MonthlyRequests))

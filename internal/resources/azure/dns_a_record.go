@@ -39,7 +39,7 @@ func (r *DNSARecord) BuildResource() *schema.Resource {
 func dnsQueriesCostComponent(region string, monthlyQueries *int64) []*schema.CostComponent {
 	var monthlyQueriesDec *decimal.Decimal
 	var requestQuantities []decimal.Decimal
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	requests := []int{1000000000}
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {

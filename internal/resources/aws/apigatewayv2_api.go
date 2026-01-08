@@ -42,7 +42,7 @@ func (r *APIGatewayV2API) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *APIGatewayV2API) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if strings.ToLower(r.ProtocolType) == "websocket" {
 		costComponents = r.websocketAPICostComponent()

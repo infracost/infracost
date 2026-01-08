@@ -33,7 +33,7 @@ func (r *Route53HealthCheck) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *Route53HealthCheck) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	endpointType := "aws"
 	usageAmount := "50"

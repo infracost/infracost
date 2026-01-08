@@ -37,7 +37,7 @@ func (r *AppServiceEnvironment) BuildResource() *schema.Resource {
 
 	stampFeeTiers := []string{"I1", "I2", "I3"}
 	productName := "Isolated Plan"
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	os := "linux"
 	if r.OperatingSystem != nil {
 		os = strings.ToLower(*r.OperatingSystem)

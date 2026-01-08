@@ -417,7 +417,7 @@ type egressRegionUsageFilterData struct {
 }
 
 func egressStepPricingHelper(usage float64, usageFiltersData []*egressRegionUsageFilterData, regData *egressRegionData, defaultAPIRegionName, serviceName string) []*schema.CostComponent {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	// TODO: Reformat to use tier helpers.
 	var used float64
 	var lastEndUsageAmount float64

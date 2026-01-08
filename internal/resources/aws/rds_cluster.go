@@ -50,7 +50,7 @@ func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *RDSCluster) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	databaseEngineMode := strings.ToLower(r.EngineMode)
 	if databaseEngineMode == "" {

@@ -172,7 +172,7 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 			}
 		}
 
-		costComponents := make([]*schema.CostComponent, 0)
+		costComponents := make([]*schema.CostComponent, 0, 1)
 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:                fmt.Sprintf("Custom instance CPU (Linux/UNIX, %s, %s %d vCPUs)", purchaseOptionLabel(purchaseOption), instanceType, cores),

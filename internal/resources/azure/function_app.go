@@ -69,7 +69,7 @@ func (r *FunctionApp) PopulateUsage(u *schema.UsageData) {
 //
 // Function apps are billed in two modes - Premium or Consumption.
 func (r *FunctionApp) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if r.Tier == "premium" {
 		cpu := r.appFunctionPremiumCPUCostComponent()
