@@ -148,7 +148,7 @@ func (r *CloudfrontDistribution) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *CloudfrontDistribution) BuildResource() *schema.Resource {
-	var components []*schema.CostComponent
+	components := make([]*schema.CostComponent, 0, 10)
 
 	if r.MonthlyHTTPRequests == nil {
 		r.MonthlyHTTPRequests = &cloudfrontDistributionRegionRequestsUsage{}
@@ -285,7 +285,7 @@ func (r *CloudfrontDistribution) buildRegionSubresource(regionData *cloudfrontDi
 		Name: regionData.awsGroupedName,
 	}
 
-	components := []*schema.CostComponent{}
+	components := make([]*schema.CostComponent, 0, 10)
 	components = append(components, r.dataOutToInternetCostComponents(regionData)...)
 	components = append(components, r.dataOutToOriginCostComponents(regionData)...)
 	components = append(components, r.httpRequestsCostComponents(regionData)...)

@@ -32,13 +32,13 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 }
 
 func GetUsageOnlyResources() []string {
-	r := []string{}
+	r := make([]string, 0, len(aws.UsageOnlyResources))
 	r = append(r, aws.UsageOnlyResources...)
 	return r
 }
 
 func createFreeResources(l []string) []*schema.RegistryItem {
-	freeResources := make([]*schema.RegistryItem, 0)
+	freeResources := make([]*schema.RegistryItem, 0, len(l))
 	for _, resourceName := range l {
 		freeResources = append(freeResources, &schema.RegistryItem{
 			Name:    resourceName,

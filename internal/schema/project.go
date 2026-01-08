@@ -480,7 +480,7 @@ func (p *Project) CalculateDiff() {
 
 // AllProjectResources returns the resources for all projects
 func AllProjectResources(projects []*Project) []*Resource {
-	resources := make([]*Resource, 0)
+	resources := make([]*Resource, 0, len(projects))
 
 	for _, p := range projects {
 		resources = append(resources, p.Resources...)

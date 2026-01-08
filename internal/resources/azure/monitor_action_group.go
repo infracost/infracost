@@ -69,7 +69,7 @@ func (r *MonitorActionGroup) BuildResource() *schema.Resource {
 	}
 
 	// SMS messages
-	smsCostComponents := []*schema.CostComponent{}
+	smsCostComponents := make([]*schema.CostComponent, 0, len(r.SMSReceiversByCountryCode))
 	for _, countryCode := range r.getSortedKeys(r.SMSReceiversByCountryCode) {
 		smsCostComponents = append(smsCostComponents, r.smsMessageCostComponent(countryCode, r.SMSReceiversByCountryCode[countryCode], r.MonthlyNotifications))
 	}
@@ -81,7 +81,7 @@ func (r *MonitorActionGroup) BuildResource() *schema.Resource {
 	}
 
 	// Voice calls
-	voiceCallCostComponents := []*schema.CostComponent{}
+	voiceCallCostComponents := make([]*schema.CostComponent, 0, len(r.VoiceCallReceiversByCountryCode))
 	for _, countryCode := range r.getSortedKeys(r.VoiceCallReceiversByCountryCode) {
 		voiceCallCostComponents = append(voiceCallCostComponents, r.voiceCallsCostComponent(countryCode, r.VoiceCallReceiversByCountryCode[countryCode], r.MonthlyNotifications))
 	}

@@ -26,7 +26,7 @@ func NewAzureRMNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		monthlyDataProcessedGb = decimalPtr(decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float()))
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	costComponents = append(costComponents, NATGatewayCostComponent("NAT gateway", region))
 	costComponents = append(costComponents, DataProcessedCostComponent("Data processed", region, monthlyDataProcessedGb))

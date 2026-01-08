@@ -115,7 +115,12 @@ func (d *ResourceData) IsEmpty(key string) bool {
 }
 
 func (d *ResourceData) References(keys ...string) []*ResourceData {
-	var data []*ResourceData
+	// Calculate total capacity needed
+	totalCap := 0
+	for _, key := range keys {
+		totalCap += len(d.ReferencesMap[key])
+	}
+	data := make([]*ResourceData, 0, totalCap)
 
 	for _, key := range keys {
 		data = append(data, d.ReferencesMap[key]...)

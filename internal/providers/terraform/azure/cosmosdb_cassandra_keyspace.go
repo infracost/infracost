@@ -115,7 +115,7 @@ func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account
 }
 
 func provisionedCosmosCostComponents(model modelType, throughputs *decimal.Decimal, zones []gjson.Result, skuName string, u *schema.UsageData) []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, len(zones))
 
 	var meterName string
 	if strings.ToLower(skuName) == "rus" {

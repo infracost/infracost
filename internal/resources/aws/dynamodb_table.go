@@ -59,7 +59,7 @@ func (a *DynamoDBTable) PopulateUsage(u *schema.UsageData) {
 func (a *DynamoDBTable) BuildResource() *schema.Resource {
 
 	costComponents := make([]*schema.CostComponent, 0)
-	subResources := make([]*schema.Resource, 0)
+	subResources := make([]*schema.Resource, 0, len(a.ReplicaRegions))
 
 	if a.BillingMode == "PROVISIONED" {
 		var wcuAutoscaling, rcuAutoscaling bool

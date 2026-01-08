@@ -16,7 +16,7 @@ func GetAzureRMHDInsightHBaseClusterRegistryItem() *schema.RegistryItem {
 func NewAzureRMHDInsightHBaseCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
 
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 3)
 
 	headNodeVM := d.Get("roles.0.head_node.0.vm_size").String()
 	regionNodeVM := d.Get("roles.0.worker_node.0.vm_size").String()

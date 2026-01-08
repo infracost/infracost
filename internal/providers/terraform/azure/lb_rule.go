@@ -36,7 +36,7 @@ func NewAzureRMLoadBalancerRule(d *schema.ResourceData, u *schema.UsageData) *sc
 		}
 	}
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 	costComponents = append(costComponents, rulesCostComponent(region))
 
 	return &schema.Resource{

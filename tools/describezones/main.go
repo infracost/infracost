@@ -64,9 +64,12 @@ func describeAWSZones() {
 			continue
 		}
 
-		var names, zoneIds, groupNames []cty.Value
+		zones := result.AvailabilityZones
+		names := make([]cty.Value, 0, len(zones))
+		zoneIds := make([]cty.Value, 0, len(zones))
+		groupNames := make([]cty.Value, 0, len(zones))
 
-		for _, zone := range result.AvailabilityZones {
+		for _, zone := range zones {
 			names = append(names, cty.StringVal(*zone.ZoneName))
 			zoneIds = append(zoneIds, cty.StringVal(*zone.ZoneId))
 			groupNames = append(groupNames, cty.StringVal(*zone.GroupName))
@@ -123,7 +126,7 @@ func describeGCPZones() {
 	regions := make(map[string]cty.Value)
 	if err := req.Pages(ctx, func(page *compute.RegionList) error {
 		for _, region := range page.Items {
-			var zones []cty.Value
+			zones := make([]cty.Value, 0, len(region.Zones))
 			for _, zoneURL := range region.Zones {
 				zones = append(zones, cty.StringVal(path.Base(zoneURL)))
 			}

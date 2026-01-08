@@ -85,9 +85,10 @@ func getComputePurchaseOption(d gjson.Result) string {
 // collectComputeGuestAccelerators collects Guest Accelerator data for Compute
 // resources.
 func collectComputeGuestAccelerators(d gjson.Result) []*google.ComputeGuestAccelerator {
-	guestAccelerators := []*google.ComputeGuestAccelerator{}
+	arr := d.Array()
+	guestAccelerators := make([]*google.ComputeGuestAccelerator, 0, len(arr))
 
-	for _, guestAccel := range d.Array() {
+	for _, guestAccel := range arr {
 		guestAccelerators = append(guestAccelerators, &google.ComputeGuestAccelerator{
 			Type:  guestAccel.Get("type").String(),
 			Count: guestAccel.Get("count").Int(),

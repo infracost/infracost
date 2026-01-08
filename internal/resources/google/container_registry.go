@@ -44,9 +44,8 @@ func (r *ContainerRegistry) BuildResource() *schema.Resource {
 		r.MonthlyEgressDataTransferGB = &ContainerRegistryNetworkEgressUsage{}
 	}
 	region := r.Region
-	components := []*schema.CostComponent{
-		dataStorageCostComponent(r.Location, r.StorageClass, r.StorageGB),
-	}
+	components := make([]*schema.CostComponent, 0, 5)
+	components = append(components, dataStorageCostComponent(r.Location, r.StorageClass, r.StorageGB))
 
 	components = append(components, operationsCostComponents(r.StorageClass, r.MonthlyClassAOperations, r.MonthlyClassBOperations)...)
 

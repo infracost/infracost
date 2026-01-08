@@ -198,7 +198,7 @@ output "loadbalancer"  {
 	output2 := blocks.Matching(BlockMatcher{Label: "loadbalancer", Type: "output"})
 	objectWithKeys := output2.GetAttribute("value").Value()
 	require.True(t, objectWithKeys.Type().IsObjectType())
-	keys := []string{}
+	keys := make([]string, 0, len(objectWithKeys.AsValueMap()))
 	for k, v := range objectWithKeys.AsValueMap() {
 		keys = append(keys, k)
 		pieces := strings.Split(k, ":")

@@ -238,7 +238,7 @@ func fetchUsageDataBatch(ctx *config.RunContext, c *apiclient.UsageAPIClient, pr
 func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) error {
 	c := apiclient.NewUsageAPIClient(ctx)
 
-	var resourceIDs []apiclient.ResourceIDAddress
+	resourceIDs := make([]apiclient.ResourceIDAddress, 0, len(project.AllPartialResources()))
 	for _, partial := range project.AllPartialResources() {
 		for _, resourceID := range partial.CloudResourceIDs {
 			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{

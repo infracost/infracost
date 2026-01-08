@@ -30,7 +30,8 @@ func (l *LeveledLogger) Warn(msg string, keysAndValues ...interface{}) {
 }
 
 func joinMessage(msg string, keysAndValues []interface{}) string {
-	s := []string{msg}
+	s := make([]string, 0, 1+len(keysAndValues))
+	s = append(s, msg)
 	for _, v := range keysAndValues {
 		s = append(s, fmt.Sprintf("%v", v))
 	}

@@ -32,27 +32,26 @@ func (r *BastionHost) PopulateUsage(u *schema.UsageData) {
 func (r *BastionHost) BuildResource() *schema.Resource {
 	productType := "Basic"
 
-	costComponents := []*schema.CostComponent{
-		{
-			Name:           "Bastion host",
-			Unit:           "hours",
-			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("azure"),
-				Region:        strPtr(r.Region),
-				Service:       strPtr("Azure Bastion"),
-				ProductFamily: strPtr("Networking"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "skuName", Value: strPtr(productType)},
-					{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Gateway", productType))},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("Consumption"),
+	costComponents := make([]*schema.CostComponent, 0, 2)
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:           "Bastion host",
+		Unit:           "hours",
+		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Bastion"),
+			ProductFamily: strPtr("Networking"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(productType)},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Gateway", productType))},
 			},
 		},
-	}
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
+	})
 
 	costComponents = append(costComponents, r.outboundDataTransferComponents(productType)...)
 

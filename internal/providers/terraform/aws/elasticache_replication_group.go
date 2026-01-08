@@ -39,8 +39,9 @@ func NewElastiCacheReplicationGroup(d *schema.ResourceData) schema.CoreResource 
 		clusterReplicasPerNodeGroup = d.Get("cluster_mode.0.replicas_per_node_group").Int()
 	}
 
-	targets := []*aws.AppAutoscalingTarget{}
-	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
+	refs := d.References("aws_appautoscaling_target.resource_id")
+	targets := make([]*aws.AppAutoscalingTarget, 0, len(refs))
+	for _, ref := range refs {
 		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
 	}
 

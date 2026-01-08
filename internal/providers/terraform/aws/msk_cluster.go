@@ -13,8 +13,9 @@ func getMSKClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 func NewMSKCluster(d *schema.ResourceData) schema.CoreResource {
-	targets := []*aws.AppAutoscalingTarget{}
-	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
+	refs := d.References("aws_appautoscaling_target.resource_id")
+	targets := make([]*aws.AppAutoscalingTarget, 0, len(refs))
+	for _, ref := range refs {
 		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
 	}
 

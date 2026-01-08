@@ -26,9 +26,8 @@ func (r *KMSKey) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *KMSKey) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		r.customerMasterKeyCostComponent(),
-	}
+	costComponents := make([]*schema.CostComponent, 0, 3)
+	costComponents = append(costComponents, r.customerMasterKeyCostComponent())
 
 	costComponents = append(costComponents, r.requestsCostComponents()...)
 

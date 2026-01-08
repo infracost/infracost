@@ -10,7 +10,7 @@ import (
 )
 
 func stubEKSDescribeNodegroup(stub *stubbedAWS, clusterName, nodeGroupName string, asgNames []string) {
-	asgMembers := []string{}
+	asgMembers := make([]string, 0, len(asgNames))
 	for _, asgName := range asgNames {
 		asgMembers = append(asgMembers, fmt.Sprintf(`{"name": "%s"}`, asgName))
 	}

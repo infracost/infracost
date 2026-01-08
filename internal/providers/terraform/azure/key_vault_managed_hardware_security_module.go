@@ -16,7 +16,7 @@ func GetAzureRMKeyVaultManagedHSMRegistryItem() *schema.RegistryItem {
 func NewAzureRMKeyVaultManagedHSM(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:           "HSM pools",

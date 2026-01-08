@@ -19,7 +19,7 @@ func GetAzureRMHDInsightKafkaClusterRegistryItem() *schema.RegistryItem {
 func NewAzureRMHDInsightKafkaCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
 
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 5)
 
 	tier := d.Get("tier").String()
 	diskSku := map[string]string{

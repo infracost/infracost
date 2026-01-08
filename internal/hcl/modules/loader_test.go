@@ -56,7 +56,7 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 		return expectedModules[i].Key < expectedModules[j].Key
 	})
 
-	expected := []*ManifestModule{}
+	expected := make([]*ManifestModule, 0, len(expectedModules))
 	for _, m := range expectedModules {
 		e := &ManifestModule{
 			Key:            m.Key,

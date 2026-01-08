@@ -275,8 +275,8 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize int, currency string) []BatchRequest {
 	reqs := make([]BatchRequest, 0)
 
-	keys := make([]PriceQueryKey, 0)
-	queries := make([]GraphQLQuery, 0)
+	keys := make([]PriceQueryKey, 0, len(resources))
+	queries := make([]GraphQLQuery, 0, len(resources))
 
 	for _, r := range resources {
 		for _, component := range r.CostComponents {

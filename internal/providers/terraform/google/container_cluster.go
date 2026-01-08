@@ -55,8 +55,9 @@ func newContainerCluster(d *schema.ResourceData) schema.CoreResource {
 	// Build a list of node pools that are defined in other `google_container_node_pool` resources
 	// If we find these in the `node_pool` field, we want to skip them for this resource
 	// since we will show the cost for these against their `google_container_node_pool` resource
-	definedNodePoolNames := []string{}
-	for _, ref := range d.References("google_container_node_pool.cluster") {
+	refs := d.References("google_container_node_pool.cluster")
+	definedNodePoolNames := make([]string, 0, len(refs))
+	for _, ref := range refs {
 		definedNodePoolNames = append(definedNodePoolNames, ref.Get("name").String())
 	}
 

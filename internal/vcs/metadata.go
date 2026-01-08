@@ -943,7 +943,7 @@ func (f *metadataFetcher) getGitlabPullRequestAuthor() string {
 }
 
 func (f *metadataFetcher) gitlabClientOps() []gitlab.ClientOptionFunc {
-	var ops []gitlab.ClientOptionFunc
+	ops := make([]gitlab.ClientOptionFunc, 0, 1)
 	v := os.Getenv("CI_API_V4_URL")
 	if v == "" {
 		return ops

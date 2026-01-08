@@ -55,7 +55,7 @@ func (r *DataTransfer) BuildResource() *schema.Resource {
 		return nil
 	}
 
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 10)
 
 	costComponents = append(costComponents, r.intraRegionCostComponents()...)
 	costComponents = append(costComponents, r.outboundInternetCostComponents()...)

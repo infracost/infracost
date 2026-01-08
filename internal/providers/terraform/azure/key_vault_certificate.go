@@ -25,7 +25,7 @@ func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
 func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	var skuName string
 	keyVault := d.References("key_vault_id")

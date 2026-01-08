@@ -21,7 +21,7 @@ func GetAzureRMFirewallRegistryItem() *schema.RegistryItem {
 func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Region
 
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	skuTier := "Standard"
 	if d.Get("sku_tier").Type != gjson.Null {

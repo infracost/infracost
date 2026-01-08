@@ -52,7 +52,7 @@ func (r *BackupVault) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *BackupVault) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 12)
 
 	bd := backupData{ref: "monthly_efs_warm_backup_gb", name: "EFS backup (warm)", unit: "GB", usageType: "WarmStorage-ByteHrs-EFS$", service: "AWSBackup", family: "AWS Backup Storage"}
 	if r.MonthlyEFSWarmBackupGB != nil {

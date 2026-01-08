@@ -48,7 +48,7 @@ func (r *TransferServer) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid TransferServer struct.
 // This method is called after the resource is initialised by an IaC provider.
 func (r *TransferServer) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, len(r.Protocols)+1+1)
 
 	for _, protocol := range r.Protocols {
 		costComponents = append(costComponents, r.protocolEnabledCostComponent(protocol))

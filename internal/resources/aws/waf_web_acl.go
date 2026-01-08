@@ -32,7 +32,8 @@ func (r *WAFWebACL) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *WAFWebACL) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{r.webACLUsageCostComponent()}
+	costComponents := make([]*schema.CostComponent, 0, 4)
+	costComponents = append(costComponents, r.webACLUsageCostComponent())
 
 	rules := r.Rules
 	if r.RuleGroupRules != nil {
