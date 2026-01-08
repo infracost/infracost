@@ -29,7 +29,7 @@ func (r *ComputeTargetGRPCProxy) PopulateUsage(u *schema.UsageData) {
 func (r *ComputeTargetGRPCProxy) BuildResource() *schema.Resource {
 	var monthlyProxyInstances, monthlyDataProcessedGb *decimal.Decimal
 	region := r.Region
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	if r.MonthlyProxyInstances != nil {
 		monthlyProxyInstances = decimalPtr(decimal.NewFromFloat(*r.MonthlyProxyInstances))

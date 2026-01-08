@@ -37,7 +37,7 @@ func (r *DatabricksWorkspace) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
-	var costComponents []*schema.CostComponent
+	costComponents := make([]*schema.CostComponent, 0, 3)
 
 	sku := cases.Title(language.English).String(r.SKU)
 

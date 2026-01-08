@@ -352,7 +352,7 @@ func (r *CloudfrontDistribution) buildDataOutCostComponent(usageName, fromLocati
 }
 
 func (r *CloudfrontDistribution) dataOutToOriginCostComponents(regionData *cloudfrontDistributionRegionData) []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	apiRegion := regionData.priceRegion
 
@@ -382,7 +382,7 @@ func (r *CloudfrontDistribution) dataOutToOriginCostComponents(regionData *cloud
 }
 
 func (r *CloudfrontDistribution) httpRequestsCostComponents(regionData *cloudfrontDistributionRegionData) []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	apiRegion := regionData.priceRegion
 
@@ -411,7 +411,7 @@ func (r *CloudfrontDistribution) httpRequestsCostComponents(regionData *cloudfro
 }
 
 func (r *CloudfrontDistribution) httpsRequestsCostComponents(regionData *cloudfrontDistributionRegionData) []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	apiRegion := regionData.priceRegion
 

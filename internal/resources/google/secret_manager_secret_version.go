@@ -47,7 +47,7 @@ func (r *SecretManagerSecretVersion) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *SecretManagerSecretVersion) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	costComponents = append(costComponents, r.activeSecretVersionsCostComponents()...)
 	costComponents = append(costComponents, r.accessOperationsCostComponents()...)

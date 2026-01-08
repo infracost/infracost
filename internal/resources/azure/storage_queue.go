@@ -62,9 +62,8 @@ func (r *StorageQueue) BuildResource() *schema.Resource {
 		return nil
 	}
 
-	costComponents := []*schema.CostComponent{
-		r.dataStorageCostComponent(),
-	}
+	costComponents := make([]*schema.CostComponent, 0, 4)
+	costComponents = append(costComponents, r.dataStorageCostComponent())
 	costComponents = append(costComponents, r.operationsCostComponents()...)
 	costComponents = append(costComponents, r.geoReplicationDataTransferCostComponents()...)
 

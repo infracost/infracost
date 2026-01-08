@@ -28,7 +28,7 @@ func (r *ComputeForwardingRule) PopulateUsage(u *schema.UsageData) {
 func (r *ComputeForwardingRule) BuildResource() *schema.Resource {
 	var monthlyIngressDataGb *decimal.Decimal
 	region := r.Region
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 2)
 
 	costComponents = append(costComponents, r.computeForwardingCostComponent())
 

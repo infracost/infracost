@@ -25,7 +25,7 @@ func (r *EKSFargateProfile) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *EKSFargateProfile) BuildResource() *schema.Resource {
-	costComponents := make([]*schema.CostComponent, 0)
+	costComponents := make([]*schema.CostComponent, 0, 2)
 	costComponents = append(costComponents, r.memoryCostComponent())
 	costComponents = append(costComponents, r.vcpuCostComponent())
 
