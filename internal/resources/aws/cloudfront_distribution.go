@@ -469,7 +469,7 @@ var regionShieldMapping = map[string]string{
 }
 
 func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.IsOriginShieldEnabled {
 		return costComponents
@@ -596,7 +596,7 @@ func (r *CloudfrontDistribution) invalidationRequestsCostComponents() []*schema.
 }
 
 func (r *CloudfrontDistribution) encryptionRequestsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.HasFieldLevelEncryptionID {
 		return costComponents
@@ -627,7 +627,7 @@ func (r *CloudfrontDistribution) encryptionRequestsCostComponents() []*schema.Co
 }
 
 func (r *CloudfrontDistribution) realtimeLogsCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{}
+	costComponents := make([]*schema.CostComponent, 0, 1)
 
 	if !r.HasLoggingConfigBucket {
 		return costComponents

@@ -61,9 +61,8 @@ func (r *StorageShare) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *StorageShare) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		r.dataStorageCostComponent(),
-	}
+	costComponents := make([]*schema.CostComponent, 0, 5)
+	costComponents = append(costComponents, r.dataStorageCostComponent())
 
 	costComponents = append(costComponents, r.snapshotCostComponents()...)
 	costComponents = append(costComponents, r.metadataCostComponents()...)
