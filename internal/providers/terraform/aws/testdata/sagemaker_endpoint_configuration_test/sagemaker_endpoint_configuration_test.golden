@@ -1,0 +1,20 @@
+
+ Name                                       Monthly Qty  Unit   Monthly Cost   
+                                                                               
+ aws_sagemaker_endpoint_configuration.test                                     
+ ├─ Inference instance (ml.m5.xlarge)             1,460  hours       $335.80   
+ └─ Inference instance storage                      100  GB           $11.20   
+                                                                               
+ OVERALL TOTAL                                                      $347.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $347 ┃           - ┃       $347 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

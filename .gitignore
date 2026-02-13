@@ -48,3 +48,4 @@ docs/generated/
 infracost-debug-report.json
 
 cmd/infracost/__debug_*
+internal/providers/terraform/aws/__debug_bin.exe1519583144
