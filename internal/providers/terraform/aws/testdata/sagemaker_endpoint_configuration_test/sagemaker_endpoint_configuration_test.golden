@@ -1,23 +1,26 @@
 
- Name                                                     Monthly Qty  Unit     Monthly Cost    
-                                                                                                
- aws_sagemaker_endpoint_configuration.provisioned_config                                        
- ├─ Inference instance (ml.m5.xlarge)                             730  hours         $167.90    
- └─ Inference instance storage                                     20  GB              $2.24    
-                                                                                                
- aws_sagemaker_endpoint_configuration.serverless_config                                         
- └─ Compute (2048MB)                                          360,000  seconds        $14.40  * 
-                                                                                                
- OVERALL TOTAL                                                                       $184.54 
+ Name                                                       Monthly Qty  Unit     Monthly Cost    
+                                                                                                  
+ aws_sagemaker_endpoint_configuration.provisioned_config                                          
+ ├─ Inference instance (ml.m5.xlarge)                               730  hours         $167.90    
+ └─ Inference instance storage                                       20  GB              $2.24    
+                                                                                                  
+ aws_sagemaker_endpoint_configuration.my_serverless_config                                        
+ ├─ Data processed                                                   20  GB              $0.32  * 
+ ├─ Compute (2048MB)                                            500,000  seconds        $20.00  * 
+ ├─ Provisioned concurrency (warm)                            5,256,000  seconds       $122.46    
+ └─ Provisioned concurrency execution                           500,000  seconds         $5.00  * 
+                                                                                                  
+ OVERALL TOTAL                                                                         $317.92 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated
+3 cloud resources were detected:
+∙ 3 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $170 ┃         $14 ┃       $185 ┃
+┃ main                                               ┃          $293 ┃         $25 ┃       $318 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -23,52 +23,17 @@ func NewSageMakerEndpointConfiguration(d *schema.ResourceData, u *schema.UsageDa
 	region := d.Get("region").String()
 	var costComponents []*schema.CostComponent
 
-	// Fix 1: We pass the gjson.Result directly to the helper
+	// 1. Process standard Production Variants
 	if d.Get("production_variants").Exists() {
 		for _, variant := range d.Get("production_variants").Array() {
-			serverlessConfig := variant.Get("serverless_config")
-
-			if serverlessConfig.Exists() && len(serverlessConfig.Array()) > 0 {
-				// --- SERVERLESS PATH ---
-				config := serverlessConfig.Array()[0]
-				memorySizeMB := config.Get("memory_size_in_mb").Int()
-
-				// AWS bills in seconds per your Postman response ($0.00004/sec)
-				// We use UnitMultiplier: 1 because the price is already for the whole 2GB chunk
-				monthlyDuration := decimal.NewFromFloat(u.Get("monthly_inference_duration_seconds").Float())
-				costComponents = append(costComponents, &schema.CostComponent{
-					Name:            fmt.Sprintf("Compute (%vMB)", memorySizeMB),
-					Unit:            "seconds",
-					UnitMultiplier:  decimal.NewFromInt(1),
-					MonthlyQuantity: &monthlyDuration,
-					UsageBased:      true,
-					ProductFilter: &schema.ProductFilter{
-						VendorName:    strPtr("aws"),
-						Region:        strPtr(region),
-						Service:       strPtr("AmazonSageMaker"),
-						ProductFamily: strPtr("ML Serverless"),
-						AttributeFilters: []*schema.AttributeFilter{
-							{
-								Key:        "usagetype",
-								ValueRegex: strPtr("/ServerlessInf:Mem-2GB/"),
-							},
-						},
-					},
-					PriceFilter: &schema.PriceFilter{
-						PurchaseOption: strPtr("on_demand"),
-					},
-				})
-			} else {
-				// --- PROVISIONED PATH ---
-				// This helper handles the instance type and storage only.
-				costComponents = append(costComponents, sagemakerInstanceComponents(region, variant, "Inference instance")...)
-			}
+			costComponents = append(costComponents, sagemakerVariantComponents(region, &variant, u, "Inference instance")...)
 		}
 	}
 
+	// 2. Process Shadow Production Variants (usually use provisioned instances)
 	if d.Get("shadow_production_variants").Exists() {
 		for _, variant := range d.Get("shadow_production_variants").Array() {
-			costComponents = append(costComponents, sagemakerInstanceComponents(region, variant, "Shadow instance")...)
+			costComponents = append(costComponents, sagemakerVariantComponents(region, &variant, u, "Shadow instance")...)
 		}
 	}
 
@@ -76,6 +41,107 @@ func NewSageMakerEndpointConfiguration(d *schema.ResourceData, u *schema.UsageDa
 		Name:           d.Address,
 		CostComponents: costComponents,
 	}
+}
+
+func sagemakerVariantComponents(region string, variant *gjson.Result, u *schema.UsageData, label string) []*schema.CostComponent {
+	serverlessConfig := variant.Get("serverless_config")
+
+	// If it's Serverless
+	if serverlessConfig.Exists() && len(serverlessConfig.Array()) > 0 {
+		return sagemakerServerlessComponents(region, variant, serverlessConfig.Array()[0], u)
+	}
+
+	// Otherwise, it's Provisioned (using your existing helper)
+	return sagemakerInstanceComponents(region, *variant, label)
+}
+
+func sagemakerServerlessComponents(region string, variant *gjson.Result, config gjson.Result, u *schema.UsageData) []*schema.CostComponent {
+	var components []*schema.CostComponent
+	memorySizeMB := config.Get("memory_size_in_mb").Int()
+	pcCount := config.Get("provisioned_concurrency").Int()
+	regionPrefix := regionToUsagePrefix(region)
+
+	// 1. DATA PROCESSING (IN & OUT)
+	// Covers the $0.016/GB fee you discovered
+	if u != nil && u.Get("monthly_data_processed_gb").Exists() {
+		monthlyData := decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float())
+		components = append(components, &schema.CostComponent{
+			Name:            "Data processed",
+			Unit:            "GB",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: &monthlyData,
+			UsageBased:      true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(region),
+				Service:    strPtr("AmazonSageMaker"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "operation", Value: strPtr("Invoke-Endpoint")},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-Hst:Data-Bytes-Out/", regionPrefix))},
+				},
+			},
+		})
+	}
+
+	// 2. COMPUTE DURATION (Standard execution)
+	monthlyDuration := decimal.NewFromFloat(u.Get("monthly_inference_duration_seconds").Float())
+	components = append(components, &schema.CostComponent{
+		Name:            fmt.Sprintf("Compute (%vMB)", memorySizeMB),
+		Unit:            "seconds",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: &monthlyDuration,
+		UsageBased:      true,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonSageMaker"),
+			ProductFamily: strPtr("ML Serverless"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ServerlessInf:Mem-%vGB/", memorySizeMB/1024))},
+			},
+		},
+	})
+
+	// 3. PROVISIONED CONCURRENCY (If enabled)
+	if pcCount > 0 {
+		// PC Readiness (Warm slots) - Billed 24/7 (730 hours/month)
+		pcQuantity := decimal.NewFromInt(pcCount * 730 * 3600) // slots * hours * seconds
+		components = append(components, &schema.CostComponent{
+			Name:            "Provisioned concurrency (warm)",
+			Unit:            "seconds",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: &pcQuantity,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(region),
+				Service:    strPtr("AmazonSageMaker"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-ProvisionedConcurrency:Mem-%vGB/", regionPrefix, memorySizeMB/1024))},
+				},
+			},
+		})
+
+		// PC Execution (Billed when request hits a warm slot)
+		// Usually separate usagetype: ServerlessInf:PC-Usage
+		pcUsage := decimal.NewFromFloat(u.Get("monthly_pc_inference_duration_seconds").Float())
+		components = append(components, &schema.CostComponent{
+			Name:            "Provisioned concurrency execution",
+			Unit:            "seconds",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: &pcUsage,
+			UsageBased:      true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(region),
+				Service:    strPtr("AmazonSageMaker"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-ProvisionedConcurrency:Usage-%vGB/", regionPrefix, memorySizeMB/1024))},
+				},
+			},
+		})
+	}
+
+	return components
 }
 
 // Fix 2: Change parameter type to gjson.Result to match the loop output
@@ -132,4 +198,27 @@ func sagemakerInstanceComponents(region string, variant gjson.Result, label stri
 	}
 
 	return components
+}
+
+func regionToUsagePrefix(region string) string {
+	mapping := map[string]string{
+		"us-east-1":      "USE1",
+		"us-east-2":      "USE2",
+		"us-west-1":      "USW1",
+		"us-west-2":      "USW2",
+		"eu-central-1":   "EUC1",
+		"eu-west-1":      "EUW1",
+		"eu-west-2":      "EUW2",
+		"ap-southeast-1": "APS1",
+		"ap-southeast-2": "APS2",
+		"ap-northeast-1": "APN1",
+		"ap-northeast-2": "APN2",
+		"ca-central-1":   "CAN1",
+		"sa-east-1":      "SAE1",
+	}
+
+	if prefix, ok := mapping[region]; ok {
+		return prefix
+	}
+	return "" // Default to empty or handle error
 }

@@ -1,4 +1,9 @@
 version: 0.1
 resource_usage:
-  aws_sagemaker_endpoint_configuration.serverless_config:
-    monthly_inference_duration_seconds: 360000 # 100 hours
+  aws_sagemaker_endpoint_configuration.my_serverless_config:
+    # Requests handled by standard on-demand scaling
+    monthly_inference_duration_seconds: 500000 
+    # Requests handled by provisioned "warm" slots
+    monthly_pc_inference_duration_seconds: 500000
+    # Total data (IN + OUT) in GB
+    monthly_data_processed_gb: 20

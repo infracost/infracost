@@ -31,3 +31,18 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
     }
   }
 }
+
+resource "aws_sagemaker_endpoint_configuration" "my_serverless_config" {
+  name = "serverless-endpoint-config"
+
+  production_variants {
+    variant_name          = "AllTraffic"
+    model_name            = "my-model-name"
+    
+    serverless_config {
+      memory_size_in_mb       = 2048
+      max_concurrency         = 10
+      provisioned_concurrency = 2  # This triggers the "warm" costs
+    }
+  }
+}
