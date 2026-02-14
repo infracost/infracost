@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_sagemaker_endpoint_configuration.serverless_config:
+    monthly_inference_duration_seconds: 360000 # 100 hours

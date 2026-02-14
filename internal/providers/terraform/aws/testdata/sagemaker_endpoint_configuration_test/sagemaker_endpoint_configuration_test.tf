@@ -7,13 +7,27 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_sagemaker_endpoint_configuration" "test" {
-  name = "my-endpoint-config"
+# 1. Provisioned Instance Example
+resource "aws_sagemaker_endpoint_configuration" "provisioned_config" {
+  name = "provisioned-config"
   production_variants {
     variant_name           = "variant-1"
     model_name             = "my-model"
     instance_type          = "ml.m5.xlarge"
-    initial_instance_count = 2
-    volume_size_in_gb      = 50
+    initial_instance_count = 1
+    volume_size_in_gb      = 20
+  }
+}
+
+# 2. Serverless Example
+resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
+  name = "serverless-config"
+  production_variants {
+    variant_name           = "serverless-variant"
+    model_name             = "my-model"
+    serverless_config {
+      memory_size_in_mb = 2048
+      max_concurrency   = 10
+    }
   }
 }

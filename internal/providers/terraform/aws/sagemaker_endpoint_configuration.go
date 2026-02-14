@@ -26,7 +26,43 @@ func NewSageMakerEndpointConfiguration(d *schema.ResourceData, u *schema.UsageDa
 	// Fix 1: We pass the gjson.Result directly to the helper
 	if d.Get("production_variants").Exists() {
 		for _, variant := range d.Get("production_variants").Array() {
-			costComponents = append(costComponents, sagemakerInstanceComponents(region, variant, "Inference instance")...)
+			serverlessConfig := variant.Get("serverless_config")
+
+			if serverlessConfig.Exists() && len(serverlessConfig.Array()) > 0 {
+				// --- SERVERLESS PATH ---
+				config := serverlessConfig.Array()[0]
+				memorySizeMB := config.Get("memory_size_in_mb").Int()
+
+				// AWS bills in seconds per your Postman response ($0.00004/sec)
+				// We use UnitMultiplier: 1 because the price is already for the whole 2GB chunk
+				monthlyDuration := decimal.NewFromFloat(u.Get("monthly_inference_duration_seconds").Float())
+				costComponents = append(costComponents, &schema.CostComponent{
+					Name:            fmt.Sprintf("Compute (%vMB)", memorySizeMB),
+					Unit:            "seconds",
+					UnitMultiplier:  decimal.NewFromInt(1),
+					MonthlyQuantity: &monthlyDuration,
+					UsageBased:      true,
+					ProductFilter: &schema.ProductFilter{
+						VendorName:    strPtr("aws"),
+						Region:        strPtr(region),
+						Service:       strPtr("AmazonSageMaker"),
+						ProductFamily: strPtr("ML Serverless"),
+						AttributeFilters: []*schema.AttributeFilter{
+							{
+								Key:        "usagetype",
+								ValueRegex: strPtr("/ServerlessInf:Mem-2GB/"),
+							},
+						},
+					},
+					PriceFilter: &schema.PriceFilter{
+						PurchaseOption: strPtr("on_demand"),
+					},
+				})
+			} else {
+				// --- PROVISIONED PATH ---
+				// This helper handles the instance type and storage only.
+				costComponents = append(costComponents, sagemakerInstanceComponents(region, variant, "Inference instance")...)
+			}
 		}
 	}
 
