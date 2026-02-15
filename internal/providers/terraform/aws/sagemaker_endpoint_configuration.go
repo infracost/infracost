@@ -48,14 +48,14 @@ func sagemakerVariantComponents(region string, variant *gjson.Result, u *schema.
 
 	// If it's Serverless
 	if serverlessConfig.Exists() && len(serverlessConfig.Array()) > 0 {
-		return sagemakerServerlessComponents(region, variant, serverlessConfig.Array()[0], u)
+		return sagemakerServerlessComponents(region, serverlessConfig.Array()[0], u)
 	}
 
 	// Otherwise, it's Provisioned (using your existing helper)
 	return sagemakerInstanceComponents(region, *variant, label)
 }
 
-func sagemakerServerlessComponents(region string, variant *gjson.Result, config gjson.Result, u *schema.UsageData) []*schema.CostComponent {
+func sagemakerServerlessComponents(region string, config gjson.Result, u *schema.UsageData) []*schema.CostComponent {
 	var components []*schema.CostComponent
 	memorySizeMB := config.Get("memory_size_in_mb").Int()
 	pcCount := config.Get("provisioned_concurrency").Int()
@@ -112,9 +112,10 @@ func sagemakerServerlessComponents(region string, variant *gjson.Result, config 
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &pcQuantity,
 			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Region:     strPtr(region),
-				Service:    strPtr("AmazonSageMaker"),
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonSageMaker"),
+				ProductFamily: strPtr("ML Serverless"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-ProvisionedConcurrency:Mem-%vGB/", regionPrefix, memorySizeMB/1024))},
 				},
@@ -123,7 +124,7 @@ func sagemakerServerlessComponents(region string, variant *gjson.Result, config 
 
 		// PC Execution (Billed when request hits a warm slot)
 		// Usually separate usagetype: ServerlessInf:PC-Usage
-		pcUsage := decimal.NewFromFloat(u.Get("monthly_pc_inference_duration_seconds").Float())
+		pcUsage := decimal.NewFromFloat(u.Get("monthly_provisioned_concurrency_inference_duration_seconds").Float())
 		components = append(components, &schema.CostComponent{
 			Name:            "Provisioned concurrency execution",
 			Unit:            "seconds",
@@ -131,9 +132,10 @@ func sagemakerServerlessComponents(region string, variant *gjson.Result, config 
 			MonthlyQuantity: &pcUsage,
 			UsageBased:      true,
 			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("aws"),
-				Region:     strPtr(region),
-				Service:    strPtr("AmazonSageMaker"),
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(region),
+				Service:       strPtr("AmazonSageMaker"),
+				ProductFamily: strPtr("ML Serverless"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s-ProvisionedConcurrency:Usage-%vGB/", regionPrefix, memorySizeMB/1024))},
 				},

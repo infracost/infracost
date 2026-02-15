@@ -46,3 +46,23 @@ resource "aws_sagemaker_endpoint_configuration" "my_serverless_config" {
     }
   }
 }
+
+resource "aws_sagemaker_endpoint_configuration" "shadow_test_config" {
+  name = "shadow-endpoint-config"
+
+  # Live Production Variant
+  production_variants {
+    variant_name           = "Primary-Live"
+    model_name             = "my-old-model"
+    instance_type          = "ml.m5.large"
+    initial_instance_count = 1
+  }
+
+  # Shadow Variant (Billing is identical to production)
+  shadow_production_variants {
+    variant_name           = "Shadow-New-Model"
+    model_name             = "my-new-model"
+    instance_type          = "ml.m5.xlarge" # testing a larger instance
+    initial_instance_count = 1
+  }
+}

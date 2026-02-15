@@ -1,6 +1,10 @@
 
  Name                                                       Monthly Qty  Unit     Monthly Cost    
                                                                                                   
+ aws_sagemaker_endpoint_configuration.shadow_test_config                                          
+ ├─ Inference instance (ml.m5.large)                                730  hours          $83.95    
+ └─ Shadow instance (ml.m5.xlarge)                                  730  hours         $167.90    
+                                                                                                  
  aws_sagemaker_endpoint_configuration.provisioned_config                                          
  ├─ Inference instance (ml.m5.xlarge)                               730  hours         $167.90    
  └─ Inference instance storage                                       20  GB              $2.24    
@@ -11,16 +15,16 @@
  ├─ Provisioned concurrency (warm)                            5,256,000  seconds       $122.46    
  └─ Provisioned concurrency execution                           500,000  seconds         $5.00  * 
                                                                                                   
- OVERALL TOTAL                                                                         $317.92 
+ OVERALL TOTAL                                                                         $569.77 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-3 cloud resources were detected:
-∙ 3 were estimated
+4 cloud resources were detected:
+∙ 4 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $293 ┃         $25 ┃       $318 ┃
+┃ main                                               ┃          $544 ┃         $25 ┃       $570 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

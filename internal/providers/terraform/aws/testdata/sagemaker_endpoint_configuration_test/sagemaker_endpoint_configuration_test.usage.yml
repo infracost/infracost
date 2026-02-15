@@ -4,6 +4,6 @@ resource_usage:
     # Requests handled by standard on-demand scaling
     monthly_inference_duration_seconds: 500000 
     # Requests handled by provisioned "warm" slots
-    monthly_pc_inference_duration_seconds: 500000
+    monthly_provisioned_concurrency_inference_duration_seconds: 500000
     # Total data (IN + OUT) in GB
     monthly_data_processed_gb: 20
