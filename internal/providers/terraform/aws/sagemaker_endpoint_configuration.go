@@ -10,11 +10,8 @@ import (
 
 func getSagemakerEndpointConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_sagemaker_endpoint_configuration",
-		RFunc: NewSageMakerEndpointConfiguration,
-		// We leave this empty for now. If we later want to support
-		// Inference Pipelines that pull costs from specific models,
-		// we would add "production_variants.model_name" here.
+		Name:                "aws_sagemaker_endpoint_configuration",
+		RFunc:               NewSageMakerEndpointConfiguration,
 		ReferenceAttributes: []string{},
 	}
 }
@@ -23,14 +20,12 @@ func NewSageMakerEndpointConfiguration(d *schema.ResourceData, u *schema.UsageDa
 	region := d.Get("region").String()
 	var costComponents []*schema.CostComponent
 
-	// 1. Process standard Production Variants
 	if d.Get("production_variants").Exists() {
 		for _, variant := range d.Get("production_variants").Array() {
 			costComponents = append(costComponents, sagemakerVariantComponents(region, &variant, u, "Inference instance")...)
 		}
 	}
 
-	// 2. Process Shadow Production Variants (usually use provisioned instances)
 	if d.Get("shadow_production_variants").Exists() {
 		for _, variant := range d.Get("shadow_production_variants").Array() {
 			costComponents = append(costComponents, sagemakerVariantComponents(region, &variant, u, "Shadow instance")...)
@@ -46,23 +41,19 @@ func NewSageMakerEndpointConfiguration(d *schema.ResourceData, u *schema.UsageDa
 func sagemakerVariantComponents(region string, variant *gjson.Result, u *schema.UsageData, label string) []*schema.CostComponent {
 	serverlessConfig := variant.Get("serverless_config")
 
-	// If it's Serverless
 	if serverlessConfig.Exists() && len(serverlessConfig.Array()) > 0 {
 		return sagemakerServerlessComponents(region, serverlessConfig.Array()[0], u)
 	}
 
-	// Otherwise, it's Provisioned (using your existing helper)
 	return sagemakerInstanceComponents(region, *variant, label)
 }
 
 func sagemakerServerlessComponents(region string, config gjson.Result, u *schema.UsageData) []*schema.CostComponent {
 	var components []*schema.CostComponent
 	memorySizeMB := config.Get("memory_size_in_mb").Int()
-	pcCount := config.Get("provisioned_concurrency").Int()
+	provisionedConcurrencyCount := config.Get("provisioned_concurrency").Int()
 	regionPrefix := regionToUsagePrefix(region)
 
-	// 1. DATA PROCESSING (IN & OUT)
-	// Covers the $0.016/GB fee you discovered
 	if u != nil && u.Get("monthly_data_processed_gb").Exists() {
 		monthlyData := decimal.NewFromFloat(u.Get("monthly_data_processed_gb").Float())
 		components = append(components, &schema.CostComponent{
@@ -83,7 +74,7 @@ func sagemakerServerlessComponents(region string, config gjson.Result, u *schema
 		})
 	}
 
-	// 2. COMPUTE DURATION (Standard execution)
+	// COMPUTE DURATION (Standard execution)
 	monthlyDuration := decimal.NewFromFloat(u.Get("monthly_inference_duration_seconds").Float())
 	components = append(components, &schema.CostComponent{
 		Name:            fmt.Sprintf("Compute (%vMB)", memorySizeMB),
@@ -103,9 +94,11 @@ func sagemakerServerlessComponents(region string, config gjson.Result, u *schema
 	})
 
 	// 3. PROVISIONED CONCURRENCY (If enabled)
-	if pcCount > 0 {
-		// PC Readiness (Warm slots) - Billed 24/7 (730 hours/month)
-		pcQuantity := decimal.NewFromInt(pcCount * 730 * 3600) // slots * hours * seconds
+	if provisionedConcurrencyCount > 0 {
+		// PC Readiness (Warm slots) - Billed 24/7
+		const monthlyHours = 730
+		const hourlySeconds = 3600
+		pcQuantity := decimal.NewFromInt(provisionedConcurrencyCount * monthlyHours * hourlySeconds)
 		components = append(components, &schema.CostComponent{
 			Name:            "Provisioned concurrency (warm)",
 			Unit:            "seconds",
@@ -123,7 +116,6 @@ func sagemakerServerlessComponents(region string, config gjson.Result, u *schema
 		})
 
 		// PC Execution (Billed when request hits a warm slot)
-		// Usually separate usagetype: ServerlessInf:PC-Usage
 		pcUsage := decimal.NewFromFloat(u.Get("monthly_provisioned_concurrency_inference_duration_seconds").Float())
 		components = append(components, &schema.CostComponent{
 			Name:            "Provisioned concurrency execution",
@@ -146,7 +138,6 @@ func sagemakerServerlessComponents(region string, config gjson.Result, u *schema
 	return components
 }
 
-// Fix 2: Change parameter type to gjson.Result to match the loop output
 func sagemakerInstanceComponents(region string, variant gjson.Result, label string) []*schema.CostComponent {
 	instanceType := variant.Get("instance_type").String()
 	count := decimal.NewFromInt(variant.Get("initial_instance_count").Int())
@@ -160,7 +151,6 @@ func sagemakerInstanceComponents(region string, variant gjson.Result, label stri
 			Name:           fmt.Sprintf("%s (%s)", label, instanceType),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
-			// Fix 3: Infracost uses &count (pointer to decimal) instead of decimal.Ptr
 			HourlyQuantity: &count,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
@@ -189,10 +179,8 @@ func sagemakerInstanceComponents(region string, variant gjson.Result, label stri
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{
-						Key: "usagetype",
-						// We use a wildcard/suffix match for the usage type
-						// so it works in us-east-1 (USE1) and others.
-						ValueRegex: strPtr("/Studio:VolumeUsage.gp3/"),
+						Key:        "usagetype",
+						ValueRegex: strPtr(fmt.Sprintf("/%s-Studio:VolumeUsage.gp3/", regionToUsagePrefix(region))), //USE1-Studio:VolumeUsage.gp3
 					},
 				},
 			},
