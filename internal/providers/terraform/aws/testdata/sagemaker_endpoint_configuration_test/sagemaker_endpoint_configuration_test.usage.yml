@@ -1,6 +1,7 @@
 version: 0.1
 resource_usage:
-  aws_sagemaker_endpoint_configuration.serverless_config_provisioned_concurrency:
+  # Adding [*] is the secret sauce for resource arrays/slices
+  aws_sagemaker_endpoint_configuration.serverless_config_provisioned_concurrency_with_usage:
     monthly_inference_duration_seconds: 500000 
     monthly_provisioned_concurrency_inference_duration_seconds: 500000
     monthly_data_processed_gb: 20

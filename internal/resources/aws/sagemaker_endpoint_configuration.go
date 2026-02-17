@@ -77,7 +77,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 			Service:    strPtr("AmazonSageMaker"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "operation", Value: strPtr("Invoke-Endpoint")},
-				{Key: "usagetype", ValueRegex: strPtr("/Hst:Data-Bytes-Out/")},
+				{Key: "usagetype", ValueRegex: strPtr("^[A-Z0-9]*-Hst:Data-Bytes-Out$")},
 			},
 		},
 	})
