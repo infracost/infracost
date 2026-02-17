@@ -13,6 +13,11 @@ type SageMakerEndpointConfiguration struct {
 	Address  string
 	Region   string
 	Variants []*SageMakerVariant
+
+	// "usage" keys
+	MonthlyInferenceDurationSeconds                       *float64 `infracost_usage:"monthly_inference_duration_seconds"`
+	MonthlyProvisionedConcurrencyInferenceDurationSeconds *float64 `infracost_usage:"monthly_provisioned_concurrency_inference_duration_seconds"`
+	DataProcessedGB                                       *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
 type SageMakerVariant struct {
@@ -25,11 +30,6 @@ type SageMakerVariant struct {
 	MaxConcurrency         int64 // Not billed, but good for completeness
 	VolumeSizeInGB         int64
 	Label                  string
-
-	// "usage" keys
-	MonthlyInferenceDurationSeconds                       *float64 `infracost_usage:"monthly_inference_duration_seconds"`
-	MonthlyProvisionedConcurrencyInferenceDurationSeconds *float64 `infracost_usage:"monthly_provisioned_concurrency_inference_duration_seconds"`
-	DataProcessedGB                                       *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
 var SageMakerEndpointConfigurationUsageSchema = []*schema.UsageItem{
@@ -64,7 +64,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 	var components []*schema.CostComponent
 
 	// 1. Data processed - Billed per GB of data processed by the endpoint
-	monthlyDataProcessedGB := floatPtrToDecimalPtr(v.DataProcessedGB)
+	monthlyDataProcessedGB := floatPtrToDecimalPtr(s.DataProcessedGB)
 	components = append(components, &schema.CostComponent{
 		Name:            "Data processed",
 		Unit:            "GB",
@@ -84,7 +84,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 
 	// 2. Compute duration
 	memorySizeMB := v.MemorySizeMB
-	monthlyDuration := floatPtrToDecimalPtr(v.MonthlyInferenceDurationSeconds)
+	monthlyDuration := floatPtrToDecimalPtr(s.MonthlyInferenceDurationSeconds)
 
 	components = append(components, &schema.CostComponent{
 		Name:            fmt.Sprintf("Compute (%vMB)", memorySizeMB),
@@ -105,7 +105,6 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 
 	// 3. Provisioned concurrency (if enabled)
 	provisionedConcurrencyCount := v.ProvisionedConcurrency
-
 	if provisionedConcurrencyCount > 0 {
 		// Provisioned Concurrency Readiness (Warm slots)
 		const monthlyHours = 730
@@ -128,7 +127,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 		})
 
 		// Provisioned Concurrency Execution (Billed when request hits a warm slot)
-		provisionedConcurrencyUsage := floatPtrToDecimalPtr(v.MonthlyProvisionedConcurrencyInferenceDurationSeconds)
+		provisionedConcurrencyUsage := floatPtrToDecimalPtr(s.MonthlyProvisionedConcurrencyInferenceDurationSeconds)
 		components = append(components, &schema.CostComponent{
 			Name:            "Provisioned concurrency execution",
 			Unit:            "seconds",
@@ -190,7 +189,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerInstanceComponents(variant *Sa
 				AttributeFilters: []*schema.AttributeFilter{
 					{
 						Key:        "usagetype",
-						ValueRegex: strPtr("/Studio:VolumeUsage.gp3/"), //USE1-Studio:VolumeUsage.gp3
+						ValueRegex: strPtr("/Studio:VolumeUsage.gp3/"),
 					},
 				},
 			},
