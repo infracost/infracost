@@ -38,6 +38,9 @@ func newSageMakerEndpointConfiguration(d *schema.ResourceData, u *schema.UsageDa
 }
 
 func decodeVariant(v gjson.Result, label string) *aws.SageMakerVariant {
+	serverlessConfig := v.Get("serverless_config").Array()
+	isServerless := len(serverlessConfig) > 0
+
 	variant := &aws.SageMakerVariant{
 		Name:                 v.Get("variant_name").String(),
 		InstanceType:         v.Get("instance_type").String(),
@@ -46,11 +49,11 @@ func decodeVariant(v gjson.Result, label string) *aws.SageMakerVariant {
 		Label:                label,
 	}
 
-	if v.Get("serverless_config").Exists() {
+	if isServerless {
 		variant.IsServerless = true
-		variant.MemorySizeMB = v.Get("serverless_config.0.memory_size_in_mb").Int()
-		variant.ProvisionedConcurrency = v.Get("serverless_config.0.provisioned_concurrency").Int()
-		variant.MaxConcurrency = v.Get("serverless_config.0.max_concurrency").Int()
+		variant.MemorySizeMB = serverlessConfig[0].Get("memory_size_in_mb").Int()
+		variant.ProvisionedConcurrency = serverlessConfig[0].Get("provisioned_concurrency").Int()
+		variant.MaxConcurrency = serverlessConfig[0].Get("max_concurrency").Int()
 	}
 
 	return variant

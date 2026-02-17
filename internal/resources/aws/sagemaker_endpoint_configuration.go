@@ -33,9 +33,9 @@ type SageMakerVariant struct {
 }
 
 var SageMakerEndpointConfigurationUsageSchema = []*schema.UsageItem{
-	{Key: "variants[*].monthly_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "variants[*].monthly_provisioned_concurrency_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "variants[*].monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_provisioned_concurrency_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 func (s *SageMakerEndpointConfiguration) PopulateUsage(u *schema.UsageData) {
@@ -48,9 +48,9 @@ func (s *SageMakerEndpointConfiguration) BuildResource() *schema.Resource {
 	for _, variant := range s.Variants {
 		if variant.IsServerless {
 			costComponents = append(costComponents, s.sagemakerServerlessComponents(variant)...)
-			continue
+		} else {
+			costComponents = append(costComponents, s.sagemakerInstanceComponents(variant)...)
 		}
-		costComponents = append(costComponents, s.sagemakerInstanceComponents(variant)...)
 	}
 
 	return &schema.Resource{
@@ -59,16 +59,6 @@ func (s *SageMakerEndpointConfiguration) BuildResource() *schema.Resource {
 		CostComponents: costComponents,
 	}
 }
-
-// func (s *SageMakerEndpointConfiguration) SagemakerVariantComponents(variant *schema.CostComponent, label string) []*schema.CostComponent {
-// 	serverlessConfig := variant.Get("serverless_config")
-
-// 	if serverlessConfig.Exists() && len(serverlessConfig.Array()) > 0 {
-// 		return s.sagemakerServerlessComponents(serverlessConfig.Array()[0])
-// 	}
-
-// 	return s.sagemakerInstanceComponents(*variant, label)
-// }
 
 func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMakerVariant) []*schema.CostComponent {
 	var components []*schema.CostComponent
@@ -108,7 +98,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 			Service:       strPtr("AmazonSageMaker"),
 			ProductFamily: strPtr("ML Serverless"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ServerlessInf:Mem-%vGB/", memorySizeMB/1024))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ServerlessInf:Mem-%vGB$/", memorySizeMB/1024))},
 			},
 		},
 	})
