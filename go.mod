@@ -1,8 +1,6 @@
 module github.com/infracost/infracost
 
-go 1.25
-
-toolchain go1.25.4
+go 1.25.7
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
