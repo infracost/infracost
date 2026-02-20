@@ -31,6 +31,10 @@ var (
 	// we were still seeing 422 "Body is too long (maximum is 65536 characters)" errors so limit
 	// more.
 	GitHubMaxMessageSize = 200000 // bytes
+
+	// Azure supports 150000 characters, which for ASCII is 150000 bytes, lets err on the side of caution and
+	// limit to 140000 bytes.
+	AzureReposMaxMessageSize = 140000 // bytes
 )
 
 type ReportInput struct {
@@ -450,10 +454,13 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 		b, err = ToHTML(r, opts)
 	case "diff":
 		b, err = ToDiff(r, opts)
+	case "azure-repos-comment":
+		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: AzureReposMaxMessageSize})
+		b, err = out.Msg, error
 	case "github-comment":
 		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
 		b, err = out.Msg, error
-	case "gitlab-comment", "azure-repos-comment":
+	case "gitlab-comment":
 		out, error := ToMarkdown(r, opts, MarkdownOptions{})
 		b, err = out.Msg, error
 	case "bitbucket-comment":
