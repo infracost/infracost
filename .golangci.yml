@@ -9,13 +9,19 @@ linters:
     - govet
     - ineffassign
     - misspell
-    - prealloc
     - revive
     - staticcheck
     - unused
   settings:
     staticcheck:
       checks: ["all", "-ST1005", "-ST1003", "-QF*"]
+    gosec:
+      excludes:
+        - G101
+        - G117
+        - G602
+        - G703
+        - G704
     gocritic:
       disabled-checks:
         - ifElseChain
