@@ -84,6 +84,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
+				MaxMessageSize:      output.AzureReposMaxMessageSize,
 			})
 			if isErrorUnhandled(commentErr) {
 				return commentErr
