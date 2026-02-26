@@ -23,10 +23,16 @@
 
 ## Overview
 
+> [!NOTE]
+>
+> Infracost is transitioning to a GitHub Discussions-based workflow for discussions
+> about bugs, feature requests and other topics. Issues are for actionable items that
+> are ready to be worked on.
+
 The overall process for contributing to Infracost is:
 
 1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. The issue labels should help you to find an issue to work on. There are also [other issues](https://github.com/infracost/infracost/issues) and [discussions](https://github.com/infracost/infracost/discussions) that you might like to check.
-2. Create a new issue if there's no issue for what you want to work on. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback.
+2. If there's no issue for what you want to work on, create a [new discussion](https://github.com/infracost/infracost/discussions) thread about the topic. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback. When we have enough detail and are ready to prioritize the work we will then create an issue for it.
 3. Add a comment to the issue you're working on to let the rest of the community know.
 4. Create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change. Don't forget to run `make lint` and `make fmt` first. Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", "fix: nil pointer...", "docs: explain...", or "chore: fix typo". This helps us generate a cleaner changelog.
 5. If it's your first PR to the Infracost org, a bot will leave a comment asking you to follow a quick step to sign our Contributor License Agreement.
@@ -39,6 +45,7 @@ This guide assumes you are familiar with Terraform, if not you can take an hour 
 ### Install
 
 Assuming you have already [installed go](https://golang.org/doc/install), install the go dependencies
+
 ```sh
 make deps
 ```
@@ -46,6 +53,7 @@ make deps
 ### Run
 
 Run the code:
+
 ```sh
 make run ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
@@ -57,12 +65,15 @@ This will use your existing Infracost API key; register for a [free API key](htt
 #### Unit tests
 
 To run only the unit tests:
+
 ```sh
 make test
 ```
 
 #### Integration tests
+
 You should run tests with the `-v` flag and warn log level so you can see and fix any warnings:
+
 ```sh
 INFRACOST_LOG_LEVEL=warn go test -v -cover ./internal/providers/terraform/aws/ebs_volume_test.go
 
@@ -70,6 +81,7 @@ time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs
 ```
 
 To run all the tests for a specific cloud vendor:
+
 ```sh
 make test_aws
 make test_google
@@ -77,11 +89,13 @@ make test_azure
 ```
 
 To run all the tests, you can use:
+
 ```sh
 make test_all
 ```
 
 Test golden files may be updated for all test or for a specific cloud vendor:
+
 ```sh
 make test_update
 make test_update_aws
@@ -102,15 +116,17 @@ Checkout **[our dedicated guide](contributing/add_new_resource_guide.md)** to ad
 ### Azure credentials
 
 Working on Azure resources requires Azure creds as the Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
-  ```sh
-  az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
-  ```
-  If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
 
-  To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
+```sh
+az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
+```
 
-  1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
-  2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
+If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
+
+To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
+
+1. Go to `https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actions`.
+2. Add repository secrets for `ARM_SUBSCRIPTION_ID`, `ARM_TENANT_ID`, `ARM_CLIENT_ID` and `ARM_CLIENT_SECRET`.
 
 ### Querying the GraphQL API
 
@@ -132,9 +148,9 @@ Consult [PR #2628](https://github.com/infracost/infracost/pull/2628) as an examp
 3. In [internal/resources/aws/cloudfront_distribution.go](internal/resources/aws/cloudfront_distribution.go), update `regionShieldMapping` as needed.
 4. In [internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.usage.yml](internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.usage.yml), add a usage block for data transfer.
 5. Update [internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.golden](internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.golden) by running `ARGS="-run TestDataTransferGoldenFile -v -update" make test_aws`.
-7. Update [internal/hcl/zones_aws.go]:
-   1. Use the AWS CLI to check if the region is enabled in your AWS account by running `aws ec2 describe-availability-zones --region <NEW-REGION_ID e.g. ca-west-1>` 
-   2. If needed, enable the region by running `aws account enable-region --region-name <NEW-REGION-ID>`.  This usually takes several minutes. 
+6. Update [internal/hcl/zones_aws.go]:
+   1. Use the AWS CLI to check if the region is enabled in your AWS account by running `aws ec2 describe-availability-zones --region <NEW-REGION_ID e.g. ca-west-1>`
+   2. If needed, enable the region by running `aws account enable-region --region-name <NEW-REGION-ID>`. This usually takes several minutes.
    3. From the `internal/hcl` directory, run `go run ../../tools/describezones/main.go aws`.
 
 ## Code reviews
