@@ -593,7 +593,9 @@ var (
 		},
 	}
 
-	today = time.Now()
+	// Today is the date used to determine extended support pricing tiers.
+	// It can be overridden in tests to make pricing deterministic.
+	Today = time.Now()
 )
 
 func extendedSupportCostComponent(version string, region string, engine string, instanceType string) *schema.CostComponent {
@@ -609,13 +611,13 @@ func extendedSupportCostComponent(version string, region string, engine string, 
 
 	switch engine {
 	case "postgres":
-		return postgresExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return postgresExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	case "mysql":
-		return mysqlExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return mysqlExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	case "aurora-postgresql":
-		return postgresAuroraExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return postgresAuroraExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	case "aurora", "aurora-mysql":
-		return mysqlAuroraExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return mysqlAuroraExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	}
 
 	return nil
