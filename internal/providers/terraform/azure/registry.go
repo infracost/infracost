@@ -73,6 +73,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLinuxVirtualMachineScaleSetRegistryItem(),
 	getLogAnalyticsWorkspaceRegistryItem(),
 	getManagedDiskRegistryItem(),
+	getManagedRedisRegistryItem(),
 	GetAzureRMMariaDBServerRegistryItem(),
 	getMSSQLDatabaseRegistryItem(),
 	GetAzureRMMySQLServerRegistryItem(),
