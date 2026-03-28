@@ -5,23 +5,23 @@ import (
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+
 	"github.com/shopspring/decimal"
 )
 
-// See the pricing information here: https://aws.amazon.com/sagemaker/ai/pricing/.
 type SageMakerEndpointConfiguration struct {
 	Address  string
 	Region   string
 	Variants []*SageMakerVariant
 
-	// "usage" keys
-	MonthlyInferenceDurationSeconds                       *float64 `infracost_usage:"monthly_inference_duration_seconds"`
-	MonthlyProvisionedConcurrencyInferenceDurationSeconds *float64 `infracost_usage:"monthly_provisioned_concurrency_inference_duration_seconds"`
-	DataProcessedGB                                       *float64 `infracost_usage:"monthly_data_processed_gb"`
+	MonthlyInferenceDurationSeconds                       *int64 `infracost_usage:"monthly_inference_duration_seconds"`
+	MonthlyProvisionedConcurrencyInferenceDurationSeconds *int64 `infracost_usage:"monthly_provisioned_concurrency_inference_duration_seconds"`
+	DataProcessedGB                                       *int64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
 type SageMakerVariant struct {
-	Name                   string
+	Name string
+
 	InstanceType           string
 	InitialInstanceCount   int64
 	IsServerless           bool
@@ -32,10 +32,20 @@ type SageMakerVariant struct {
 	Label                  string
 }
 
-var SageMakerEndpointConfigurationUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_provisioned_concurrency_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (s *SageMakerEndpointConfiguration) CoreType() string {
+	return "SageMakerEndpointConfiguration"
+}
+
+func (s *SageMakerEndpointConfiguration) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_provisioned_concurrency_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
+}
+
+func (s *SageMakerEndpointConfiguration) UsageEstimationParams() []schema.UsageParam {
+	return nil
 }
 
 func (s *SageMakerEndpointConfiguration) PopulateUsage(u *schema.UsageData) {
@@ -55,7 +65,7 @@ func (s *SageMakerEndpointConfiguration) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           s.Address,
-		UsageSchema:    SageMakerEndpointConfigurationUsageSchema,
+		UsageSchema:    s.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -63,21 +73,20 @@ func (s *SageMakerEndpointConfiguration) BuildResource() *schema.Resource {
 func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMakerVariant) []*schema.CostComponent {
 	var components []*schema.CostComponent
 
-	// 1. Data processed - Billed per GB of data processed by the endpoint
-	monthlyDataProcessedGB := floatPtrToDecimalPtr(s.DataProcessedGB)
 	components = append(components, &schema.CostComponent{
 		Name:            "Data processed",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: monthlyDataProcessedGB,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*s.DataProcessedGB)),
 		UsageBased:      true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("aws"),
 			Region:     strPtr(s.Region),
 			Service:    strPtr("AmazonSageMaker"),
 			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("Hosting:OUT")},
 				{Key: "operation", Value: strPtr("Invoke-Endpoint")},
-				{Key: "usagetype", ValueRegex: strPtr("^[A-Z0-9]*-Hst:Data-Bytes-Out$")},
+				{Key: "usagetype", ValueRegex: strPtr("/Data-Bytes-Out/")},
 			},
 		},
 	})
