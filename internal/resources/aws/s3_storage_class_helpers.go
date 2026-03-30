@@ -29,6 +29,28 @@ func s3StorageCostComponent(name string, service string, region string, usageTyp
 	}
 }
 
+func s3IntelligentTieringStorageCostComponent(name string, region string, usageType string, storageGB *float64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(storageGB),
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("aws"),
+			Region:     strPtr(region),
+			Service:    strPtr("AmazonS3"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
+				{Key: "storageClass", Value: strPtr("Intelligent-Tiering")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("0"),
+		},
+		UsageBased: true,
+	}
+}
+
 func s3StorageVolumeTypeCostComponent(name string, service string, region string, usageType string, volumeType string, storageGB *float64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
