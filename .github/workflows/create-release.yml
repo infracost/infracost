@@ -105,35 +105,7 @@ jobs:
           # Setup brew environment for coming steps.
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-      - uses: dawidd6/action-homebrew-bump-formula@v3
+      - uses: dawidd6/action-homebrew-bump-formula@baf2b60c51fc1f8453c884b0c61052668a71bd1d # v3
         with:
           token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
           formula: infracost
-
-  update-fig-autocomplete-spec:
-    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
-    name: Update Fig autocomplete spec
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-
-      - name: Get the new version
-        id: version
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Generate the spec
-        run: |
-          make build
-          ./build/infracost fig-autocomplete > fig-spec.ts
-      - name: Create Autocomplete PR
-        uses: withfig/push-to-fig-autocomplete-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          autocomplete-spec-name: infracost
-          spec-path: fig-spec.ts
-          diff-based-versioning: true
-          new-spec-version: ${{ steps.version.outputs.tag }}
-          use-minor-base: true
