@@ -84,7 +84,6 @@ func sendSlackMessage(regions string) {
 	_, _, err := api.PostMessage(
 		"production",
 		slack.MsgOptionAttachments(attachment),
-		slack.MsgOptionAsUser(true),
 	)
 	if err != nil {
 		logging.Logger.Fatal().Msgf("error sending slack notifications %s", err)
