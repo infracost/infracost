@@ -1,0 +1,33 @@
+
+ Name                                                       Monthly Qty  Unit                    Monthly Cost   
+                                                                                                                
+ azurerm_container_app_environment.example_dedicated                                                            
+ ├─ Dedicated vCPU usage (D4)                                     2,920  hours                        $236.11   
+ ├─ Dedicated memory usage (D4)                                  11,680  GiB-hours                     $77.53   
+ ├─ Dedicated vCPU usage (E4)                                     2,920  hours                        $236.11   
+ ├─ Dedicated memory usage (E4)                                  23,360  GiB-hours                    $155.06   
+ └─ Management fee                                                  730  hours                         $73.00   
+                                                                                                                
+ azurerm_log_analytics_workspace.example                                                                        
+ ├─ Log data ingestion                                Monthly cost depends on usage: $2.99 per GB               
+ ├─ Log data export                                   Monthly cost depends on usage: $0.13 per GB               
+ ├─ Basic log data ingestion                          Monthly cost depends on usage: $0.65 per GB               
+ ├─ Basic log search queries                          Monthly cost depends on usage: $0.0065 per GB searched    
+ ├─ Archive data                                      Monthly cost depends on usage: $0.026 per GB              
+ ├─ Archive data restored                             Monthly cost depends on usage: $0.13 per GB               
+ └─ Archive data searched                             Monthly cost depends on usage: $0.0065 per GB             
+                                                                                                                
+ OVERALL TOTAL                                                                                       $777.81 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 3 were estimated
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃          $778 ┃           - ┃       $778 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
