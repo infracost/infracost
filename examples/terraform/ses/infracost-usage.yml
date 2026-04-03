@@ -1,0 +1,43 @@
+# Infracost usage file for AWS SES example
+# 
+# This file defines usage estimates for SES resources.
+# Adjust these values to match your expected usage.
+#
+# For more information:
+# - https://www.infracost.io/docs/features/usage_based_resources/
+# - https://aws.amazon.com/ses/pricing/
+
+version: 0.1
+
+resource_usage:
+  # Estimated monthly email sending volumes
+  aws_ses_configuration_set.main:
+    monthly_outbound_emails: 10000        # Number of outbound emails per month
+    monthly_inbound_emails: 5000          # Number of inbound emails per month
+    monthly_attachments_gb: 50            # Total attachment size in GB per month
+
+  # Cost estimates for dedicated IP (if enabled)
+  # aws_ses_dedicated_ip_pool.main:
+  #   monthly_dedicated_ip_hours: 730       # 24/7 operation = 730 hours/month
+
+  # Email identity usage (typically no cost for identities themselves)
+  # aws_ses_email_identity.notification:
+  # aws_ses_email_identity.support:
+  # aws_ses_domain_identity.main:
+
+# Notes on SES Pricing (as of March 2026):
+# 
+# Outbound Email Pricing (US East - N. Virginia):
+# - First 62,000 emails/month (if sent from EC2): $0.00 per 1,000 emails
+# - Next 1,000 emails: $0.10 per 1,000 emails
+# - Dedicated IP: $24.95 per IP per month
+# - Attachments: $0.12 per GB of attachments
+#
+# Inbound Email Pricing:
+# - First 1,000 emails/month: $0.00
+# - Next 1,000 emails: $0.10 per 1,000 emails
+#
+# Additional Costs:
+# - Dedicated IP warmup: No additional cost
+# - Suppression list management: Included
+# - Deliverability dashboard: $1,250/month (if enabled)
