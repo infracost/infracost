@@ -87,7 +87,8 @@ func (y *YamlError) Error() string {
 		indent = strings.Repeat(indent, y.indent)
 	}
 
-	str := y.base + ":\n"
+	var str strings.Builder
+	str.WriteString(y.base + ":\n")
 
 	for i, err := range y.errors {
 		if v, ok := err.(*YamlError); ok {
@@ -95,14 +96,14 @@ func (y *YamlError) Error() string {
 		}
 
 		if i == len(y.errors)-1 {
-			str += indent + err.Error()
+			str.WriteString(indent + err.Error())
 			break
 		}
 
-		str += indent + err.Error() + "\n"
+		str.WriteString(indent + err.Error() + "\n")
 	}
 
-	return str
+	return str.String()
 }
 
 type ConfigFileSpec struct {
@@ -115,11 +116,11 @@ type ConfigFileSpec struct {
 // yaml into an intermediary struct so that we can catch field violations before
 // the data is set on the main ConfigFileSpec. Note this method must return a YamlError
 // type so that we don't run into error collisions with the base yaml.v2 errors.
-func (f *ConfigFileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (f *ConfigFileSpec) UnmarshalYAML(unmarshal func(any) error) error {
 	type roughFile struct {
-		Version                 string                   `yaml:"version"`
-		Projects                []map[string]interface{} `yaml:"projects"`
-		TerraformSourceMapRegex TerraformSourceMapRegex  `yaml:"terraform_source_map,omitempty"`
+		Version                 string                  `yaml:"version"`
+		Projects                []map[string]any        `yaml:"projects"`
+		TerraformSourceMapRegex TerraformSourceMapRegex `yaml:"terraform_source_map,omitempty"`
 	}
 
 	var r roughFile
@@ -128,12 +129,11 @@ func (f *ConfigFileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error 
 		return &YamlError{raw: ErrorInvalidConfigFile}
 	}
 
-	p := Project{}
-	v := reflect.TypeOf(p)
+	v := reflect.TypeFor[Project]()
 	numFields := v.NumField()
 	allowedKeys := make(map[string]struct{}, numFields)
 
-	for i := 0; i < numFields; i++ {
+	for i := range numFields {
 		tag := v.Field(i).Tag.Get("yaml")
 		pieces := strings.Split(tag, ",")
 		allowedKeys[strings.TrimSpace(pieces[0])] = struct{}{}

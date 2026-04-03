@@ -10,8 +10,8 @@ type TerraformSourceMap map[string]string
 
 func (s *TerraformSourceMap) Decode(value string) error {
 	sourceMap := map[string]string{}
-	pairs := strings.Split(value, ",")
-	for _, pair := range pairs {
+	pairs := strings.SplitSeq(value, ",")
+	for pair := range pairs {
 		kvpair := maskAndSplit(pair)
 
 		if len(kvpair) != 2 {

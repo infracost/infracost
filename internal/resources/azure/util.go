@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -49,21 +50,11 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 }
 
 func contains(a []string, x string) bool {
-	for _, n := range a {
-		if x == n {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(a, x)
 }
 
 func containsInt64(arr []int64, val int64) bool {
-	for _, a := range arr {
-		if a == val {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(arr, val)
 }
 
 func regexPtr(regex string) *string {

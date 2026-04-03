@@ -236,11 +236,11 @@ func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, e
 
 	for _, e := range res[0].Expressions {
 		switch v := e.Value.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			readPolicyOut(v, &checks)
-		case []interface{}:
+		case []any:
 			for _, ii := range v {
-				if m, ok := ii.(map[string]interface{}); ok {
+				if m, ok := ii.(map[string]any); ok {
 					readPolicyOut(m, &checks)
 				}
 			}
@@ -250,7 +250,7 @@ func queryPolicy(policyPaths []string, input output.Root) (output.PolicyCheck, e
 	return checks, nil
 }
 
-func readPolicyOut(v map[string]interface{}, checks *output.PolicyCheck) {
+func readPolicyOut(v map[string]any, checks *output.PolicyCheck) {
 	if _, ok := v["msg"]; !ok {
 		checks.Failures = append(checks.Failures, "Policy rule invalid as it did not contain {msg: string} property in output object. Please edit rule output object.")
 		return

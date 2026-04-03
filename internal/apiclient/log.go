@@ -13,23 +13,23 @@ type LeveledLogger struct {
 	Logger zerolog.Logger
 }
 
-func (l *LeveledLogger) Error(msg string, keysAndValues ...interface{}) {
+func (l *LeveledLogger) Error(msg string, keysAndValues ...any) {
 	l.Logger.Error().Msg(joinMessage(msg, keysAndValues))
 }
 
-func (l *LeveledLogger) Info(msg string, keysAndValues ...interface{}) {
+func (l *LeveledLogger) Info(msg string, keysAndValues ...any) {
 	l.Logger.Info().Msg(joinMessage(msg, keysAndValues))
 }
 
-func (l *LeveledLogger) Debug(msg string, keysAndValues ...interface{}) {
+func (l *LeveledLogger) Debug(msg string, keysAndValues ...any) {
 	l.Logger.Debug().Msg(joinMessage(msg, keysAndValues))
 }
 
-func (l *LeveledLogger) Warn(msg string, keysAndValues ...interface{}) {
+func (l *LeveledLogger) Warn(msg string, keysAndValues ...any) {
 	l.Logger.Warn().Msg(joinMessage(msg, keysAndValues))
 }
 
-func joinMessage(msg string, keysAndValues []interface{}) string {
+func joinMessage(msg string, keysAndValues []any) string {
 	s := []string{msg}
 	for _, v := range keysAndValues {
 		s = append(s, fmt.Sprintf("%v", v))

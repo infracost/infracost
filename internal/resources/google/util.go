@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -46,12 +47,7 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 
 // nolint:deadcode,unused
 func contains(a []string, x string) bool {
-	for _, n := range a {
-		if x == n {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(a, x)
 }
 
 // RegionsUsage is a reusable type that represents a usage cost map.
@@ -147,7 +143,7 @@ type RegionUsage struct {
 // product filters and cost lookups.
 func (r RegionsUsage) Values() []RegionUsage {
 	s := reflect.ValueOf(r)
-	t := reflect.TypeOf(r)
+	t := reflect.TypeFor[RegionsUsage]()
 
 	var regions []RegionUsage
 	for i := 0; i < s.NumField(); i++ {
@@ -166,7 +162,7 @@ func (r RegionsUsage) Values() []RegionUsage {
 	return regions
 }
 
-func GetFloatFieldValueByUsageTag(tagValue string, s interface{}) float64 {
+func GetFloatFieldValueByUsageTag(tagValue string, s any) float64 {
 	rt := reflect.TypeOf(s)
 	if rt.Kind() != reflect.Struct {
 		return 0

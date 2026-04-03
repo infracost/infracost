@@ -20,7 +20,6 @@ func Test_ToMarkdown(t *testing.T) {
 	}
 
 	for i, test := range cases {
-		test := test
 
 		t.Run(fmt.Sprintf("%02d.%s", i+1, test.Name), func(t *testing.T) {
 			r, err := Load(test.Fixture)

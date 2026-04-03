@@ -339,7 +339,7 @@ func TestReplaceResourceUsageWithUsageData(t *testing.T) {
 
 	usageData := schema.NewUsageData(
 		"resource",
-		schema.ParseAttributes(map[string]interface{}{
+		schema.ParseAttributes(map[string]any{
 			"attr_dest_default":   int64(100),
 			"attr_dest_nil_val":   int64(200),
 			"attr_dest_not_exist": int64(400), // This should be skipped
@@ -402,13 +402,13 @@ func TestReplaceResourceUsageWithUsageDataDeep(t *testing.T) {
 
 	usageData := schema.NewUsageData(
 		"resource",
-		schema.ParseAttributes(map[string]interface{}{
-			"subresource_1": map[string]interface{}{
+		schema.ParseAttributes(map[string]any{
+			"subresource_1": map[string]any{
 				"attr_dest_default":   int64(100),
 				"attr_dest_nil_val":   int64(200),
 				"attr_dest_not_exist": int64(400), // This should be skipped
 			},
-			"subresource_3": map[string]interface{}{ // This should be skipped
+			"subresource_3": map[string]any{ // This should be skipped
 				"attr_1": int64(100),
 			},
 		}),

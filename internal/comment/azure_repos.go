@@ -95,7 +95,7 @@ func newAzureReposAPIClient(ctx context.Context, token string, tlsConfig *tls.Co
 
 	if len(token) == azurePATLength {
 		accessToken = base64.StdEncoding.EncodeToString(
-			[]byte(fmt.Sprintf(":%s", accessToken)),
+			fmt.Appendf(nil, ":%s", accessToken),
 		)
 		tokenType = "Basic"
 	}
@@ -252,8 +252,8 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 	if h.initAsActive {
 		status = "active"
 	}
-	reqData, err := json.Marshal(map[string]interface{}{
-		"comments": []map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
+		"comments": []map[string]any{
 			{
 				"content":         body,
 				"parentCommentId": 0,
@@ -323,7 +323,7 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 
 // CallUpdateComment calls the Azure Repos API to update the body of a comment on the pull request.
 func (h *azureReposPRHandler) CallUpdateComment(ctx context.Context, comment Comment, body string) error {
-	reqData, err := json.Marshal(map[string]interface{}{
+	reqData, err := json.Marshal(map[string]any{
 		"content":         body,
 		"parentCommentId": 0,
 		"commentType":     1,

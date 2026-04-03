@@ -496,7 +496,7 @@ func governanceTestEndpoint(garr governanceAddRunResponse) *httptest.Server {
 				%v
 			}}]\n`, string(guardrailJson))
 		} else {
-			for _, s := range strings.Split(string(bodyBytes), "details") {
+			for s := range strings.SplitSeq(string(bodyBytes), "details") {
 				if strings.Contains(s, "Guardrail") {
 					logging.Logger.Warn().Msg(s)
 				}

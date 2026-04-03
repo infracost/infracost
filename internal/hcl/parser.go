@@ -3,6 +3,7 @@ package hcl
 import (
 	"errors"
 	"fmt"
+	maps0 "maps"
 	"os"
 	"path"
 	"path/filepath"
@@ -173,7 +174,7 @@ func OptionWithPlanFlagVars(vs []string) Option {
 
 // OptionWithInputVars takes cmd line var input values and converts them to cty.Value
 // It sets these as the Parser starting inputVars which are used at the root module evaluation.
-func OptionWithInputVars(vars map[string]interface{}) Option {
+func OptionWithInputVars(vars map[string]any) Option {
 	return func(p *Parser) {
 		if p.inputVars == nil {
 			p.inputVars = make(map[string]cty.Value, len(vars))
@@ -210,9 +211,7 @@ func OptionWithRawCtyInput(input cty.Value) (op Option) {
 			return
 		}
 
-		for k, v := range asMap {
-			p.inputVars[k] = v
-		}
+		maps0.Copy(p.inputVars, asMap)
 	}
 }
 
@@ -679,9 +678,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 				return combinedVars, err
 			}
 
-			for k, v := range remoteVars {
-				combinedVars[k] = v
-			}
+			maps0.Copy(combinedVars, remoteVars)
 		}
 	}
 
@@ -692,9 +689,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 		}
 	}
 
-	for k, v := range p.inputVars {
-		combinedVars[k] = v
-	}
+	maps0.Copy(combinedVars, p.inputVars)
 
 	// add a common "env" name to the input vars for the project if it is not
 	// explicitly defined. This is done as often users have a common project variable
@@ -727,9 +722,7 @@ func (p *Parser) loadAndCombineVars(filename string, combinedVars map[string]cty
 		return err
 	}
 
-	for k, v := range vars {
-		combinedVars[k] = v
-	}
+	maps0.Copy(combinedVars, vars)
 
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"runtime"
 	"strings"
@@ -21,12 +22,12 @@ import (
 // ContextValues is a type that wraps a map with methods that safely
 // handle concurrent reads and writes.
 type ContextValues struct {
-	values map[string]interface{}
+	values map[string]any
 	mu     *sync.RWMutex
 }
 
 // NewContextValues returns a new instance of ContextValues.
-func NewContextValues(values map[string]interface{}) *ContextValues {
+func NewContextValues(values map[string]any) *ContextValues {
 	return &ContextValues{
 		values: values,
 		mu:     &sync.RWMutex{},
@@ -36,7 +37,7 @@ func NewContextValues(values map[string]interface{}) *ContextValues {
 // GetValue safely retrieves a value from the map.
 // It locks the mutex for reading, deferring the unlock until the method returns.
 // This prevents a race condition if a separate goroutine writes to the map concurrently.
-func (cv *ContextValues) GetValue(key string) (interface{}, bool) {
+func (cv *ContextValues) GetValue(key string) (any, bool) {
 	cv.mu.RLock()
 	defer cv.mu.RUnlock()
 
@@ -47,7 +48,7 @@ func (cv *ContextValues) GetValue(key string) (interface{}, bool) {
 // SetValue safely sets a value in the map.
 // It locks the mutex for writing, deferring the unlock until the method returns.
 // This prevents a race condition if separate goroutines read or write to the map concurrently.
-func (cv *ContextValues) SetValue(key string, value interface{}) {
+func (cv *ContextValues) SetValue(key string, value any) {
 	cv.mu.Lock()
 	defer cv.mu.Unlock()
 	cv.values[key] = value
@@ -57,13 +58,11 @@ func (cv *ContextValues) SetValue(key string, value interface{}) {
 // This method locks the mutex for reading, deferring the unlock until the method returns.
 // By returning a copy, this prevents a race condition if separate goroutines read or write to the original map concurrently.
 // However, creating a copy may be expensive for large maps.
-func (cv *ContextValues) Values() map[string]interface{} {
+func (cv *ContextValues) Values() map[string]any {
 	cv.mu.RLock()
 	defer cv.mu.RUnlock()
-	copyMap := make(map[string]interface{})
-	for k, v := range cv.values {
-		copyMap[k] = v
-	}
+	copyMap := make(map[string]any)
+	maps.Copy(copyMap, cv.values)
 	return copyMap
 }
 
@@ -104,7 +103,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 		Config:    cfg,
 		State:     state,
 		ContextValues: NewContextValues(
-			map[string]interface{}{
+			map[string]any{
 				"version":               baseVersion(version.Version),
 				"fullVersion":           version.Version,
 				"isTest":                IsTest(),
@@ -127,7 +126,7 @@ func EmptyRunContext() *RunContext {
 	return &RunContext{
 		Config:        &Config{},
 		State:         &State{},
-		ContextValues: NewContextValues(map[string]interface{}{}),
+		ContextValues: NewContextValues(map[string]any{}),
 		mu:            &sync.RWMutex{},
 		ModuleMutex:   &intSync.KeyMutex{},
 		StartTime:     time.Now().Unix(),
@@ -186,11 +185,11 @@ func (r *RunContext) VCSRepositoryURL() string {
 	return r.VCSMetadata.Remote.URL
 }
 
-func (r *RunContext) EventEnv() map[string]interface{} {
+func (r *RunContext) EventEnv() map[string]any {
 	return r.EventEnvWithProjectContexts([]*ProjectContext{})
 }
 
-func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
+func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]any {
 	env := r.ContextValues.Values()
 
 	env["installId"] = r.State.InstallID
@@ -202,9 +201,9 @@ func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectConte
 
 		for k, v := range projectContext.ContextValues.Values() {
 			if _, ok := env[k]; !ok {
-				env[k] = make([]interface{}, 0)
+				env[k] = make([]any, 0)
 			}
-			env[k] = append(env[k].([]interface{}), v)
+			env[k] = append(env[k].([]any), v)
 		}
 	}
 

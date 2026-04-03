@@ -158,16 +158,16 @@ func (d *ResourceData) ReplaceReference(k string, oldReference *ResourceData, ne
 	d.Set(key, newReference.Get("id").String())
 }
 
-func (d *ResourceData) Set(key string, value interface{}) {
+func (d *ResourceData) Set(key string, value any) {
 	d.RawValues = AddRawValue(d.RawValues, key, value)
 }
 
-func AddRawValue(r gjson.Result, key string, v interface{}) gjson.Result {
-	j := make(map[string]interface{})
+func AddRawValue(r gjson.Result, key string, v any) gjson.Result {
+	j := make(map[string]any)
 
 	_ = json.Unmarshal([]byte(r.Raw), &j) // TODO: unhandled error
 	if j == nil {
-		j = make(map[string]interface{})
+		j = make(map[string]any)
 	}
 
 	j[key] = v

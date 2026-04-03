@@ -98,7 +98,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 		subResources = append(subResources, storageClass.BuildResource())
 	}
 
-	estimate := func(ctx context.Context, u map[string]interface{}) error {
+	estimate := func(ctx context.Context, u map[string]any) error {
 		// https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html
 
 		storageMetricsMap := map[string]map[string]string{
@@ -132,9 +132,9 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 				continue
 			}
 
-			storageClassUsage := make(map[string]interface{})
+			storageClassUsage := make(map[string]any)
 			if v, ok := u[storageClass.UsageKey()]; ok && v != nil {
-				storageClassUsage = v.(map[string]interface{})
+				storageClassUsage = v.(map[string]any)
 			}
 
 			for usageKey, metric := range storageMetricsMap[storageClass.UsageKey()] {
@@ -162,7 +162,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			}
 			logging.Logger.Debug().Msg(msg)
 		} else {
-			standardStorageClassUsage := u["standard"].(map[string]interface{})
+			standardStorageClassUsage := u["standard"].(map[string]any)
 
 			monthlyTier1Requests, err := aws.S3GetBucketRequests(ctx, a.Region, a.Name, filter, []string{"PutRequests", "PostRequests", "ListRequests"})
 			if err != nil {

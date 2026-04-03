@@ -461,7 +461,7 @@ resource "other_resource" "test" {
 	require.NotNil(t, output)
 	attr := output.GetAttribute("task_definition")
 	mockedVal := attr.Value()
-	for _, v := range strings.Split(mockedVal.AsString(), ":") {
+	for v := range strings.SplitSeq(mockedVal.AsString(), ":") {
 		assert.Equal(t, fmt.Sprintf("task_definition-%s", mock.Identifier), v)
 	}
 }
@@ -1427,7 +1427,7 @@ func valueToBytes(t TestingT, v cty.Value) []byte {
 }
 
 type TestingT interface {
-	Errorf(format string, args ...interface{})
+	Errorf(format string, args ...any)
 	FailNow()
 	Helper()
 }
@@ -2298,7 +2298,7 @@ func Test_TFJSONAttributes(t *testing.T) {
 }
 
 func BenchmarkParserEvaluate(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		b.StopTimer()
 		logger := newDiscardLogger()
 		dir := "./testdata/benchmarks/heavy"

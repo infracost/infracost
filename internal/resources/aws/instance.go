@@ -125,7 +125,7 @@ func (a *Instance) BuildResource() *schema.Resource {
 		}
 	}
 
-	estimate := func(ctx context.Context, values map[string]interface{}) error {
+	estimate := func(ctx context.Context, values map[string]any) error {
 		if a.AMI != "" {
 			platform, err := aws.EC2DescribeOS(ctx, a.Region, a.AMI)
 			if err != nil {

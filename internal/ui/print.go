@@ -20,7 +20,7 @@ func PrintError(w io.Writer, msg string) {
 	fmt.Fprintf(w, "%s %s\n", ErrorString("Error:"), msg)
 }
 
-func PrintErrorf(w io.Writer, msg string, a ...interface{}) {
+func PrintErrorf(w io.Writer, msg string, a ...any) {
 	PrintError(w, fmt.Sprintf(msg, a...))
 }
 

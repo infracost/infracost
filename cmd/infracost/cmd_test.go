@@ -197,8 +197,8 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	return stripDynamicValues(actual)
 }
 
-func filterJSON(r gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) map[string]interface{} {
-	values := make(map[string]interface{})
+func filterJSON(r gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) map[string]any {
+	values := make(map[string]any)
 	for k, v := range r.Map() {
 		if include.MatchString(k) {
 			values[k] = v.Value()
@@ -223,8 +223,8 @@ func filterJSON(r gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) 
 	return values
 }
 
-func filterJSONArray(rArray []gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) []interface{} {
-	var values []interface{}
+func filterJSONArray(rArray []gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) []any {
+	var values []any
 	for _, el := range rArray {
 		if el.IsObject() {
 			filteredEl := filterJSON(el, include, exclude)

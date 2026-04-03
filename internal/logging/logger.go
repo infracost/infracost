@@ -34,7 +34,7 @@ type Config interface {
 	// WriteLevel is the log level that the Logger writes to LogWriter.
 	WriteLevel() string
 	// LogFields sets the meta fields that are added to any log line entries.
-	LogFields() map[string]interface{}
+	LogFields() map[string]any
 }
 
 // ConfigureBaseLogger configures the global Logger using the provided Config.

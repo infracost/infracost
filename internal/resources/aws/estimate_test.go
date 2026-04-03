@@ -16,11 +16,11 @@ import (
 
 type estimates struct {
 	t     *testing.T
-	usage map[string]interface{}
+	usage map[string]any
 }
 
 func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) estimates {
-	u := make(map[string]interface{})
+	u := make(map[string]any)
 	err := resource.EstimateUsage(ctx, u)
 	if err != nil {
 		t.Fatalf("Expected %T.EstimateUsage to succeed, got %s", resource, err)
@@ -49,7 +49,7 @@ func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) 
 				t.Errorf("Expected %T %s of type []string, got a %T", resource, item.Key, value)
 			}
 		case schema.SubResourceUsage:
-			if _, ok := value.(map[string]interface{}); !ok {
+			if _, ok := value.(map[string]any); !ok {
 				t.Errorf("Expected %T %s of type map[string]interface{}, got a %T", resource, item.Key, value)
 			}
 		case schema.KeyValueMap:

@@ -23,7 +23,7 @@ func CreateDirectoryStructure(t *testing.T, treeOutputLocation string, tmpDir st
 
 	var lines []string
 	// Strip any comments
-	for _, line := range strings.Split(string(val), "\n") {
+	for line := range strings.SplitSeq(string(val), "\n") {
 		if !strings.HasPrefix(line, "#") {
 			lines = append(lines, line)
 		}

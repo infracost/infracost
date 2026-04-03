@@ -10,7 +10,7 @@ import (
 )
 
 type ProjectContexter interface {
-	ProjectContext() map[string]interface{}
+	ProjectContext() map[string]any
 }
 
 type ProjectContext struct {
@@ -24,7 +24,7 @@ type ProjectContext struct {
 	CacheErr   string
 }
 
-func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields interface{}) *ProjectContext {
+func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields any) *ProjectContext {
 	ctx := logging.Logger.With().
 		Str("project_name", projectCfg.Name).
 		Str("project_path", projectCfg.Path)
@@ -44,16 +44,16 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields interf
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
 		logger:        contextLogger,
-		ContextValues: NewContextValues(map[string]interface{}{}),
+		ContextValues: NewContextValues(map[string]any{}),
 		mu:            &sync.RWMutex{},
 	}
 }
 
 func (c *ProjectContext) SetProjectType(projectType string) {
 	c.ContextValues.SetValue("project_type", projectType)
-	var projectTypes []interface{}
+	var projectTypes []any
 	if t, ok := c.RunContext.ContextValues.GetValue("projectTypes"); ok {
-		projectTypes = t.([]interface{})
+		projectTypes = t.([]any)
 	}
 
 	projectTypes = append(projectTypes, projectType)
