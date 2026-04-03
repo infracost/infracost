@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  google_cloud_scheduler.usage:
+    monthly_schedules: 10000
