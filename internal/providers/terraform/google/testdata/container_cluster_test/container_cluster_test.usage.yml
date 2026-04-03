@@ -2,6 +2,7 @@ version: 0.1
 resource_usage:
   google_container_cluster.zonal_withUsage:
     nodes: 4
+    skip_management_fee: true
 
   google_container_cluster.regional_withUsage:
     nodes: 4
