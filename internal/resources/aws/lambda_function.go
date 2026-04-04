@@ -161,6 +161,9 @@ func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decim
 
 func calculateStorageGBSeconds(storageSize decimal.Decimal, gbSeconds decimal.Decimal) decimal.Decimal {
 	storage := storageSize.Sub(decimal.NewFromInt(512)).Div(decimal.NewFromInt(1024))
+	if storage.IsNegative() {
+		storage = decimal.Zero
+	}
 	return storage.Mul(gbSeconds)
 }
 
