@@ -562,6 +562,7 @@ var FreeResources = []string{
 	"aws_service_discovery_service",
 
 	// AWS SES
+	"aws_ses_active_receipt_rule_set",
 	"aws_ses_configuration_set",
 	"aws_ses_domain_dkim",
 	"aws_ses_domain_identity",
