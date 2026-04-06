@@ -52,7 +52,7 @@ If you run into any issues or have feedback, please open a thread in [GitHub Dis
 
 ## Contributing
 
-We ❤️ contributions big or small. Please start by opening a thread in [GitHub Discussions](https://github.com/infracost/infracost/discussions) to discuss your idea before submitting a PR.
+We ❤️ contributions big or small. Please start by opening a thread in [GitHub Discussions](https://github.com/infracost/infracost/discussions) to discuss your idea before submitting a PR. A more detailed explanation of our approach is on our [contribution guide](CONTRIBUTING.md)
 
 <a href="https://github.com/infracost/infracost/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=infracost/infracost" />
