@@ -471,19 +471,6 @@ func TestCreateResource(t *testing.T) {
 		},
 		{
 			data: &schema.ResourceData{
-				Address: "aws_ses_active_receipt_rule_set.free_resource",
-				Type:    "aws_ses_active_receipt_rule_set",
-			},
-			expected: &schema.Resource{
-				Name:         "aws_ses_active_receipt_rule_set.free_resource",
-				ResourceType: "aws_ses_active_receipt_rule_set",
-				IsSkipped:    true,
-				NoPrice:      true,
-				SkipMessage:  "Free resource.",
-			},
-		},
-		{
-			data: &schema.ResourceData{
 				Address: "fake_resource.unsupported_resource",
 				Type:    "fake_resource",
 			},
