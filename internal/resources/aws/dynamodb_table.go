@@ -117,7 +117,7 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 	// Global tables (replica)
 	subResources = append(subResources, a.globalTables(a.BillingMode, a.ReplicaRegions, a.WriteCapacity, a.MonthlyWriteRequestUnits)...)
 
-	estimate := func(ctx context.Context, values map[string]interface{}) error {
+	estimate := func(ctx context.Context, values map[string]any) error {
 		storageB, err := aws.DynamoDBGetStorageBytes(ctx, a.Region, a.Name)
 		if err != nil {
 			return err

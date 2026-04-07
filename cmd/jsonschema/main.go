@@ -54,7 +54,7 @@ func main() {
 }
 
 func typeMapper(i reflect.Type) *jsonschema.Type {
-	if i == reflect.TypeOf(decimal.Decimal{}) {
+	if i == reflect.TypeFor[decimal.Decimal]() {
 		return &jsonschema.Type{
 			Type: "decimal",
 		}

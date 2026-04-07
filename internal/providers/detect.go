@@ -242,8 +242,8 @@ func isTerraformPlanJSON(path string) bool {
 	}
 
 	var jsonFormat struct {
-		FormatVersion string      `json:"format_version"`
-		PlannedValues interface{} `json:"planned_values"`
+		FormatVersion string `json:"format_version"`
+		PlannedValues any    `json:"planned_values"`
 	}
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
@@ -266,8 +266,8 @@ func isTerraformStateJSON(path string) bool {
 	}
 
 	var jsonFormat struct {
-		FormatVersion string      `json:"format_version"`
-		Values        interface{} `json:"values"`
+		FormatVersion string `json:"format_version"`
+		Values        any    `json:"values"`
 	}
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)

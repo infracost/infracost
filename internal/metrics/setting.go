@@ -3,7 +3,7 @@ package metrics
 import "sync"
 
 type Setting struct {
-	value interface{}
+	value any
 	mu    sync.Mutex
 }
 

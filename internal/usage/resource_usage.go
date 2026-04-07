@@ -17,8 +17,8 @@ type ResourceUsage struct {
 	Items []*schema.UsageItem
 }
 
-func (r *ResourceUsage) Map() map[string]interface{} {
-	m := make(map[string]interface{}, len(r.Items))
+func (r *ResourceUsage) Map() map[string]any {
+	m := make(map[string]any, len(r.Items))
 	for _, item := range r.Items {
 		m[item.Key] = mapUsageItem(item)
 	}
@@ -87,9 +87,9 @@ func (r *ResourceUsage) MergeResourceUsage(src *ResourceUsage) {
 	}
 }
 
-func mapUsageItem(item *schema.UsageItem) interface{} {
+func mapUsageItem(item *schema.UsageItem) any {
 	if item.ValueType == schema.SubResourceUsage {
-		m := make(map[string]interface{})
+		m := make(map[string]any)
 
 		if item.Value != nil {
 			subResourceUsage := item.Value.(*ResourceUsage)
@@ -361,7 +361,7 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 		return nil, errors.New("unexpected YAML format")
 	}
 
-	var value interface{}
+	var value any
 	var usageValueType schema.UsageVariableType
 
 	if valNode.ShortTag() == "!!map" {

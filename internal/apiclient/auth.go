@@ -27,7 +27,7 @@ type callbackServerResp struct {
 
 // Login opens a browser with authentication URL and starts a HTTP server to
 // wait for a callback request.
-func (a AuthClient) Login(contextVals map[string]interface{}) (string, string, error) {
+func (a AuthClient) Login(contextVals map[string]any) (string, string, error) {
 	state := uuid.NewString()
 
 	listener, err := net.Listen("tcp", "localhost:0")

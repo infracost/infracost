@@ -424,7 +424,7 @@ func TestBreakdownTerraformOutFileJSON(t *testing.T) {
 		return
 	}
 
-	data := map[string]interface{}{}
+	data := map[string]any{}
 	err = json.Unmarshal(file, &data)
 	if err != nil {
 		t.Error(err)

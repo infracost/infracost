@@ -3,6 +3,7 @@ package hcl
 import (
 	"errors"
 	"fmt"
+	"maps"
 	"math"
 	"os"
 	"path/filepath"
@@ -299,9 +300,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
 		}
 
-		for k, v := range e.ctx.Inner().Variables {
-			lastContext.Variables[k] = v
-		}
+		maps.Copy(lastContext.Variables, e.ctx.Inner().Variables)
 	}
 
 	if i == maxContextIterations {
@@ -407,9 +406,7 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
 		}
 
-		for k, v := range e.ctx.Inner().Variables {
-			lastContext.Variables[k] = v
-		}
+		maps.Copy(lastContext.Variables, e.ctx.Inner().Variables)
 	}
 
 	if i == maxContextIterations {
@@ -1007,9 +1004,7 @@ func (e *Evaluator) expandedEachBlockToValue(b *Block, existingValues map[string
 			return cty.ObjectVal(ob)
 		}
 
-		for ek, v := range eachMap.AsValueMap() {
-			ob[ek] = v
-		}
+		maps.Copy(ob, eachMap.AsValueMap())
 	}
 
 	ob[*k] = b.Values()
@@ -1030,9 +1025,7 @@ func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
 	// via the "providers" attribute.
 	providerRefs := map[string]*Block{}
 
-	for key, block := range e.module.ProviderReferences {
-		providerRefs[key] = block
-	}
+	maps.Copy(providerRefs, e.module.ProviderReferences)
 
 	providerAttr := b.GetAttribute("providers")
 	if providerAttr != nil {

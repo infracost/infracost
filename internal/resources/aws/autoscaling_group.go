@@ -95,7 +95,7 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 		estimateInstanceQualities = lt.EstimateUsage
 	}
 
-	estimate := func(ctx context.Context, u map[string]interface{}) error {
+	estimate := func(ctx context.Context, u map[string]any) error {
 		if estimateInstanceQualities != nil {
 			err := estimateInstanceQualities(ctx, u)
 			if err != nil {

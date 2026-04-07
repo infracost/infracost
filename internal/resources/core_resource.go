@@ -12,10 +12,10 @@ import (
 var intPtr *int64
 var floatPtr *float64
 var strPtr *string
-var strType = reflect.TypeOf("")
-var float64Type = reflect.TypeOf(float64(0))
+var strType = reflect.TypeFor[string]()
+var float64Type = reflect.TypeFor[float64]()
 
-func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
+func PopulateArgsWithUsage(args any, u *schema.UsageData) {
 	if u == nil {
 		// nothing to do
 		return
@@ -52,17 +52,17 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 		// Check whether a value for this arg was specified in the usage data.
 		if u.Get(usageKey).Exists() {
 			// Set the value of the arg to the value specified in the usage data.
-			if f.Type() == reflect.TypeOf(floatPtr) {
+			if f.Type() == reflect.TypeFor[*float64]() {
 				f.Set(reflect.ValueOf(u.GetFloat(usageKey)))
 				continue
 			}
 
-			if f.Type() == reflect.TypeOf(intPtr) {
+			if f.Type() == reflect.TypeFor[*int64]() {
 				f.Set(reflect.ValueOf(u.GetInt(usageKey)))
 				continue
 			}
 
-			if f.Type() == reflect.TypeOf(strPtr) {
+			if f.Type() == reflect.TypeFor[*string]() {
 				f.Set(reflect.ValueOf(u.GetString(usageKey)))
 				continue
 			}

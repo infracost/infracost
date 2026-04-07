@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -72,11 +73,8 @@ func (p *PriceFetcher) addNotFoundResult(result apiclient.PriceQueryResult) {
 		entry.Count++
 
 		var found bool
-		for _, resourceName := range entry.ResourceNames {
-			if resourceName == name {
-				found = true
-				break
-			}
+		if slices.Contains(entry.ResourceNames, name) {
+			found = true
 		}
 
 		if !found {
@@ -119,7 +117,7 @@ func (p *PriceFetcher) MissingPricesComponents() []string {
 
 	var result []string
 	for key, count := range p.components {
-		for i := 0; i < count; i++ {
+		for range count {
 			result = append(result, key)
 		}
 	}
@@ -237,7 +235,7 @@ func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 	close(jobs)
 
 	// Get the result of the jobs
-	for i := 0; i < numJobs; i++ {
+	for range numJobs {
 		err := <-resultErrors
 		if err != nil {
 			return err
@@ -262,7 +260,7 @@ func (p *PriceFetcher) getPrices(req apiclient.BatchRequest) error {
 	return nil
 }
 
-func (p *PriceFetcher) logPriceLookupErr(cc *schema.CostComponent, format string, v ...interface{}) {
+func (p *PriceFetcher) logPriceLookupErr(cc *schema.CostComponent, format string, v ...any) {
 	if p.warnOnPriceErrors {
 		productFilterJson, _ := json.Marshal(cc.ProductFilter)
 		priceFilterJson, _ := json.Marshal(cc.PriceFilter)
