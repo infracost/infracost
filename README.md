@@ -16,6 +16,36 @@ Follow our [**quick start guide**](https://www.infracost.io/docs/#quick-start) t
 
 Infracost also has many CI/CD integrations so you can easily post cost estimates in pull requests. This provides your team with a safety net as people can discuss costs as part of the workflow.
 
+## Quick examples
+
+Check out the [`examples`](./examples) directory for sample projects you can use to explore Infracost:
+
+| Example | Description |
+|---------|-------------|
+| [`examples/terraform`](./examples/terraform) | Basic Terraform project with AWS resources (EC2, Lambda) |
+| [`examples/terragrunt`](./examples/terragrunt) | Terragrunt multi-environment setup example |
+| [`examples/cloudformation`](./examples/cloudformation) | AWS CloudFormation template example |
+
+Try running `infracost breakdown --path examples/terraform` to see cost estimates in action!
+
+### Usage file example
+
+For usage-based resources like AWS Lambda or S3, you can provide usage estimates via a YAML file:
+
+```yaml
+version: 0.1
+resource_usage:
+  aws_lambda_function.hello_world:
+    monthly_requests: 10000000
+    request_duration_ms: 500
+```
+
+Run with: `infracost breakdown --path . --usage-file infracost-usage.yml`
+
+See the [full usage file example](./infracost-usage-example.yml) for all supported parameters.
+
+## Screenshots
+
 #### Post cost estimates in pull requests
 
 <img src=".github/assets/github_actions_screenshot.png" alt="Infracost in GitHub Actions" width=700 />
@@ -36,9 +66,20 @@ Infracost also has many CI/CD integrations so you can easily post cost estimates
 
 ## Supported clouds and resources
 
-Infracost supports over **1,100** Terraform resources across [AWS](https://www.infracost.io/docs/supported_resources/aws), [Azure](https://www.infracost.io/docs/supported_resources/azure) and [Google](https://www.infracost.io/docs/supported_resources/google). Other IaC tools, such as [Pulumi](https://github.com/infracost/infracost/issues/187), [AWS CloudFormation/CDK](https://github.com/infracost/infracost/issues/190) and [Azure ARM/Bicep](https://github.com/infracost/infracost/issues/812) are on our roadmap.
+Infracost supports over **1,100** Terraform resources across [AWS](https://www.infracost.io/docs/supported_resources/aws), [Azure](https://www.infracost.io/docs/supported_resources/azure) and [Google](https://www.infracost.io/docs/supported_resources/google).
 
-Infracost can also estimate [usage-based resources](https://www.infracost.io/docs/usage_based_resources) such as AWS S3 or Lambda!
+### Usage-based resources
+
+Infracost can estimate [usage-based resources](https://www.infracost.io/docs/usage_based_resources) such as AWS S3, Lambda, and data transfer costs. By default, these show as "cost depends on usage" - provide usage estimates via a [usage file](https://www.infracost.io/docs/features/usage_file/) to get accurate cost calculations.
+
+### Other IaC tools
+
+The following tools are on our roadmap:
+- [Pulumi](https://github.com/infracost/infracost/issues/187)
+- [AWS CloudFormation/CDK](https://github.com/infracost/infracost/issues/190)
+- [Azure ARM/Bicep](https://github.com/infracost/infracost/issues/812)
+
+👍 **Upvote** the linked issues to help us prioritize!
 
 ## Community
 
