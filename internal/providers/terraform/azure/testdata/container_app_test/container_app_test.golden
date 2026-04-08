@@ -1,0 +1,41 @@
+
+ Name                                           Monthly Qty  Unit                    Monthly Cost    
+                                                                                                     
+ azurerm_container_app.example                                                                       
+ ├─ vCPU (active)                                 2,320,000  vCPU-seconds                  $78.88  * 
+ ├─ Memory (active)                               4,640,000  GiB-seconds                   $18.56  * 
+ ├─ vCPU (idle)                                   3,942,000  vCPU-seconds                  $15.77    
+ ├─ Memory (idle)                                 7,884,000  GiB-seconds                   $31.54    
+ ├─ Requests                                              3  1M requests                    $1.68  * 
+ ├─ vCPU (free)                                     180,000  vCPU-seconds                   $0.00    
+ ├─ Memory (free)                                   360,000  GiB-seconds                    $0.00    
+ └─ Requests (free)                                       2  1M requests                    $0.00    
+                                                                                                     
+ azurerm_container_app.example_free                                                                  
+ ├─ vCPU (free)                                       2,500  vCPU-seconds                   $0.00    
+ ├─ Memory (free)                                     5,000  GiB-seconds                    $0.00    
+ └─ Requests (free)                                     0.1  1M requests                    $0.00    
+                                                                                                     
+ azurerm_log_analytics_workspace.example                                                             
+ ├─ Log data ingestion                    Monthly cost depends on usage: $2.99 per GB                
+ ├─ Log data export                       Monthly cost depends on usage: $0.13 per GB                
+ ├─ Basic log data ingestion              Monthly cost depends on usage: $0.65 per GB                
+ ├─ Basic log search queries              Monthly cost depends on usage: $0.0065 per GB searched     
+ ├─ Archive data                          Monthly cost depends on usage: $0.026 per GB               
+ ├─ Archive data restored                 Monthly cost depends on usage: $0.13 per GB                
+ └─ Archive data searched                 Monthly cost depends on usage: $0.0065 per GB              
+                                                                                                     
+ OVERALL TOTAL                                                                            $146.42 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 4 were estimated
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $47 ┃         $99 ┃       $146 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
