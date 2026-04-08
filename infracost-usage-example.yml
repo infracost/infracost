@@ -430,6 +430,11 @@ resource_usage:
       monthly_bulk_data_retrieval_gb: 6000 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
       early_delete_gb: 600000 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
 
+  aws_sagemaker_endpoint_configuration.my_serverless_config:
+    monthly_inference_duration_seconds: 500000 
+    monthly_provisioned_concurrency_inference_duration_seconds: 200000
+    monthly_data_processed_gb: 20
+
   aws_secretsmanager_secret.my_secret:
     monthly_requests: 1000000 # Monthly API requests to Secrets Manager.
 
