@@ -1,0 +1,29 @@
+
+ Name                                     Monthly Qty  Unit   Monthly Cost   
+                                                                             
+ azurerm_managed_redis.flash_optimized                                       
+ └─ Cache usage (FlashOptimized_A700)             730  hours     $3,416.40   
+                                                                             
+ azurerm_managed_redis.compute_optimized                                     
+ └─ Cache usage (ComputeOptimized_X10)            730  hours       $425.59   
+                                                                             
+ azurerm_managed_redis.memory_optimized                                      
+ └─ Cache usage (MemoryOptimized_M10)             730  hours       $157.68   
+                                                                             
+ azurerm_managed_redis.balanced                                              
+ └─ Cache usage (Balanced_B3)                     730  hours        $47.45   
+                                                                             
+ OVERALL TOTAL                                                  $4,047.12 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 4 were estimated
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃        $4,047 ┃           - ┃     $4,047 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
