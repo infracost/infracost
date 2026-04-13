@@ -1,0 +1,24 @@
+# Infracost usage file for cost-optimized example
+# This file estimates usage-based costs for resources
+# See: https://www.infracost.io/docs/features/usage_based_resources/
+
+version: 0.1
+resource_usage:
+  aws_instance.web_app_optimized:
+    operating_system: linux
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+    # Monthly hours the instance runs (730 hours = full month)
+    monthly_hours: 730
+
+  aws_lambda_function.hello_world_optimized:
+    monthly_requests: 1000000 # 1 million requests per month
+    request_duration_ms: 200  # Average duration in milliseconds
+
+  aws_instance.web_app_graviton:
+    operating_system: linux
+    reserved_instance_type: standard
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+    monthly_hours: 730
