@@ -30,7 +30,8 @@ var (
 	// Technically Github allows 66536 characters, which we interpreted as 262144 bytes, but
 	// we were still seeing 422 "Body is too long (maximum is 65536 characters)" errors so limit
 	// more.
-	GitHubMaxMessageSize = 200000 // bytes
+	GitHubMaxMessageSize = 200000  // bytes
+	GitLabMaxMessageSize = 1000000 // bytes
 
 	// Azure supports 150000 characters, which for ASCII is 150000 bytes, lets err on the side of caution and
 	// limit to 140000 bytes.
