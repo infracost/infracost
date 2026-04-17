@@ -97,7 +97,7 @@ require (
 	github.com/fatih/camelcase v1.0.0
 	github.com/go-errors/errors v1.4.2
 	github.com/go-git/go-billy/v5 v5.8.0
-	github.com/go-git/go-git/v5 v5.17.1
+	github.com/go-git/go-git/v5 v5.18.0
 	github.com/google/go-github/v41 v41.0.0
 	github.com/gruntwork-io/go-commons v0.17.1
 	github.com/gruntwork-io/terragrunt v0.52.4
