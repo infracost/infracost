@@ -13,6 +13,7 @@ func getStorageAccountRegistryItem() *schema.RegistryItem {
 		CoreRFunc: newAzureRMStorageAccount,
 		ReferenceAttributes: []string{
 			"azurerm_storage_management_policy.storage_account_id",
+			"azurerm_storage_account_customer_managed_key.storage_account_id",
 		},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			return []string{d.Get("name").String()}
