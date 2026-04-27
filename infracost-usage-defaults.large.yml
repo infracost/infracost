@@ -119,6 +119,7 @@ resource_type_default_usage:
     additional_backup_storage_gb: 952 # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 200000000 # Monthly number of input/output requests for database.
     monthly_additional_performance_insights_requests: 2000000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    monthly_cpu_credit_hrs: 133
   aws_directory_service_directory:
     additional_domain_controllers: 0.54 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
     shared_accounts: 1.5 # Number of accounts that Microsoft AD directory is shared with
