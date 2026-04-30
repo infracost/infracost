@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_iothub_device_update_instance.standard_instance:
+    device_count: 500
