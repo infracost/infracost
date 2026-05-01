@@ -105,7 +105,7 @@ jobs:
           # Setup brew environment for coming steps.
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-      - uses: dawidd6/action-homebrew-bump-formula@baf2b60c51fc1f8453c884b0c61052668a71bd1d # v3
+      - uses: dawidd6/action-homebrew-bump-formula@1446dca236b0440c6f02723a3f14f13be2c04ab0 # v7
         with:
           token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
           formula: infracost
