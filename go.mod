@@ -102,10 +102,10 @@ require (
 	github.com/gruntwork-io/go-commons v0.17.1
 	github.com/gruntwork-io/terragrunt v0.52.4
 	github.com/hashicorp/go-cty-funcs v0.0.0-20230405223818-a090f58aa992
-	github.com/hashicorp/go-retryablehttp v0.7.7
+	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/hashicorp/go-terraform-address v0.0.0-20210506203813-2cc4f0f34da8
 	github.com/hashicorp/golang-lru/v2 v2.0.7
-	github.com/hashicorp/terraform-svchost v0.1.1
+	github.com/hashicorp/terraform-svchost v0.2.1
 	github.com/maruel/panicparse/v2 v2.3.1
 	github.com/mholt/archives v0.1.1
 	github.com/mitchellh/hashstructure/v2 v2.0.2
@@ -288,7 +288,7 @@ require (
 	github.com/hashicorp/go-getter v1.7.6
 	github.com/hashicorp/go-safetemp v1.0.0
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/hashicorp/go-version v1.6.0
+	github.com/hashicorp/go-version v1.7.0
 	github.com/heimdalr/dag v1.3.1
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
