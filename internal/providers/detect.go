@@ -33,6 +33,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 
 	forceCLI := project.TerraformForceCLI
 	projectType := DetectProjectType(project.Path, forceCLI)
+	fmt.Fprintf(os.Stderr, "DEBUG_DETECT path=%q forceCLI=%v projectType=%v\n", project.Path, forceCLI, projectType)
 	projectContext := config.NewProjectContext(ctx, project, nil)
 	if projectType != ProjectTypeAutodetect {
 		projectContext.ContextValues.SetValue("project_type", projectType)

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"runtime/debug"
 	"sort"
@@ -814,6 +815,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.Name, _ = cmd.Flags().GetString("project-name")
 		projectCfg.TerraformForceCLI, _ = cmd.Flags().GetBool("terraform-force-cli")
+		fmt.Fprintf(os.Stderr, "DEBUG_LOAD path=%q forceCLI=%v changed=%v allArgs=%v\n", projectCfg.Path, projectCfg.TerraformForceCLI, cmd.Flags().Changed("terraform-force-cli"), os.Args)
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
