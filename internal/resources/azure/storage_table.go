@@ -23,13 +23,13 @@ type StorageTable struct {
 	AccountReplicationType string
 	HasCustomerManagedKey  bool
 
-	MonthlyStorageGB     *float64 `infracost_usage:"monthly_storage_gb"`
-	BatchWriteOperations *int64   `infracost_usage:"batch_write_operations"`
-	WriteOperations      *int64   `infracost_usage:"write_operations"`
-	ReadOperations       *int64   `infracost_usage:"read_operations"`
-	ScanOperations       *int64   `infracost_usage:"scan_operations"`
-	ListOperations       *int64   `infracost_usage:"list_operations"`
-	DeleteOperations     *int64   `infracost_usage:"delete_operations"`
+	MonthlyStorageGB            *float64 `infracost_usage:"monthly_storage_gb"`
+	MonthlyBatchWriteOperations *int64   `infracost_usage:"monthly_batch_write_operations"`
+	MonthlyWriteOperations      *int64   `infracost_usage:"monthly_write_operations"`
+	MonthlyReadOperations       *int64   `infracost_usage:"monthly_read_operations"`
+	MonthlyScanOperations       *int64   `infracost_usage:"monthly_scan_operations"`
+	MonthlyListOperations       *int64   `infracost_usage:"monthly_list_operations"`
+	MonthlyDeleteOperations     *int64   `infracost_usage:"monthly_delete_operations"`
 }
 
 func (r *StorageTable) CoreType() string {
@@ -39,12 +39,12 @@ func (r *StorageTable) CoreType() string {
 func (r *StorageTable) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
 		{Key: "monthly_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
-		{Key: "batch_write_operations", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "write_operations", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "read_operations", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "scan_operations", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "list_operations", DefaultValue: 0, ValueType: schema.Int64},
-		{Key: "delete_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_batch_write_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_write_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_read_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_scan_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_list_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_delete_operations", DefaultValue: 0, ValueType: schema.Int64},
 	}
 }
 
@@ -61,12 +61,12 @@ func (r *StorageTable) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
 		r.dataStorageCostComponent(),
 	}
-	costComponents = append(costComponents, r.operationsCostComponent("Batch Write", r.BatchWriteOperations))
-	costComponents = append(costComponents, r.operationsCostComponent("Write", r.WriteOperations))
-	costComponents = append(costComponents, r.operationsCostComponent("Read", r.ReadOperations))
-	costComponents = append(costComponents, r.operationsCostComponent("Scan", r.ScanOperations))
-	costComponents = append(costComponents, r.operationsCostComponent("List", r.ListOperations))
-	costComponents = append(costComponents, r.operationsCostComponent("Delete", r.DeleteOperations))
+	costComponents = append(costComponents, r.operationsCostComponent("Batch Write", r.MonthlyBatchWriteOperations))
+	costComponents = append(costComponents, r.operationsCostComponent("Write", r.MonthlyWriteOperations))
+	costComponents = append(costComponents, r.operationsCostComponent("Read", r.MonthlyReadOperations))
+	costComponents = append(costComponents, r.operationsCostComponent("Scan", r.MonthlyScanOperations))
+	costComponents = append(costComponents, r.operationsCostComponent("List", r.MonthlyListOperations))
+	costComponents = append(costComponents, r.operationsCostComponent("Delete", r.MonthlyDeleteOperations))
 
 	return &schema.Resource{
 		Name:           r.Address,
