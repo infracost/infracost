@@ -397,6 +397,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 			costComponents = append(costComponents, r.cpuCreditsCostComponent(databaseEngine, instanceFamily, cpuCreditQuantity))
 		}
 	}
+
 	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine, r.InstanceClass)
 	if extendedSupport != nil {
 		costComponents = append(costComponents, extendedSupport)
