@@ -330,11 +330,13 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 	args = append(args, flags...)
 	args = append(args, fmt.Sprintf("-out=%s", fileName))
 	fmt.Fprintf(os.Stderr, "DEBUG_PLAN planFlags=%q parsedFlags=%v finalArgs=%v binary=%q dir=%q\n", p.PlanFlags, flags, args, opts.TerraformBinary, opts.Dir)
-	if which, _ := exec.Command("which", "terraform").CombinedOutput(); true {
-		ver, _ := exec.Command("terraform", "version").CombinedOutput()
-		ls, _ := exec.Command("ls", "-la", opts.Dir).CombinedOutput()
-		fmt.Fprintf(os.Stderr, "DEBUG_TF which=%q version=%q dirContents=%q\n", string(which), string(ver), string(ls))
-	}
+	//nolint:gosec
+	which, _ := exec.Command("which", "terraform").CombinedOutput()
+	//nolint:gosec
+	ver, _ := exec.Command("terraform", "version").CombinedOutput()
+	//nolint:gosec
+	ls, _ := exec.Command("ls", "-la", opts.Dir).CombinedOutput()
+	fmt.Fprintf(os.Stderr, "DEBUG_TF which=%q version=%q dirContents=%q\n", string(which), string(ver), string(ls))
 	planOut, err := Cmd(opts, args...)
 	fmt.Fprintf(os.Stderr, "DEBUG_PLAN_RESULT err=%v outLen=%d outFirst200=%q\n", err, len(planOut), string(planOut[:min(len(planOut), 200)]))
 
