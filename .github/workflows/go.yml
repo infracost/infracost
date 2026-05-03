@@ -20,6 +20,8 @@ jobs:
 
       - name: Install Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: 1.14.0
 
       - name: Check Terraform format
         run: make tf_fmt_check
@@ -81,6 +83,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: 1.14.0
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -100,6 +104,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: 1.14.0
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -119,6 +125,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: 1.14.0
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
