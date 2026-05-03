@@ -170,6 +170,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getFederatedIdentityCredentialRegistryItem(),
 	getCognitiveAccountRegistryItem(),
 	getCognitiveDeploymentRegistryItem(),
+	GetAzureRMAADB2CDirectoryRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -666,6 +667,7 @@ var FreeResources = []string{
 	"azurerm_security_center_server_vulnerability_assessment_virtual_machine",
 	"azurerm_security_center_setting",
 	"azurerm_security_center_workspace",
+	"azurerm_aadb2c_directory", // Free for first 50,000 MAUs, then billed per MAU
 }
 
 var UsageOnlyResources = []string{}
