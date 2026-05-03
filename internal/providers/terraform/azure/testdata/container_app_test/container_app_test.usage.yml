@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  azurerm_container_app.example:
+    requests: 5000000
+    concurrent_requests: 1
+    execution_time_ms: 1000
+    min_replicas: 3
+  azurerm_container_app.example_free:
+    requests: 100000
+    concurrent_requests: 1
+    execution_time_ms: 100
+    min_replicas: 0
