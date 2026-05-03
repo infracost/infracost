@@ -328,9 +328,9 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 
 	args = append(args, "plan", "-input=false", "-lock=false", "-no-color")
 	args = append(args, flags...)
-	finalArgs := append(args, fmt.Sprintf("-out=%s", fileName))
-	fmt.Fprintf(os.Stderr, "DEBUG_PLAN planFlags=%q parsedFlags=%v finalArgs=%v\n", p.PlanFlags, flags, finalArgs)
-	_, err = Cmd(opts, finalArgs...)
+	args = append(args, fmt.Sprintf("-out=%s", fileName))
+	fmt.Fprintf(os.Stderr, "DEBUG_PLAN planFlags=%q parsedFlags=%v finalArgs=%v\n", p.PlanFlags, flags, args)
+	_, err = Cmd(opts, args...)
 
 	// Check if the error requires a remote run or an init
 	if err != nil {
