@@ -29,9 +29,11 @@ func newStorageTable(d *schema.ResourceData) schema.CoreResource {
 	if len(d.References("storage_account_name")) > 0 {
 		storageAccount := d.References("storage_account_name")[0]
 		accountReplicationType = storageAccount.Get("account_replication_type").String()
-		hasCustomerManagedKey = storageAccount.Get("customer_managed_key").Exists()
+		// Use IsEmpty rather than Exists; terraform plan JSON includes the
+		// customer_managed_key key as an empty array even when not configured.
+		hasCustomerManagedKey = !storageAccount.IsEmpty("customer_managed_key")
 
-		if storageAccount.References("azurerm_storage_account_customer_managed_key.storage_account_id") != nil {
+		if len(storageAccount.References("azurerm_storage_account_customer_managed_key.storage_account_id")) > 0 {
 			hasCustomerManagedKey = true
 		}
 	}

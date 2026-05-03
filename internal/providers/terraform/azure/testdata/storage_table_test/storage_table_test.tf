@@ -3,7 +3,16 @@ provider "azurerm" {
 }
 
 locals {
-  account_replication_types = ["LRS", "ZRS", "GRS", "RA-GRS", "GZRS", "RA-GZRS"]
+  # Map of resource address key (used in golden output) to the
+  # account_replication_type value the azurerm provider expects (no dashes).
+  account_replication_types = {
+    LRS       = "LRS"
+    ZRS       = "ZRS"
+    GRS       = "GRS"
+    "RA-GRS"  = "RAGRS"
+    GZRS      = "GZRS"
+    "RA-GZRS" = "RAGZRS"
+  }
 }
 
 resource "azurerm_resource_group" "test" {
@@ -12,8 +21,8 @@ resource "azurerm_resource_group" "test" {
 }
 
 resource "azurerm_storage_account" "standard" {
-  for_each                 = toset(local.account_replication_types)
-  name                     = "standard${each.value}"
+  for_each                 = local.account_replication_types
+  name                     = "standard${lower(replace(each.key, "-", ""))}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
@@ -22,9 +31,9 @@ resource "azurerm_storage_account" "standard" {
 }
 
 resource "azurerm_storage_table" "standard" {
-  for_each             = toset(local.account_replication_types)
-  name                 = "tablestandard${each.value}"
-  storage_account_name = azurerm_storage_account.standard[each.value].name
+  for_each             = local.account_replication_types
+  name                 = "tablestandard${lower(replace(each.key, "-", ""))}"
+  storage_account_name = azurerm_storage_account.standard[each.key].name
 }
 
 resource "azurerm_user_assigned_identity" "test" {
@@ -34,8 +43,8 @@ resource "azurerm_user_assigned_identity" "test" {
 }
 
 resource "azurerm_storage_account" "inline_key" {
-  for_each                 = toset(local.account_replication_types)
-  name                     = "customermanagedkey${each.value}"
+  for_each                 = local.account_replication_types
+  name                     = "cmk${lower(replace(each.key, "-", ""))}"
   resource_group_name      = azurerm_resource_group.test.name
   location                 = azurerm_resource_group.test.location
   account_tier             = "Standard"
@@ -47,9 +56,9 @@ resource "azurerm_storage_account" "inline_key" {
 }
 
 resource "azurerm_storage_table" "inline_key" {
-  for_each             = toset(local.account_replication_types)
-  name                 = "tableinlinekey${each.value}"
-  storage_account_name = azurerm_storage_account.inline_key[each.value].name
+  for_each             = local.account_replication_types
+  name                 = "tablecmk${lower(replace(each.key, "-", ""))}"
+  storage_account_name = azurerm_storage_account.inline_key[each.key].name
 }
 
 resource "azurerm_key_vault" "test" {
