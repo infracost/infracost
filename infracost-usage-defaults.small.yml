@@ -119,6 +119,7 @@ resource_type_default_usage:
     additional_backup_storage_gb: 238 # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 50000000 # Monthly number of input/output requests for database.
     monthly_additional_performance_insights_requests: 500000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    monthly_cpu_credit_hrs: 33 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 and T4g instances.
   aws_directory_service_directory:
     additional_domain_controllers: 0.135 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
     shared_accounts: 0.375 # Number of accounts that Microsoft AD directory is shared with
