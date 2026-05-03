@@ -99,7 +99,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.8.0
 	github.com/go-git/go-git/v5 v5.18.0
 	github.com/google/go-github/v41 v41.0.0
-	github.com/gruntwork-io/go-commons v0.17.1
+	github.com/gruntwork-io/go-commons v0.17.2
 	github.com/gruntwork-io/terragrunt v0.52.4
 	github.com/hashicorp/go-cty-funcs v0.0.0-20230405223818-a090f58aa992
 	github.com/hashicorp/go-retryablehttp v0.7.7
@@ -192,7 +192,7 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/goware/prefixer v0.0.0-20160118172347-395022866408 // indirect
 	github.com/gruntwork-io/gruntwork-cli v0.7.0 // indirect
-	github.com/gruntwork-io/terratest v0.41.0 // indirect
+	github.com/gruntwork-io/terratest v0.46.16 // indirect
 	github.com/hashicorp/aws-sdk-go-base/v2 v2.0.0-beta.65 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect

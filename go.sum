@@ -1236,12 +1236,12 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0/go.mod h1:hgWBS7lorOAVIJEQMi4Zs
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3/go.mod h1:o//XUCC/F+yRGJoPO/VU0GSB0f8Nhgmxx0VIRUvaC0w=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3 h1:5ZPtiqj0JL5oKWmcsq4VMaAW5ukBEgSGXEN89zeH1Jo=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3/go.mod h1:ndYquD05frm2vACXE1nsccT4oJzjhw2arTS2cpUD1PI=
-github.com/gruntwork-io/go-commons v0.17.1 h1:2KS9wAqrgeOTWj33DSHzDNJ1FCprptWdLFqej+wB8x0=
-github.com/gruntwork-io/go-commons v0.17.1/go.mod h1:S98JcR7irPD1bcruSvnqupg+WSJEJ6xaM89fpUZVISk=
+github.com/gruntwork-io/go-commons v0.17.2 h1:14dsCJ7M5Vv2X3BIPKeG9Kdy6vTMGhM8L4WZazxfTuY=
+github.com/gruntwork-io/go-commons v0.17.2/go.mod h1:zs7Q2AbUKuTarBPy19CIxJVUX/rBamfW8IwuWKniWkE=
 github.com/gruntwork-io/gruntwork-cli v0.7.0 h1:YgSAmfCj9c61H+zuvHwKfYUwlMhu5arnQQLM4RH+CYs=
 github.com/gruntwork-io/gruntwork-cli v0.7.0/go.mod h1:jp6Z7NcLF2avpY8v71fBx6hds9eOFPELSuD/VPv7w00=
-github.com/gruntwork-io/terratest v0.41.0 h1:QKFK6m0EMVnrV7lw2L06TlG+Ha3t0CcOXuBVywpeNRU=
-github.com/gruntwork-io/terratest v0.41.0/go.mod h1:qH1xkPTTGx30XkMHw8jAVIbzqheSjIa5IyiTwSV2vKI=
+github.com/gruntwork-io/terratest v0.46.16 h1:l+HHuU7lNLwoAl2sP8zkYJy0uoE2Mwha2nw+rim+OhQ=
+github.com/gruntwork-io/terratest v0.46.16/go.mod h1:oywHw1cFKXSYvKPm27U7quZVzDUlA22H2xUrKCe26xM=
 github.com/hashicorp/aws-sdk-go-base v0.6.0/go.mod h1:2fRjWDv3jJBeN6mVWFHV6hFTNeFBx2gpDLQaZNxUVAY=
 github.com/hashicorp/aws-sdk-go-base/v2 v2.0.0-beta.65 h1:81+kWbE1yErFBMjME0I5k3x3kojjKsWtPYHEAutoPow=
 github.com/hashicorp/aws-sdk-go-base/v2 v2.0.0-beta.65/go.mod h1:WtMzv9T++tfWVea+qB2MXoaqxw33S8bpJslzUike2mQ=
