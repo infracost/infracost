@@ -4,6 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: monthly
+    open-pull-requests-limit: 0
     reviewers:
       - infracost/engineering
     labels:
@@ -12,7 +13,7 @@ updates:
     directory: "/"
     schedule:
       interval: monthly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     reviewers:
       - infracost/engineering
     labels:
