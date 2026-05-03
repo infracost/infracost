@@ -129,7 +129,7 @@
  └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
                                                                                                               
  azurerm_storage_table.inline_key["GZRS"]                                                                     
- ├─ Capacity                                    Monthly cost depends on usage: $0.12 per GB                   
+ ├─ Capacity                                    Monthly cost depends on usage: $0.13 per GB                   
  ├─ Batch Write operations                      Monthly cost depends on usage: $0.19 per 10k operations       
  ├─ Write operations                            Monthly cost depends on usage: $0.0625 per 10k operations     
  ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     
@@ -156,7 +156,7 @@
  └─ Delete operations                           Monthly cost depends on usage: $0.00 per 10k operations       
                                                                                                               
  azurerm_storage_table.inline_key["RA-GZRS"]                                                                  
- ├─ Capacity                                    Monthly cost depends on usage: $0.15 per GB                   
+ ├─ Capacity                                    Monthly cost depends on usage: $0.16 per GB                   
  ├─ Batch Write operations                      Monthly cost depends on usage: $0.19 per 10k operations       
  ├─ Write operations                            Monthly cost depends on usage: $0.0625 per 10k operations     
  ├─ Read operations                             Monthly cost depends on usage: $0.0065 per 10k operations     

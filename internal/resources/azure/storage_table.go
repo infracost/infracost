@@ -94,13 +94,12 @@ func (r *StorageTable) dataStorageCostComponent() *schema.CostComponent {
 		qty = decimalPtr(decimal.NewFromFloat(*r.MonthlyStorageGB))
 	}
 
-	// There's no listed prices for the account encrypted GZRS or RA-GZRS.
-	// The prices are the same as GRS or RA-GRS so we just use those.
-	accountReplicationLookup := r.AccountReplicationType
-	if r.HasCustomerManagedKey && (r.AccountReplicationType == "GZRS") {
-		accountReplicationLookup = "GRS"
-	} else if r.HasCustomerManagedKey && (r.AccountReplicationType == "RA-GZRS") {
-		accountReplicationLookup = "RA-GRS"
+	replication := strings.ToUpper(r.AccountReplicationType)
+	// Account Encrypted GZRS/RA-GZRS Data Stored meters carry the "Account Encrypted"
+	// prefix in the meter name; the other replication types do not.
+	meterName := fmt.Sprintf("%s Data Stored", replication)
+	if r.HasCustomerManagedKey && (replication == "GZRS" || replication == "RA-GZRS") {
+		meterName = fmt.Sprintf("Account Encrypted %s Data Stored", replication)
 	}
 
 	return &schema.CostComponent{
@@ -115,8 +114,8 @@ func (r *StorageTable) dataStorageCostComponent() *schema.CostComponent {
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Tables")},
-				{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", r.lookupPrefix(), strings.ToUpper(accountReplicationLookup)))},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Data Stored", strings.ToUpper(accountReplicationLookup)))},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", r.lookupPrefix(), replication))},
+				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
