@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go 1.x
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
@@ -86,7 +86,7 @@ jobs:
         with:
           terraform_version: 1.14.0
       - name: Set up Go 1.x
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
@@ -107,7 +107,7 @@ jobs:
         with:
           terraform_version: 1.14.0
       - name: Set up Go 1.x
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
@@ -128,7 +128,7 @@ jobs:
         with:
           terraform_version: 1.14.0
       - name: Set up Go 1.x
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
 
