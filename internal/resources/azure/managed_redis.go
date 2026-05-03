@@ -61,8 +61,8 @@ func (r *ManagedRedis) BuildResource() *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           fmt.Sprintf("Cache usage (%s)", r.SKU),
-				Unit:           "instances",
-				UnitMultiplier: schema.HourToMonthUnitMultiplier,
+				Unit:           "hours",
+				UnitMultiplier: decimal.NewFromInt(1),
 				HourlyQuantity: decimalPtr(decimal.NewFromInt(instanceCount)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr(vendorName),
