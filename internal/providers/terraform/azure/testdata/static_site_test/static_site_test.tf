@@ -41,3 +41,10 @@ resource "azurerm_static_web_app" "standard" {
   location            = azurerm_resource_group.example.location
   sku_tier            = "Standard"
 }
+
+resource "azurerm_static_site" "sku_size_only" {
+  name                = "example-static-site-sku-size"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  sku_size            = "Standard"
+}

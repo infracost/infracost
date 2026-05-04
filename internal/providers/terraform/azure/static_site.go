@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -28,9 +30,17 @@ func getStaticWebAppRegistryItem() *schema.RegistryItem {
 }
 
 func newStaticSite(d *schema.ResourceData) schema.CoreResource {
+	// sku_tier and sku_size are equivalent on the schema. Take whichever is
+	// non-Free so a config that sets only sku_size still picks up the paid
+	// tier even when terraform plan has filled the other in with the "Free"
+	// default.
 	sku := "Free"
-	if !d.IsEmpty("sku_tier") {
-		sku = d.Get("sku_tier").String()
+	for _, attr := range []string{"sku_tier", "sku_size"} {
+		v := d.Get(attr).String()
+		if v != "" && !strings.EqualFold(v, "Free") {
+			sku = v
+			break
+		}
 	}
 
 	return &azure.StaticSite{
