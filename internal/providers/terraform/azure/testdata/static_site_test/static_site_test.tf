@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
-  location = "eastus"
+  location = "centralus"
 }
 
 resource "azurerm_static_site" "free" {
