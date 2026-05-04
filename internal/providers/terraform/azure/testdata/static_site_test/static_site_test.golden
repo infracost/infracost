@@ -1,0 +1,33 @@
+
+ Name                                 Monthly Qty  Unit            Monthly Cost    
+                                                                                   
+ azurerm_static_site.with_usage                                                    
+ ├─ Static Web App (Standard)                   1  months                 $9.00    
+ └─ Bandwidth (over 100GB)                    150  GB                    $30.00  * 
+                                                                                   
+ azurerm_static_site.sku_size_only                                                 
+ ├─ Static Web App (Standard)                   1  months                 $9.00    
+ └─ Bandwidth (over 100GB)          Monthly cost depends on usage: $0.20 per GB    
+                                                                                   
+ azurerm_static_site.standard                                                      
+ ├─ Static Web App (Standard)                   1  months                 $9.00    
+ └─ Bandwidth (over 100GB)          Monthly cost depends on usage: $0.20 per GB    
+                                                                                   
+ azurerm_static_web_app.standard                                                   
+ ├─ Static Web App (Standard)                   1  months                 $9.00    
+ └─ Bandwidth (over 100GB)          Monthly cost depends on usage: $0.20 per GB    
+                                                                                   
+ OVERALL TOTAL                                                           $66.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 4 were estimated
+∙ 3 were free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃           $36 ┃         $30 ┃        $66 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

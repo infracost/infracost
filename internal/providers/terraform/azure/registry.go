@@ -118,6 +118,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLogAnalyticsSolutionRegistryItem(),
 	getMySQLFlexibleServerRegistryItem(),
 	getServicePlanRegistryItem(),
+	getStaticSiteRegistryItem(),
+	getStaticWebAppRegistryItem(),
 	getSentinelDataConnectorAwsCloudTrailRegistryItem(),
 	getSentinelDataConnectorAzureActiveDirectoryRegistryItem(),
 	getSentinelDataConnectorAzureAdvancedThreatProtectionRegistryItem(),
