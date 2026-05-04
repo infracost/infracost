@@ -12,4 +12,4 @@ func TestAzureRMStaticSite(t *testing.T) {
 	}
 
 	tftest.GoldenFileResourceTestsWithOpts(t, "static_site_test", &tftest.GoldenFileOptions{CaptureLogs: true})
-} 
+}

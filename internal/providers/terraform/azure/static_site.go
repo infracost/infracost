@@ -16,16 +16,14 @@ func getStaticSiteRegistryItem() *schema.RegistryItem {
 }
 
 func newStaticSite(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{"resource_group_name"})
-
 	sku := "Free"
-	if d.Get("sku_tier").String() != "" {
+	if !d.IsEmpty("sku_tier") {
 		sku = d.Get("sku_tier").String()
 	}
 
 	return &azure.StaticSite{
 		Address: d.Address,
-		Region:  region,
+		Region:  d.Region,
 		SKU:     sku,
 	}
-} 
+}

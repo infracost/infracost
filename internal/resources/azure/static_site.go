@@ -1,7 +1,6 @@
 package azure
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -29,16 +28,10 @@ func (r *StaticSite) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{}
 }
 
-// PopulateUsage parses the u schema.UsageData into the StaticSite struct
-// It uses the `infracost_usage` struct tags to populate data into the StaticSite
 func (r *StaticSite) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-// BuildResource builds a schema.Resource from a valid StaticSite struct.
-//
-// StaticSite has two SKUs: Free and Standard. Free tier has no cost, while Standard
-// tier is charged per month.
 func (r *StaticSite) BuildResource() *schema.Resource {
 	if strings.ToLower(r.SKU) == "free" {
 		return &schema.Resource{
@@ -66,15 +59,16 @@ func (r *StaticSite) staticSiteCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
-			Service:       strPtr("Static Web Apps"),
-			ProductFamily: strPtr("Web"),
+			Service:       strPtr("Azure App Service"),
+			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("Static Web Apps")},
 				{Key: "skuName", Value: strPtr("Standard")},
-				{Key: "meterName", Value: strPtr("Standard Static Web App")},
+				{Key: "meterName", Value: strPtr("Standard App")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
 	}
-} 
+}
