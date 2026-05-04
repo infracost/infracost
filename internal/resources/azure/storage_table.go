@@ -140,9 +140,7 @@ func (r *StorageTable) operationsCostComponent(operation string, usage *int64) *
 	}
 
 	if operationLookup == "Write" {
-		// Exclude "Batch Write Operations" from this lookup. ValueRegex is
-		// evaluated server-side by the pricing API (PCRE), so the lookbehind
-		// is fine here even though Go's RE2 wouldn't compile it.
+		// Ensure we don't look up prices for Batch Write
 		operationLookup = "(?<!Batch\\s+)Write"
 	}
 
