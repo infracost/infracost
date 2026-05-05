@@ -40,7 +40,8 @@ func (r *AutomationWatcher) BuildResource() *schema.Resource {
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
-				PurchaseOption: strPtr("Consumption"),
+				PurchaseOption:   strPtr("Consumption"),
+				StartUsageAmount: strPtr("744"),
 			},
 		},
 	}
