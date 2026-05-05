@@ -16,10 +16,10 @@ resource "azurerm_automation_account" "example" {
 }
 
 resource "azurerm_automation_watcher" "example" {
-  name                             = "example-watcher"
-  location                         = azurerm_resource_group.example.location
-  automation_account_id            = azurerm_automation_account.example.id
-  script_name                      = "myscript.ps1"
-  script_run_on                    = "HybridWorker"
-  execution_frequency_in_seconds   = 300
+  name                           = "example-watcher"
+  location                       = azurerm_resource_group.example.location
+  automation_account_id          = azurerm_automation_account.example.id
+  script_name                    = "myscript.ps1"
+  script_run_on                  = "HybridWorker"
+  execution_frequency_in_seconds = 300
 }
