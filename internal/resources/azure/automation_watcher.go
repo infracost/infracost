@@ -15,12 +15,10 @@ func (r *AutomationWatcher) CoreType() string {
 }
 
 func (r *AutomationWatcher) UsageSchema() []*schema.UsageItem {
-	return []*schema.UsageItem{}
+	return nil
 }
 
-func (r *AutomationWatcher) PopulateUsage(u *schema.UsageData) {
-	// No usage-based data
-}
+func (r *AutomationWatcher) PopulateUsage(u *schema.UsageData) {}
 
 func (r *AutomationWatcher) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
