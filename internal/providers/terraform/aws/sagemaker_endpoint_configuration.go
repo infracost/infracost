@@ -47,6 +47,7 @@ func decodeVariant(v gjson.Result, label string) *aws.SageMakerVariant {
 		InitialInstanceCount: v.Get("initial_instance_count").Int(),
 		VolumeSizeInGB:       v.Get("volume_size_in_gb").Int(),
 		Label:                label,
+		IsShadow:             label == "Shadow instance",
 	}
 
 	if isServerless {
