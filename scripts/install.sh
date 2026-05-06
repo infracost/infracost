@@ -51,14 +51,27 @@ else
 fi
 echo
 
-tar xzf "/tmp/$tar" -C /tmp
+extract_dir=$(mktemp -d)
+trap 'rm -rf "$extract_dir"' EXIT
+
+tar xzf "/tmp/$tar" -C "$extract_dir"
 rm "/tmp/$tar"
 
-echo "Moving /tmp/infracost-$os-$arch to /usr/local/bin/infracost (you might be asked for your password due to sudo)"
+binary="$extract_dir/infracost-$os-$arch"
+# v0.10 archives used a suffixed binary name; v2 archives use plain infracost.
+if [ ! -f "$binary" ]; then
+  binary="$extract_dir/infracost"
+fi
+if [ ! -f "$binary" ]; then
+  echo "Could not find infracost binary in $tar"
+  exit 1
+fi
+
+echo "Moving $binary to /usr/local/bin/infracost (you might be asked for your password due to sudo)"
 if [ -x "$(command -v sudo)" ]; then
-  sudo mv "/tmp/infracost-$os-$arch" "/usr/local/bin/infracost"
+  sudo mv "$binary" "/usr/local/bin/infracost"
 else
-  mv "/tmp/infracost-$os-$arch" "/usr/local/bin/infracost"
+  mv "$binary" "/usr/local/bin/infracost"
 fi
 echo
 echo "Completed installing $(infracost --version)"
