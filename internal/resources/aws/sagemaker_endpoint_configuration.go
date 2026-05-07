@@ -15,6 +15,7 @@ type SageMakerEndpointConfiguration struct {
 	Variants []*SageMakerVariant
 
 	MonthlyInferenceDurationSeconds                       *int64 `infracost_usage:"monthly_inference_duration_seconds"`
+	MonthlyProvisionedConcurrencyUsageSeconds             *int64 `infracost_usage:"monthly_provisioned_concurrency_usage_seconds"`
 	MonthlyProvisionedConcurrencyInferenceDurationSeconds *int64 `infracost_usage:"monthly_provisioned_concurrency_inference_duration_seconds"`
 	MonthlyInstanceHours                                  *int64 `infracost_usage:"monthly_instance_hours"`
 	DataProcessedOutGB                                    *int64 `infracost_usage:"monthly_data_processed_out_gb"`
@@ -42,6 +43,7 @@ func (s *SageMakerEndpointConfiguration) CoreType() string {
 func (s *SageMakerEndpointConfiguration) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
 		{Key: "monthly_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_provisioned_concurrency_usage_seconds", DefaultValue: 0, ValueType: schema.Int64},
 		{Key: "monthly_provisioned_concurrency_inference_duration_seconds", DefaultValue: 0, ValueType: schema.Int64},
 		{Key: "monthly_data_processed_out_gb", DefaultValue: 0, ValueType: schema.Int64},
 		{Key: "monthly_data_processed_in_gb", DefaultValue: 0, ValueType: schema.Int64},
@@ -93,13 +95,12 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 	if s.MonthlyInferenceDurationSeconds != nil {
 		monthlyInferenceSeconds = decimal.NewFromInt(*s.MonthlyInferenceDurationSeconds)
 	}
-	monthlyComputeGBSeconds := monthlyInferenceSeconds.Mul(memorySizeGB)
 
 	components = append(components, &schema.CostComponent{
 		Name:            "Compute Duration",
-		Unit:            "GB-seconds",
+		Unit:            "seconds",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(monthlyComputeGBSeconds),
+		MonthlyQuantity: decimalPtr(monthlyInferenceSeconds),
 		UsageBased:      true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -107,7 +108,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 			Service:       strPtr("AmazonSageMaker"),
 			ProductFamily: strPtr("ML Serverless"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^ServerlessInf:Mem-%vGB$/i", memorySizeMB/1024))},
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ServerlessInf:Mem-%vGB/", memorySizeMB/1024))},
 			},
 		},
 	})
@@ -126,7 +127,7 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "group", Value: strPtr("Hosting:OUT")},
 					{Key: "operation", Value: strPtr("Invoke-Endpoint")},
-					{Key: "usagetype", ValueRegex: strPtr("/^Data-Bytes-Out$/i")},
+					{Key: "usagetype", ValueRegex: strPtr("/Data-Bytes-Out/")},
 				},
 			},
 		})
@@ -154,36 +155,39 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 
 	provisionedConcurrencyCount := v.ProvisionedConcurrency
 	if provisionedConcurrencyCount > 0 {
-		const monthlyHours = 730
-		const hourlySeconds = 3600
+		provisionedConcurrencyUsageSeconds := decimal.NewFromInt(0)
+		if s.MonthlyProvisionedConcurrencyUsageSeconds != nil {
+			provisionedConcurrencyUsageSeconds = decimal.NewFromInt(*s.MonthlyProvisionedConcurrencyUsageSeconds)
+		}
 		warmGBSeconds := decimal.NewFromInt(provisionedConcurrencyCount).
-			Mul(memorySizeGB).
-			Mul(decimal.NewFromInt(monthlyHours * hourlySeconds))
+			Mul(provisionedConcurrencyUsageSeconds)
 		components = append(components, &schema.CostComponent{
 			Name:            "Provisioned concurrency (warm)",
-			Unit:            "GB-seconds",
+			Unit:            "seconds",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(warmGBSeconds),
+			UsageBased:      true,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(s.Region),
 				Service:       strPtr("AmazonSageMaker"),
 				ProductFamily: strPtr("ML Serverless"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^ProvisionedConcurrency:Mem-%vGB$/i", memorySizeMB/1024))},
+					{Key: "group", Value: strPtr("ServerlessProvisionedConcurrency-Usage")},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ProvisionedConcurrency:Usage-%vGB/", memorySizeMB/1024))},
 				},
 			},
 		})
 
-		provisionedConcurrencyUsageSeconds := decimal.NewFromInt(0)
+		provisionedConcurrencyInferenceDurationSeconds := decimal.NewFromInt(0)
 		if s.MonthlyProvisionedConcurrencyInferenceDurationSeconds != nil {
-			provisionedConcurrencyUsageSeconds = decimal.NewFromInt(*s.MonthlyProvisionedConcurrencyInferenceDurationSeconds)
+			provisionedConcurrencyInferenceDurationSeconds = decimal.NewFromInt(*s.MonthlyProvisionedConcurrencyInferenceDurationSeconds)
 		}
-		provisionedConcurrencyExecutionGBSeconds := provisionedConcurrencyUsageSeconds.Mul(memorySizeGB)
+		provisionedConcurrencyExecutionGBSeconds := provisionedConcurrencyInferenceDurationSeconds.Mul(memorySizeGB)
 
 		components = append(components, &schema.CostComponent{
 			Name:            "Provisioned concurrency execution",
-			Unit:            "GB-seconds",
+			Unit:            "seconds",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(provisionedConcurrencyExecutionGBSeconds),
 			UsageBased:      true,
@@ -193,7 +197,8 @@ func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMa
 				Service:       strPtr("AmazonSageMaker"),
 				ProductFamily: strPtr("ML Serverless"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/^ProvisionedConcurrency:Usage-%vGB$/i", memorySizeMB/1024))},
+					{Key: "group", Value: strPtr("ServerlessProvisionedConcurrency-Duration")},
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ProvisionedConcurrency:Mem-%vGB/", memorySizeMB/1024))},
 				},
 			},
 		})
@@ -210,15 +215,17 @@ func (s *SageMakerEndpointConfiguration) sagemakerInstanceComponents(variant *Sa
 
 	monthlyHours := decimal.NewFromInt(730)
 	if s.MonthlyInstanceHours != nil {
+		print("Using monthly instance hours from usage data: ", *s.MonthlyInstanceHours)
 		monthlyHours = decimal.NewFromInt(*s.MonthlyInstanceHours)
 	}
 
 	components := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Instance (%s)", variant.InstanceType),
-			Unit:           "hours",
-			UnitMultiplier: monthlyHours,
-			HourlyQuantity: &count,
+			Name:            fmt.Sprintf("Instance (%s)", variant.InstanceType),
+			Unit:            "hours",
+			UnitMultiplier:  count,
+			MonthlyQuantity: &monthlyHours,
+			UsageBased:      true,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(s.Region),
@@ -245,11 +252,17 @@ func (s *SageMakerEndpointConfiguration) sagemakerInstanceComponents(variant *Sa
 			Unit:            "GB-month",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &monthlyQty,
+			UsageBased:      true,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("aws"),
 				Region:        strPtr(s.Region),
 				Service:       strPtr("AmazonSageMaker"),
 				ProductFamily: strPtr("Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "volumeType", Value: strPtr("General Purpose-Hosting")},
+					{Key: "usagetype", ValueRegex: strPtr("/Host:VolumeUsage.gp2/")},
+					{Key: "platoclassificationtype", Value: strPtr("Host:VolumeUsage")},
+				},
 			},
 		})
 	}
