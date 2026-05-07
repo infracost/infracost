@@ -89,135 +89,135 @@ func (s *SageMakerEndpointConfiguration) BuildResource() *schema.Resource {
 func (s *SageMakerEndpointConfiguration) sagemakerServerlessComponents(v *SageMakerVariant) []*schema.CostComponent {
 	var components []*schema.CostComponent
 
-    memorySizeMB := v.MemorySize
-    memorySizeGB := decimal.NewFromInt(memorySizeMB).Div(decimal.NewFromInt(1024))
+	memorySizeMB := v.MemorySize
+	memorySizeGB := decimal.NewFromInt(memorySizeMB).Div(decimal.NewFromInt(1024))
 
-    monthlyInferenceSeconds := decimal.NewFromInt(0)
-    if s.MonthlyInferenceDurationSeconds != nil {
-        monthlyInferenceSeconds = decimal.NewFromInt(*s.MonthlyInferenceDurationSeconds)
-    }
-    monthlyComputeGBSeconds := monthlyInferenceSeconds.Mul(memorySizeGB)
+	monthlyInferenceSeconds := decimal.NewFromInt(0)
+	if s.MonthlyInferenceDurationSeconds != nil {
+		monthlyInferenceSeconds = decimal.NewFromInt(*s.MonthlyInferenceDurationSeconds)
+	}
+	monthlyComputeGBSeconds := monthlyInferenceSeconds.Mul(memorySizeGB)
 
-    serverlessDurationPriceFilter := &schema.PriceFilter{StartUsageAmount: strPtr("150000")}
+	serverlessDurationPriceFilter := &schema.PriceFilter{StartUsageAmount: strPtr("150000")}
 
-    components = append(components, &schema.CostComponent{
-        Name:            "Compute Duration",
-        Unit:            "GB-seconds",
-        UnitMultiplier:  decimal.NewFromInt(1),
-        MonthlyQuantity: decimalPtr(monthlyComputeGBSeconds),
-        UsageBased:      true,
-        ProductFilter: &schema.ProductFilter{
-            VendorName:    strPtr("aws"),
-            Region:        strPtr(s.Region),
-            Service:       strPtr("AmazonSageMaker"),
-            ProductFamily: strPtr("ML Serverless"),
-            AttributeFilters: []*schema.AttributeFilter{
-                {Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ServerlessInf:Mem-%vGB$/", memorySizeMB/1024))},
-            },
-        },
-        PriceFilter: serverlessDurationPriceFilter,
-    })
+	components = append(components, &schema.CostComponent{
+		Name:            "Compute Duration",
+		Unit:            "GB-seconds",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(monthlyComputeGBSeconds),
+		UsageBased:      true,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(s.Region),
+			Service:       strPtr("AmazonSageMaker"),
+			ProductFamily: strPtr("ML Serverless"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ServerlessInf:Mem-%vGB$/", memorySizeMB/1024))},
+			},
+		},
+		PriceFilter: serverlessDurationPriceFilter,
+	})
 
-    if s.DataProcessedOutGB != nil && *s.DataProcessedOutGB > 0 {
-        components = append(components, &schema.CostComponent{
-            Name:            "Data processed (out)",
-            Unit:            "GB",
-            UnitMultiplier:  decimal.NewFromInt(1),
-            MonthlyQuantity: decimalPtr(decimal.NewFromInt(*s.DataProcessedOutGB)),
-            UsageBased:      true,
-            ProductFilter: &schema.ProductFilter{
-                VendorName: strPtr("aws"),
-                Region:     strPtr(s.Region),
-                Service:    strPtr("AmazonSageMaker"),
-                AttributeFilters: []*schema.AttributeFilter{
-                    {Key: "group", Value: strPtr("Hosting:OUT")},
-                    {Key: "operation", Value: strPtr("Invoke-Endpoint")},
-                    {Key: "usagetype", ValueRegex: strPtr("/Data-Bytes-Out/")},
-                },
-            },
-        })
-    }
+	if s.DataProcessedOutGB != nil && *s.DataProcessedOutGB > 0 {
+		components = append(components, &schema.CostComponent{
+			Name:            "Data processed (out)",
+			Unit:            "GB",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*s.DataProcessedOutGB)),
+			UsageBased:      true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(s.Region),
+				Service:    strPtr("AmazonSageMaker"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "group", Value: strPtr("Hosting:OUT")},
+					{Key: "operation", Value: strPtr("Invoke-Endpoint")},
+					{Key: "usagetype", ValueRegex: strPtr("/Data-Bytes-Out/")},
+				},
+			},
+		})
+	}
 
-    if s.DataProcessedInGB != nil && *s.DataProcessedInGB > 0 {
-        components = append(components, &schema.CostComponent{
-            Name:            "Data processed (in)",
-            Unit:            "GB",
-            UnitMultiplier:  decimal.NewFromInt(1),
-            MonthlyQuantity: decimalPtr(decimal.NewFromInt(*s.DataProcessedInGB)),
-            UsageBased:      true,
-            ProductFilter: &schema.ProductFilter{
-                VendorName: strPtr("aws"),
-                Region:     strPtr(s.Region),
-                Service:    strPtr("AmazonSageMaker"),
-                AttributeFilters: []*schema.AttributeFilter{
-                    {Key: "group", Value: strPtr("Hosting:IN")},
-                    {Key: "operation", Value: strPtr("Invoke-Endpoint")},
-                    {Key: "usagetype", ValueRegex: strPtr("/Data-Bytes-In/")},
-                },
-            },
-        })
-    }
+	if s.DataProcessedInGB != nil && *s.DataProcessedInGB > 0 {
+		components = append(components, &schema.CostComponent{
+			Name:            "Data processed (in)",
+			Unit:            "GB",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*s.DataProcessedInGB)),
+			UsageBased:      true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(s.Region),
+				Service:    strPtr("AmazonSageMaker"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "group", Value: strPtr("Hosting:IN")},
+					{Key: "operation", Value: strPtr("Invoke-Endpoint")},
+					{Key: "usagetype", ValueRegex: strPtr("/Data-Bytes-In/")},
+				},
+			},
+		})
+	}
 
-    // 3. Provisioned concurrency (if enabled)
-    provisionedConcurrencyCount := v.ProvisionedConcurrency
-    if provisionedConcurrencyCount > 0 {
-        // Provisioned Concurrency Readiness (Warm slots)
-        const monthlyHours = 730
-        const hourlySeconds = 3600
-        warmGBSeconds := decimal.NewFromInt(provisionedConcurrencyCount).
-            Mul(memorySizeGB).
-            Mul(decimal.NewFromInt(monthlyHours * hourlySeconds))
-        components = append(components, &schema.CostComponent{
-            Name:            "Provisioned concurrency (warm)",
-            Unit:            "GB-seconds",
-            UnitMultiplier:  decimal.NewFromInt(1),
-            MonthlyQuantity: decimalPtr(warmGBSeconds),
-            ProductFilter: &schema.ProductFilter{
-                VendorName:    strPtr("aws"),
-                Region:        strPtr(s.Region),
-                Service:       strPtr("AmazonSageMaker"),
-                ProductFamily: strPtr("ML Serverless"),
-                AttributeFilters: []*schema.AttributeFilter{
-                    {Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ProvisionedConcurrency:Mem-%vGB/", memorySizeMB/1024))},
-                },
-            },
-        })
+	// 3. Provisioned concurrency (if enabled)
+	provisionedConcurrencyCount := v.ProvisionedConcurrency
+	if provisionedConcurrencyCount > 0 {
+		// Provisioned Concurrency Readiness (Warm slots)
+		const monthlyHours = 730
+		const hourlySeconds = 3600
+		warmGBSeconds := decimal.NewFromInt(provisionedConcurrencyCount).
+			Mul(memorySizeGB).
+			Mul(decimal.NewFromInt(monthlyHours * hourlySeconds))
+		components = append(components, &schema.CostComponent{
+			Name:            "Provisioned concurrency (warm)",
+			Unit:            "GB-seconds",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(warmGBSeconds),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(s.Region),
+				Service:       strPtr("AmazonSageMaker"),
+				ProductFamily: strPtr("ML Serverless"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ProvisionedConcurrency:Mem-%vGB/", memorySizeMB/1024))},
+				},
+			},
+		})
 
-        // Provisioned Concurrency Execution (Billed when request hits a warm slot)
-        provisionedConcurrencyUsageSeconds := decimal.NewFromInt(0)
-        if s.MonthlyProvisionedConcurrencyInferenceDurationSeconds != nil {
-            provisionedConcurrencyUsageSeconds = decimal.NewFromInt(*s.MonthlyProvisionedConcurrencyInferenceDurationSeconds)
-        }
-        provisionedConcurrencyExecutionGBSeconds := provisionedConcurrencyUsageSeconds.Mul(memorySizeGB)
+		// Provisioned Concurrency Execution (Billed when request hits a warm slot)
+		provisionedConcurrencyUsageSeconds := decimal.NewFromInt(0)
+		if s.MonthlyProvisionedConcurrencyInferenceDurationSeconds != nil {
+			provisionedConcurrencyUsageSeconds = decimal.NewFromInt(*s.MonthlyProvisionedConcurrencyInferenceDurationSeconds)
+		}
+		provisionedConcurrencyExecutionGBSeconds := provisionedConcurrencyUsageSeconds.Mul(memorySizeGB)
 
-        components = append(components, &schema.CostComponent{
-            Name:            "Provisioned concurrency execution",
-            Unit:            "GB-seconds",
-            UnitMultiplier:  decimal.NewFromInt(1),
-            MonthlyQuantity: decimalPtr(provisionedConcurrencyExecutionGBSeconds),
-            UsageBased:      true,
-            ProductFilter: &schema.ProductFilter{
-                VendorName:    strPtr("aws"),
-                Region:        strPtr(s.Region),
-                Service:       strPtr("AmazonSageMaker"),
-                ProductFamily: strPtr("ML Serverless"),
-                AttributeFilters: []*schema.AttributeFilter{
-                    {Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ProvisionedConcurrency:Usage-%vGB/", memorySizeMB/1024))},
-                },
-            },
-        })
-    }
+		components = append(components, &schema.CostComponent{
+			Name:            "Provisioned concurrency execution",
+			Unit:            "GB-seconds",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(provisionedConcurrencyExecutionGBSeconds),
+			UsageBased:      true,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(s.Region),
+				Service:       strPtr("AmazonSageMaker"),
+				ProductFamily: strPtr("ML Serverless"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/ProvisionedConcurrency:Usage-%vGB/", memorySizeMB/1024))},
+				},
+			},
+		})
+	}
 
-    return components
+	return components
 }
 
 func (s *SageMakerEndpointConfiguration) sagemakerInstanceComponents(variant *SageMakerVariant) []*schema.CostComponent {
-    count := decimal.NewFromInt(variant.InitialInstanceCount)
-    if count.IsZero() {
-        count = decimal.NewFromInt(1)
-    }
+	count := decimal.NewFromInt(variant.InitialInstanceCount)
+	if count.IsZero() {
+		count = decimal.NewFromInt(1)
+	}
 
-    components := []*schema.CostComponent{
+	components := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Instance (%s)", variant.InstanceType),
 			Unit:           "hours",
