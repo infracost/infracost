@@ -14,10 +14,10 @@ type SageMakerEndpointConfiguration struct {
 	Region   string
 	Variants []*SageMakerVariant
 
+	MonthlyInstanceHours                                  *int64 `infracost_usage:"monthly_instance_hours"`
 	MonthlyInferenceDurationSeconds                       *int64 `infracost_usage:"monthly_inference_duration_seconds"`
 	MonthlyProvisionedConcurrencyUsageSeconds             *int64 `infracost_usage:"monthly_provisioned_concurrency_usage_seconds"`
 	MonthlyProvisionedConcurrencyInferenceDurationSeconds *int64 `infracost_usage:"monthly_provisioned_concurrency_inference_duration_seconds"`
-	MonthlyInstanceHours                                  *int64 `infracost_usage:"monthly_instance_hours"`
 	DataProcessedOutGB                                    *int64 `infracost_usage:"monthly_data_processed_out_gb"`
 	DataProcessedInGB                                     *int64 `infracost_usage:"monthly_data_processed_in_gb"`
 	MonthlyStorageDays                                    *int64 `infracost_usage:"monthly_storage_days"`
