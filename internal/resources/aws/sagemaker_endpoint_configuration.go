@@ -215,7 +215,6 @@ func (s *SageMakerEndpointConfiguration) sagemakerInstanceComponents(variant *Sa
 
 	monthlyHours := decimal.NewFromInt(730)
 	if s.MonthlyInstanceHours != nil {
-		print("Using monthly instance hours from usage data: ", *s.MonthlyInstanceHours)
 		monthlyHours = decimal.NewFromInt(*s.MonthlyInstanceHours)
 	}
 
