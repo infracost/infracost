@@ -41,7 +41,7 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
 }
 
 resource "aws_sagemaker_endpoint_configuration" "serverless_config_multiple_variants" {
-  name = "serverless-config"
+  name = "serverless-config-multiple-variants"
   production_variants {
     variant_name           = "serverless-variant"
     model_name             = "my-model"
