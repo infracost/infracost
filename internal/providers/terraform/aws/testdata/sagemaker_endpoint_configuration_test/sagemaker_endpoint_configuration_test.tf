@@ -8,13 +8,20 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-# 1. Provisioned Instance Example
-resource "aws_sagemaker_endpoint_configuration" "provisioned_config" {
-  name = "provisioned-config"
+resource "aws_sagemaker_endpoint_configuration" "instance_config" {
+  name = "instance-config"
   production_variants {
-    variant_name           = "provisioned-config-variant"
+    variant_name           = "instance-config-variant"
     model_name             = "my-model"
     instance_type          = "ml.m5.xlarge"
+    initial_instance_count = 1
+    volume_size_in_gb      = 20
+  }
+
+  production_variants {
+    variant_name           = "instance-config-variant2"
+    model_name             = "my-model"
+    instance_type          = "ml.m5.large"
     initial_instance_count = 1
     volume_size_in_gb      = 20
   }
@@ -33,6 +40,28 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
   }
 }
 
+resource "aws_sagemaker_endpoint_configuration" "serverless_config_multiple_variants" {
+  name = "serverless-config"
+  production_variants {
+    variant_name           = "serverless-variant"
+    model_name             = "my-model"
+    serverless_config {
+      memory_size_in_mb = 2048
+      max_concurrency   = 10
+    }
+  }
+
+  production_variants {
+    variant_name           = "serverless-variant2"
+    model_name             = "my-model"
+    serverless_config {
+      memory_size_in_mb = 1024
+      max_concurrency   = 10
+    }
+  }
+}
+
+
 resource "aws_sagemaker_endpoint_configuration" "serverless_config_provisioned_concurrency" {
   name = "serverless-config-provisioned-concurrency"
 
@@ -50,8 +79,6 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config_provisioned_c
 
 resource "aws_sagemaker_endpoint_configuration" "shadow_test_config" {
   name = "shadow-test-config"
-
-  # Live Production Variant
   production_variants {
     variant_name           = "Primary-Live-variant"
     model_name             = "my-old-model"
