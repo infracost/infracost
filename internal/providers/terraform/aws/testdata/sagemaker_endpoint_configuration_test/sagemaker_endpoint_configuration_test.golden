@@ -2,32 +2,48 @@
  Name                                                                            Monthly Qty  Unit     Monthly Cost    
                                                                                                                        
  aws_sagemaker_endpoint_configuration.shadow_test_config                                                               
- ├─ Inference instance (ml.m5.large)                                                     730  hours          $83.95    
- └─ Shadow instance (ml.m5.xlarge)                                                       730  hours         $167.90    
+ ├─ Instance (ml.m5.large)                                                               730  hours          $83.95  * 
+ └─ Instance (ml.m5.xlarge)                                                              730  hours         $167.90  * 
                                                                                                                        
- aws_sagemaker_endpoint_configuration.provisioned_config                                                               
- ├─ Inference instance (ml.m5.xlarge)                                                    730  hours         $167.90    
- └─ Inference instance storage                                                            20  GB              $2.24    
+ aws_sagemaker_endpoint_configuration.instance_config                                                                  
+ ├─ Instance (ml.m5.xlarge)                                                              100  hours          $23.00  * 
+ ├─ Inference instance storage                                                        6.6666  GB              $0.93  * 
+ ├─ Data processed (out)                                                                  30  GB              $0.48  * 
+ ├─ Data processed (in)                                                                   15  GB              $0.24  * 
+ ├─ Instance (ml.m5.large)                                                               100  hours          $11.50  * 
+ ├─ Inference instance storage                                                        6.6666  GB              $0.93  * 
+ ├─ Data processed (out)                                                                  30  GB              $0.48  * 
+ └─ Data processed (in)                                                                   15  GB              $0.24  * 
                                                                                                                        
  aws_sagemaker_endpoint_configuration.serverless_config_provisioned_concurrency                                        
+ ├─ Compute Duration (2048 MB)                                                       500,000  seconds        $20.00  * 
  ├─ Data processed (out)                                                                  20  GB              $0.32  * 
- ├─ Compute (2048MB)                                                                 500,000  seconds        $20.00  * 
- ├─ Provisioned concurrency (warm)                                                 5,256,000  seconds       $122.46    
- └─ Provisioned concurrency execution                                                200,000  seconds         $2.00  * 
-                                                                                                                        
- aws_sagemaker_endpoint_configuration.serverless_config                                                                
- ├─ Data processed (out)                                                                  20  GB              $0.32  * 
+ ├─ Provisioned concurrency (warm)                                                   400,000  seconds         $4.00  * 
+ └─ Provisioned concurrency execution                                                400,000  seconds         $9.32  * 
                                                                                                                        
- OVERALL TOTAL                                                                                              $587.09 
+ aws_sagemaker_endpoint_configuration.serverless_config                                                                
+ ├─ Compute Duration (2048 MB)                                                       500,000  seconds        $20.00  * 
+ ├─ Data processed (out)                                                                  20  GB              $0.32  * 
+ └─ Data processed (in)                                                                   10  GB              $0.16  * 
+                                                                                                                       
+ aws_sagemaker_endpoint_configuration.serverless_config_multiple_variants                                              
+ ├─ Compute Duration (2048 MB)                                                       250,000  seconds        $10.00  * 
+ ├─ Data processed (out)                                                                  20  GB              $0.32  * 
+ ├─ Data processed (in)                                                                   10  GB              $0.16  * 
+ ├─ Compute Duration (1024 MB)                                                       250,000  seconds         $5.00  * 
+ ├─ Data processed (out)                                                                  20  GB              $0.32  * 
+ └─ Data processed (in)                                                                   10  GB              $0.16  * 
+                                                                                                                       
+ OVERALL TOTAL                                                                                              $359.74 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 4 were estimated
+5 cloud resources were detected:
+∙ 5 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $544 ┃         $43 ┃       $587 ┃
+┃ main                                               ┃         $0.00 ┃        $360 ┃       $360 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
