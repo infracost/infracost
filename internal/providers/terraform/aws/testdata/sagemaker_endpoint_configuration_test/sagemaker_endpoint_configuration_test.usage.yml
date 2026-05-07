@@ -1,11 +1,17 @@
 version: 0.1
 resource_usage:
+  aws_sagemaker_endpoint_configuration.instance_config:
+    monthly_instance_hours: 100
+    monthly_data_processed_out_gb: 30
+    monthly_data_processed_in_gb: 15
+    monthly_storage_days: 10
+
   aws_sagemaker_endpoint_configuration.serverless_config:
     monthly_inference_duration_seconds: 500000
-    monthly_data_processed_gb: 20
+    monthly_data_processed_out_gb: 20
+    monthly_data_processed_in_gb: 10
 
   aws_sagemaker_endpoint_configuration.serverless_config_provisioned_concurrency:
-    monthly_inference_duration_seconds: 500000 
+    monthly_inference_duration_seconds: 500000
     monthly_provisioned_concurrency_inference_duration_seconds: 200000
-    monthly_data_processed_gb: 20
-
+    monthly_data_processed_out_gb: 20
