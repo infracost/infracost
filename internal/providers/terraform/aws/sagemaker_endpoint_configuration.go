@@ -52,9 +52,8 @@ func decodeVariant(v gjson.Result, label string) *aws.SageMakerVariant {
 
 	if isServerless {
 		variant.IsServerless = true
-		variant.MemorySizeMB = serverlessConfig[0].Get("memory_size_in_mb").Int()
+		variant.MemorySize = serverlessConfig[0].Get("memory_size_in_mb").Int()
 		variant.ProvisionedConcurrency = serverlessConfig[0].Get("provisioned_concurrency").Int()
-		variant.MaxConcurrency = serverlessConfig[0].Get("max_concurrency").Int()
 	}
 
 	return variant
