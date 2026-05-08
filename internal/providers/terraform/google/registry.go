@@ -42,6 +42,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLoggingFolderBucketConfigRegistryItem(),
 	getLoggingFolderSinkRegistryItem(),
 	getLoggingOrganizationBucketConfigRegistryItem(),
+	getRecaptchaEnterpriseKeyRegistryItem(),
 	getLoggingOrganizationSinkRegistryItem(),
 	getLoggingProjectSinkRegistryItem(),
 	getMonitoringItem(),
