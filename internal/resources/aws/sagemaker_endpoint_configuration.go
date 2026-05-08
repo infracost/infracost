@@ -53,13 +53,6 @@ func (s *SageMakerEndpointConfiguration) UsageSchema() []*schema.UsageItem {
 }
 
 func (s *SageMakerEndpointConfiguration) UsageEstimationParams() []schema.UsageParam {
-	for _, v := range s.Variants {
-		if v.IsServerless {
-			return []schema.UsageParam{
-				{Key: "memory_size_gb", Value: decimal.NewFromInt(v.MemorySize).Div(decimal.NewFromInt(1024)).String()},
-			}
-		}
-	}
 	return nil
 }
 
