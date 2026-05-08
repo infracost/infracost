@@ -7,11 +7,11 @@
                                                                                                                        
  aws_sagemaker_endpoint_configuration.instance_config                                                                  
  ├─ Instance (on-demand, ml.m5.xlarge)                                                   100  hours          $23.00  * 
- ├─ Inference instance storage                                                        6.6666  GB              $0.93  * 
+ ├─ General purpose storage                                                           6.6666  GB              $0.93  * 
  ├─ Data processed OUT                                                                    30  GB              $0.48  * 
  ├─ Data processed IN                                                                     15  GB              $0.24  * 
  ├─ Instance (on-demand, ml.m5.large)                                                    100  hours          $11.50  * 
- ├─ Inference instance storage                                                        6.6666  GB              $0.93  * 
+ ├─ General purpose storage                                                           6.6666  GB              $0.93  * 
  ├─ Data processed OUT                                                                    30  GB              $0.48  * 
  └─ Data processed IN                                                                     15  GB              $0.24  * 
                                                                                                                        
