@@ -90,6 +90,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getS3BucketLifecycleConfigurationRegistryItem(),
 	getS3BucketRegistryItem(),
 	getS3BucketVersioningRegistryItem(),
+	getSagemakerEndpointConfigurationRegistryItem(),
 	getSecretsManagerSecret(),
 	getSSMActivationRegistryItem(),
 	getSSMParameterRegistryItem(),
