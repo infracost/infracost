@@ -32,6 +32,8 @@ type DBInstance struct {
 	MonthlyAdditionalPerformanceInsightsRequests *int64   `infracost_usage:"monthly_additional_performance_insights_requests"`
 	ReservedInstanceTerm                         *string  `infracost_usage:"reserved_instance_term"`
 	ReservedInstancePaymentOption                *string  `infracost_usage:"reserved_instance_payment_option"`
+	MonthlyCPUCreditHrs                          *int64   `infracost_usage:"monthly_cpu_credit_hrs"`
+	VCPUCount                                    *int64   `infracost_usage:"vcpu_count"`
 }
 
 func (r *DBInstance) CoreType() string {
@@ -48,6 +50,8 @@ var DBInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_additional_performance_insights_requests", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
 	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "vcpu_count", ValueType: schema.Int64, DefaultValue: 0},
 }
 
 func (r *DBInstance) PopulateUsage(u *schema.UsageData) {
@@ -375,6 +379,25 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		}
 	}
 
+	if instanceFamily := getBurstableInstanceFamily([]string{"db.t3", "db.t4g"}, r.InstanceClass); instanceFamily != "" {
+		instanceCPUCreditHours := decimal.Zero
+		if r.MonthlyCPUCreditHrs != nil {
+			instanceCPUCreditHours = decimal.NewFromInt(*r.MonthlyCPUCreditHrs)
+		}
+
+		instanceVCPUCount := decimal.Zero
+		if r.VCPUCount != nil {
+			instanceVCPUCount = decimal.NewFromInt(*r.VCPUCount)
+		} else if count, ok := InstanceTypeToVCPU[strings.TrimPrefix(r.InstanceClass, "db.")]; ok {
+			instanceVCPUCount = decimal.NewFromInt(count)
+		}
+
+		if instanceCPUCreditHours.GreaterThan(decimal.Zero) {
+			cpuCreditQuantity := instanceVCPUCount.Mul(instanceCPUCreditHours)
+			costComponents = append(costComponents, r.cpuCreditsCostComponent(databaseEngine, instanceFamily, cpuCreditQuantity))
+		}
+	}
+
 	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine, r.InstanceClass)
 	if extendedSupport != nil {
 		costComponents = append(costComponents, extendedSupport)
@@ -593,7 +616,9 @@ var (
 		},
 	}
 
-	today = time.Now()
+	// Today is the date used to determine extended support pricing tiers.
+	// It can be overridden in tests to make pricing deterministic.
+	Today = time.Now()
 )
 
 func extendedSupportCostComponent(version string, region string, engine string, instanceType string) *schema.CostComponent {
@@ -609,14 +634,34 @@ func extendedSupportCostComponent(version string, region string, engine string, 
 
 	switch engine {
 	case "postgres":
-		return postgresExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return postgresExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	case "mysql":
-		return mysqlExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return mysqlExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	case "aurora-postgresql":
-		return postgresAuroraExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return postgresAuroraExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	case "aurora", "aurora-mysql":
-		return mysqlAuroraExtendedSupport.CostComponent(version, region, today, vCPUCount)
+		return mysqlAuroraExtendedSupport.CostComponent(version, region, Today, vCPUCount)
 	}
 
 	return nil
+}
+
+func (r *DBInstance) cpuCreditsCostComponent(databaseEngine, instanceFamily string, vCPUCount decimal.Decimal) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "CPU credits",
+		Unit:            "vCPU-hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: &vCPUCount,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonRDS"),
+			ProductFamily: strPtr("CPU Credits"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "databaseEngine", Value: strPtr(databaseEngine)},
+				{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
+			},
+		},
+		UsageBased: true,
+	}
 }

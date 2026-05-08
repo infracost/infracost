@@ -58,8 +58,8 @@ func (a *S3IntelligentTieringStorageClass) BuildResource() *schema.Resource {
 		Name:        "Intelligent tiering",
 		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
-			s3StorageCostComponent("Storage (frequent access)", "AmazonS3", a.Region, "TimedStorage-INT-FA-ByteHrs", a.FrequentAccessStorageGB),
-			s3StorageCostComponent("Storage (infrequent access)", "AmazonS3", a.Region, "TimedStorage-INT-IA-ByteHrs", a.InfrequentAccessStorageGB),
+			s3IntelligentTieringStorageCostComponent("Storage (frequent access)", a.Region, "TimedStorage-INT-FA-ByteHrs", a.FrequentAccessStorageGB),
+			s3IntelligentTieringStorageCostComponent("Storage (infrequent access)", a.Region, "TimedStorage-INT-IA-ByteHrs", a.InfrequentAccessStorageGB),
 			s3StorageVolumeTypeCostComponent("Storage (archive access)", "AmazonS3", a.Region, "TimedStorage-INT-AA-ByteHrs", "IntelligentTieringArchive", a.FrequentAccessStorageGB),
 			s3StorageVolumeTypeCostComponent("Storage (deep archive access)", "AmazonS3", a.Region, "TimedStorage-INT-DAA-ByteHrs", "IntelligentTieringDeepArchive", a.InfrequentAccessStorageGB),
 			s3MonitoringCostComponent(a.Region, a.MonitoredObjects),

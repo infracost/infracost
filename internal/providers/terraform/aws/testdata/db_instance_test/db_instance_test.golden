@@ -188,6 +188,13 @@
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72    
  └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30    
                                                                                                                          
+ aws_db_instance.mysql-performance-insights-usage                                                                        
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28    
+ ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30    
+ ├─ Performance Insights Long Term Retention (db.t3.large)                    2  vCPU-month                     $5.90    
+ ├─ Performance Insights API                                             12.345  1000 requests                  $0.12  * 
+ └─ CPU credits                                                              60  vCPU-hours                     $4.50  * 
+                                                                                                                         
  aws_db_instance.gp3["above_high_baseline"]                                                                              
  ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                  730  hours                         $23.36    
  ├─ Storage (general purpose SSD, gp3)                                      400  GB                            $46.00    
@@ -208,12 +215,6 @@
  aws_db_instance.extended_support["postgres-16"]                                                                         
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $105.85    
  └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30    
-                                                                                                                         
- aws_db_instance.mysql-performance-insights-usage                                                                        
- ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28    
- ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30    
- ├─ Performance Insights Long Term Retention (db.t3.large)                    2  vCPU-month                     $5.90    
- └─ Performance Insights API                                             12.345  1000 requests                  $0.12  * 
                                                                                                                          
  aws_db_instance.mysql-magnetic                                                                                          
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28    
@@ -312,7 +313,7 @@
  ├─ Database instance (reserved, Single-AZ, db.t3.large)                    730  hours                          $0.00    
  └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30    
                                                                                                                          
- OVERALL TOTAL                                                                                             $12,756.39 
+ OVERALL TOTAL                                                                                             $12,760.89 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -323,5 +324,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $11,595 ┃      $1,161 ┃    $12,756 ┃
+┃ main                                               ┃       $11,595 ┃      $1,166 ┃    $12,761 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

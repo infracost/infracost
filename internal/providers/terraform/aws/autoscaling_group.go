@@ -98,10 +98,11 @@ func newLaunchConfiguration(d *schema.ResourceData, region string, instanceCount
 	}
 
 	a.RootBlockDevice = &aws.EBSVolume{
-		Address: "root_block_device",
-		Region:  region,
-		Type:    d.Get("root_block_device.0.volume_type").String(),
-		IOPS:    d.Get("root_block_device.0.iops").Int(),
+		Address:    "root_block_device",
+		Region:     region,
+		Type:       d.Get("root_block_device.0.volume_type").String(),
+		IOPS:       d.Get("root_block_device.0.iops").Int(),
+		Throughput: d.Get("root_block_device.0.throughput").Int(),
 	}
 
 	if d.Get("root_block_device.0.volume_size").Type != gjson.Null {
@@ -110,10 +111,11 @@ func newLaunchConfiguration(d *schema.ResourceData, region string, instanceCount
 
 	for i, data := range d.Get("ebs_block_device").Array() {
 		ebsBlockDevice := &aws.EBSVolume{
-			Address: fmt.Sprintf("ebs_block_device[%d]", i),
-			Region:  region,
-			Type:    data.Get("volume_type").String(),
-			IOPS:    data.Get("iops").Int(),
+			Address:    fmt.Sprintf("ebs_block_device[%d]", i),
+			Region:     region,
+			Type:       data.Get("volume_type").String(),
+			IOPS:       data.Get("iops").Int(),
+			Throughput: data.Get("throughput").Int(),
 		}
 
 		if data.Get("volume_size").Type != gjson.Null {
@@ -147,10 +149,11 @@ func newLaunchTemplate(d *schema.ResourceData, region string, instanceCount, onD
 
 	for i, data := range d.Get("block_device_mappings.#.ebs|@flatten").Array() {
 		ebsBlockDevice := &aws.EBSVolume{
-			Address: fmt.Sprintf("block_device_mapping[%d]", i),
-			Region:  region,
-			Type:    data.Get("volume_type").String(),
-			IOPS:    data.Get("iops").Int(),
+			Address:    fmt.Sprintf("block_device_mapping[%d]", i),
+			Region:     region,
+			Type:       data.Get("volume_type").String(),
+			IOPS:       data.Get("iops").Int(),
+			Throughput: data.Get("throughput").Int(),
 		}
 
 		if data.Get("volume_size").Type != gjson.Null {

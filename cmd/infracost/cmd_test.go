@@ -12,13 +12,20 @@ import (
 	"regexp"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/tidwall/gjson"
 
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
+	aws "github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/testutil"
 )
+
+func init() {
+	// Pin the date used for extended support pricing so tests are deterministic.
+	aws.Today = time.Date(2025, time.June, 1, 0, 0, 0, 0, time.UTC)
+}
 
 var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)

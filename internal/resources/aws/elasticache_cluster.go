@@ -106,6 +106,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 				{Key: "instanceType", Value: strPtr(r.NodeType)},
 				{Key: "locationType", Value: strPtr("AWS Region")},
 				{Key: "cacheEngine", Value: strPtr(cases.Title(language.English).String(r.Engine))},
+				{Key: "currentGeneration", Value: strPtr("Yes")},
 			},
 		},
 		PriceFilter: priceFilter,

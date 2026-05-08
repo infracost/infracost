@@ -96,6 +96,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 				WillUpdate:          mrNumber != 0 && behavior == "update",
 				WillReplace:         mrNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
+				MaxMessageSize:      output.GitLabMaxMessageSize,
 			})
 			if isErrorUnhandled(commentErr) {
 				return commentErr

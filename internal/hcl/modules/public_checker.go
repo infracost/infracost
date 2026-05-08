@@ -21,7 +21,7 @@ type HttpPublicModuleChecker struct {
 func NewHttpPublicModuleChecker() *HttpPublicModuleChecker {
 	return &HttpPublicModuleChecker{
 		client: &http.Client{
-			Timeout: 2 * time.Second,
+			Timeout: 5 * time.Second,
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				// Stop following redirects
 				return http.ErrUseLastResponse

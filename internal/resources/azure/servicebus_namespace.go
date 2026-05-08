@@ -93,6 +93,9 @@ func (r *ServiceBusNamespace) baseChargeCostComponent() *schema.CostComponent {
 				{Key: "meterName", ValueRegex: regexPtr("Base Unit$")},
 			},
 		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("1/Hour"),
+		},
 	}
 }
 

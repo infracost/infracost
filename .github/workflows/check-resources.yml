@@ -8,6 +8,9 @@ jobs:
   check:
     name: Check resources
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go 1.x
@@ -15,11 +18,10 @@ jobs:
         with:
           go-version-file: go.mod
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2 # region doesn't matter for the cmd, just needs to be set
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-resource-check-role
+          aws-region: us-east-2
       - name: Run
         run: go run cmd/resourcecheck/main.go
         env:

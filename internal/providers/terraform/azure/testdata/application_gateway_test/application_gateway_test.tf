@@ -13,8 +13,8 @@ resource "azurerm_application_gateway" "standard" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "Standard_Small"
-    tier     = "Standard"
+    name     = "Standard_v2"
+    tier     = "Standard_v2"
     capacity = 2
   }
 
@@ -69,8 +69,8 @@ resource "azurerm_application_gateway" "waf" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_Medium"
-    tier     = "WAF"
+    name     = "WAF_v2"
+    tier     = "WAF_v2"
     capacity = 2
   }
 
@@ -125,8 +125,8 @@ resource "azurerm_application_gateway" "waf_without_usage" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_Medium"
-    tier     = "WAF"
+    name     = "WAF_v2"
+    tier     = "WAF_v2"
     capacity = 2
   }
 
@@ -182,8 +182,8 @@ resource "azurerm_application_gateway" "waf_with_autoscaling" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name = "WAF_Medium"
-    tier = "WAF"
+    name = "WAF_v2"
+    tier = "WAF_v2"
   }
 
   gateway_ip_configuration {
@@ -242,8 +242,8 @@ resource "azurerm_application_gateway" "waf_with_autoscaling_without_usage" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name = "WAF_Medium"
-    tier = "WAF"
+    name = "WAF_v2"
+    tier = "WAF_v2"
   }
 
   gateway_ip_configuration {
