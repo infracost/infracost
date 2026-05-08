@@ -2,37 +2,37 @@
  Name                                                                            Monthly Qty  Unit     Monthly Cost    
                                                                                                                        
  aws_sagemaker_endpoint_configuration.shadow_test_config                                                               
- ├─ Instance (ml.m5.large)                                                               730  hours          $83.95  * 
- └─ Instance (ml.m5.xlarge)                                                              730  hours         $167.90  * 
+ ├─ Instance (on-demand, ml.m5.large)                                                    730  hours          $83.95  * 
+ └─ Instance (on-demand, ml.m5.xlarge)                                                   730  hours         $167.90  * 
                                                                                                                        
  aws_sagemaker_endpoint_configuration.instance_config                                                                  
- ├─ Instance (ml.m5.xlarge)                                                              100  hours          $23.00  * 
+ ├─ Instance (on-demand, ml.m5.xlarge)                                                   100  hours          $23.00  * 
  ├─ Inference instance storage                                                        6.6666  GB              $0.93  * 
- ├─ Data processed (out)                                                                  30  GB              $0.48  * 
- ├─ Data processed (in)                                                                   15  GB              $0.24  * 
- ├─ Instance (ml.m5.large)                                                               100  hours          $11.50  * 
+ ├─ Data processed OUT                                                                    30  GB              $0.48  * 
+ ├─ Data processed IN                                                                     15  GB              $0.24  * 
+ ├─ Instance (on-demand, ml.m5.large)                                                    100  hours          $11.50  * 
  ├─ Inference instance storage                                                        6.6666  GB              $0.93  * 
- ├─ Data processed (out)                                                                  30  GB              $0.48  * 
- └─ Data processed (in)                                                                   15  GB              $0.24  * 
+ ├─ Data processed OUT                                                                    30  GB              $0.48  * 
+ └─ Data processed IN                                                                     15  GB              $0.24  * 
                                                                                                                        
  aws_sagemaker_endpoint_configuration.serverless_config_provisioned_concurrency                                        
- ├─ Compute Duration (2048 MB)                                                       500,000  seconds        $20.00  * 
- ├─ Data processed (out)                                                                  20  GB              $0.32  * 
- ├─ Provisioned concurrency (warm)                                                   400,000  seconds         $4.00  * 
+ ├─ Compute duration (2048 MB)                                                       500,000  seconds        $20.00  * 
+ ├─ Data processed OUT                                                                    20  GB              $0.32  * 
+ ├─ Provisioned concurrency warm                                                     400,000  seconds         $4.00  * 
  └─ Provisioned concurrency execution                                                400,000  seconds         $9.32  * 
                                                                                                                        
  aws_sagemaker_endpoint_configuration.serverless_config                                                                
- ├─ Compute Duration (2048 MB)                                                       500,000  seconds        $20.00  * 
- ├─ Data processed (out)                                                                  20  GB              $0.32  * 
- └─ Data processed (in)                                                                   10  GB              $0.16  * 
+ ├─ Compute duration (2048 MB)                                                       500,000  seconds        $20.00  * 
+ ├─ Data processed OUT                                                                    20  GB              $0.32  * 
+ └─ Data processed IN                                                                     10  GB              $0.16  * 
                                                                                                                        
  aws_sagemaker_endpoint_configuration.serverless_config_multiple_variants                                              
- ├─ Compute Duration (2048 MB)                                                       250,000  seconds        $10.00  * 
- ├─ Data processed (out)                                                                  20  GB              $0.32  * 
- ├─ Data processed (in)                                                                   10  GB              $0.16  * 
- ├─ Compute Duration (1024 MB)                                                       250,000  seconds         $5.00  * 
- ├─ Data processed (out)                                                                  20  GB              $0.32  * 
- └─ Data processed (in)                                                                   10  GB              $0.16  * 
+ ├─ Compute duration (2048 MB)                                                       250,000  seconds        $10.00  * 
+ ├─ Data processed OUT                                                                    20  GB              $0.32  * 
+ ├─ Data processed IN                                                                     10  GB              $0.16  * 
+ ├─ Compute duration (1024 MB)                                                       250,000  seconds         $5.00  * 
+ ├─ Data processed OUT                                                                    20  GB              $0.32  * 
+ └─ Data processed IN                                                                     10  GB              $0.16  * 
                                                                                                                        
  OVERALL TOTAL                                                                                              $359.74 
 

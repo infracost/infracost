@@ -31,8 +31,8 @@ resource "aws_sagemaker_endpoint_configuration" "instance_config" {
 resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
   name = "serverless-config"
   production_variants {
-    variant_name           = "serverless-variant"
-    model_name             = "my-model"
+    variant_name = "serverless-variant"
+    model_name   = "my-model"
     serverless_config {
       memory_size_in_mb = 2048
       max_concurrency   = 10
@@ -43,8 +43,8 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config" {
 resource "aws_sagemaker_endpoint_configuration" "serverless_config_multiple_variants" {
   name = "serverless-config-multiple-variants"
   production_variants {
-    variant_name           = "serverless-variant"
-    model_name             = "my-model"
+    variant_name = "serverless-variant"
+    model_name   = "my-model"
     serverless_config {
       memory_size_in_mb = 2048
       max_concurrency   = 10
@@ -52,8 +52,8 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config_multiple_vari
   }
 
   production_variants {
-    variant_name           = "serverless-variant2"
-    model_name             = "my-model"
+    variant_name = "serverless-variant2"
+    model_name   = "my-model"
     serverless_config {
       memory_size_in_mb = 1024
       max_concurrency   = 10
@@ -66,9 +66,9 @@ resource "aws_sagemaker_endpoint_configuration" "serverless_config_provisioned_c
   name = "serverless-config-provisioned-concurrency"
 
   production_variants {
-    variant_name          = "serverless-config-provisioned-concurrency-variant"
-    model_name            = "my-model"
-    
+    variant_name = "serverless-config-provisioned-concurrency-variant"
+    model_name   = "my-model"
+
     serverless_config {
       memory_size_in_mb       = 2048
       max_concurrency         = 10

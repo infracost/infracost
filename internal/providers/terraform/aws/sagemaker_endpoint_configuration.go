@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
@@ -47,7 +49,7 @@ func decodeVariant(v gjson.Result, label string) *aws.SageMakerVariant {
 		InitialInstanceCount: v.Get("initial_instance_count").Int(),
 		VolumeSizeInGB:       v.Get("volume_size_in_gb").Int(),
 		Label:                label,
-		IsShadow:             label == "Shadow instance",
+		IsShadow:             strings.EqualFold(label, "Shadow instance"),
 	}
 
 	if isServerless {
