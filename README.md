@@ -21,7 +21,13 @@ Infracost meets engineers wherever they work with infrastructure code — the te
 
 **1. Install the CLI**
 
-macOS / Linux:
+macOS (Homebrew):
+
+```sh
+brew install infracost
+```
+
+Linux:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/infracost/cli/master/scripts/install.sh | sh
