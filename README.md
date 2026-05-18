@@ -13,9 +13,35 @@
 <a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20Terraform%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,terraform"><img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 </p>
 
-## The Infracost developer toolkit
+## The Infracost Dev toolkit
 
 Infracost meets engineers wherever they work with infrastructure code — the terminal, their editor, their AI coding agent, and their CI pipeline. Every entry point talks to the same engine, the same pricing data, and the same FinOps policies, so a check you set up once shows up everywhere.
+
+### Get started
+
+**1. Install the CLI**
+
+macOS / Linux:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/infracost/cli/master/scripts/install.sh | sh
+```
+
+Windows (Chocolatey):
+
+```sh
+choco install infracost
+```
+
+Or download the latest release directly from [GitHub Releases](https://github.com/infracost/cli/releases/latest).
+
+**2. Run setup**
+
+```sh
+infracost setup
+```
+
+The interactive setup walks you through authenticating, connecting your editor, configuring AI agent skills, and wiring up CI/CD. It's the fastest way to get every part of the Infracost toolkit working for your team.
 
 Pick the entry points your team needs:
 
