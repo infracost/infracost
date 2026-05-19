@@ -94,11 +94,7 @@ All of them are powered by the [**Infracost Language Server**](https://github.co
 
 ### CI/CD
 
-Post cost diffs and policy checks directly on pull requests as part of your existing workflow:
-
-- **GitHub Actions** — [`infracost/actions`](https://github.com/infracost/actions)
-- **Azure DevOps / Azure Pipelines** — [`infracost/infracost-azure-devops`](https://github.com/infracost/infracost-azure-devops)
-- **Atlantis** — [`infracost/infracost-atlantis`](https://github.com/infracost/infracost-atlantis)
+Post cost diffs and policy checks directly on pull requests as part of your existing workflow, use the [CI/CD integrations](https://www.infracost.io/docs/integrations/cicd/) to set this up.
 
 <img src=".github/assets/github_actions_screenshot.png" alt="Infracost cost diff comment on a pull request" width="700" />
 
