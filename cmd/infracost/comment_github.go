@@ -112,7 +112,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
-				MaxMessageSize:      output.GitHubMaxMessageSize,
+				MaxMessageChars:     output.GitHubMaxMessageChars,
 			})
 			if isErrorUnhandled(commentErr) {
 				return commentErr

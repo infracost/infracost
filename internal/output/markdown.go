@@ -334,27 +334,38 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		originalSize = opts.originalSize
 	}
 
-	if markdownOpts.MaxMessageSize > 0 && msgByteLength > markdownOpts.MaxMessageSize {
-		// Calculate how much we need to reduce the message size
-		excessBytes := msgByteLength - markdownOpts.MaxMessageSize
+	exceedsCharLimit := markdownOpts.MaxMessageChars > 0 && msgRuneLength > markdownOpts.MaxMessageChars
+	exceedsByteLimit := markdownOpts.MaxMessageSize > 0 && msgByteLength > markdownOpts.MaxMessageSize
 
-		// Use the diff message's own rune-to-byte ratio for more accurate truncation
+	if exceedsCharLimit || exceedsByteLimit {
 		diffMsgRunes := utf8.RuneCountInString(diffMsg)
-		diffMsgBytes := len([]byte(diffMsg))
 
 		var truncateRunes int
-		if diffMsgBytes > 0 {
-			diffRatio := float64(diffMsgRunes) / float64(diffMsgBytes)
-			truncateRunes = int(float64(excessBytes) * diffRatio)
+		var hardCapRunes int
+
+		if exceedsCharLimit {
+			// Limit is rune-based: excess and hard cap are already in runes.
+			truncateRunes = msgRuneLength - markdownOpts.MaxMessageChars
+			hardCapRunes = markdownOpts.MaxMessageChars - 1000
 		} else {
-			truncateRunes = excessBytes // fallback
+			// Limit is byte-based: convert excess bytes to runes using the
+			// diff message's rune-to-byte ratio for more accurate truncation.
+			excessBytes := msgByteLength - markdownOpts.MaxMessageSize
+			diffMsgBytes := len([]byte(diffMsg))
+			if diffMsgBytes > 0 {
+				diffRatio := float64(diffMsgRunes) / float64(diffMsgBytes)
+				truncateRunes = int(float64(excessBytes) * diffRatio)
+			} else {
+				truncateRunes = excessBytes // fallback
+			}
+			hardCapRunes = markdownOpts.MaxMessageSize - 1000
 		}
 
 		newLength := diffMsgRunes - truncateRunes - 1000
 
 		if newLength < 0 {
 			// trimming diff msg is not enough, so we truncate the whole message
-			truncated := truncateMiddle(string(msg), markdownOpts.MaxMessageSize-1000, "\n\n...(truncated due to message size limit)...\n\n")
+			truncated := truncateMiddle(string(msg), hardCapRunes, "\n\n...(truncated due to message size limit)...\n\n")
 			return MarkdownOutput{Msg: []byte(truncated), RuneLen: utf8.RuneCountInString(truncated), OriginalMsgSize: originalSize}, nil
 		}
 

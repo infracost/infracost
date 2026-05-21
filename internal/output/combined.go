@@ -27,15 +27,18 @@ import (
 var (
 	minOutputVersion = "0.2"
 	maxOutputVersion = "0.2"
-	// Technically Github allows 66536 characters, which we interpreted as 262144 bytes, but
-	// we were still seeing 422 "Body is too long (maximum is 65536 characters)" errors so limit
-	// more.
-	GitHubMaxMessageSize = 200000  // bytes
-	GitLabMaxMessageSize = 1000000 // bytes
 
-	// Azure supports 150000 characters, which for ASCII is 150000 bytes, lets err on the side of caution and
-	// limit to 140000 bytes.
-	AzureReposMaxMessageSize = 140000 // bytes
+	// GitHub enforces a 65536 character (rune) limit on issue/PR comment bodies.
+	// Leave a small safety margin.
+	GitHubMaxMessageChars = 65000 // characters
+
+	// Azure Repos enforces a 150000 character limit on PR comment content.
+	// Leave a small safety margin.
+	AzureReposMaxMessageChars = 149000 // characters
+
+	// GitLab's documented note size limit is ~1MB / ~1 million characters,
+	// so a byte cap is sufficient in practice.
+	GitLabMaxMessageSize = 1000000 // bytes
 )
 
 type ReportInput struct {
@@ -456,10 +459,10 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	case "diff":
 		b, err = ToDiff(r, opts)
 	case "azure-repos-comment":
-		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: AzureReposMaxMessageSize})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageChars: AzureReposMaxMessageChars})
 		b, err = out.Msg, error
 	case "github-comment":
-		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageChars: GitHubMaxMessageChars})
 		b, err = out.Msg, error
 	case "gitlab-comment":
 		out, error := ToMarkdown(r, opts, MarkdownOptions{})

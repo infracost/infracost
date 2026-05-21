@@ -497,8 +497,14 @@ type MarkdownOptions struct {
 	IncludeFeedbackLink bool
 	OmitDetails         bool
 	BasicSyntax         bool
-	MaxMessageSize      int
-	Additional          string
+	// MaxMessageSize caps the output by byte length. Use for platforms that
+	// enforce a byte/size limit (e.g. GitLab's ~1MB).
+	MaxMessageSize int
+	// MaxMessageChars caps the output by character (rune) count. Use for
+	// platforms that enforce a character limit (e.g. GitHub 65536 chars,
+	// Azure DevOps 150000 chars). Takes precedence over MaxMessageSize when set.
+	MaxMessageChars int
+	Additional      string
 }
 
 func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown {
