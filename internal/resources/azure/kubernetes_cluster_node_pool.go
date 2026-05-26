@@ -19,6 +19,11 @@ type KubernetesClusterNodePool struct {
 	OS           string
 	OSDiskType   string
 	OSDiskSizeGB int64
+	// Priority is the scheduling priority of the node pool, mapping to the
+	// Terraform attribute `priority` on azurerm_kubernetes_cluster_node_pool.
+	// When set to "Spot", instances are costed at Spot pricing; any other
+	// value (including the default "Regular") uses pay-as-you-go.
+	Priority     string
 	Nodes        *int64   `infracost_usage:"nodes"`
 	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
 	IsDevTest    bool
@@ -48,12 +53,12 @@ func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
 		nodeCount = decimal.NewFromInt(*r.Nodes)
 	}
 
-	pool := aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours, r.IsDevTest)
+	pool := aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours, r.IsDevTest, r.Priority)
 	pool.UsageSchema = r.UsageSchema()
 	return pool
 }
 
-func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64, isDevTest bool) *schema.Resource {
+func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64, isDevTest bool, priority string) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource
 
@@ -62,9 +67,9 @@ func aksClusterNodePool(name, region, instanceType, os string, osDiskType string
 	}
 
 	if strings.EqualFold(os, "windows") {
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, "None", monthlyHours, isDevTest))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponentWithPriority(region, instanceType, "None", monthlyHours, isDevTest, priority))
 	} else {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+		costComponents = append(costComponents, linuxVirtualMachineCostComponentWithPriority(region, instanceType, monthlyHours, priority))
 	}
 
 	mainResource.CostComponents = costComponents
