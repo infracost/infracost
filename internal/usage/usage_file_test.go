@@ -37,6 +37,25 @@ func TestUsageFileEmpty(t *testing.T) {
 	tftest.GoldenFileUsageSyncTest(t, "usage_file_empty")
 }
 
+// TestInvalidKeysSubResourceOverScalar checks that InvalidKeys does not panic
+// when the user provides a nested map for a key that the reference usage file
+// defines as a scalar (e.g. aws_lambda_function.monthly_requests). The key
+// should be reported as invalid instead.
+func TestInvalidKeysSubResourceOverScalar(t *testing.T) {
+	usageFile, err := usage.LoadUsageFileFromString(
+		`version: 0.1
+resource_usage:
+  aws_lambda_function.my_function:
+    monthly_requests:
+      nested: 1
+`)
+	assert.NoError(t, err)
+
+	invalidKeys, err := usageFile.InvalidKeys()
+	assert.NoError(t, err)
+	assert.Contains(t, invalidKeys, "monthly_requests")
+}
+
 // This should really be in schema.usage_data_test but I need to put it here so I can use LoadUsageFileFromString without
 // getting import cycles.
 func TestUsageDataEmpty(t *testing.T) {
