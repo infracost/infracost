@@ -26,6 +26,55 @@ type TestLoaderE2EOpts = struct {
 	IgnoreDir      bool
 }
 
+func TestLoadModuleFromPathAllowsOpenTofuProviderIndex(t *testing.T) {
+	dir := t.TempDir()
+	err := os.WriteFile(filepath.Join(dir, "main.tf"), []byte(`
+provider "aws" {
+  alias    = "by_region"
+  for_each = { east = "us-east-2" }
+  region   = each.value
+}
+
+data "aws_region" "current" {
+  for_each = { selected = "east" }
+  provider = aws.by_region[each.value]
+}
+
+module "child" {
+  source = "./child"
+}
+`), 0600)
+	require.NoError(t, err)
+
+	loader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath: dir,
+		HCLParser: NewSharedHCLParser(),
+		Logger:    zerolog.New(io.Discard),
+	})
+	mod, err := loader.loadModuleFromPath(dir)
+	require.NoError(t, err)
+	require.Contains(t, mod.ModuleCalls, "child")
+	assert.Equal(t, "./child", mod.ModuleCalls["child"].Source)
+}
+
+func TestLoadModuleFromPathRejectsInvalidProviderIndex(t *testing.T) {
+	dir := t.TempDir()
+	err := os.WriteFile(filepath.Join(dir, "main.tf"), []byte(`
+data "aws_region" "current" {
+  provider = aws.by_region.extra[each.value]
+}
+`), 0600)
+	require.NoError(t, err)
+
+	loader := NewModuleLoader(ModuleLoaderOptions{
+		CachePath: dir,
+		HCLParser: NewSharedHCLParser(),
+		Logger:    zerolog.New(io.Discard),
+	})
+	_, err = loader.loadModuleFromPath(dir)
+	require.ErrorContains(t, err, "Invalid provider reference")
+}
+
 func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, opts TestLoaderE2EOpts) {
 
 	ResetGlobalModuleCache()
