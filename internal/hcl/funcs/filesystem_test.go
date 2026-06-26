@@ -2,8 +2,12 @@ package funcs
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
@@ -495,4 +499,54 @@ func TestFileBase64(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestIsFullPathWithinRepo_BlocksIntermediateSymlink locks in the FIX-318
+// hardening of the hosted-app file()/templatefile() guard: when running in the
+// github/gitlab app environment, a path that escapes the repository directory
+// via an intermediate directory symlink (whose leaf isn't itself a symlink)
+// must be rejected. The previous leaf-only symlinkPath resolver let it through.
+func TestIsFullPathWithinRepo_BlocksIntermediateSymlink(t *testing.T) {
+	// repo/                -- the working directory / repository root
+	//   inside/main.tf     -- a legitimate in-repo file
+	//   evil -> outside    -- an intermediate symlink escaping the repo
+	// outside/secret       -- a secret living outside the repo root
+	tmp := t.TempDir()
+	repo := filepath.Join(tmp, "repo")
+	outside := filepath.Join(tmp, "outside")
+	require.NoError(t, os.MkdirAll(filepath.Join(repo, "inside"), 0700))
+	require.NoError(t, os.MkdirAll(outside, 0700))
+	require.NoError(t, os.WriteFile(filepath.Join(repo, "inside", "main.tf"), []byte("# tf"), 0600))
+	require.NoError(t, os.WriteFile(filepath.Join(outside, "secret"), []byte("TOP-SECRET"), 0600))
+	require.NoError(t, os.Symlink(outside, filepath.Join(repo, "evil")))
+
+	// isPathInRepo checks against the process working directory.
+	t.Chdir(repo)
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+
+	// Legitimate in-repo path is allowed.
+	require.NoError(t, isFullPathWithinRepo(repo, "inside/main.tf"),
+		"an in-repo path must be allowed")
+
+	// Intermediate symlink escaping the repo is rejected (the FIX-318 gap).
+	assert.Error(t, isFullPathWithinRepo(repo, "evil/secret"),
+		"a path traversing an intermediate symlink out of the repo must be rejected")
+}
+
+// TestIsFullPathWithinRepo_NoopOutsideHostedApp confirms the guard stays a
+// no-op when not running in the github/gitlab app environment, preserving the
+// existing behaviour for the standalone CLI.
+func TestIsFullPathWithinRepo_NoopOutsideHostedApp(t *testing.T) {
+	tmp := t.TempDir()
+	repo := filepath.Join(tmp, "repo")
+	outside := filepath.Join(tmp, "outside")
+	require.NoError(t, os.MkdirAll(repo, 0700))
+	require.NoError(t, os.MkdirAll(outside, 0700))
+	require.NoError(t, os.Symlink(outside, filepath.Join(repo, "evil")))
+
+	t.Chdir(repo)
+	t.Setenv("INFRACOST_CI_PLATFORM", "")
+
+	assert.NoError(t, isFullPathWithinRepo(repo, "evil/secret"),
+		"the guard must be a no-op outside the hosted github/gitlab app environment")
 }
