@@ -64,23 +64,34 @@ type Disco struct {
 
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
-func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *Disco {
+func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger, ssrfGuard bool) *Disco {
 
 	innerDisco := disco.NewWithCredentialsSource(credentialsSource)
 
-	if proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxyURL != "" {
-		innerDisco.Transport = &ConditionalTransport{
-			ProxyHosts: []string{"terraform.io"},
-			ProxyURL:   proxyURL,
-			Inner:      innerDisco.Transport,
-		}
+	proxyURL := os.Getenv("INFRACOST_REGISTRY_PROXY")
+	var proxyHosts []string
+	if proxyURL != "" {
+		proxyHosts = []string{"terraform.io"}
+	}
+
+	// Guard direct registry discovery requests against SSRF (a registry module
+	// source's host is attacker-controlled), while forwarding terraform.io
+	// through the trusted proxy unguarded.
+	var base *http.Transport
+	if t, ok := innerDisco.Transport.(*http.Transport); ok {
+		base = t
+	}
+	innerDisco.Transport = &ConditionalTransport{
+		ProxyHosts: proxyHosts,
+		ProxyURL:   proxyURL,
+		Inner:      GuardTransport(base, ssrfGuard),
 	}
 
 	return &Disco{
 		disco:           innerDisco,
 		logger:          logger,
-		httpClient:      newRetryableClient(""),
-		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
+		httpClient:      newRetryableClient("", ssrfGuard),
+		proxyHttpClient: newRetryableClient(proxyURL, ssrfGuard),
 	}
 }
 
@@ -195,15 +206,19 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	return location, nil
 }
 
-func newRetryableClient(proxyURL string) *retryablehttp.Client {
+func newRetryableClient(proxyURL string, ssrfGuard bool) *retryablehttp.Client {
 	httpClient := retryablehttp.NewClient()
 	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
 	if proxyURL != "" {
+		// Requests go to the trusted operator-configured proxy.
 		if parsed, err := url.Parse(proxyURL); err == nil {
 			httpClient.HTTPClient.Transport = &http.Transport{
 				Proxy: http.ProxyURL(parsed),
 			}
 		}
+	} else {
+		// Direct requests to an attacker-controllable registry host: guard them.
+		httpClient.HTTPClient.Transport = GuardTransport(nil, ssrfGuard)
 	}
 	return httpClient
 }
@@ -218,13 +233,13 @@ type RegistryLoader struct {
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zerolog.Logger) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zerolog.Logger, ssrfGuard bool) *RegistryLoader {
 	return &RegistryLoader{
 		packageFetcher:  packageFetcher,
 		disco:           disco,
 		logger:          logger,
-		httpClient:      newRetryableClient(""),
-		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY")),
+		httpClient:      newRetryableClient("", ssrfGuard),
+		proxyHttpClient: newRetryableClient(os.Getenv("INFRACOST_REGISTRY_PROXY"), ssrfGuard),
 	}
 }
 

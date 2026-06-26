@@ -96,13 +96,22 @@ type ModuleLoaderOptions struct {
 	ModuleSync          *intSync.KeyMutex
 	RemoteCache         RemoteCache
 	PublicModuleChecker PublicModuleChecker
+	// AllowPrivateModuleSources disables the SSRF guard that blocks module
+	// fetches to loopback/private/link-local addresses. Set it only for trusted
+	// input where modules are intentionally hosted on internal infrastructure
+	// (i.e. not an untrusted PR in CI). See FIX-315.
+	AllowPrivateModuleSources bool
 }
 
 // NewModuleLoader constructs a new module loader
 func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
-	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger, WithPublicModuleChecker(opts.PublicModuleChecker))
+	ssrfGuard := !opts.AllowPrivateModuleSources
+	fetcher := NewPackageFetcher(opts.RemoteCache, opts.Logger,
+		WithPublicModuleChecker(opts.PublicModuleChecker),
+		WithAllowPrivateSources(opts.AllowPrivateModuleSources),
+	)
 	// we need to have a disco for each project that has defined credentials
-	d := NewDisco(opts.CredentialsSource, opts.Logger)
+	d := NewDisco(opts.CredentialsSource, opts.Logger, ssrfGuard)
 
 	if err := opts.SourceMapRegex.Compile(); err != nil {
 		opts.Logger.Error().Err(err).Msg("error compiling source map regex")
@@ -119,7 +128,7 @@ func NewModuleLoader(opts ModuleLoaderOptions) *ModuleLoader {
 		sync:           opts.ModuleSync,
 	}
 
-	m.registryLoader = NewRegistryLoader(fetcher, d, opts.Logger)
+	m.registryLoader = NewRegistryLoader(fetcher, d, opts.Logger, ssrfGuard)
 
 	return m
 }

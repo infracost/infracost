@@ -34,7 +34,16 @@ type PackageFetcher struct {
 	remoteCache         RemoteCache
 	logger              zerolog.Logger
 	getters             map[string]getter.Getter
+	customGetters       map[string]getter.Getter
 	publicModuleChecker PublicModuleChecker
+	// ssrfGuardEnabled blocks module fetches to loopback/private/link-local
+	// addresses (FIX-315). Disabled via WithAllowPrivateSources.
+	ssrfGuardEnabled bool
+	// proxyHosts/proxyURL describe the optional INFRACOST_REGISTRY_PROXY route;
+	// requests to proxyHosts are forwarded to the trusted proxy and exempt from
+	// the SSRF guard.
+	proxyHosts []string
+	proxyURL   string
 }
 
 // use a global cache to avoid downloading the same module multiple times for each project
@@ -72,6 +81,31 @@ func (t *ConditionalTransport) RoundTrip(req *http.Request) (*http.Response, err
 
 // NewPackageFetcher constructs a new package fetcher
 func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...PackageFetcherOpts) *PackageFetcher {
+	p := &PackageFetcher{
+		remoteCache:      remoteCache,
+		logger:           logger,
+		customGetters:    map[string]getter.Getter{},
+		ssrfGuardEnabled: true,
+		proxyURL:         os.Getenv("INFRACOST_REGISTRY_PROXY"),
+	}
+	if p.proxyURL != "" {
+		p.proxyHosts = []string{"terraform.io"}
+	}
+
+	for _, opt := range opts {
+		opt(p)
+	}
+
+	p.getters = p.buildGetters()
+
+	return p
+}
+
+// buildGetters assembles the go-getter getter map. It always routes http(s)
+// module downloads through a transport guarded against SSRF (see ssrf.go), with
+// requests to a configured registry proxy forwarded to the trusted proxy
+// unguarded. Caller-supplied getters (WithGetters) are overlaid last.
+func (p *PackageFetcher) buildGetters() map[string]getter.Getter {
 	getters := make(map[string]getter.Getter, len(getter.Getters))
 	for k, g := range getter.Getters {
 		getters[k] = g
@@ -79,39 +113,42 @@ func NewPackageFetcher(remoteCache RemoteCache, logger zerolog.Logger, opts ...P
 	getters["git"] = &CustomGitGetter{
 		&getter.GitGetter{},
 	}
-	if proxy := os.Getenv("INFRACOST_REGISTRY_PROXY"); proxy != "" {
-		httpGetter := &getter.HttpGetter{
-			Netrc: true,
-			Client: &http.Client{
-				Transport: &ConditionalTransport{
-					ProxyHosts: []string{"terraform.io"},
-					ProxyURL:   proxy,
-					Inner:      http.DefaultTransport,
-				},
+
+	httpGetter := &getter.HttpGetter{
+		Netrc: true,
+		Client: &http.Client{
+			Transport: &ConditionalTransport{
+				ProxyHosts: p.proxyHosts,
+				ProxyURL:   p.proxyURL,
+				Inner:      GuardTransport(nil, p.ssrfGuardEnabled),
 			},
-		}
-		getters["http"] = httpGetter
-		getters["https"] = httpGetter
+		},
+	}
+	getters["http"] = httpGetter
+	getters["https"] = httpGetter
+
+	for k, g := range p.customGetters {
+		getters[k] = g
 	}
 
-	p := &PackageFetcher{
-		remoteCache: remoteCache,
-		logger:      logger,
-		getters:     getters,
-	}
-
-	for _, opt := range opts {
-		opt(p)
-	}
-
-	return p
+	return getters
 }
 
 func WithGetters(getters map[string]getter.Getter) PackageFetcherOpts {
 	return func(p *PackageFetcher) {
 		for k, g := range getters {
-			p.getters[k] = g
+			p.customGetters[k] = g
 		}
+	}
+}
+
+// WithAllowPrivateSources disables the SSRF guard so modules can be fetched from
+// private/loopback/internal addresses. Use only for trusted input where modules
+// are intentionally hosted on internal infrastructure; it must not be enabled
+// when parsing untrusted Terraform (e.g. a fork PR in CI). See FIX-315.
+func WithAllowPrivateSources(allow bool) PackageFetcherOpts {
+	return func(p *PackageFetcher) {
+		p.ssrfGuardEnabled = !allow
 	}
 }
 
@@ -280,6 +317,11 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), defaultModuleRetrieveTimeout)
 	defer cancel()
 
+	if err := p.validateRemoteHost(ctx, moduleAddr); err != nil {
+		errorCache.Store(moduleAddr, err)
+		return false, err
+	}
+
 	err := client.Get(ctx)
 	if err != nil {
 		errorCache.Store(moduleAddr, err)
@@ -287,6 +329,28 @@ func (p *PackageFetcher) fetchFromRemote(moduleAddr, dest string) (bool, error) 
 	}
 
 	return true, nil
+}
+
+// validateRemoteHost is the pre-fetch SSRF check applied to every module source
+// before it is handed to go-getter. It covers the getters that shell out (git,
+// hg) or use their own SDK clients (s3, gcs) and so bypass the guarded HTTP
+// transport, as well as literal-IP http(s) sources. Hosts routed through the
+// registry proxy are exempt (the connection goes to the trusted proxy).
+func (p *PackageFetcher) validateRemoteHost(ctx context.Context, moduleAddr string) error {
+	if !p.ssrfGuardEnabled {
+		return nil
+	}
+
+	host := moduleSourceHost(moduleAddr)
+	if host == "" {
+		return nil
+	}
+
+	if hostIsProxied(host, p.proxyHosts) {
+		return nil
+	}
+
+	return CheckHost(ctx, host)
 }
 
 func determineTTL(moduleAddr string) time.Duration {
