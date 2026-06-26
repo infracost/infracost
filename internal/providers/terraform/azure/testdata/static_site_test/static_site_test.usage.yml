@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_static_site.with_usage:
+    monthly_bandwidth_gb: 250

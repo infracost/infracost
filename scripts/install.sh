@@ -19,7 +19,27 @@ if [ "$arch" = "aarch64" ]; then
   arch="arm64"
 fi
 
+# This script only installs versions <1.0.0; the CLI moved to https://github.com/infracost/cli.
+# "latest" is resolved against this repo's releases rather than the infracost.io downloads endpoint,
+# which now points to the new CLI.
 version=${INFRACOST_VERSION:-latest}
+if [ "$version" = "latest" ]; then
+  echo "Fetching the latest release tag from infracost/infracost..."
+  version=$(curl -sL https://api.github.com/repos/infracost/infracost/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+  if [ -z "$version" ]; then
+    echo "Failed to fetch the latest release tag from GitHub. Please set INFRACOST_VERSION explicitly."
+    exit 1
+  fi
+fi
+
+major=$(echo "$version" | sed 's/^v//' | cut -d. -f1)
+if echo "$major" | grep -qE '^[0-9]+$' && [ "$major" -ge 1 ]; then
+  echo "Error: version $version is not supported by this script."
+  echo "This script only installs versions <1.0.0 from the infracost/infracost repository."
+  echo "For Infracost CLI >=2.0.0, see https://github.com/infracost/cli."
+  exit 1
+fi
+
 url="https://infracost.io/downloads/${version}"
 tar="infracost-$os-$arch.tar.gz"
 echo "Downloading version ${version} of infracost-$os-$arch..."

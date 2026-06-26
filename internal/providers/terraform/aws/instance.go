@@ -58,9 +58,10 @@ func NewInstance(d *schema.ResourceData) schema.CoreResource {
 		for _, data := range ref.Get("block_device_mappings").Array() {
 			deviceName := data.Get("device_name").String()
 			ebsBlockDevice := &aws.EBSVolume{
-				Region: region,
-				Type:   data.Get("ebs.0.volume_type").String(),
-				IOPS:   data.Get("ebs.0.iops").Int(),
+				Region:     region,
+				Type:       data.Get("ebs.0.volume_type").String(),
+				IOPS:       data.Get("ebs.0.iops").Int(),
+				Throughput: data.Get("ebs.0.throughput").Int(),
 			}
 
 			if v := data.Get("ebs.0.volume_size"); v.Exists() {
@@ -93,10 +94,11 @@ func NewInstance(d *schema.ResourceData) schema.CoreResource {
 	}
 
 	a.RootBlockDevice = &aws.EBSVolume{
-		Address: "root_block_device",
-		Region:  region,
-		Type:    d.Get("root_block_device.0.volume_type").String(),
-		IOPS:    d.Get("root_block_device.0.iops").Int(),
+		Address:    "root_block_device",
+		Region:     region,
+		Type:       d.Get("root_block_device.0.volume_type").String(),
+		IOPS:       d.Get("root_block_device.0.iops").Int(),
+		Throughput: d.Get("root_block_device.0.throughput").Int(),
 	}
 
 	if d.Get("root_block_device.0.volume_size").Type != gjson.Null {
@@ -139,12 +141,18 @@ func NewInstance(d *schema.ResourceData) schema.CoreResource {
 			iops = v.Int()
 		}
 
+		throughput := ltDevice.Throughput
+		if v := data.Get("throughput"); v.Exists() {
+			throughput = v.Int()
+		}
+
 		ebsBlockDevice := &aws.EBSVolume{
-			Address: fmt.Sprintf("ebs_block_device[%d]", i),
-			Region:  region,
-			Type:    volumeType,
-			Size:    volumeSize,
-			IOPS:    iops,
+			Address:    fmt.Sprintf("ebs_block_device[%d]", i),
+			Region:     region,
+			Type:       volumeType,
+			Size:       volumeSize,
+			IOPS:       iops,
+			Throughput: throughput,
 		}
 
 		delete(ltEBSBlockDevices, deviceName)
