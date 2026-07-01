@@ -1,6 +1,6 @@
 module github.com/infracost/infracost
 
-go 1.25.8
+go 1.25.11
 
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -76,7 +76,7 @@ require (
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/slack-go/slack v0.12.3
+	github.com/slack-go/slack v0.27.0
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	golang.org/x/text v0.37.0
@@ -86,7 +86,7 @@ require (
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.10 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.23 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	golang.org/x/sync v0.20.0
 )
 
