@@ -31,6 +31,32 @@ const (
 	authTokenEnvVarName   = "TG_TF_REGISTRY_TOKEN" //nolint
 )
 
+// isTrustedRegistryHost reports whether the TG_TF_REGISTRY_TOKEN may be sent to
+// the given host. The token is a Terraform Cloud/Enterprise registry token, so
+// we only attach it to the well-known public registries and to the configured
+// Terraform Cloud/Enterprise host - never to a host derived from an untrusted
+// module source.
+func isTrustedRegistryHost(host string) bool {
+	trusted := []string{
+		"registry.terraform.io", // public Terraform registry
+		"registry.opentofu.org", // public OpenTofu registry
+		"app.terraform.io",      // Terraform Cloud (incl. private module registry)
+	}
+	// TERRAFORM_CLOUD_HOST lets Terraform Enterprise users point at their own
+	// host, so trust it too when it is explicitly configured.
+	if h := os.Getenv("TERRAFORM_CLOUD_HOST"); h != "" {
+		trusted = append(trusted, h)
+	}
+
+	for _, t := range trusted {
+		if hostsEqual(host, t) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // TerraformRegistryServicePath is a struct for extracting the modules service path in the Registry.
 type TerraformRegistryServicePath struct {
 	ModulesPath string `json:"modules.v1"`
@@ -257,9 +283,11 @@ func httpGETAndGetResponse(ctx context.Context, getURL url.URL) ([]byte, *http.H
 	}
 
 	// Handle authentication via env var. Authentication is done by providing the registry token as a bearer token in
-	// the request header.
+	// the request header. The request host is derived from the (untrusted) module source, so we only attach the token
+	// when the host is a trusted registry - otherwise a malicious module source could exfiltrate the token to an
+	// attacker-controlled host.
 	authToken := os.Getenv(authTokenEnvVarName)
-	if authToken != "" {
+	if authToken != "" && isTrustedRegistryHost(getURL.Host) {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", authToken))
 	}
 

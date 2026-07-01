@@ -143,6 +143,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 			credsSource.BaseCredentialSet.Host,
 			credsSource.BaseCredentialSet.Token,
 			localWorkspace,
+			ctx.ProjectConfig.TerraformCloudHost != "",
 			loaderOpts...),
 		)
 	}

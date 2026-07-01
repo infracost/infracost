@@ -217,15 +217,18 @@ func OptionWithRawCtyInput(input cty.Value) (op Option) {
 }
 
 // OptionWithTFCRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
-// values to load remote execution variables.
-func OptionWithTFCRemoteVarLoader(host, token, localWorkspace string, loaderOpts ...TFCRemoteVariablesLoaderOption) Option {
+// values to load remote execution variables. hostConfigured indicates whether
+// the host was explicitly set by the user (rather than defaulted to
+// app.terraform.io), which controls how the loader handles a mismatching host
+// in the scanned Terraform.
+func OptionWithTFCRemoteVarLoader(host, token, localWorkspace string, hostConfigured bool, loaderOpts ...TFCRemoteVariablesLoaderOption) Option {
 	return func(p *Parser) {
 		if host == "" || token == "" {
 			return
 		}
 
 		client := extclient.NewAuthedAPIClient(host, token)
-		p.remoteVariableLoaders = append(p.remoteVariableLoaders, NewTFCRemoteVariablesLoader(client, localWorkspace, p.logger, loaderOpts...))
+		p.remoteVariableLoaders = append(p.remoteVariableLoaders, NewTFCRemoteVariablesLoader(client, localWorkspace, hostConfigured, p.logger, loaderOpts...))
 	}
 }
 

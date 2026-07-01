@@ -35,6 +35,12 @@ type TFCRemoteVariablesLoader struct {
 	client         *extclient.AuthedAPIClient
 	localWorkspace string
 	remoteConfig   *TFCRemoteConfig
+	// hostConfigured is true when the user has explicitly set the Terraform
+	// Cloud host (via the TERRAFORM_CLOUD_HOST env var or terraform_cloud_host
+	// config option) rather than falling back to the app.terraform.io default.
+	// It controls how we react when the scanned Terraform requests a different
+	// host to the trusted one: see Load.
+	hostConfigured bool
 	logger         zerolog.Logger
 }
 
@@ -102,7 +108,7 @@ func RemoteVariablesLoaderWithRemoteConfig(config TFCRemoteConfig) TFCRemoteVari
 }
 
 // NewTFCRemoteVariablesLoader constructs a new loader for fetching remote variables.
-func NewTFCRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger zerolog.Logger, opts ...TFCRemoteVariablesLoaderOption) *TFCRemoteVariablesLoader {
+func NewTFCRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, hostConfigured bool, logger zerolog.Logger, opts ...TFCRemoteVariablesLoaderOption) *TFCRemoteVariablesLoader {
 	if localWorkspace == "" {
 		localWorkspace = os.Getenv("TF_WORKSPACE")
 	}
@@ -110,6 +116,7 @@ func NewTFCRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspa
 	r := &TFCRemoteVariablesLoader{
 		client:         client,
 		localWorkspace: localWorkspace,
+		hostConfigured: hostConfigured,
 		logger:         logger,
 	}
 
@@ -153,7 +160,28 @@ func (r *TFCRemoteVariablesLoader) Load(options RemoteVarLoaderOptions) (map[str
 		}
 	}
 
+	// config.Host may have come from the scanned Terraform (the cloud/backend
+	// "hostname" attribute), which is untrusted input. We must never send the
+	// configured Terraform Cloud token to a host other than the trusted one,
+	// otherwise a malicious .tf could exfiltrate the token to an attacker host.
+	trustedHost := r.client.Host()
+	if config.Host != "" && !hostsEqual(config.Host, trustedHost) {
+		if r.hostConfigured {
+			// The user pinned a trusted host but the scanned Terraform asks for a
+			// different one. Don't send the token to the unverified host, just
+			// skip loading remote variables.
+			r.logger.Warn().Msgf("Terraform config sets hostname %q which does not match the configured Terraform Cloud host %q, not sending token to the unverified host and skipping remote variable loading", config.Host, trustedHost)
+			return vars, nil
+		}
+
+		// The user has a Terraform Cloud token set but has not pinned a trusted
+		// host, and the scanned Terraform is trying to point us at its own host.
+		// Refuse to run rather than risk sending the token to an untrusted host.
+		return vars, errors.Errorf("the Terraform being scanned sets a Terraform Cloud/Enterprise hostname (%q), but no trusted host is configured. Infracost will not send your Terraform Cloud token to an unverified host. If %q is trusted, set the TERRAFORM_CLOUD_HOST environment variable (or terraform_cloud_host config option) to it.", config.Host, config.Host)
+	}
+
 	if config.Host != "" {
+		// config.Host has been verified to match the trusted host.
 		r.client.SetHost(config.Host)
 	}
 
@@ -359,6 +387,12 @@ func (r *TFCRemoteVariablesLoader) getVarValue(variable tfcVar) cty.Value {
 	}
 
 	return cty.StringVal(variable.Value)
+}
+
+// hostsEqual reports whether two Terraform Cloud/Enterprise hostnames refer to
+// the same host, ignoring case and any trailing dot.
+func hostsEqual(a, b string) bool {
+	return strings.EqualFold(strings.TrimSuffix(a, "."), strings.TrimSuffix(b, "."))
 }
 
 func getAttribute(block *Block, name string) string {
