@@ -333,27 +333,38 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 		}
 
 		res[i].Query = query
+
+		// Custom-priced components have no product filter and can't be looked up via
+		// the API, so mark them filled to skip the request. Their price is applied
+		// from the custom price when the result is processed.
+		if req.keys[i].CostComponent.ProductFilter == nil {
+			res[i].filled = true
+		}
 	}
 
 	// first filter any queries that have been stored in the cache. We don't need to
 	// send requests for these as we already have the results in memory.
 	var serverQueries []pricingQuery
-	if c.cache == nil {
-		serverQueries = queries
-	} else {
-		var hit int
-		for i, query := range queries {
-			v, ok := c.cache.Get(query.hash)
-			if ok {
+	var hit int
+	for i, query := range queries {
+		if res[i].filled {
+			continue
+		}
+
+		if c.cache != nil {
+			if v, ok := c.cache.Get(query.hash); ok {
 				logging.Logger.Debug().Msgf("cache hit for query hash: %d", query.hash)
 				hit++
 				res[i].Result = v.Result
 				res[i].filled = true
-			} else {
-				serverQueries = append(serverQueries, query)
+				continue
 			}
 		}
 
+		serverQueries = append(serverQueries, query)
+	}
+
+	if c.cache != nil {
 		logging.Logger.Debug().Msgf("%d/%d queries were built from cache", hit, len(queries))
 	}
 
