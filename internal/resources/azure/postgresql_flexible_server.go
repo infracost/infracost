@@ -183,10 +183,6 @@ func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion strin
 		skuName = fmt.Sprintf("%s vCore", cores)
 
 		series = coreRegex.ReplaceAllString(instanceType, "") + instanceVersion
-
-		if series == "Esv3" {
-			productName = "Az DB for PGSQL Flexible Server"
-		}
 	}
 
 	return flexibleServerFilterAttributes{
