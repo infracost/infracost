@@ -183,7 +183,11 @@ func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, erro
 	if !stringInSlice(validOptions, r.paymentOption) {
 		return def, fmt.Errorf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
 	}
-	nodeType := strings.Split(r.cacheNodeType, ".")[1] // Get node type from cache node type. cache.m3.large -> m3
+	cacheNodeTypeParts := strings.Split(r.cacheNodeType, ".")
+	if len(cacheNodeTypeParts) < 2 {
+		return def, fmt.Errorf("Invalid cache node type, ignoring reserved options. Expected format like 'cache.m3.large'. Got: %s", r.cacheNodeType)
+	}
+	nodeType := cacheNodeTypeParts[1] // Get node type from cache node type. cache.m3.large -> m3
 	if stringInSlice(elasticacheReservedNodeLegacyTypes, nodeType) {
 		logging.Logger.Warn().Msgf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
 	}
