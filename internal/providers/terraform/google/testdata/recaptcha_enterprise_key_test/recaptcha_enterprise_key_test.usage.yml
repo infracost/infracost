@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  google_recaptcha_enterprise_key.default:
+    monthly_assessments: 1000000
+  google_recaptcha_enterprise_key.android:
+    monthly_assessments: 500000
