@@ -426,12 +426,9 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 	s := strings.Split(u.Path, "/")
 	runID := s[len(s)-1]
 
-	token := p.TerraformCloudToken
-	if token == "" {
-		token = credentials.FindTerraformCloudToken(host)
-	}
-	if token == "" {
-		return []byte{}, credentials.ErrMissingCloudToken
+	token, err := p.tokenForRemoteHost(host)
+	if err != nil {
+		return []byte{}, err
 	}
 
 	body, err := cloudAPI(host, fmt.Sprintf("/api/v2/runs/%s/plan", runID), token)
@@ -453,6 +450,41 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 		return []byte{}, errors.New("Could not parse path to plan JSON from remote")
 	}
 	return cloudAPI(host, jsonPath, token)
+}
+
+// tokenForRemoteHost returns the Terraform Cloud token to use for a remote run
+// hosted at the given host. host is derived from the terraform remote-run output
+// URL, which is driven by the (untrusted) .tf cloud/backend hostname, so we only
+// send the configured token to the trusted host (TERRAFORM_CLOUD_HOST if set,
+// otherwise app.terraform.io). When the host does not match we refuse rather
+// than risk leaking the token, falling back to a host-scoped lookup only when no
+// primary token is configured.
+func (p *DirProvider) tokenForRemoteHost(host string) (string, error) {
+	trustedHost := p.TerraformCloudHost
+	hostConfigured := trustedHost != ""
+	if trustedHost == "" {
+		trustedHost = "app.terraform.io"
+	}
+
+	var token string
+	if hostsEqual(host, trustedHost) {
+		token = p.TerraformCloudToken
+	} else if p.TerraformCloudToken != "" {
+		// A token is configured but the remote run lives on a different host.
+		// Refuse to run rather than risk leaking the token to an unverified host.
+		if hostConfigured {
+			return "", errors.Errorf("the remote Terraform run is hosted at %q, which does not match the configured Terraform Cloud host %q; Infracost will not send your Terraform Cloud token to an unverified host", host, trustedHost)
+		}
+		return "", errors.Errorf("the remote Terraform run is hosted at %q, but no trusted host is configured. Infracost will not send your Terraform Cloud token to an unverified host. If %q is trusted, set the TERRAFORM_CLOUD_HOST environment variable (or terraform_cloud_host config option) to it.", host, host)
+	}
+	if token == "" {
+		token = credentials.FindTerraformCloudToken(host)
+	}
+	if token == "" {
+		return "", credentials.ErrMissingCloudToken
+	}
+
+	return token, nil
 }
 
 func (p *DirProvider) runShow(opts *CmdOptions, planFile string, initOnFail bool) ([]byte, error) {

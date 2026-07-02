@@ -43,6 +43,12 @@ func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
 	}
 }
 
+// Host returns the trusted host that the authed API client sends
+// authenticated requests to.
+func (a *AuthedAPIClient) Host() string {
+	return a.host
+}
+
 // SetHost sets the host for base host for the authed API client.
 func (a *AuthedAPIClient) SetHost(host string) {
 	a.host = host
