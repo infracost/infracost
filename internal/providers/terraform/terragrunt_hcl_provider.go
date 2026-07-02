@@ -133,10 +133,20 @@ func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext)
 		}
 	}
 
+	// Use Infracost's own registry getter (rather than tgterraform.RegistryGetter)
+	// so we can scope the TG_TF_REGISTRY_TOKEN to trusted hosts. TrustedHosts is
+	// seeded with the configured Terraform Cloud host (terraform_cloud_host config
+	// value / TERRAFORM_CLOUD_HOST env var) so tokens are also sent to a private
+	// Terraform Enterprise registry when the user has pinned one.
+	var trustedRegistryHosts []string
+	if h := ctx.ProjectConfig.TerraformCloudHost; h != "" {
+		trustedRegistryHosts = append(trustedRegistryHosts, h)
+	}
 	fetcher := modules.NewPackageFetcher(remoteCache, logger, modules.WithGetters(map[string]getter.Getter{
-		"tfr": &tgterraform.RegistryGetter{
+		"tfr": &TerraformRegistryGetter{
 			ProxyForDomains: []string{".terraform.io"},
 			ProxyURL:        os.Getenv("INFRACOST_REGISTRY_PROXY"),
+			TrustedHosts:    trustedRegistryHosts,
 		},
 		"file": &tgcliterraform.FileCopyGetter{},
 	}), modules.WithPublicModuleChecker(modules.NewHttpPublicModuleChecker()))
