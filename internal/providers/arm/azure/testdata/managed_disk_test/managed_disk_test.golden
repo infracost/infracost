@@ -1,0 +1,32 @@
+
+ Name                                            Monthly Qty  Unit                      Monthly Cost    
+                                                                                                        
+ Microsoft.Compute/disks/ultra                                                                          
+ ├─ Storage (ultra, 2048 GiB)                          2,048  GiB                            $245.19    
+ ├─ Provisioned IOPS                                   4,000  IOPS                           $198.56    
+ └─ Throughput                                            20  MB/s                             $6.99    
+                                                                                                        
+ Microsoft.Compute/disks/custom_size_ssd                                                                
+ ├─ Storage (E30, LRS)                                     1  months                          $76.80    
+ └─ Disk operations                                        2  10k operations                   $0.00  * 
+                                                                                                        
+ Microsoft.Compute/disks/premium                                                                        
+ └─ Storage (P4, LRS)                                      1  months                           $5.28    
+                                                                                                        
+ Microsoft.Compute/disks/standard                                                                       
+ ├─ Storage (S4, LRS)                                      1  months                           $1.54    
+ └─ Disk operations                       Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                        
+ OVERALL TOTAL                                                                               $534.36 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 4 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMManagedDiskGoldenFile/ARM               ┃          $534 ┃       $0.00 ┃       $534 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
