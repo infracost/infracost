@@ -44,6 +44,11 @@ func NewKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
 		}
 	}
 
+	priority := ""
+	if d.Get("priority").Type != gjson.Null {
+		priority = d.Get("priority").String()
+	}
+
 	r := &azure.KubernetesClusterNodePool{
 		Address:      d.Address,
 		Region:       d.Region,
@@ -53,6 +58,7 @@ func NewKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
 		OSDiskSizeGB: d.Get("os_disk_size_gb").Int(),
 		NodeCount:    nodeCount,
 		IsDevTest:    d.ProjectMetadata["isProduction"] == "false",
+		Priority:     priority,
 	}
 	return r
 }

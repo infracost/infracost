@@ -108,8 +108,10 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 		monthlyHours = r.DefaultNodePool.MonthlyHours
 	}
 
+	// Azure forbids Spot priority on the default_node_pool (must be Regular):
+	// pass an empty priority so PAYG pricing is used.
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOS, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount, monthlyHours, r.IsDevTest),
+		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOS, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount, monthlyHours, r.IsDevTest, ""),
 	}
 
 	if strings.ToLower(r.NetworkProfileLoadBalancerSKU) == "standard" {
