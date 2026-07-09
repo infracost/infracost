@@ -169,7 +169,7 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 		usageType = "Aurora:IO-OptimizedStorageUsage$"
 	}
 
-	return []*schema.CostComponent{
+	costComponents := []*schema.CostComponent{
 		{
 			Name:            label,
 			Unit:            "GB",
@@ -187,7 +187,12 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 			},
 			UsageBased: true,
 		},
-		{
+	}
+
+	// Aurora I/O-Optimized clusters bundle I/O into the instance and storage
+	// rates, so there is no per-request "Aurora:StorageIOUsage" charge.
+	if !r.IOOptimized {
+		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            "I/O requests",
 			Unit:            "1M requests",
 			UnitMultiplier:  decimal.NewFromInt(1000000),
@@ -203,8 +208,10 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 				},
 			},
 			UsageBased: true,
-		},
+		})
 	}
+
+	return costComponents
 }
 
 func (r *RDSCluster) auroraBackupStorageCostComponent(totalBackupStorageGB *decimal.Decimal, databaseEngine string) *schema.CostComponent {
