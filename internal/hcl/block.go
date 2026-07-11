@@ -743,8 +743,8 @@ func (b *Block) Provider() string {
 		value := attr.AsString()
 		r, err := attr.Reference()
 		if err == nil {
-			// An explicit provider is provided so use that
-			return r.String()
+			// Provider config keys do not include count or for_each indices.
+			return strings.TrimSuffix(stripCount(r.String()), ".")
 		}
 
 		if value != "" {
