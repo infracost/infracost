@@ -67,6 +67,8 @@ func newFunctionAppFromAppServicePlanRef(d *schema.ResourceData, data *schema.Re
 	skuName := data.Get("sku_name").String()
 	if strings.HasPrefix(strings.ToLower(skuName), "ep") {
 		tier = "premium"
+	} else if strings.HasPrefix(strings.ToLower(skuName), "fc") {
+		tier = "flexconsumption"
 	}
 
 	return &azure.FunctionApp{

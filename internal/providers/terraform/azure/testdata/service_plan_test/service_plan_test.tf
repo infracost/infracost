@@ -44,6 +44,7 @@ locals {
     "EP1",
     "EP2",
     "EP3",
+    "FC1",
     "WS1",
     "WS2",
     "WS3",

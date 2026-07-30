@@ -97,6 +97,10 @@
  ├─ vCPU (EP1)                                                                                                                      1  vCPU                           $126.29    
  └─ Memory (EP1)                                                                                                                  3.5  GB                              $31.43    
                                                                                                                                                                                  
+ azurerm_linux_function_app.function_with_usage["plan-Linux-FC1"]                                                                                                                
+ ├─ Execution time                                                                                                       876,180.4425  GB-seconds                      $22.78  * 
+ └─ Executions                                                                                                                 3.5401  1M requests                      $1.42  * 
+                                                                                                                                                                                 
  azurerm_linux_function_app.function_with_usage["plan-Linux-Y1"]                                                                                                                 
  ├─ Execution time                                                                                                       876,180.4425  GB-seconds                      $14.02  * 
  └─ Executions                                                                                                                 3.5401  1M requests                      $0.71  * 
@@ -128,6 +132,10 @@
  azurerm_linux_function_app.legacy_service_plan_function_with_usage["legacy-plan-Standard-Y1-elastic"]                                                                           
  ├─ Execution time                                                                                                       876,180.4425  GB-seconds                      $14.02  * 
  └─ Executions                                                                                                                 3.5401  1M requests                      $0.71  * 
+                                                                                                                                                                                 
+ azurerm_linux_function_app.function["plan-Linux-FC1"]                                                                                                                           
+ ├─ Execution time                                                                                                 Monthly cost depends on usage: $0.000026 per GB-seconds       
+ └─ Executions                                                                                                     Monthly cost depends on usage: $0.40 per 1M requests          
                                                                                                                                                                                  
  azurerm_linux_function_app.function["plan-Linux-Y1"]                                                                                                                            
  ├─ Execution time                                                                                                 Monthly cost depends on usage: $0.000016 per GB-seconds       
@@ -171,17 +179,17 @@
  ├─ Blob index                                                                                                     Monthly cost depends on usage: $0.03 per 10k tags             
  └─ Early deletion                                                                                                 Monthly cost depends on usage: $0.0152 per GB                 
                                                                                                                                                                                  
- OVERALL TOTAL                                                                                                                                                     $13,366.00 
+ OVERALL TOTAL                                                                                                                                                     $13,390.20 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-63 cloud resources were detected:
-∙ 41 were estimated
-∙ 22 were free
+66 cloud resources were detected:
+∙ 43 were estimated
+∙ 23 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $13,248 ┃        $118 ┃    $13,366 ┃
+┃ main                                               ┃       $13,248 ┃        $142 ┃    $13,390 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

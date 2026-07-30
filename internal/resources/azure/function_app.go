@@ -89,6 +89,22 @@ func (r *FunctionApp) BuildResource() *schema.Resource {
 		}
 	}
 
+	if r.Tier == "flexconsumption" {
+		// Always-ready instance costs aren't modelled yet since they depend on the
+		// site_config.always_ready block, which isn't currently read from Terraform data.
+		costComponents = append(
+			costComponents,
+			r.appFunctionFlexConsumptionExecutionTimeCostComponent(),
+			r.appFunctionFlexConsumptionExecutionsCostComponent(),
+		)
+
+		return &schema.Resource{
+			Name:           r.Address,
+			CostComponents: costComponents,
+			UsageSchema:    r.UsageSchema(),
+		}
+	}
+
 	costComponents = append(
 		costComponents,
 		r.appFunctionConsumptionExecutionTimeCostComponent(),
@@ -225,6 +241,69 @@ func (r *FunctionApp) appFunctionConsumptionExecutionsCostComponent() *schema.Co
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("100000"),
+		},
+		UsageBased: true,
+	}
+}
+
+// appFunctionFlexConsumptionExecutionTimeCostComponent prices the "On Demand" execution time meter
+// used by Flex Consumption (FC1) plans. Verified against the Azure Retail Prices API: Flex
+// Consumption gives 100,000 free GB-seconds/month before "On Demand Execution Time" is billed.
+func (r *FunctionApp) appFunctionFlexConsumptionExecutionTimeCostComponent() *schema.CostComponent {
+	gbSeconds := r.calculateFunctionAppGBSeconds()
+	return &schema.CostComponent{
+		Name:            "Execution time",
+		Unit:            "GB-seconds",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: gbSeconds,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Functions"),
+			ProductFamily: strPtr("Compute"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", ValueRegex: regexPtr("Execution Time$")},
+				{Key: "skuName", Value: strPtr("On Demand")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("100000"),
+		},
+		UsageBased: true,
+	}
+}
+
+// appFunctionFlexConsumptionExecutionsCostComponent prices the "On Demand" executions meter used by
+// Flex Consumption (FC1) plans. Verified against the Azure Retail Prices API: Flex Consumption
+// gives 250,000 free executions/month (tierMinimumUnits 25000, in units of 10 executions) before
+// "On Demand Total Executions" is billed.
+func (r *FunctionApp) appFunctionFlexConsumptionExecutionsCostComponent() *schema.CostComponent {
+	// Azure's pricing API returns prices per 10 executions so if the user has provided
+	// the number of executions, we should divide it by 10
+	var executions *decimal.Decimal
+	if r.MonthlyExecutions != nil {
+		executions = decimalPtr(decimal.NewFromInt(*r.MonthlyExecutions).Div(decimal.NewFromInt(10)))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Executions",
+		Unit:            "1M requests",
+		UnitMultiplier:  decimal.NewFromInt(100000),
+		MonthlyQuantity: executions,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Functions"),
+			ProductFamily: strPtr("Compute"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "meterName", ValueRegex: regexPtr("Total Executions$")},
+				{Key: "skuName", Value: strPtr("On Demand")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption:   strPtr("Consumption"),
+			StartUsageAmount: strPtr("25000"),
 		},
 		UsageBased: true,
 	}

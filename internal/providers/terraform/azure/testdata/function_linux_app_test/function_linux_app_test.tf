@@ -34,10 +34,13 @@ resource "azurerm_storage_account" "example" {
 locals {
   os_types = ["Linux"]
   skus     = ["EP1", "EP2", "EP3", "Y1"]
+  # FC1 (Flex Consumption) only exists on the modern azurerm_service_plan resource, so it's
+  # kept out of `skus`, which also seeds the legacy azurerm_app_service_plan permutations below.
+  plan_skus = concat(local.skus, ["FC1"])
 
   permutations = distinct(flatten([
     for os_type in local.os_types : [
-      for sku in local.skus : {
+      for sku in local.plan_skus : {
         sku     = sku
         os_type = os_type
       }

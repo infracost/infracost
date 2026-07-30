@@ -43,7 +43,10 @@ func (r *ServicePlan) BuildResource() *schema.Resource {
 	productName := "Standard Plan"
 	sku := r.SKUName
 
-	if len(r.SKUName) < 2 || strings.ToLower(r.SKUName[:2]) == "ep" || strings.ToLower(r.SKUName[:2]) == "ws" || strings.ToLower(r.SKUName[:2]) == "y1" {
+	if len(r.SKUName) < 2 || strings.ToLower(r.SKUName[:2]) == "ep" || strings.ToLower(r.SKUName[:2]) == "ws" || strings.ToLower(r.SKUName[:2]) == "y1" || strings.ToLower(r.SKUName[:2]) == "fc" {
+		// Flex Consumption ("FC1") plans have no direct cost of their own - Azure bills
+		// executions/GB-seconds on the linked Function App resource instead, so this plan
+		// is skipped here in the same way as WS/Y1 (see FunctionApp for the actual pricing).
 		return &schema.Resource{
 			Name:        r.Address,
 			IsSkipped:   true,
