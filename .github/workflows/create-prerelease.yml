@@ -12,10 +12,21 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Need full history + tags so git describe can find the latest v* tag
+          fetch-depth: 0
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+
+      - name: Compute preview tag
+        id: preview_tag
+        run: |
+          base=$(git describe --tags --abbrev=0 --match 'v*')
+          tag="preview-${base}-$(git rev-parse --short HEAD)"
+          echo "Preview tag: $tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Build project
         run: |
@@ -24,7 +35,7 @@ jobs:
       - name: Release
         run: go run tools/release/main.go
         env:
-          RELEASE_ID: "preview"
+          RELEASE_ID: ${{ steps.preview_tag.outputs.tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Remove build assets

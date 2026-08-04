@@ -23,60 +23,56 @@ func main() {
 	var release *github.RepositoryRelease
 	var err error
 	if releaseId != "" {
-		release, err = fetchExistingRelease(cli, releaseId)
+		release, err = createPrerelease(cli, releaseId)
 	} else {
 		release, err = createDraftRelease(cli)
 	}
 
 	if err != nil {
-		logging.Logger.Error().Msgf("failed to create draft release %s", err)
-		return
+		logging.Logger.Error().Msgf("failed to create release %s", err)
+		os.Exit(1)
 	}
 	toUpload, err := findReleaseAssets()
 	if err != nil {
 		logging.Logger.Error().Msgf("failed to collect release assets %s", err)
-		return
+		os.Exit(1)
 	}
 
 	err = uploadAssets(toUpload, cli, release)
 	if err != nil {
 		logging.Logger.Error().Msgf("failed to upload release assets %s", err)
-		return
+		os.Exit(1)
 	}
 
-	logging.Logger.Info().Msg("successfully created draft release")
+	logging.Logger.Info().Msg("successfully created release")
 }
 
-func fetchExistingRelease(cli *github.Client, tag string) (*github.RepositoryRelease, error) {
-	release, _, err := cli.Repositories.GetReleaseByTag(context.Background(), "infracost", "infracost", tag)
+// createPrerelease creates a new immutable prerelease at the current commit.
+// The tag must not start with "v", or scripts/get_version.sh (git tag --list
+// 'v*') would select it and corrupt version detection.
+func createPrerelease(cli *github.Client, tag string) (*github.RepositoryRelease, error) {
+	o, res, err := cli.Repositories.CreateRelease(
+		context.Background(),
+		"infracost",
+		"infracost",
+		&github.RepositoryRelease{
+			Name:                 github.String(tag),
+			TagName:              github.String(tag),
+			TargetCommitish:      github.String(os.Getenv("GITHUB_SHA")),
+			Prerelease:           github.Bool(true),
+			GenerateReleaseNotes: github.Bool(true),
+		},
+	)
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch existing release %s %s", tag, err)
-	}
-
-	newGitSha := os.Getenv("GITHUB_SHA")
-	if newGitSha != "" {
-		_, _, err = cli.Git.UpdateRef(context.Background(), "infracost", "infracost", &github.Reference{
-			Ref: github.String("refs/tags/" + tag),
-			Object: &github.GitObject{
-				SHA: github.String(newGitSha),
-			},
-		}, true)
-		if err != nil {
-			return nil, fmt.Errorf("could not update ref %s %s", tag, err)
+		body := ""
+		if res != nil {
+			b, _ := io.ReadAll(res.Body)
+			body = string(b)
 		}
+		return nil, fmt.Errorf("could not create prerelease %s: body: %s %w", tag, body, err)
 	}
 
-	// delete all the assets of the release as we are going to re-upload them and
-	// GitHub does not allow name conflicts with assets
-	for _, asset := range release.Assets {
-		_, err = cli.Repositories.DeleteReleaseAsset(context.Background(), "infracost", "infracost", asset.GetID())
-		if err != nil {
-			logging.Logger.Error().Msgf("failed to delete asset %s", err)
-			continue
-		}
-	}
-
-	return release, err
+	return o, nil
 }
 
 func createDraftRelease(cli *github.Client) (*github.RepositoryRelease, error) {
