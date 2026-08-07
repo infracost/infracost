@@ -119,6 +119,7 @@ resource_type_default_usage:
     additional_backup_storage_gb: 476 # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 100000000 # Monthly number of input/output requests for database.
     monthly_additional_performance_insights_requests: 1000000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    monthly_cpu_credit_hrs: 67 # Monthly CPU credits used over the instance baseline in vCPU-hours, only applicable for T3 and T4g instances.
   aws_directory_service_directory:
     additional_domain_controllers: 0.27 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
     shared_accounts: 0.75 # Number of accounts that Microsoft AD directory is shared with
@@ -778,6 +779,14 @@ resource_type_default_usage:
     monthly_data_retrieval_gb: 1000 # Monthly number of data retrieval in GB.
     snapshots_storage_gb: 440 # Total size of Snapshots in GB
     metadata_at_rest_storage_gb: 335 # Total size of Metadata in GB
+  azurerm_storage_table:
+    monthly_storage_gb: 222 # Monthly amount of storage used in GB.
+    monthly_batch_write_operations: 277777777 # Monthly number of Batch Write operations.
+    monthly_write_operations: 277777777 # Monthly number of Write operations.
+    monthly_read_operations: 277777777 # Monthly number of Read operations.
+    monthly_scan_operations: 277777777 # Monthly number of Scan operations.
+    monthly_list_operations: 277777777 # Monthly number of List operations.
+    monthly_delete_operations: 277777777 # Monthly number of Delete operations.
   azurerm_synapse_sql_pool:
     storage_tb: 0 # Total storage size, including snapshots, in TB.
   #

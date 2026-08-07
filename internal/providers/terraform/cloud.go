@@ -4,12 +4,19 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/credentials"
 	"github.com/infracost/infracost/internal/logging"
 )
+
+// hostsEqual reports whether two Terraform Cloud/Enterprise hostnames refer to
+// the same host, ignoring case and any trailing dot.
+func hostsEqual(a, b string) bool {
+	return strings.EqualFold(strings.TrimSuffix(a, "."), strings.TrimSuffix(b, "."))
+}
 
 func cloudAPI(host string, path string, token string) ([]byte, error) {
 	client := &http.Client{}

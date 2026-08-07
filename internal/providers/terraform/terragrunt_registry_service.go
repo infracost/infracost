@@ -1,6 +1,15 @@
 package terraform
 
-// Contents of this file were copied from github.com/gruntwork-io/terragrunt
+// Contents of this file were copied from github.com/gruntwork-io/terragrunt (the
+// tfr:// registry getter) and adapted so that Infracost controls the getter that
+// is actually wired up. On top of the upstream getter we add:
+//   - a trusted-host allowlist so the configured registry token (TG_TF_REGISTRY_TOKEN)
+//     is only ever sent to a trusted host, never to a host derived from an
+//     untrusted module source (see isTrustedRegistryHost / httpGETAndGetResponse);
+//   - support for the TG_TF_DEFAULT_REGISTRY_HOST env var, both as the default
+//     registry domain and as a trusted host;
+//   - the INFRACOST_REGISTRY_PROXY support (ProxyForDomains/ProxyURL) carried
+//     over from Infracost's terragrunt fork.
 import (
 	"context"
 	"fmt"
@@ -29,6 +38,10 @@ const (
 	serviceDiscoveryPath  = "/.well-known/terraform.json"
 	versionQueryKey       = "version"
 	authTokenEnvVarName   = "TG_TF_REGISTRY_TOKEN" //nolint
+	// defaultRegistryHostEnvVarName lets users point Terragrunt at a private
+	// default registry (used when a module source omits the registry host). When
+	// set we both resolve unqualified sources to it and trust it as a token host.
+	defaultRegistryHostEnvVarName = "TG_TF_DEFAULT_REGISTRY_HOST"
 )
 
 // TerraformRegistryServicePath is a struct for extracting the modules service path in the Registry.
@@ -51,7 +64,8 @@ type TerraformRegistryServicePath struct {
 //
 // Authentication to private module registries is handled via environment variables. The authorization API token is
 // expected to be provided to Terragrunt via the TG_TF_REGISTRY_TOKEN environment variable. This token can be any
-// registry API token generated on Terraform Cloud / Enterprise.
+// registry API token generated on Terraform Cloud / Enterprise. The token is only ever attached to requests to a
+// trusted host (see isTrustedRegistryHost); it is never sent to a host derived from an untrusted module source.
 //
 // MAINTAINER'S NOTE: Ideally we implement the full credential system that terraform uses as part of `terraform login`,
 // but all the relevant packages are internal to the terraform repository, thus making it difficult to use as a
@@ -65,6 +79,15 @@ type TerraformRegistryServicePath struct {
 // GH issue: https://github.com/gruntwork-io/terragrunt/issues/1772
 type TerraformRegistryGetter struct {
 	client *getter.Client
+	// ProxyForDomains / ProxyURL route requests to matching hosts through the
+	// INFRACOST_REGISTRY_PROXY (carried over from Infracost's terragrunt fork).
+	ProxyForDomains []string
+	ProxyURL        string
+	// TrustedHosts are additional hosts the registry token may be sent to, on top
+	// of the well-known public registries and the TG_TF_DEFAULT_REGISTRY_HOST env
+	// var. This is populated from the resolved terraform_cloud_host config value
+	// (which also covers the TERRAFORM_CLOUD_HOST env var).
+	TrustedHosts []string
 }
 
 // SetClient allows the getter to know what getter client (different from the underlying HTTP client) to use for
@@ -86,7 +109,7 @@ func (tfrGetter *TerraformRegistryGetter) ClientMode(ctx context.Context, u *url
 func (tfrGetter *TerraformRegistryGetter) Get(ctx context.Context, dstPath string, srcURL *url.URL) error {
 	registryDomain := srcURL.Host
 	if registryDomain == "" {
-		registryDomain = defaultRegistryDomain
+		registryDomain = defaultRegistryHost()
 	}
 	queryValues := srcURL.Query()
 	modulePath, moduleSubDir := getter.SourceDirSubdir(srcURL.Path)
@@ -100,7 +123,7 @@ func (tfrGetter *TerraformRegistryGetter) Get(ctx context.Context, dstPath strin
 	}
 	version := versionList[0]
 
-	moduleRegistryBasePath, err := getModuleRegistryURLBasePath(ctx, registryDomain)
+	moduleRegistryBasePath, err := tfrGetter.getModuleRegistryURLBasePath(ctx, registryDomain)
 	if err != nil {
 		return err
 	}
@@ -110,7 +133,7 @@ func (tfrGetter *TerraformRegistryGetter) Get(ctx context.Context, dstPath strin
 		return err
 	}
 
-	terraformGet, err := getTerraformGetHeader(ctx, *moduleURL)
+	terraformGet, err := tfrGetter.getTerraformGetHeader(ctx, *moduleURL)
 	if err != nil {
 		return err
 	}
@@ -138,7 +161,7 @@ func (tfrGetter *TerraformRegistryGetter) Get(ctx context.Context, dstPath strin
 
 // GetFile is not implemented for the Terraform module registry Getter since the terraform module registry doesn't serve
 // a single file.
-func (tfrGetter *TerraformRegistryGetter) GetFile(dst string, src *url.URL) error {
+func (tfrGetter *TerraformRegistryGetter) GetFile(ctx context.Context, dst string, src *url.URL) error {
 	return errors.WithStackTrace(fmt.Errorf("GetFile is not implemented for the Terraform Registry Getter"))
 }
 
@@ -194,13 +217,13 @@ func (tfrGetter *TerraformRegistryGetter) getSubdir(ctx context.Context, dstPath
 // (https://www.terraform.io/docs/internals/remote-service-discovery.html)
 // to figure out where the modules are stored. This will return the base
 // path where the modules can be accessed
-func getModuleRegistryURLBasePath(ctx context.Context, domain string) (string, error) {
+func (tfrGetter *TerraformRegistryGetter) getModuleRegistryURLBasePath(ctx context.Context, domain string) (string, error) {
 	sdURL := url.URL{
 		Scheme: "https",
 		Host:   domain,
 		Path:   serviceDiscoveryPath,
 	}
-	bodyData, _, err := httpGETAndGetResponse(ctx, sdURL)
+	bodyData, _, err := tfrGetter.httpGETAndGetResponse(ctx, sdURL)
 	if err != nil {
 		return "", err
 	}
@@ -215,8 +238,8 @@ func getModuleRegistryURLBasePath(ctx context.Context, domain string) (string, e
 
 // getTerraformGetHeader makes an http GET call to the given registry URL and return the contents of the header
 // X-Terraform-Get. This function will return an error if the response does not contain the header.
-func getTerraformGetHeader(ctx context.Context, url url.URL) (string, error) {
-	_, header, err := httpGETAndGetResponse(ctx, url)
+func (tfrGetter *TerraformRegistryGetter) getTerraformGetHeader(ctx context.Context, url url.URL) (string, error) {
+	_, header, err := tfrGetter.httpGETAndGetResponse(ctx, url)
 	if err != nil {
 		details := "error receiving HTTP data"
 		return "", errors.WithStackTrace(ModuleDownloadErr{sourceURL: url.String(), details: details})
@@ -250,20 +273,42 @@ func getDownloadURLFromHeader(moduleURL url.URL, terraformGet string) (string, e
 
 // httpGETAndGetResponse is a helper function to make a GET request to the given URL using the http client. This
 // function will then read the response and return the contents + the response header.
-func httpGETAndGetResponse(ctx context.Context, getURL url.URL) ([]byte, *http.Header, error) {
+func (tfrGetter *TerraformRegistryGetter) httpGETAndGetResponse(ctx context.Context, getURL url.URL) ([]byte, *http.Header, error) {
 	req, err := http.NewRequestWithContext(ctx, "GET", getURL.String(), nil)
 	if err != nil {
 		return nil, nil, errors.WithStackTrace(err)
 	}
 
 	// Handle authentication via env var. Authentication is done by providing the registry token as a bearer token in
-	// the request header.
+	// the request header. The request host is derived from the (untrusted) module source, so we only attach the token
+	// when the host is a trusted registry - otherwise a malicious module source could exfiltrate the token to an
+	// attacker-controlled host.
 	authToken := os.Getenv(authTokenEnvVarName)
-	if authToken != "" {
+	if authToken != "" && tfrGetter.isTrustedRegistryHost(getURL.Host) {
 		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", authToken))
 	}
 
-	resp, err := httpClient.Do(req)
+	client := httpClient
+	if tfrGetter.ProxyURL != "" {
+		var shouldProxy bool
+		for _, suffix := range tfrGetter.ProxyForDomains {
+			if strings.HasSuffix(getURL.Host, suffix) {
+				shouldProxy = true
+				break
+			}
+		}
+		if shouldProxy {
+			if parsed, err := url.Parse(tfrGetter.ProxyURL); err == nil {
+				client = &http.Client{
+					Transport: &http.Transport{
+						Proxy: http.ProxyURL(parsed),
+					},
+				}
+			}
+		}
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, nil, errors.WithStackTrace(err)
 	}
@@ -275,6 +320,55 @@ func httpGETAndGetResponse(ctx context.Context, getURL url.URL) ([]byte, *http.H
 
 	bodyData, err := io.ReadAll(resp.Body)
 	return bodyData, &resp.Header, errors.WithStackTrace(err)
+}
+
+// defaultRegistryHost returns the registry host to use when a module source omits
+// it. Users can point at a private default registry via TG_TF_DEFAULT_REGISTRY_HOST,
+// otherwise we fall back to the public Terraform registry.
+func defaultRegistryHost() string {
+	if h := os.Getenv(defaultRegistryHostEnvVarName); h != "" {
+		return h
+	}
+	return defaultRegistryDomain
+}
+
+// isTrustedRegistryHost reports whether the TG_TF_REGISTRY_TOKEN may be sent to
+// the given host. The token is a Terraform Cloud/Enterprise registry token, so
+// we only attach it to the well-known public registries, to the configured
+// Terraform Cloud/Enterprise host (terraform_cloud_host config / TERRAFORM_CLOUD_HOST
+// env var, passed in via TrustedHosts) and to a configured default registry
+// (TG_TF_DEFAULT_REGISTRY_HOST) - never to a host derived from an untrusted
+// module source.
+func (tfrGetter *TerraformRegistryGetter) isTrustedRegistryHost(host string) bool {
+	trusted := []string{
+		"registry.terraform.io", // public Terraform registry
+		"registry.opentofu.org", // public OpenTofu registry
+		"app.terraform.io",      // Terraform Cloud (incl. private module registry)
+	}
+	// The resolved terraform_cloud_host config value lets Terraform Enterprise
+	// users point at their own host, so trust it too when it is explicitly
+	// configured.
+	trusted = append(trusted, tfrGetter.TrustedHosts...)
+	// Also read TERRAFORM_CLOUD_HOST directly so the token is scoped correctly
+	// even when the getter is constructed without a resolved config (the config
+	// value above already covers this env var, but reading it here keeps the
+	// getter self-contained).
+	if h := os.Getenv("TERRAFORM_CLOUD_HOST"); h != "" {
+		trusted = append(trusted, h)
+	}
+	// TG_TF_DEFAULT_REGISTRY_HOST points unqualified module sources at a private
+	// registry, so trust that host as well when it is configured.
+	if h := os.Getenv(defaultRegistryHostEnvVarName); h != "" {
+		trusted = append(trusted, h)
+	}
+
+	for _, t := range trusted {
+		if t != "" && hostsEqual(host, t) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // buildRequestUrl - create url to download module using moduleRegistryBasePath

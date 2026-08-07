@@ -1,0 +1,10 @@
+version: 0.1
+resource_usage:
+  azurerm_storage_table.usage:
+    monthly_storage_gb: 100
+    monthly_batch_write_operations: 1000000
+    monthly_write_operations: 2000000
+    monthly_read_operations: 3000000
+    monthly_scan_operations: 4000000
+    monthly_list_operations: 5000000
+    monthly_delete_operations: 6000000
