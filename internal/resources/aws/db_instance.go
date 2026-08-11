@@ -574,11 +574,14 @@ func (s ExtendedSupport) CostComponent(version string, region string, d time.Tim
 
 var (
 	// https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html#MySQL.Concepts.VersionMgmt.ReleaseCalendar
+	// "8" is the pre-8.4 fallback (8.0 and 8.1–8.3 via version segment stripping).
+	// "8.4" must be explicit so it is not collapsed to "8".
 	mysqlExtendedSupport = ExtendedSupport{
 		Engine: "MySQL",
 		Versions: map[string]ExtendedSupportDates{
 			"5.7": {Year1: time.Date(2024, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2026, time.March, 1, 0, 0, 0, 0, time.UTC)},
 			"8":   {Year1: time.Date(2026, time.August, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2028, time.August, 1, 0, 0, 0, 0, time.UTC)},
+			"8.4": {Year1: time.Date(2029, time.August, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2031, time.August, 1, 0, 0, 0, 0, time.UTC)},
 		},
 	}
 
