@@ -70,8 +70,26 @@ func (r *LinuxVirtualMachine) BuildResource() *schema.Resource {
 }
 
 func linuxVirtualMachineCostComponent(region string, instanceType string, monthlyHours *float64) *schema.CostComponent {
+	return linuxVirtualMachineCostComponentWithPriority(region, instanceType, monthlyHours, "")
+}
+
+// linuxVirtualMachineCostComponentWithPriority returns the per-hour instance
+// cost component for a Linux VM/node, optionally selecting Spot pricing.
+//
+// priority="Spot" matches SKUs ending with " Spot" in the Azure retail catalog
+// (variable market price; the catalog snapshot is used as a point estimate
+// — actual Spot prices fluctuate with demand).
+// priority="" or "Regular" excludes Low Priority/Spot SKUs, falling back to
+// the standard pay-as-you-go price.
+func linuxVirtualMachineCostComponentWithPriority(region string, instanceType string, monthlyHours *float64, priority string) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
+	skuNameRe := "/^(?!.*(Low Priority|Spot)$).*$/i"
+	if strings.EqualFold(priority, "Spot") {
+		purchaseOption = "Spot"
+		purchaseOptionLabel = "spot"
+		skuNameRe = "/^.*Spot$/i"
+	}
 
 	productNameRe := "/Series( Linux)?$/i"
 	if strings.HasPrefix(strings.ToLower(instanceType), "basic_") {
@@ -97,7 +115,7 @@ func linuxVirtualMachineCostComponent(region string, instanceType string, monthl
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "meterName", ValueRegex: strPtr("/^(?!.*(Expired|Free)$).*$/i")},
-				{Key: "skuName", ValueRegex: strPtr("/^(?!.*(Low Priority|Spot)$).*$/i")},
+				{Key: "skuName", ValueRegex: strPtr(skuNameRe)},
 				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 			},

@@ -84,8 +84,22 @@ func (r *WindowsVirtualMachine) BuildResource() *schema.Resource {
 }
 
 func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string, monthlyHours *float64, isDevTest bool) *schema.CostComponent {
+	return windowsVirtualMachineCostComponentWithPriority(region, instanceType, licenseType, monthlyHours, isDevTest, "")
+}
+
+// windowsVirtualMachineCostComponentWithPriority is the Windows counterpart of
+// linuxVirtualMachineCostComponentWithPriority. See its godoc for the priority
+// argument semantics.
+func windowsVirtualMachineCostComponentWithPriority(region string, instanceType string, licenseType string, monthlyHours *float64, isDevTest bool, priority string) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
+	skuNameRe := "/^(?!.*(Low Priority|Spot)$).*$/i"
+	isSpot := strings.EqualFold(priority, "Spot")
+	if isSpot {
+		purchaseOption = "Spot"
+		purchaseOptionLabel = "spot"
+		skuNameRe = "/^.*Spot$/i"
+	}
 
 	productNameRe := "/(Series )?Windows$/i"
 	if strings.HasPrefix(instanceType, "Basic_") {
@@ -94,14 +108,19 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 
-	if strings.ToLower(licenseType) == "windows_client" || strings.ToLower(licenseType) == "windows_server" {
-		purchaseOption = "DevTestConsumption"
-		purchaseOptionLabel = "hybrid benefit"
-	}
+	// Hybrid benefit and dev/test are mutually exclusive with Spot in Azure:
+	// Spot VMs cannot use Azure Hybrid Benefit licensing, and dev/test rates
+	// are not offered for Spot SKUs. Keep PAYG for Spot regardless of licenseType.
+	if !isSpot {
+		if strings.ToLower(licenseType) == "windows_client" || strings.ToLower(licenseType) == "windows_server" {
+			purchaseOption = "DevTestConsumption"
+			purchaseOptionLabel = "hybrid benefit"
+		}
 
-	if isDevTest {
-		purchaseOption = "DevTestConsumption"
-		purchaseOptionLabel = "dev/test"
+		if isDevTest {
+			purchaseOption = "DevTestConsumption"
+			purchaseOptionLabel = "dev/test"
+		}
 	}
 
 	qty := schema.HourToMonthUnitMultiplier
@@ -120,7 +139,7 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 			Service:       strPtr("Virtual Machines"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr("/^(?!.*(Low Priority|Spot)$).*$/i")},
+				{Key: "skuName", ValueRegex: strPtr(skuNameRe)},
 				{Key: "armSkuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", instanceType))},
 				{Key: "productName", ValueRegex: strPtr(productNameRe)},
 			},
