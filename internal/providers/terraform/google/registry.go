@@ -59,6 +59,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getCloudRunServiceRegistryItem(),
 	getCloudRunV2JobRegistryItem(),
 	getCloudRunV2ServiceRegistryItem(),
+	getCloudSchedulerRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
