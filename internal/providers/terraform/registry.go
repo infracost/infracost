@@ -6,6 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 	"github.com/infracost/infracost/internal/providers/terraform/azure"
 	"github.com/infracost/infracost/internal/providers/terraform/google"
+	"github.com/infracost/infracost/internal/providers/terraform/sakura"
 )
 
 type RegistryItemMap map[string]*schema.RegistryItem
@@ -48,6 +49,17 @@ func buildResourceRegistryMap() *RegistryItemMap {
 		resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = google.GetDefaultRefIDFunc
 	}
 	for _, registryItem := range createFreeResources(google.FreeResources, google.GetDefaultRefIDFunc, google.DefaultCloudResourceIDFunc) {
+		resourceRegistryMap[registryItem.Name] = registryItem
+	}
+
+	for _, registryItem := range sakura.ResourceRegistry {
+		if registryItem.CloudResourceIDFunc == nil {
+			registryItem.CloudResourceIDFunc = sakura.DefaultCloudResourceIDFunc
+		}
+		resourceRegistryMap[registryItem.Name] = registryItem
+		resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = sakura.GetDefaultRefIDFunc
+	}
+	for _, registryItem := range createFreeResources(sakura.FreeResources, sakura.GetDefaultRefIDFunc, sakura.DefaultCloudResourceIDFunc) {
 		resourceRegistryMap[registryItem.Name] = registryItem
 	}
 
@@ -96,6 +108,7 @@ func GetUsageOnlyResources() []string {
 	r = append(r, aws.UsageOnlyResources...)
 	r = append(r, azure.UsageOnlyResources...)
 	r = append(r, google.UsageOnlyResources...)
+	r = append(r, sakura.UsageOnlyResources...)
 	return r
 }
 
