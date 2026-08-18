@@ -82,7 +82,7 @@ func (r *BackupProtectedVM) additionalCostForSizeOfVM() *schema.CostComponent {
 	quantity := decimal.NewFromInt(1)
 	filter := &schema.AttributeFilter{
 		Key:   "meterName",
-		Value: strPtr("Azure Files Protected Instances"),
+		Value: strPtr("Azure Files Protected Instance"),
 	}
 
 	utilization := r.diskUtilization()
@@ -138,7 +138,7 @@ func (r *BackupProtectedVM) storageCostsForVM() *schema.CostComponent {
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Backup")},
-				{Key: "skuName", Value: strPtr("Standard")},
+				{Key: "skuName", Value: strPtr("Azure VM")},
 				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s/i", dataStored))},
 			},
 		},

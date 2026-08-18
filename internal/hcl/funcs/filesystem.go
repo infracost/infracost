@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/bmatcuk/doublestar"
 	homedir "github.com/mitchellh/go-homedir"
@@ -13,6 +12,7 @@ import (
 	"github.com/zclconf/go-cty/cty/function"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/security"
 )
 
 func MakeFileFunc(baseDir string, encBase64 bool) function.Function {
@@ -254,33 +254,13 @@ func isPathInRepo(path string) error {
 		path = filepath.Join(wd, path)
 	}
 
-	// ensure the path resolves to the real symlink path
-	path = symlinkPath(path)
-
-	clean := filepath.Clean(wd)
-	if wd != "" && !strings.HasPrefix(path, clean) {
+	// security.IsPathAllowed resolves symlinks anywhere in the path (leaf and
+	// intermediate directory symlinks) before checking containment, so an
+	// in-repo symlink can't be used to escape the repository directory via a
+	// path like dir-link/secret whose leaf isn't itself a symlink.
+	if wd != "" && !security.IsPathAllowed(path, wd) {
 		return fmt.Errorf("file %s is not within the repository directory %s", path, wd)
 	}
 
 	return nil
-}
-
-// symlinkPath checks the given file path and returns the real path if it is a
-// symlink.
-func symlinkPath(filepathStr string) string {
-	fileInfo, err := os.Lstat(filepathStr)
-	if err != nil {
-		return filepathStr
-	}
-
-	if fileInfo.Mode()&os.ModeSymlink != 0 {
-		realPath, err := filepath.EvalSymlinks(filepathStr)
-		if err != nil {
-			return filepathStr
-		}
-
-		return realPath
-	}
-
-	return filepathStr
 }
