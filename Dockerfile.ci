@@ -6,6 +6,11 @@ ARG ARCH=linux64
 SHELL ["/bin/bash", "-c"]
 ENV HOME=/app
 ENV CGO_ENABLED=0
+# Force the golang image tag above to be in sync with the `toolchain` directive
+# in go.mod: the build fails if they drift, instead of silently downloading
+# another toolchain (or, with the image default GOTOOLCHAIN=local, silently
+# building with the wrong one).
+ENV GOTOOLCHAIN=path
 
 WORKDIR /app
 

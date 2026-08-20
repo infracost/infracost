@@ -8,6 +8,11 @@ ARG TERRAGRUNT_VERSION=0.31.8
 SHELL ["/bin/bash", "-c"]
 ENV HOME=/app
 ENV CGO_ENABLED=0
+# Force the golang image tag above to be in sync with the `toolchain` directive
+# in go.mod: the build fails if they drift, instead of silently downloading
+# another toolchain (or, with the image default GOTOOLCHAIN=local, silently
+# building with the wrong one).
+ENV GOTOOLCHAIN=path
 
 # Install Packages
 RUN apt-get update -q && apt-get -y install unzip && rm -rf /var/lib/apt/lists/*
