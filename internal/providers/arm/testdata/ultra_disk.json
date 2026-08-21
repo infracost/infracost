@@ -1,0 +1,23 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+      {
+        "type": "Microsoft.Compute/disks",
+        "apiVersion": "2023-10-02",
+        "name": "ultra",
+        "location": "francecentral",
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          },
+          "diskSizeGB": 2000,
+          "diskIOPSReadWrite": 4000,
+          "diskMBpsReadWrite": 20
+        },
+        "sku": {
+          "name": "UltraSSD_LRS"
+        }
+      }
+    ]
+  }
