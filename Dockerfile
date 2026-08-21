@@ -1,4 +1,6 @@
-FROM golang:1.26.5 AS builder
+ARG GO_VERSION=1.26.6
+
+FROM golang:${GO_VERSION} AS builder
 
 ARG ARCH=linux
 ARG DEFAULT_TERRAFORM_VERSION=0.15.5
@@ -8,6 +10,10 @@ ARG TERRAGRUNT_VERSION=0.31.8
 SHELL ["/bin/bash", "-c"]
 ENV HOME=/app
 ENV CGO_ENABLED=0
+# force the GO_VERSION above to be in sync with the `toolchain` directive in go.mod.
+# This avoids downloading other Go Toolchains, which happens silently and would slow
+# down our image builds.
+ENV GOTOOLCHAIN=path
 
 # Install Packages
 RUN apt-get update -q && apt-get -y install unzip && rm -rf /var/lib/apt/lists/*
