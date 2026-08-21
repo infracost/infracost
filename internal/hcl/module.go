@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/zclconf/go-cty/cty"
 )
 
 // ModuleCall represents a call to a defined Module by a parent Module.
@@ -48,9 +49,13 @@ type Module struct {
 	// ProviderReferences is a map of provider names (relative to the module) to
 	// the provider block that defines that provider. We keep track of this so we
 	// can re-evaluate the provider blocks when we need to.
-	ProviderReferences  map[string]*Block
-	TerraformVersion    string
-	ProviderConstraints *ProviderConstraints
+	ProviderReferences map[string]*Block
+	// ProviderReferenceValues contains provider instances selected by a module
+	// call's providers map. These values take precedence over the corresponding
+	// unexpanded provider blocks in ProviderReferences.
+	ProviderReferenceValues map[string]cty.Value
+	TerraformVersion        string
+	ProviderConstraints     *ProviderConstraints
 }
 
 // Index returns the count index of the Module using the name.

@@ -51,6 +51,9 @@ func (v *VertexData) Visit(mutex *sync.Mutex) error {
 		for name, providerBlock := range e.module.ProviderReferences {
 			e.ctx.Set(providerBlock.Values(), name)
 		}
+		for name, providerValue := range e.module.ProviderReferenceValues {
+			e.ctx.Set(providerValue, name)
+		}
 
 		err := v.evaluate(e, blockInstance)
 		if err != nil {

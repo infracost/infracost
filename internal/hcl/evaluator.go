@@ -127,6 +127,9 @@ func NewEvaluator(
 	if module.ProviderReferences == nil {
 		module.ProviderReferences = make(map[string]*Block)
 	}
+	if module.ProviderReferenceValues == nil {
+		module.ProviderReferenceValues = make(map[string]cty.Value)
+	}
 
 	providerBlocks := module.Blocks.OfType("provider")
 	for _, block := range providerBlocks {
@@ -137,10 +140,14 @@ func NewEvaluator(
 			k = k + "." + alias.AsString()
 		}
 		module.ProviderReferences[k] = block
+		delete(module.ProviderReferenceValues, k)
 	}
 
 	for key, provider := range module.ProviderReferences {
 		ctx.Set(provider.Values(), key)
+	}
+	for key, provider := range module.ProviderReferenceValues {
+		ctx.Set(provider, key)
 	}
 
 	if visitedModules == nil {
@@ -272,6 +279,9 @@ func (e *Evaluator) collectModules() *Module {
 	for name, providerBlock := range root.ProviderReferences {
 		e.ctx.Set(providerBlock.Values(), name)
 	}
+	for name, providerValue := range root.ProviderReferenceValues {
+		e.ctx.Set(providerValue, name)
+	}
 
 	if v := e.MissingVars(); len(v) > 0 {
 		root.Warnings = append(root.Warnings, schema.NewDiagMissingVars(v...))
@@ -353,16 +363,17 @@ func (e *Evaluator) evaluateModules() {
 
 		moduleEvaluator := NewEvaluator(
 			Module{
-				Name:               fullName,
-				Source:             moduleCall.Module.Source,
-				Blocks:             moduleCall.Module.RawBlocks,
-				RawBlocks:          moduleCall.Module.RawBlocks,
-				RootPath:           e.module.RootPath,
-				ModulePath:         moduleCall.Path,
-				Modules:            nil,
-				Parent:             &e.module,
-				SourceURL:          moduleCall.Module.SourceURL,
-				ProviderReferences: moduleCall.Module.ProviderReferences,
+				Name:                    fullName,
+				Source:                  moduleCall.Module.Source,
+				Blocks:                  moduleCall.Module.RawBlocks,
+				RawBlocks:               moduleCall.Module.RawBlocks,
+				RootPath:                e.module.RootPath,
+				ModulePath:              moduleCall.Path,
+				Modules:                 nil,
+				Parent:                  &e.module,
+				SourceURL:               moduleCall.Module.SourceURL,
+				ProviderReferences:      moduleCall.Module.ProviderReferences,
+				ProviderReferenceValues: moduleCall.Module.ProviderReferenceValues,
 			},
 			e.workingDir,
 			vars,
@@ -913,9 +924,13 @@ func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.
 		return cty.ObjectVal(values)
 	}
 
+	// Expand for_each instances so that indexed references like
+	// aws.by_region["us-east-1"] evaluate to the per-instance values.
+	aliasVal := e.expandProviderForEach(b)
+
 	if !exists {
 		return cty.ObjectVal(map[string]cty.Value{
-			str: b.Values(),
+			str: aliasVal,
 		})
 	}
 
@@ -923,8 +938,45 @@ func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.
 	if ob == nil {
 		ob = make(map[string]cty.Value)
 	}
-	ob[str] = b.Values()
+	ob[str] = aliasVal
 	return cty.ObjectVal(ob)
+}
+
+// expandProviderForEach returns one entry per for_each instance so indexed
+// provider references like aws.by_region["us-east-1"] resolve to values
+// evaluated with the corresponding each.key and each.value.
+func (e *Evaluator) expandProviderForEach(b *Block) cty.Value {
+	forEachAttr := b.GetAttribute("for_each")
+	if forEachAttr == nil || !forEachAttr.IsIterable() {
+		return b.Values()
+	}
+
+	forEachVal := forEachAttr.Value()
+	if forEachVal.IsNull() || !forEachVal.IsKnown() {
+		return b.Values()
+	}
+
+	expandedMap := map[string]cty.Value{}
+	forEachVal.ForEachElement(func(key cty.Value, val cty.Value) bool {
+		var keyStr string
+		if err := gocty.FromCtyValue(key, &keyStr); err != nil {
+			e.logger.Debug().Err(err).Msgf("could not marshal for_each provider key to string")
+			return false
+		}
+
+		clone := e.blockBuilder.CloneBlock(b, key)
+		clone.SetLabels(append([]string(nil), b.Labels()...))
+		ctx := clone.Context()
+		ctx.SetByDot(key, "each.key")
+		ctx.SetByDot(val, "each.value")
+		expandedMap[keyStr] = clone.Values()
+		return false
+	})
+
+	if len(expandedMap) == 0 {
+		return b.Values()
+	}
+	return cty.ObjectVal(expandedMap)
 }
 
 // evaluateResourceOrData evaluates a resource or data block.
@@ -1029,9 +1081,13 @@ func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
 	// module, as well as any explicit provider references that are passed in
 	// via the "providers" attribute.
 	providerRefs := map[string]*Block{}
+	providerValues := map[string]cty.Value{}
 
 	for key, block := range e.module.ProviderReferences {
 		providerRefs[key] = block
+	}
+	for key, value := range e.module.ProviderReferenceValues {
+		providerValues[key] = value
 	}
 
 	providerAttr := b.GetAttribute("providers")
@@ -1040,9 +1096,14 @@ func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
 		for key, val := range decodedProviders {
 			providerRefs[key] = providerRefs[val]
 		}
+		for key, val := range providerAttr.DecodeProviderValues() {
+			delete(providerRefs, key)
+			providerValues[key] = val
+		}
 	}
 
 	modCall.Module.ProviderReferences = providerRefs
+	modCall.Module.ProviderReferenceValues = providerValues
 
 	return modCall, nil
 }
