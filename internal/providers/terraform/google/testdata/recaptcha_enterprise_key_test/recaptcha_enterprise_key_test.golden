@@ -1,0 +1,21 @@
+ Name                                                  Monthly Qty  Unit               Monthly Cost    
+                                                                                                      
+ google_recaptcha_enterprise_key.default                                                     
+ └─ reCAPTCHA Enterprise assessments                        1,000,000  assessments           $1,000.00  * 
+                                                                                                      
+ google_recaptcha_enterprise_key.android                                                      
+ └─ reCAPTCHA Enterprise assessments                          500,000  assessments             $500.00  * 
+                                                                                                      
+ OVERALL TOTAL                                                                       $1,500.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+─────────────────────────────────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃         $0.00 ┃     $1,500  ┃     $1,500 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
