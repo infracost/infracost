@@ -274,8 +274,16 @@ func findInvalidKeys(item *schema.UsageItem, refMap map[string]interface{}) []st
 	if refVal, ok := refMap[item.Key]; !ok {
 		invalidKeys = append(invalidKeys, item.Key)
 	} else if item.ValueType == schema.SubResourceUsage && item.Value != nil {
+		// The user provided a nested map for this key, but the reference file may
+		// define it as a scalar. In that case the user's value is invalid, so report
+		// the key rather than panicking on the type assertion.
+		refSubMap, ok := refVal.(map[string]interface{})
+		if !ok {
+			invalidKeys = append(invalidKeys, item.Key)
+			return invalidKeys
+		}
 		for _, subItem := range item.Value.(*ResourceUsage).Items {
-			invalidKeys = append(invalidKeys, findInvalidKeys(subItem, refVal.(map[string]interface{}))...)
+			invalidKeys = append(invalidKeys, findInvalidKeys(subItem, refSubMap)...)
 		}
 	}
 
