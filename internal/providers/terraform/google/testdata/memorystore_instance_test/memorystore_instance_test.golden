@@ -1,0 +1,58 @@
+
+ Name                                                       Monthly Qty  Unit                Monthly Cost   
+                                                                                                            
+ google_memorystore_instance.nodes["HIGHMEM_2XLARGE"]                                                       
+ └─ Node (highmem 2xlarge)                                        2,920  hours                  $4,752.01   
+                                                                                                            
+ google_memorystore_instance.nodes["HIGHMEM_XLARGE"]                                                        
+ └─ Node (highmem xlarge)                                         2,920  hours                  $2,505.65   
+                                                                                                            
+ google_memorystore_instance.nodes["STANDARD_LARGE"]                                                        
+ └─ Node (standard large)                                         2,920  hours                  $1,663.82   
+                                                                                                            
+ google_memorystore_instance.nodes["HIGHCPU_MEDIUM"]                                                        
+ └─ Node (highcpu medium)                                         2,920  hours                  $1,455.91   
+                                                                                                            
+ google_memorystore_instance.nodes["HIGHMEM_MEDIUM"]                                                        
+ └─ Node (highmem medium)                                         2,920  hours                    $561.52   
+                                                                                                            
+ google_memorystore_instance.aof_and_backups                                                                
+ ├─ Node (standard small)                                         2,920  hours                    $416.10   
+ ├─ AOF persistence                                               9,490  GB                         $5.20   
+ └─ Backups                                             Monthly cost depends on usage: $0.0811103 per GB    
+                                                                                                            
+ google_memorystore_instance.default_node_type                                                              
+ └─ Node (highmem medium)                                         2,190  hours                    $421.14   
+                                                                                                            
+ google_memorystore_instance.nodes["STANDARD_SMALL"]                                                        
+ └─ Node (standard small)                                         2,920  hours                    $416.10   
+                                                                                                            
+ google_memorystore_instance.nodes["CUSTOM_MINI"]                                                           
+ └─ Node (custom mini)                                            2,920  hours                    $269.81   
+                                                                                                            
+ google_memorystore_instance.nodes["CUSTOM_MICRO"]                                                          
+ └─ Node (custom micro)                                           2,920  hours                    $179.87   
+                                                                                                            
+ google_memorystore_instance.backups_with_usage                                                             
+ ├─ Node (shared core nano)                                         730  hours                     $23.21   
+ └─ Backups                                                       1,000  GB                        $81.11   
+                                                                                                            
+ google_memorystore_instance.nodes["SHARED_CORE_NANO"]                                                      
+ └─ Node (shared core nano)                                       2,920  hours                     $92.86   
+                                                                                                            
+ google_memorystore_instance.nodes["CUSTOM_PICO"]                                                           
+ └─ Node (custom pico)                                            2,920  hours                     $89.94   
+                                                                                                            
+ OVERALL TOTAL                                                                                $12,934.24 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+13 cloud resources were detected:
+∙ 13 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃       $12,934 ┃           - ┃    $12,934 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

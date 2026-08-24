@@ -44,6 +44,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLoggingOrganizationBucketConfigRegistryItem(),
 	getLoggingOrganizationSinkRegistryItem(),
 	getLoggingProjectSinkRegistryItem(),
+	getMemorystoreInstanceRegistryItem(),
 	getMonitoringItem(),
 	getPubSubSubscriptionRegistryItem(),
 	getPubSubTopicRegistryItem(),

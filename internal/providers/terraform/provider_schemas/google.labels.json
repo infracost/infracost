@@ -93,6 +93,7 @@
   "google_integration_connectors_managed_zone": true,
   "google_kms_crypto_key": true,
   "google_memcache_instance": true,
+  "google_memorystore_instance": true,
   "google_migration_center_group": true,
   "google_ml_engine_model": true,
   "google_monitoring_notification_channel": true,
