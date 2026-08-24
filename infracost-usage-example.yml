@@ -712,6 +712,9 @@ resource_usage:
   google_logging_project_sink.my_sink:
     monthly_logging_data_gb: 100  # Monthly logging data in GB.
 
+  google_memorystore_instance.my_valkey_instance:
+    backup_storage_gb: 1000 # Amount of backup storage in GB.
+
   google_monitoring_metric_descriptor.my_monitoring:
     monthly_monitoring_data_mb: 5000 # Monthly monitoring data in MB (only for chargeable metrics).
     monthly_api_calls: 1000000       # Monthly read API calls (write calls are free).
