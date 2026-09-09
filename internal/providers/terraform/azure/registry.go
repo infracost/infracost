@@ -614,6 +614,7 @@ var FreeResources = []string{
 	// Azure Storage
 	"azurerm_storage_account_local_user",
 	"azurerm_storage_account_network_rules",
+	"azurerm_storage_account_queue_properties",
 	"azurerm_storage_blob",
 	"azurerm_storage_blob_inventory_policy",
 	"azurerm_storage_container",
