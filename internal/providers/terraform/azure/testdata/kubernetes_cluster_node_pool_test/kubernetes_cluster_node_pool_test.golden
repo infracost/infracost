@@ -48,17 +48,27 @@
  └─ os_disk                                                                                                  
     └─ Storage (S10, LRS)                                                          1  months         $5.89   
                                                                                                              
- OVERALL TOTAL                                                                                  $1,310.20 
+ azurerm_kubernetes_cluster_node_pool.spot_linux                                                             
+ ├─ Instance usage (Linux, spot, Standard_D2as_v5)                               730  hours         $13.65   
+ └─ os_disk                                                                                                  
+    └─ Storage (P10, LRS)                                                          1  months        $19.71   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.spot_windows                                                           
+ ├─ Instance usage (Windows, spot, Standard_D2as_v5)                             730  hours         $13.65   
+ └─ os_disk                                                                                                  
+    └─ Storage (P10, LRS)                                                          1  months        $19.71   
+                                                                                                             
+ OVERALL TOTAL                                                                                  $1,376.93 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-11 cloud resources were detected:
-∙ 10 were estimated
+13 cloud resources were detected:
+∙ 12 were estimated
 ∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃        $1,310 ┃           - ┃     $1,310 ┃
+┃ main                                               ┃        $1,377 ┃           - ┃     $1,377 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

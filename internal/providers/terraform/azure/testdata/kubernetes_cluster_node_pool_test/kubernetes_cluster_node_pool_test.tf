@@ -86,3 +86,24 @@ resource "azurerm_kubernetes_cluster_node_pool" "non_premium" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
   vm_size               = "Standard_D2_v3"
 }
+
+resource "azurerm_kubernetes_cluster_node_pool" "spot_linux" {
+  name                  = "spotlinux"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
+  vm_size               = "Standard_D2as_v5"
+  priority              = "Spot"
+  eviction_policy       = "Delete"
+  spot_max_price        = -1
+  node_count            = 1
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "spot_windows" {
+  name                  = "spotwin"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
+  vm_size               = "Standard_D2as_v5"
+  os_type               = "Windows"
+  priority              = "Spot"
+  eviction_policy       = "Delete"
+  spot_max_price        = -1
+  node_count            = 1
+}
