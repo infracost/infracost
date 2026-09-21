@@ -41,6 +41,18 @@ var tfProviders = `
 			}
 			azurerm = {
 				source  = "hashicorp/azurerm"
+				# The fixtures and goldens are written against v4. v5 removed
+				# skip_provider_registration and renamed arguments such as
+				# azurerm_storage_table.storage_account_name, so leaving this
+				# unconstrained breaks every Terraform_CLI subtest.
+				version = "~> 4.0"
+			}
+			# Declared so that fixtures using random_* resolve from the shared
+			# init cache. A provider missing here forces a fresh terraform init
+			# in the project directory, which re-resolves azurerm and defeats
+			# the pin above.
+			random = {
+				source  = "hashicorp/random"
 			}
 		}
 	}

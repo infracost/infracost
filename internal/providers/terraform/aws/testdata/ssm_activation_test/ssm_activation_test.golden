@@ -1,13 +1,13 @@
 
- Name                                             Monthly Qty  Unit                Monthly Cost    
-                                                                                                   
- aws_ssm_activation.ssm_activation_withUsage                                                       
- └─ On-prem managed instances (advanced)               73,000  hours                    $507.35  * 
-                                                                                                   
- aws_ssm_activation.ssm_activation                                                                 
- └─ On-prem managed instances (advanced)      Monthly cost depends on usage: $0.00695 per hours    
-                                                                                                   
- OVERALL TOTAL                                                                          $507.35 
+ Name                                            Monthly Qty  Unit              Monthly Cost    
+                                                                                                
+ aws_ssm_activation.ssm_activation_withUsage                                                    
+ └─ On-prem managed instances (advanced)              73,000  hours                    $0.00  * 
+                                                                                                
+ aws_ssm_activation.ssm_activation                                                              
+ └─ On-prem managed instances (advanced)      Monthly cost depends on usage: $0.00 per hours    
+                                                                                                
+ OVERALL TOTAL                                                                         $0.00 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -18,5 +18,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃         $0.00 ┃        $507 ┃       $507 ┃
+┃ main                                               ┃         $0.00 ┃           - ┃      $0.00 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

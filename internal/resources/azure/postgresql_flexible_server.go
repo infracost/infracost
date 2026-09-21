@@ -114,7 +114,9 @@ func (r *PostgreSQLFlexibleServer) storageCostComponent() *schema.CostComponent 
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Az DB for PostgreSQL Flexible Server Storage")},
+				// Azure renamed this to "Azure Database for PostgreSQL Flex Server
+				// Storage", but the Delos Cloud regions still publish the old name.
+				{Key: "productName", ValueRegex: regexPtr("^(Az DB for PostgreSQL Flexible|Azure Database for PostgreSQL Flex) Server Storage$")},
 				{Key: "meterName", Value: strPtr("Storage Data Stored")},
 			},
 		},
