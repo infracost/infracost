@@ -33,8 +33,10 @@ var (
 	projectPathRegex = regexp.MustCompile(`(Project:) .*/(examples|cmd/infracost)/(.*)`)
 	versionRegex     = regexp.MustCompile(`Infracost (v|preview).*`)
 	panicRegex       = regexp.MustCompile(`(?s)runtime\serror:(.*?)Environment`)
-	pathRegex        = regexp.MustCompile(`(:\s*"|^|\s|')([a-zA-Z0-9-_/]+/)*(testdata/[^\s"']*)`)
-	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
+	// The prefix must start with a non-dot character so that a leading "./" is
+	// left alone, while still traversing dotted directories such as ".hh".
+	pathRegex  = regexp.MustCompile(`(:\s*"|^|\s|')([a-zA-Z0-9-_/]+[a-zA-Z0-9-_./]*/)*(testdata/[^\s"']*)`)
+	credsRegex = regexp.MustCompile(`/.*/credentials\.yml`)
 )
 
 type GoldenFileOptions = struct {
