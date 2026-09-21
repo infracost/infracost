@@ -41,6 +41,11 @@ var tfProviders = `
 			}
 			azurerm = {
 				source  = "hashicorp/azurerm"
+				# The fixtures and goldens are written against v4. v5 removed
+				# skip_provider_registration and renamed arguments such as
+				# azurerm_storage_table.storage_account_name, so leaving this
+				# unconstrained breaks every Terraform_CLI subtest.
+				version = "~> 4.0"
 			}
 		}
 	}
