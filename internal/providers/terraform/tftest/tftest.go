@@ -47,6 +47,13 @@ var tfProviders = `
 				# unconstrained breaks every Terraform_CLI subtest.
 				version = "~> 4.0"
 			}
+			# Declared so that fixtures using random_* resolve from the shared
+			# init cache. A provider missing here forces a fresh terraform init
+			# in the project directory, which re-resolves azurerm and defeats
+			# the pin above.
+			random = {
+				source  = "hashicorp/random"
+			}
 		}
 	}
 
