@@ -96,7 +96,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 					Service:       strPtr("AmazonCloudWatch"),
 					ProductFamily: strPtr("Data Payload"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr("/-DataScanned-Bytes/")},
+						{Key: "usagetype", ValueRegex: strPtr("/^[A-Z0-9]+-DataScanned-Bytes$/")},
 					},
 				},
 				UsageBased: true,
