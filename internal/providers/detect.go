@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"sync"
@@ -12,6 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/providers/arm"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
@@ -51,6 +53,8 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		return &DetectionOutput{Providers: []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
 	case ProjectTypeCloudFormation:
 		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+	case ProjectTypeARMTemplate:
+		return &DetectionOutput{Providers: []schema.Provider{arm.NewTemplateProvider(projectContext, includePastResources, project.Path)}}, nil
 	}
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
@@ -204,10 +208,12 @@ var (
 	ProjectTypeTerragruntCLI       ProjectType = "terragrunt_cli"
 	ProjectTypeTerraformStateJSON  ProjectType = "terraform_state_json"
 	ProjectTypeCloudFormation      ProjectType = "cloudformation"
+	ProjectTypeARMTemplate         ProjectType = "arm_template"
 	ProjectTypeAutodetect          ProjectType = "autodetect"
 )
 
 func DetectProjectType(path string, forceCLI bool) ProjectType {
+
 	if isCloudFormationTemplate(path) {
 		return ProjectTypeCloudFormation
 	}
@@ -223,6 +229,9 @@ func DetectProjectType(path string, forceCLI bool) ProjectType {
 	if isTerraformPlan(path) {
 		return ProjectTypeTerraformPlanBinary
 	}
+	if IsARMTemplate(path) {
+		return ProjectTypeARMTemplate
+	}
 
 	if forceCLI {
 		if isTerragruntNestedDir(path, 5) {
@@ -233,6 +242,21 @@ func DetectProjectType(path string, forceCLI bool) ProjectType {
 	}
 
 	return ProjectTypeAutodetect
+}
+
+func IsARMTemplate(path string) bool {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	// Store the file content in the content struct
+	var content arm.FileContent
+	if err = json.Unmarshal(data, &content); err != nil {
+		log.Fatalf("Failed to unmarshal JSON: %v", err)
+	}
+	// If it is not an ARM template, return
+	return arm.IsARMTemplate(content)
 }
 
 func isTerraformPlanJSON(path string) bool {
