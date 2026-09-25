@@ -1,32 +1,44 @@
 
- Name                                         Monthly Qty  Unit                      Monthly Cost    
-                                                                                                     
- azurerm_managed_disk.ultra                                                                          
- ├─ Storage (ultra, 2048 GiB)                       2,048  GiB                            $245.19    
- ├─ Provisioned IOPS                                4,000  IOPS                           $198.56    
- └─ Throughput                                         20  MB/s                             $6.99    
-                                                                                                     
- azurerm_managed_disk.custom_size_ssd                                                                
- ├─ Storage (E30, LRS)                                  1  months                          $76.80    
- └─ Disk operations                                     2  10k operations                   $0.00  * 
-                                                                                                     
- azurerm_managed_disk.premium                                                                        
- └─ Storage (P4, LRS)                                   1  months                           $5.28    
-                                                                                                     
- azurerm_managed_disk.standard                                                                       
- ├─ Storage (S4, LRS)                                   1  months                           $1.54    
- └─ Disk operations                    Monthly cost depends on usage: $0.0005 per 10k operations     
-                                                                                                     
- OVERALL TOTAL                                                                            $534.36 
+ Name                                           Monthly Qty  Unit                      Monthly Cost    
+                                                                                                       
+ azurerm_managed_disk.premiumv2_custom                                                                 
+ ├─ Storage (provisioned)                            10,752  GiB                            $863.39    
+ ├─ Provisioned IOPS (included)                       3,000  IOPS                             $0.00    
+ ├─ Provisioned IOPS                                  3,000  IOPS                            $15.33    
+ ├─ Provisioned throughput (included)                   125  MBps                             $0.00    
+ └─ Provisioned throughput                              375  MBps                            $15.06    
+                                                                                                       
+ azurerm_managed_disk.ultra                                                                            
+ ├─ Storage (ultra, 2048 GiB)                         2,048  GiB                            $245.19    
+ ├─ Provisioned IOPS                                  4,000  IOPS                           $198.56    
+ └─ Throughput                                           20  MB/s                             $6.99    
+                                                                                                       
+ azurerm_managed_disk.premiumv2_default                                                                
+ ├─ Storage (provisioned)                             1,024  GiB                             $82.23    
+ ├─ Provisioned IOPS (included)                       3,000  IOPS                             $0.00    
+ └─ Provisioned throughput (included)                   125  MBps                             $0.00    
+                                                                                                       
+ azurerm_managed_disk.custom_size_ssd                                                                  
+ ├─ Storage (E30, LRS)                                    1  months                          $76.80    
+ └─ Disk operations                                       2  10k operations                   $0.00  * 
+                                                                                                       
+ azurerm_managed_disk.premium                                                                          
+ └─ Storage (P4, LRS)                                     1  months                           $5.28    
+                                                                                                       
+ azurerm_managed_disk.standard                                                                         
+ ├─ Storage (S4, LRS)                                     1  months                           $1.54    
+ └─ Disk operations                      Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                       
+ OVERALL TOTAL                                                                            $1,510.36 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 4 were estimated
+6 cloud resources were detected:
+∙ 6 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃          $534 ┃       $0.00 ┃       $534 ┃
+┃ main                                               ┃        $1,510 ┃       $0.00 ┃     $1,510 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

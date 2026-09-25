@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 
 	"fmt"
 	"math"
@@ -143,7 +144,104 @@ func managedDiskCostComponents(region, diskType string, diskSizeGB, diskIOPSRead
 		return ultraDiskCostComponents(region, storageReplicationType, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite)
 	}
 
+	if strings.ToLower(diskTypePrefix) == "premiumv2" {
+		return premiumV2DiskCostComponents(region, storageReplicationType, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite)
+	}
+
 	return standardPremiumDiskCostComponents(region, diskTypePrefix, storageReplicationType, diskSizeGB, monthlyDiskOperations)
+}
+
+// premiumV2IncludedIOPS and premiumV2IncludedThroughput are the amounts of
+// provisioned IOPS/throughput that Azure includes at no extra cost with every
+// Premium SSD v2 disk, regardless of provisioned size.
+var premiumV2IncludedIOPS = 3000
+var premiumV2IncludedThroughput = 125
+
+func premiumV2DiskCostComponents(region string, storageReplicationType string, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite int64) []*schema.CostComponent {
+	requestedSize := 1024
+	iops := premiumV2IncludedIOPS
+	throughput := premiumV2IncludedThroughput
+
+	if diskSizeGB > 0 {
+		requestedSize = int(diskSizeGB)
+	}
+
+	if diskIOPSReadWrite > 0 {
+		iops = int(diskIOPSReadWrite)
+	}
+
+	if diskMBPSReadWrite > 0 {
+		throughput = int(diskMBPSReadWrite)
+	}
+
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           "Storage (provisioned)",
+			Unit:           "GiB",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(requestedSize))),
+			ProductFilter:  premiumV2ProductFilter(region, storageReplicationType, "Provisioned Capacity$"),
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("Consumption"),
+			},
+		},
+	}
+
+	costComponents = append(costComponents, premiumV2TieredCostComponents("Provisioned IOPS", "IOPS", region, storageReplicationType, "Provisioned IOPS$", iops, premiumV2IncludedIOPS)...)
+	costComponents = append(costComponents, premiumV2TieredCostComponents("Provisioned throughput", "MBps", region, storageReplicationType, "Provisioned Throughput \\(MBps\\)$", throughput, premiumV2IncludedThroughput)...)
+
+	return costComponents
+}
+
+// premiumV2TieredCostComponents builds cost components for a Premium SSD v2
+// meter that has a free included amount followed by a paid amount above that,
+// e.g. the first 3,000 provisioned IOPS and 125 MBps of throughput are
+// included at no cost, with usage above that billed per unit.
+func premiumV2TieredCostComponents(name, unit, region, storageReplicationType, meterNameRegex string, requested, included int) []*schema.CostComponent {
+	tiers := usage.CalculateTierBuckets(decimal.NewFromInt(int64(requested)), []int{included})
+
+	data := []struct {
+		name       string
+		startUsage string
+	}{
+		{name: fmt.Sprintf("%s (included)", name), startUsage: "0"},
+		{name: name, startUsage: fmt.Sprintf("%d", included)},
+	}
+
+	var costComponents []*schema.CostComponent
+	for i, d := range data {
+		if i >= len(tiers) || !tiers[i].GreaterThan(decimal.Zero) {
+			continue
+		}
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           d.name,
+			Unit:           unit,
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
+			HourlyQuantity: decimalPtr(tiers[i]),
+			ProductFilter:  premiumV2ProductFilter(region, storageReplicationType, meterNameRegex),
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption:   strPtr("Consumption"),
+				StartUsageAmount: strPtr(d.startUsage),
+			},
+		})
+	}
+
+	return costComponents
+}
+
+func premiumV2ProductFilter(region, storageReplicationType, meterNameRegex string) *schema.ProductFilter {
+	return &schema.ProductFilter{
+		VendorName:    strPtr("azure"),
+		Region:        strPtr(region),
+		Service:       strPtr("Storage"),
+		ProductFamily: strPtr("Storage"),
+		AttributeFilters: []*schema.AttributeFilter{
+			{Key: "productName", Value: strPtr("Azure Premium SSD v2")},
+			{Key: "skuName", Value: strPtr(fmt.Sprintf("Premium %s", storageReplicationType))},
+			{Key: "meterName", ValueRegex: regexPtr(meterNameRegex)},
+		},
+	}
 }
 
 func standardPremiumDiskCostComponents(region string, diskTypePrefix string, storageReplicationType string, diskSizeGB int64, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
