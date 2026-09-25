@@ -525,8 +525,16 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 				return
 			}
 
+			inputs, ok := content.Attributes["inputs"]
+			if !ok || inputs == nil {
+				// Nothing to recover: the config has no inputs (e.g. the diagnostic came from a block
+				// the vendored Terragrunt does not support, such as exclude).
+				p.logger.Debug().Msgf("Terragrunt diagnostic func found no inputs to reparse for %s", filename)
+				return
+			}
+
 			attr := hcl.Attribute{
-				HCLAttr: content.Attributes["inputs"],
+				HCLAttr: inputs,
 				Ctx:     hcl.NewContext(evalContext, nil, p.logger),
 				Logger:  p.logger,
 				// set is graph to true so that we use the better expression mocking
