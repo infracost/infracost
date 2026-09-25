@@ -213,3 +213,39 @@ func TestUsageMap_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestUsageMap_GetNestedOverride(t *testing.T) {
+	usage := NewUsageMapFromInterface(map[string]interface{}{
+		"aws_s3_bucket": map[string]interface{}{
+			"object_tags": 10,
+			"standard": map[string]interface{}{
+				"storage_gb": 100,
+			},
+			"intelligent_tiering": map[string]interface{}{
+				"frequent_access_storage_gb": 100,
+				"monthly_tier_2_requests":    1000,
+			},
+		},
+		"aws_s3_bucket.example": map[string]interface{}{
+			"object_tags": 0,
+			"standard": map[string]interface{}{
+				"storage_gb":              200,
+				"monthly_tier_1_requests": 300,
+			},
+			"intelligent_tiering": map[string]interface{}{
+				"frequent_access_storage_gb": 0,
+			},
+		},
+	})
+
+	got := usage.Get("aws_s3_bucket.example")
+	require.NotNil(t, got)
+
+	assert.Equal(t, 0.0, got.Get("object_tags").Float())
+	assert.Equal(t, 200.0, got.Get("standard").Get("storage_gb").Float())
+	assert.Equal(t, 300.0, got.Get("standard").Get("monthly_tier_1_requests").Float())
+
+	it := got.Get("intelligent_tiering")
+	assert.Equal(t, 0.0, it.Get("frequent_access_storage_gb").Float())
+	assert.Equal(t, 1000.0, it.Get("monthly_tier_2_requests").Float())
+}

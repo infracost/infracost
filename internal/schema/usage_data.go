@@ -373,7 +373,7 @@ func mergeUsage(dst *UsageData, src *UsageData) {
 				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not unmarshal src attribute key: %q", key)
 				continue
 			}
-			err = mergo.Map(&destJson, srcJson)
+			err = mergo.Map(&destJson, srcJson, mergo.WithOverwriteWithEmptyValue)
 			if err != nil {
 				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not merge attribute key: %q", key)
 				continue
