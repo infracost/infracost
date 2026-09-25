@@ -143,6 +143,10 @@ func managedDiskCostComponents(region, diskType string, diskSizeGB, diskIOPSRead
 		return ultraDiskCostComponents(region, storageReplicationType, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite)
 	}
 
+	if strings.ToLower(diskTypePrefix) == "premiumv2" {
+		return premiumV2DiskCostComponents(region, storageReplicationType, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite)
+	}
+
 	return standardPremiumDiskCostComponents(region, diskTypePrefix, storageReplicationType, diskSizeGB, monthlyDiskOperations)
 }
 
@@ -303,6 +307,93 @@ func ultraDiskCostComponents(region string, storageReplicationType string, diskS
 				PurchaseOption: strPtr("Consumption"),
 			},
 		},
+	}
+
+	return costComponents
+}
+
+func premiumV2DiskCostComponents(region string, storageReplicationType string, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite int64) []*schema.CostComponent {
+	requestedSize := 100
+	iops := 3000
+	throughput := 125
+
+	if diskSizeGB > 0 {
+		requestedSize = int(diskSizeGB)
+	}
+	if diskIOPSReadWrite > 0 {
+		iops = int(diskIOPSReadWrite)
+	}
+	if diskMBPSReadWrite > 0 {
+		throughput = int(diskMBPSReadWrite)
+	}
+
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           fmt.Sprintf("Storage (Premium v2, %d GiB)", requestedSize),
+			Unit:           "GiB",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(requestedSize))),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("azure"),
+				Region:        strPtr(region),
+				Service:       strPtr("Storage"),
+				ProductFamily: strPtr("Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "productName", Value: strPtr("Premium SSD v2 Managed Disks")},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("Premium v2 %s", storageReplicationType))},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Capacity$")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("Consumption"),
+			},
+		},
+	}
+
+	if iops > 3000 {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           fmt.Sprintf("Provisioned IOPS (Premium v2, %d IOPS)", iops-3000),
+			Unit:           "IOPS",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(iops - 3000))),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("azure"),
+				Region:        strPtr(region),
+				Service:       strPtr("Storage"),
+				ProductFamily: strPtr("Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "productName", Value: strPtr("Premium SSD v2 Managed Disks")},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("Premium v2 %s", storageReplicationType))},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned IOPS$")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("Consumption"),
+			},
+		})
+	}
+
+	if throughput > 125 {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           fmt.Sprintf("Provisioned throughput (Premium v2, %d MBps)", throughput-125),
+			Unit:           "MBps",
+			UnitMultiplier: schema.HourToMonthUnitMultiplier,
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(int64(throughput - 125))),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("azure"),
+				Region:        strPtr(region),
+				Service:       strPtr("Storage"),
+				ProductFamily: strPtr("Storage"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "productName", Value: strPtr("Premium SSD v2 Managed Disks")},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("Premium v2 %s", storageReplicationType))},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Bandwidth$")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				PurchaseOption: strPtr("Consumption"),
+			},
+		})
 	}
 
 	return costComponents
