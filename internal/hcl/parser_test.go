@@ -1611,6 +1611,209 @@ data "aws_availability_zones" "ne" {
 	assert.JSONEq(t, `{"group_names":["us-east-1","us-east-1","us-east-1","us-east-1","us-east-1","us-east-1","us-east-1-atl-1","us-east-1-bos-1","us-east-1-bue-1","us-east-1-chi-2","us-east-1-dfw-2","us-east-1-iah-2","us-east-1-lim-1","us-east-1-mci-1","us-east-1-mia-1","us-east-1-msp-1","us-east-1-nyc-1","us-east-1-phl-1","us-east-1-qro-1","us-east-1-scl-1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1"],"id":"us-east-1","names":["us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-east-1e","us-east-1f","us-east-1-atl-1a","us-east-1-bos-1a","us-east-1-bue-1a","us-east-1-chi-2a","us-east-1-dfw-2a","us-east-1-iah-2a","us-east-1-lim-1a","us-east-1-mci-1a","us-east-1-mia-1a","us-east-1-msp-1a","us-east-1-nyc-1a","us-east-1-phl-1a","us-east-1-qro-1a","us-east-1-scl-1a","us-east-1-wl1-atl-wlz-1","us-east-1-wl1-bna-wlz-1","us-east-1-wl1-bos-wlz-1","us-east-1-wl1-chi-wlz-1","us-east-1-wl1-clt-wlz-1","us-east-1-wl1-dfw-wlz-1","us-east-1-wl1-dtw-wlz-1","us-east-1-wl1-iah-wlz-1","us-east-1-wl1-mia-wlz-1","us-east-1-wl1-msp-wlz-1","us-east-1-wl1-nyc-wlz-1","us-east-1-wl1-tpa-wlz-1","us-east-1-wl1-was-wlz-1"],"zone_ids":["use1-az6","use1-az1","use1-az2","use1-az4","use1-az3","use1-az5","use1-atl1-az1","use1-bos1-az1","use1-bue1-az1","use1-chi2-az1","use1-dfw2-az1","use1-iah2-az1","use1-lim1-az1","use1-mci1-az1","use1-mia1-az1","use1-msp1-az1","use1-nyc1-az1","use1-phl1-az1","use1-qro1-az1","use1-scl1-az1","use1-wl1-atl-wlz1","use1-wl1-bna-wlz1","use1-wl1-bos-wlz1","use1-wl1-chi-wlz1","use1-wl1-clt-wlz1","use1-wl1-dfw-wlz1","use1-wl1-dtw-wlz1","use1-wl1-iah-wlz1","use1-wl1-mia-wlz1","use1-wl1-msp-wlz1","use1-wl1-nyc-wlz1","use1-wl1-tpa-wlz1","use1-wl1-was-wlz1"]}`, string(b))
 }
 
+func Test_ProvideMockRegionForDynamicForEachProvider(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		options []Option
+	}{
+		{name: "legacy evaluator"},
+		{name: "graph evaluator", options: []Option{OptionGraphEvaluator()}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			path := createTestFile("test.tf", `
+provider "aws" {
+	alias = "by_region"
+	for_each = {
+		east   = { region = "us-east-2" }
+		region = { region = "eu-west-1" }
+	}
+	region = each.value.region
+
+	skip_credentials_validation = true
+	skip_requesting_account_id  = true
+	access_key                  = "mock_access_key"
+	secret_key                  = "mock_secret_key"
+}
+
+data "aws_region" "by_key" {
+	for_each = {
+		east   = true
+		region = true
+	}
+	provider = aws.by_region[each.key]
+}
+
+data "aws_region" "by_value" {
+	for_each = {
+		first  = "region"
+		second = "east"
+	}
+	provider = aws.by_region[each.value]
+}
+`)
+
+			logger := newDiscardLogger()
+			loader := modules.NewModuleLoader(modules.ModuleLoaderOptions{
+				CachePath:         filepath.Dir(path),
+				HCLParser:         modules.NewSharedHCLParser(),
+				CredentialsSource: nil,
+				SourceMap:         config.TerraformSourceMap{},
+				Logger:            logger,
+				ModuleSync:        &sync.KeyMutex{},
+			})
+			parser := NewParser(
+				RootPath{DetectedPath: filepath.Dir(path)},
+				CreateEnvFileMatcher([]string{}, nil),
+				loader,
+				logger,
+				tc.options...,
+			)
+			module, err := parser.ParseDirectory()
+			require.NoError(t, err)
+
+			blocks := module.Blocks
+			require.Len(t, blocks.OfType("data"), 4)
+			for label, region := range map[string]string{
+				`aws_region.by_key["east"]`:     "us-east-2",
+				`aws_region.by_key["region"]`:   "eu-west-1",
+				`aws_region.by_value["first"]`:  "eu-west-1",
+				`aws_region.by_value["second"]`: "us-east-2",
+			} {
+				regionBlock := blocks.Matching(BlockMatcher{Label: label, Type: "data"})
+				require.NotNil(t, regionBlock)
+				require.Equal(t, label, regionBlock.Label())
+				assert.Equal(t, "aws.by_region", regionBlock.ProviderConfigKey())
+				assert.Equal(t, region, regionBlock.Values().GetAttr("name").AsString())
+			}
+		})
+	}
+}
+
+func Test_ModuleForEachWithIndexedForEachProvider(t *testing.T) {
+	for _, tc := range []struct {
+		name    string
+		options []Option
+	}{
+		{name: "legacy evaluator"},
+		{name: "graph evaluator", options: []Option{OptionGraphEvaluator()}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			path := createTestFileWithModule(`
+provider "aws" {
+  alias = "by_region"
+  for_each = {
+    east = { region = "us-east-2" }
+    west = { region = "eu-west-1" }
+  }
+  region = each.value.region
+
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
+}
+
+locals {
+  provider_keys = {
+    east = "east"
+    west = "west"
+  }
+}
+
+module "by_key" {
+  source = "../."
+  for_each = {
+    east = true
+    west = true
+  }
+  providers = {
+    "aws" = aws.by_region[each.key]
+  }
+}
+
+module "by_value" {
+  source = "../."
+  for_each = {
+    primary   = { provider = "west" }
+    secondary = { provider = "east" }
+  }
+  providers = {
+    aws = aws.by_region[local.provider_keys[each.value.provider]]
+  }
+}
+`, `
+module "leaf" {
+  source = "./leaf"
+  providers = {
+    aws = aws
+  }
+}
+
+output "region" {
+  value = module.leaf.region
+}
+`, "")
+			leafPath := filepath.Join(filepath.Dir(path), "leaf")
+			require.NoError(t, os.Mkdir(leafPath, 0755))
+			require.NoError(t, os.WriteFile(filepath.Join(leafPath, "main.tf"), []byte(`
+data "aws_region" "current" {}
+
+output "region" {
+  value = data.aws_region.current.name
+}
+`), 0600))
+
+			logger := newDiscardLogger()
+			loader := modules.NewModuleLoader(modules.ModuleLoaderOptions{
+				CachePath:         filepath.Dir(path),
+				HCLParser:         modules.NewSharedHCLParser(),
+				CredentialsSource: nil,
+				SourceMap:         config.TerraformSourceMap{},
+				Logger:            logger,
+				ModuleSync:        &sync.KeyMutex{},
+			})
+			parser := NewParser(
+				RootPath{DetectedPath: path},
+				CreateEnvFileMatcher([]string{}, nil),
+				loader,
+				logger,
+				tc.options...,
+			)
+
+			module, err := parser.ParseDirectory()
+			require.NoError(t, err)
+			require.Len(t, module.Modules, 4)
+
+			for name, region := range map[string]string{
+				`module.by_key["east"]`:        "us-east-2",
+				`module.by_key["west"]`:        "eu-west-1",
+				`module.by_value["primary"]`:   "eu-west-1",
+				`module.by_value["secondary"]`: "us-east-2",
+			} {
+				var child *Module
+				for _, candidate := range module.Modules {
+					if candidate.Name == name {
+						child = candidate
+						break
+					}
+				}
+				require.NotNil(t, child, "module %s not found", name)
+
+				require.Len(t, child.Modules, 1)
+				leaf := child.Modules[0]
+				regionBlock := leaf.Blocks.Matching(BlockMatcher{Type: "data", Label: "aws_region.current"})
+				require.NotNil(t, regionBlock)
+				require.Equal(t, "aws_region.current", regionBlock.Label())
+				assert.Equal(t, region, regionBlock.Values().GetAttr("name").AsString())
+				assert.Equal(t, "aws.by_region", regionBlock.ProviderConfigKey())
+
+				outputs := child.Blocks.Outputs(false).AsValueMap()
+				assert.Equal(t, region, outputs["region"].AsString())
+			}
+		})
+	}
+}
+
 func Test_RandomShuffleSetsResult(t *testing.T) {
 	path := createTestFile("test.tf", `
 resource "random_shuffle" "one" {

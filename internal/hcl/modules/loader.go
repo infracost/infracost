@@ -19,6 +19,7 @@ import (
 	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/hashicorp/go-getter"
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/infracost/infracost/internal/metrics"
 	"github.com/otiai10/copy"
@@ -699,6 +700,59 @@ func HasOpenTofuExtension(name string) bool {
 	return filepath.Ext(name) == ".tofu" || strings.HasSuffix(name, ".tofu.json")
 }
 
+// filterOpenTofuProviderIndexDiagnostics removes the diagnostic emitted by
+// terraform-config-inspect for OpenTofu's indexed provider syntax. The module
+// loader only consumes ModuleCalls from tfconfig; provider expressions are
+// evaluated later from the original, unmodified HCL syntax tree.
+func filterOpenTofuProviderIndexDiagnostics(file *hcl.File, diags hcl.Diagnostics) hcl.Diagnostics {
+	body, ok := file.Body.(*hclsyntax.Body)
+	if !ok {
+		return diags
+	}
+
+	providerIndexRanges := make(map[hcl.Range]struct{})
+	for _, block := range body.Blocks {
+		if block.Type != "resource" && block.Type != "data" {
+			continue
+		}
+
+		attr, ok := block.Body.Attributes["provider"]
+		if !ok {
+			continue
+		}
+
+		indexExpr, ok := attr.Expr.(*hclsyntax.IndexExpr)
+		if !ok {
+			continue
+		}
+
+		traversal, traversalDiags := hcl.AbsTraversalForExpr(indexExpr.Collection)
+		if traversalDiags.HasErrors() || len(traversal) != 2 {
+			continue
+		}
+		if _, ok := traversal[0].(hcl.TraverseRoot); !ok {
+			continue
+		}
+		if _, ok := traversal[1].(hcl.TraverseAttr); !ok {
+			continue
+		}
+
+		providerIndexRanges[attr.Expr.Range()] = struct{}{}
+	}
+
+	filtered := make(hcl.Diagnostics, 0, len(diags))
+	for _, diag := range diags {
+		if diag.Summary == "Invalid provider reference" && diag.Subject != nil {
+			if _, ok := providerIndexRanges[*diag.Subject]; ok {
+				continue
+			}
+		}
+		filtered = append(filtered, diag)
+	}
+
+	return filtered
+}
+
 func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, error) {
 	mod := tfconfig.NewModule(fullPath)
 
@@ -762,6 +816,7 @@ func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, er
 		}
 
 		contentDiag := tfconfig.LoadModuleFromFile(f, mod)
+		contentDiag = filterOpenTofuProviderIndexDiagnostics(f, contentDiag)
 		if contentDiag != nil && contentDiag.HasErrors() {
 			return nil, fmt.Errorf("failed to load module from file %s diag: %w", path, contentDiag)
 		}

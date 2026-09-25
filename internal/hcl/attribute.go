@@ -215,6 +215,22 @@ func (attr *Attribute) ProvidersValue() cty.Value {
 	return attr.Value()
 }
 
+func decodeProviderKey(keyExpr *hclsyntax.ObjectConsKeyExpr, ctx *hcl.EvalContext) (string, bool) {
+	if wrapped, ok := keyExpr.Wrapped.(*hclsyntax.ScopeTraversalExpr); ok {
+		return traversalAsString(wrapped.AsTraversal()), true
+	}
+
+	keyValue, diags := keyExpr.Value(ctx)
+	if diags.HasErrors() || !keyValue.IsKnown() || keyValue.IsNull() {
+		return "", false
+	}
+	var key string
+	if err := gocty.FromCtyValue(keyValue, &key); err != nil {
+		return "", false
+	}
+	return key, true
+}
+
 // DecodeProviders decodes the providers block into a map of provider names to provider aliases.
 // This is used by the graph evaluator to make sure the correct edges are created when providers are
 // inherited from parent modules.
@@ -228,16 +244,60 @@ func (attr *Attribute) DecodeProviders() map[string]string {
 				continue
 			}
 
-			valExpr, ok := item.ValueExpr.(*hclsyntax.ScopeTraversalExpr)
-			if !ok {
+			var traversal hcl.Traversal
+			switch valExpr := item.ValueExpr.(type) {
+			case *hclsyntax.ScopeTraversalExpr:
+				traversal = valExpr.AsTraversal()
+			case *hclsyntax.IndexExpr:
+				var diags hcl.Diagnostics
+				traversal, diags = hcl.AbsTraversalForExpr(valExpr.Collection)
+				if diags.HasErrors() {
+					continue
+				}
+			default:
 				continue
 			}
 
-			key := traversalAsString(keyExpr.AsTraversal())
-			val := traversalAsString(valExpr.AsTraversal())
+			key, ok := decodeProviderKey(keyExpr, attr.Ctx.Inner())
+			if !ok {
+				continue
+			}
+			val := traversalAsString(traversal)
 
 			providers[key] = val
 		}
+	}
+
+	return providers
+}
+
+// DecodeProviderValues evaluates the provider instances passed to a child
+// module, keyed by the provider names used within that module.
+func (attr *Attribute) DecodeProviderValues() map[string]cty.Value {
+	providers := make(map[string]cty.Value)
+
+	origExpr, ok := attr.HCLAttr.Expr.(*hclsyntax.ObjectConsExpr)
+	if !ok {
+		return providers
+	}
+
+	for _, item := range origExpr.Items {
+		keyExpr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
+		if !ok {
+			continue
+		}
+		key, ok := decodeProviderKey(keyExpr, attr.Ctx.Inner())
+		if !ok {
+			continue
+		}
+		providers[key] = cty.DynamicVal
+
+		value, diags := item.ValueExpr.Value(attr.Ctx.Inner())
+		if diags.HasErrors() {
+			continue
+		}
+
+		providers[key] = value
 	}
 
 	return providers
@@ -1133,6 +1193,14 @@ func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
 		}
 
 		isProviderReference := usesProviderConfiguration(b) && attr.Name() == "provider"
+		if b.Type() == "module" && attr.Name() == "providers" {
+			for _, provider := range attr.DecodeProviders() {
+				if key == provider {
+					isProviderReference = true
+					break
+				}
+			}
+		}
 		if isProviderReference {
 			key = fmt.Sprintf("provider.%s", strings.TrimSuffix(key, "."))
 		}
