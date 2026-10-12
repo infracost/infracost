@@ -23,6 +23,9 @@ type PostgreSQLFlexibleServer struct {
 	InstanceType     string
 	InstanceVersion  string
 	Storage          int64
+	StorageType      string
+	StorageIOPS      int64
+	StorageMBps      int64
 	HighAvailability bool
 
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
@@ -53,8 +56,11 @@ func (r *PostgreSQLFlexibleServer) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
 		r.computeCostComponent(),
 		r.storageCostComponent(),
-		r.backupCostComponent(),
 	}
+	if r.isPremiumV2() {
+		costComponents = append(costComponents, r.premiumV2PerformanceCostComponents()...)
+	}
+	costComponents = append(costComponents, r.backupCostComponent())
 
 	return &schema.Resource{
 		Name:           r.Address,
@@ -67,17 +73,11 @@ func (r *PostgreSQLFlexibleServer) BuildResource() *schema.Resource {
 func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent {
 	attrs := getFlexibleServerFilterAttributes(r.Tier, r.InstanceType, r.InstanceVersion)
 
-	// Double the quantity if high availability is enabled
-	quantity := decimal.NewFromInt(1)
-	if r.HighAvailability {
-		quantity = quantity.Mul(decimal.NewFromInt(2))
-	}
-
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", r.SKU),
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(quantity),
+		HourlyQuantity: decimalPtr(r.nodes()),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
@@ -100,7 +100,12 @@ func (r *PostgreSQLFlexibleServer) storageCostComponent() *schema.CostComponent 
 	var quantity *decimal.Decimal
 	if r.Storage > 0 {
 		// Storage is in MB
-		quantity = decimalPtr(decimal.NewFromInt(r.Storage / 1024))
+		quantity = decimalPtr(decimal.NewFromInt(r.Storage / 1024).Mul(r.nodes()))
+	}
+
+	meterName := "Storage Data Stored"
+	if r.isPremiumV2() {
+		meterName = "Premium SSD v2 Storage Data Stored"
 	}
 
 	return &schema.CostComponent{
@@ -117,10 +122,60 @@ func (r *PostgreSQLFlexibleServer) storageCostComponent() *schema.CostComponent 
 				// Azure renamed this to "Azure Database for PostgreSQL Flex Server
 				// Storage", but the Delos Cloud regions still publish the old name.
 				{Key: "productName", ValueRegex: regexPtr("^(Az DB for PostgreSQL Flexible|Azure Database for PostgreSQL Flex) Server Storage$")},
-				{Key: "meterName", Value: strPtr("Storage Data Stored")},
+				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
 	}
+}
+
+// premiumV2PerformanceCostComponents returns cost components for Premium SSD
+// v2 IOPS and throughput above the baseline Azure includes for free.
+func (r *PostgreSQLFlexibleServer) premiumV2PerformanceCostComponents() []*schema.CostComponent {
+	freeIOPS, freeMBps := int64(3000), int64(125)
+	if r.Storage/1024 >= 400 {
+		freeIOPS, freeMBps = 12000, 500
+	}
+
+	var components []*schema.CostComponent
+	if r.StorageIOPS > freeIOPS {
+		components = append(components, r.premiumV2CostComponent("Provisioned IOPS", "IOPS", "Premium SSD v2 IOPS Provisioned IOPS", r.StorageIOPS-freeIOPS))
+	}
+	if r.StorageMBps > freeMBps {
+		components = append(components, r.premiumV2CostComponent("Provisioned throughput", "MB/s", "Premium SSDv2 Throughput Prov Throughput (MBps)", r.StorageMBps-freeMBps))
+	}
+	return components
+}
+
+func (r *PostgreSQLFlexibleServer) premiumV2CostComponent(name, unit, meterName string, quantity int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            name,
+		Unit:            unit,
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity).Mul(r.nodes())),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Database for PostgreSQL"),
+			ProductFamily: strPtr("Databases"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("Azure Database for PostgreSQL Flex Server Storage")},
+				{Key: "meterName", Value: strPtr(meterName)},
+			},
+		},
+	}
+}
+
+func (r *PostgreSQLFlexibleServer) isPremiumV2() bool {
+	return r.StorageType == "PremiumV2_LRS"
+}
+
+// nodes is the number of servers billed: the primary, plus a standby with the
+// same compute and storage when high availability is on.
+func (r *PostgreSQLFlexibleServer) nodes() decimal.Decimal {
+	if r.HighAvailability {
+		return decimal.NewFromInt(2)
+	}
+	return decimal.NewFromInt(1)
 }
 
 // backupCostComponent returns a cost component for additional backup storage.
