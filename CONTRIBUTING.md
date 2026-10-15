@@ -23,6 +23,15 @@
 
 ## Overview
 
+> [!IMPORTANT]
+>
+> This repository is the end-of-life **Infracost 0.10.x** CLI. Active development has
+> moved to [`infracost/cli`](https://github.com/infracost/cli) and the other repos linked
+> in the [README](README.md). Before writing code or opening a pull request or issue here,
+> please [start a discussion](https://github.com/infracost/infracost/discussions/new/choose)
+> so we can point you to the right place. Pull requests that weren't discussed first are
+> unlikely to be merged. If you use an AI coding agent, see [AGENTS.md](AGENTS.md).
+
 > [!NOTE]
 >
 > Infracost is transitioning to a GitHub Discussions-based workflow for discussions
@@ -34,7 +43,7 @@ The overall process for contributing to Infracost is:
 1. Check the [project board](https://github.com/infracost/infracost/projects/2) to see if there is something you'd like to work on; these are the issues we'd like to focus on in the near future. The issue labels should help you to find an issue to work on. There are also [other issues](https://github.com/infracost/infracost/issues) and [discussions](https://github.com/infracost/infracost/discussions) that you might like to check.
 2. If there's no issue for what you want to work on, create a [new discussion](https://github.com/infracost/infracost/discussions) thread about the topic. Please put as much as details as you think is necessary, the use-case context is especially helpful if you'd like to receive good feedback. When we have enough detail and are ready to prioritize the work we will then create an issue for it.
 3. Add a comment to the issue you're working on to let the rest of the community know.
-4. Create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change. Don't forget to run `make lint` and `make fmt` first. Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", "fix: nil pointer...", "docs: explain...", or "chore: fix typo". This helps us generate a cleaner changelog.
+4. Once a maintainer has agreed the change belongs in this repo, create a fork, commit and push to your fork. Send a pull request (PR) from your fork to this repo with the proposed change. Don't forget to run `make lint` and `make fmt` first. Please include unit and integration tests where applicable. We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Commit messages can usually start with "feat(aws): add ...", "feat(google): add ...", "fix: nil pointer...", "docs: explain...", or "chore: fix typo". This helps us generate a cleaner changelog.
 5. If it's your first PR to the Infracost org, a bot will leave a comment asking you to follow a quick step to sign our Contributor License Agreement.
 6. We'll review your change and provide feedback.
 
