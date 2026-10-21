@@ -1,4 +1,4 @@
-ARG GO_VERSION=1.26.9
+ARG GO_VERSION=1.26.10
 
 FROM golang:${GO_VERSION} AS builder
 
@@ -50,7 +50,7 @@ RUN NO_DIRTY=true make build
 RUN chmod +x /app/build/infracost
 
 # Application
-FROM alpine:3.16 AS app
+FROM alpine:3.24 AS app
 # Tools needed for running diffs in CI integrations
 RUN apk --no-cache add ca-certificates openssl openssh-client curl git bash
 
