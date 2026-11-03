@@ -80,7 +80,11 @@ func fetchExistingRelease(cli *github.Client, tag string) (*github.RepositoryRel
 }
 
 func createDraftRelease(cli *github.Client) (*github.RepositoryRelease, error) {
-	name := github.String(strings.Join(strings.Split(os.Getenv("GITHUB_REF"), "/")[2:], "/"))
+	tag := strings.TrimSpace(os.Getenv("RELEASE_TAG"))
+	if tag == "" {
+		return nil, errors.New("RELEASE_TAG is not set")
+	}
+	name := github.String(tag)
 	o, res, err := cli.Repositories.CreateRelease(
 		context.Background(),
 		"infracost",
