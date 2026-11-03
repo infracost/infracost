@@ -1,9 +1,19 @@
 name: Upload Release Asset
 
+# Releases are started by hand from master with the version to release. The
+# draft release targets the commit this run builds, so publishing it creates
+# the tag there.
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. v0.10.48"
+        type: string
+        required: true
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -24,7 +34,40 @@ jobs:
           sudo rm -rf /usr/share/swift        # ~3GB Swift toolchain
           sudo rm -rf /opt/hostedtoolcache    # ~6GB cached tool versions
 
+      - name: Check the version
+        env:
+          VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/master" ]; then
+            echo "::error::Releases run on master, not $GITHUB_REF"; exit 1
+          fi
+          if ! [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$ ]]; then
+            echo "::error::$VERSION is not vX.Y.Z or vX.Y.Z-pre"; exit 1
+          fi
+          # Only a 404 means the tag is free; any other error stops the release.
+          if out=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$VERSION" 2>&1); then
+            echo "::error::$VERSION already exists"; exit 1
+          elif ! grep -q "HTTP 404" <<<"$out"; then
+            echo "::error::Couldn't check whether $VERSION exists: $out"; exit 1
+          fi
+          # A draft has no tag yet, so a re-run would pass the check above and
+          # make a second draft. Delete the old draft first.
+          if out=$(gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" 2>&1); then
+            echo "::error::A release named $VERSION already exists (possibly a draft). Delete it, then run again."; exit 1
+          elif ! grep -q "release not found" <<<"$out"; then
+            echo "::error::Couldn't check for a release named $VERSION: $out"; exit 1
+          fi
+
       - uses: actions/checkout@v4
+
+      # The build reads its version from the tag on HEAD. Tag the checkout
+      # locally; the real tag is created when the draft release is published.
+      - name: Tag the checkout
+        env:
+          VERSION: ${{ inputs.version }}
+        run: git tag "$VERSION"
+
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
@@ -38,6 +81,7 @@ jobs:
         run: go run tools/release/main.go
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.version }}
 
       - name: Remove build assets
         run: rm -rf build
@@ -61,8 +105,8 @@ jobs:
           images: |
             infracost/infracost
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}},value=${{ inputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v4
@@ -85,8 +129,8 @@ jobs:
           flavor: |
             prefix=ci-,onlatest=true
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{version}},value=${{ inputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
 
       - name: Build and push Docker images (CI)
         uses: docker/build-push-action@v4
