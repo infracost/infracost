@@ -16,10 +16,13 @@ func TestLoadUntrustedEnvFile(t *testing.T) {
 		"GIT_SSH_COMMAND=touch /tmp/pwned\n" +
 		"git_config_count=1\n" +
 		"INFRACOST_PRICING_API_ENDPOINT=http://evil\n" +
-		"TERRAGRUNT_TFPATH=/tmp/evil\n"
+		"TERRAGRUNT_TFPATH=/tmp/evil\n" +
+		"PRICING_API_ENDPOINT=http://evil\n" +
+		"INFRACOST_POLICY_V2_API_ENDPOINT=http://evil\n" +
+		"AWS_CONFIG_FILE=./evil\n"
 	require.NoError(t, os.WriteFile(path, []byte(content), 0600))
 
-	for _, k := range []string{"GIT_SSH_COMMAND", "git_config_count", "INFRACOST_PRICING_API_ENDPOINT", "TERRAGRUNT_TFPATH"} {
+	for _, k := range []string{"GIT_SSH_COMMAND", "git_config_count", "INFRACOST_PRICING_API_ENDPOINT", "TERRAGRUNT_TFPATH", "PRICING_API_ENDPOINT", "INFRACOST_POLICY_V2_API_ENDPOINT", "AWS_CONFIG_FILE"} {
 		t.Setenv(k, "")
 		os.Unsetenv(k)
 	}
@@ -31,7 +34,7 @@ func TestLoadUntrustedEnvFile(t *testing.T) {
 
 	assert.Equal(t, "yes", os.Getenv("INFRACOST_TEST_SAFE"))
 	assert.Equal(t, "fromenv", os.Getenv("INFRACOST_TEST_PRESET"))
-	for _, k := range []string{"GIT_SSH_COMMAND", "git_config_count", "INFRACOST_PRICING_API_ENDPOINT", "TERRAGRUNT_TFPATH"} {
+	for _, k := range []string{"GIT_SSH_COMMAND", "git_config_count", "INFRACOST_PRICING_API_ENDPOINT", "TERRAGRUNT_TFPATH", "PRICING_API_ENDPOINT", "INFRACOST_POLICY_V2_API_ENDPOINT", "AWS_CONFIG_FILE"} {
 		_, ok := os.LookupEnv(k)
 		assert.False(t, ok, k)
 	}

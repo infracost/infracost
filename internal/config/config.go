@@ -535,33 +535,41 @@ var blockedEnvFilePrefixes = []string{
 	"TG_",
 }
 
+// Infracost vars are listed without the INFRACOST_ prefix, since envconfig
+// also reads the unprefixed name.
 var blockedEnvFileVars = map[string]bool{
-	"PATH":                 true,
-	"HOME":                 true,
-	"XDG_CONFIG_HOME":      true,
-	"BASH_ENV":             true,
-	"ENV":                  true,
-	"SHELL":                true,
-	"HTTP_PROXY":           true,
-	"HTTPS_PROXY":          true,
-	"ALL_PROXY":            true,
-	"NO_PROXY":             true,
-	"SSL_CERT_FILE":        true,
-	"SSL_CERT_DIR":         true,
-	"TERRAFORM_CLOUD_HOST": true,
+	"PATH":            true,
+	"HOME":            true,
+	"XDG_CONFIG_HOME": true,
+	"BASH_ENV":        true,
+	"ENV":             true,
+	"SHELL":           true,
+	"HTTP_PROXY":      true,
+	"HTTPS_PROXY":     true,
+	"ALL_PROXY":       true,
+	"NO_PROXY":        true,
+	"SSL_CERT_FILE":   true,
+	"SSL_CERT_DIR":    true,
 
-	"INFRACOST_TERRAFORM_BINARY":             true,
-	"INFRACOST_PRICING_API_ENDPOINT":         true,
-	"INFRACOST_DEFAULT_PRICING_API_ENDPOINT": true,
-	"INFRACOST_DASHBOARD_API_ENDPOINT":       true,
-	"INFRACOST_USAGE_API_ENDPOINT":           true,
-	"INFRACOST_SPACELIFT_API_KEY_ENDPOINT":   true,
-	"INFRACOST_TERRAFORM_CLOUD_HOST":         true,
-	"INFRACOST_REGISTRY_PROXY":               true,
+	"AWS_CONFIG_FILE":                           true,
+	"AWS_SHARED_CREDENTIALS_FILE":               true,
+	"GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES": true,
+
+	"TERRAFORM_BINARY":             true,
+	"PRICING_API_ENDPOINT":         true,
+	"DEFAULT_PRICING_API_ENDPOINT": true,
+	"DASHBOARD_API_ENDPOINT":       true,
+	"POLICY_V2_API_ENDPOINT":       true,
+	"USAGE_API_ENDPOINT":           true,
+	"SPACELIFT_API_KEY_ENDPOINT":   true,
+	"TERRAFORM_CLOUD_HOST":         true,
+	"REGISTRY_PROXY":               true,
+	"TLS_INSECURE_SKIP_VERIFY":     true,
+	"METRICS_PATH":                 true,
 }
 
 func isBlockedEnvFileVar(key string) bool {
-	key = strings.ToUpper(key)
+	key = strings.TrimPrefix(strings.ToUpper(key), "INFRACOST_")
 	if blockedEnvFileVars[key] {
 		return true
 	}
