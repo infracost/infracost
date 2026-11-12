@@ -515,8 +515,87 @@ func loadDotEnv() error {
 	}
 
 	if FileExists(".env") {
-		err := godotenv.Load()
-		if err != nil {
+		return loadUntrustedEnvFile(".env")
+	}
+
+	return nil
+}
+
+// The working directory .env may come from an untrusted checkout (e.g. a PR),
+// so vars that can run commands, redirect credentials or write files are
+// skipped.
+var blockedEnvFilePrefixes = []string{
+	"GIT_",
+	"SSH_",
+	"LD_",
+	"DYLD_",
+	"TF_CLI_",
+	"TF_PLUGIN_",
+	"TERRAGRUNT_",
+	"TG_",
+}
+
+var blockedEnvFileVars = map[string]bool{
+	"PATH":                 true,
+	"HOME":                 true,
+	"XDG_CONFIG_HOME":      true,
+	"BASH_ENV":             true,
+	"ENV":                  true,
+	"SHELL":                true,
+	"HTTP_PROXY":           true,
+	"HTTPS_PROXY":          true,
+	"ALL_PROXY":            true,
+	"NO_PROXY":             true,
+	"SSL_CERT_FILE":        true,
+	"SSL_CERT_DIR":         true,
+	"TERRAFORM_CLOUD_HOST": true,
+
+	"INFRACOST_TERRAFORM_BINARY":             true,
+	"INFRACOST_PRICING_API_ENDPOINT":         true,
+	"INFRACOST_DEFAULT_PRICING_API_ENDPOINT": true,
+	"INFRACOST_DASHBOARD_API_ENDPOINT":       true,
+	"INFRACOST_DASHBOARD_ENDPOINT":           true,
+	"INFRACOST_USAGE_API_ENDPOINT":           true,
+	"INFRACOST_SPACELIFT_API_KEY_ENDPOINT":   true,
+	"INFRACOST_TERRAFORM_CLOUD_HOST":         true,
+	"INFRACOST_REGISTRY_PROXY":               true,
+	"INFRACOST_TLS_INSECURE_SKIP_VERIFY":     true,
+	"INFRACOST_GIT_SSL_CAINFO":               true,
+	"INFRACOST_METRICS_PATH":                 true,
+	"INFRACOST_CPU_PROFILE":                  true,
+	"INFRACOST_MEMORY_PROFILE":               true,
+	"INFRACOST_JSON_DUMP":                    true,
+	"INFRACOST_JSON_DUMP_PATH":               true,
+}
+
+func isBlockedEnvFileVar(key string) bool {
+	key = strings.ToUpper(key)
+	if blockedEnvFileVars[key] {
+		return true
+	}
+	for _, prefix := range blockedEnvFilePrefixes {
+		if strings.HasPrefix(key, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func loadUntrustedEnvFile(path string) error {
+	vars, err := godotenv.Read(path)
+	if err != nil {
+		return err
+	}
+
+	for key, value := range vars {
+		if isBlockedEnvFileVar(key) {
+			logging.Logger.Warn().Msgf("Ignoring %s from %s: it cannot be set from an env file", key, path)
+			continue
+		}
+		if _, ok := os.LookupEnv(key); ok {
+			continue
+		}
+		if err := os.Setenv(key, value); err != nil {
 			return err
 		}
 	}
