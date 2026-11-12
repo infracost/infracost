@@ -522,7 +522,7 @@ func loadDotEnv() error {
 }
 
 // The working directory .env may come from an untrusted checkout (e.g. a PR),
-// so vars that can run commands, redirect credentials or write files are
+// so vars that can run commands or send credentials to another host are
 // skipped.
 var blockedEnvFilePrefixes = []string{
 	"GIT_",
@@ -554,18 +554,10 @@ var blockedEnvFileVars = map[string]bool{
 	"INFRACOST_PRICING_API_ENDPOINT":         true,
 	"INFRACOST_DEFAULT_PRICING_API_ENDPOINT": true,
 	"INFRACOST_DASHBOARD_API_ENDPOINT":       true,
-	"INFRACOST_DASHBOARD_ENDPOINT":           true,
 	"INFRACOST_USAGE_API_ENDPOINT":           true,
 	"INFRACOST_SPACELIFT_API_KEY_ENDPOINT":   true,
 	"INFRACOST_TERRAFORM_CLOUD_HOST":         true,
 	"INFRACOST_REGISTRY_PROXY":               true,
-	"INFRACOST_TLS_INSECURE_SKIP_VERIFY":     true,
-	"INFRACOST_GIT_SSL_CAINFO":               true,
-	"INFRACOST_METRICS_PATH":                 true,
-	"INFRACOST_CPU_PROFILE":                  true,
-	"INFRACOST_MEMORY_PROFILE":               true,
-	"INFRACOST_JSON_DUMP":                    true,
-	"INFRACOST_JSON_DUMP_PATH":               true,
 }
 
 func isBlockedEnvFileVar(key string) bool {
