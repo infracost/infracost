@@ -515,8 +515,97 @@ func loadDotEnv() error {
 	}
 
 	if FileExists(".env") {
-		err := godotenv.Load()
-		if err != nil {
+		if os.Getenv("INFRACOST_TRUST_ENVFILE") == "true" {
+			return godotenv.Load()
+		}
+		return loadUntrustedEnvFile(".env")
+	}
+
+	return nil
+}
+
+// The working directory .env may come from an untrusted checkout (e.g. a PR),
+// so vars that can run commands or send credentials to another host are
+// skipped.
+var blockedEnvFilePrefixes = []string{
+	"GIT_",
+	"SSH_",
+	"LD_",
+	"DYLD_",
+	"TF_CLI_",
+	"TF_PLUGIN_",
+	"TERRAGRUNT_",
+	"TG_",
+}
+
+var blockedEnvFileVars = map[string]bool{
+	"PATH":            true,
+	"HOME":            true,
+	"XDG_CONFIG_HOME": true,
+	"BASH_ENV":        true,
+	"ENV":             true,
+	"SHELL":           true,
+	"HTTP_PROXY":      true,
+	"HTTPS_PROXY":     true,
+	"ALL_PROXY":       true,
+	"NO_PROXY":        true,
+	"SSL_CERT_FILE":   true,
+	"SSL_CERT_DIR":    true,
+
+	"AWS_CONFIG_FILE":                           true,
+	"AWS_SHARED_CREDENTIALS_FILE":               true,
+	"GOOGLE_EXTERNAL_ACCOUNT_ALLOW_EXECUTABLES": true,
+	"CI_API_V4_URL":                             true,
+	"TERRAFORM_CLOUD_HOST":                      true,
+
+	"INFRACOST_REGISTRY_PROXY": true,
+	"INFRACOST_JSON_DUMP_PATH": true,
+}
+
+// Config fields that envconfig reads both with and without the INFRACOST_
+// prefix, so both forms are blocked.
+var blockedEnvFileConfigVars = map[string]bool{
+	"TERRAFORM_BINARY":             true,
+	"PRICING_API_ENDPOINT":         true,
+	"DEFAULT_PRICING_API_ENDPOINT": true,
+	"DASHBOARD_API_ENDPOINT":       true,
+	"DASHBOARD_ENDPOINT":           true,
+	"POLICY_V2_API_ENDPOINT":       true,
+	"USAGE_API_ENDPOINT":           true,
+	"SPACELIFT_API_KEY_ENDPOINT":   true,
+	"TERRAFORM_CLOUD_HOST":         true,
+	"TLS_INSECURE_SKIP_VERIFY":     true,
+	"METRICS_PATH":                 true,
+}
+
+func isBlockedEnvFileVar(key string) bool {
+	key = strings.ToUpper(key)
+	if blockedEnvFileVars[key] || blockedEnvFileConfigVars[strings.TrimPrefix(key, "INFRACOST_")] {
+		return true
+	}
+	for _, prefix := range blockedEnvFilePrefixes {
+		if strings.HasPrefix(key, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func loadUntrustedEnvFile(path string) error {
+	vars, err := godotenv.Read(path)
+	if err != nil {
+		return err
+	}
+
+	for key, value := range vars {
+		if isBlockedEnvFileVar(key) {
+			logging.Logger.Warn().Msgf("Infracost ignored %s in %s for security reasons. Set it in the environment instead, or set INFRACOST_TRUST_ENVFILE=true to load the whole file.", key, path)
+			continue
+		}
+		if _, ok := os.LookupEnv(key); ok {
+			continue
+		}
+		if err := os.Setenv(key, value); err != nil {
 			return err
 		}
 	}
