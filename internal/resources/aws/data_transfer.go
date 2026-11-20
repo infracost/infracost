@@ -211,7 +211,7 @@ func (r *DataTransfer) outboundUsEastCostComponents() []*schema.CostComponent {
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundUsEastToUsEastGB)),
-		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
+		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, "-AWS-Out-Bytes"),
 		UsageBased:      true,
 	})
 
@@ -245,7 +245,7 @@ func (r *DataTransfer) outboundOtherRegionsCostComponents() []*schema.CostCompon
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundOtherRegionsGB)),
-		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
+		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, "-AWS-Out-Bytes"),
 		UsageBased:      true,
 	})
 
