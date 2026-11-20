@@ -2,6 +2,7 @@ package modules
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -13,15 +14,15 @@ import (
 	"github.com/google/uuid"
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go"
 	"github.com/mholt/archives"
 )
 
 type S3Cache struct {
-	s3Client     *s3.S3
+	s3Client     *s3.Client
 	bucketName   string
 	prefix       string
 	publicPrefix string
@@ -30,18 +31,13 @@ type S3Cache struct {
 
 // NewS3Cache creates a new S3Cache instance
 func NewS3Cache(region, bucketName, prefix string, cachePrivate bool) (*S3Cache, error) {
-	sess, err := session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-		Config: aws.Config{
-			Region: aws.String(region),
-		},
-	})
+	cfg, err := config.LoadDefaultConfig(context.Background(), config.WithRegion(region))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create AWS session: %w", err)
+		return nil, fmt.Errorf("failed to load AWS config: %w", err)
 	}
 
 	return &S3Cache{
-		s3Client:     s3.New(sess),
+		s3Client:     s3.NewFromConfig(cfg),
 		bucketName:   bucketName,
 		prefix:       prefix,
 		publicPrefix: "publicModules",
@@ -72,14 +68,15 @@ func (cache *S3Cache) Exists(key string, public bool) (bool, error) {
 	}
 
 	prefixedKey := cache.applyPrefix(key, public)
-	headObj, err := cache.s3Client.HeadObject(&s3.HeadObjectInput{
+	headObj, err := cache.s3Client.HeadObject(context.Background(), &s3.HeadObjectInput{
 		Bucket: aws.String(cache.bucketName),
 		Key:    aws.String(prefixedKey),
 	})
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok {
-			switch awsErr.Code() {
-			case s3.ErrCodeNoSuchKey, "NotFound", "Forbidden":
+		var apiErr smithy.APIError
+		if errors.As(err, &apiErr) {
+			switch apiErr.ErrorCode() {
+			case "NoSuchKey", "NotFound", "Forbidden":
 				return false, nil
 			}
 		}
@@ -88,7 +85,7 @@ func (cache *S3Cache) Exists(key string, public bool) (bool, error) {
 
 	// Check expiration based on x-amz-meta-expires-at
 	if expiresAtStr, ok := headObj.Metadata["x-amz-meta-expires-at"]; ok {
-		expirationTime, err := time.Parse(time.RFC3339, *expiresAtStr)
+		expirationTime, err := time.Parse(time.RFC3339, expiresAtStr)
 		if err != nil {
 			return false, fmt.Errorf("failed to parse expiration metadata: %w", err)
 		}
@@ -110,8 +107,10 @@ func (cache *S3Cache) Get(key, destPath string, public bool) error {
 
 	prefixedKey := cache.applyPrefix(key, public)
 
+	ctx := context.Background()
+
 	// Download from S3
-	result, err := cache.s3Client.GetObject(&s3.GetObjectInput{
+	result, err := cache.s3Client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(cache.bucketName),
 		Key:    aws.String(prefixedKey),
 	})
@@ -124,8 +123,6 @@ func (cache *S3Cache) Get(key, destPath string, public bool) error {
 	if err := os.MkdirAll(destPath, 0700); err != nil {
 		return fmt.Errorf("failed to create destination directory: %w", err)
 	}
-
-	ctx := context.Background()
 
 	format := archives.CompressedArchive{
 		Compression: archives.Gz{},
@@ -239,8 +236,8 @@ func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration, public bool) e
 
 	// Calculate expiration time and set it as metadata
 	expirationTime := time.Now().Add(ttl).Format(time.RFC3339)
-	metadata := map[string]*string{
-		"x-amz-meta-expires-at": aws.String(expirationTime),
+	metadata := map[string]string{
+		"x-amz-meta-expires-at": expirationTime,
 	}
 
 	_, err = tmpFile.Seek(0, 0)
@@ -248,7 +245,7 @@ func (cache *S3Cache) Put(key, srcPath string, ttl time.Duration, public bool) e
 		return fmt.Errorf("failed to seek to start of file: %w", err)
 	}
 
-	_, err = cache.s3Client.PutObject(&s3.PutObjectInput{
+	_, err = cache.s3Client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:   aws.String(cache.bucketName),
 		Key:      aws.String(prefixedKey),
 		Body:     tmpFile,
