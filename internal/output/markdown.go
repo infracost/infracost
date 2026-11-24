@@ -35,7 +35,7 @@ func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, 
 		plusMinus = ""
 	}
 
-	if pastCost != nil && cost != nil && pastCost.Equals(*cost) {
+	if pastCost != nil && cost != nil && pastCost.Equal(*cost) {
 		return plusMinus + formatWholeDecimalCurrency(currency, decimal.Zero)
 	}
 
@@ -81,7 +81,7 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 	diff := cost.Sub(*pastCost).Abs()
 	change := formatCost(currency, &diff)
 
-	if pastCost.Equals(*cost) {
+	if pastCost.Equal(*cost) {
 		return "Monthly estimate generated"
 	}
 
