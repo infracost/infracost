@@ -236,7 +236,7 @@ func diffDecimals(current *decimal.Decimal, past *decimal.Decimal) *decimal.Deci
 		diff = *current
 	} else if current == nil {
 		diff = past.Neg()
-	} else if current.Equals(*past) {
+	} else if current.Equal(*past) {
 		// Handling the strange behavior of decimal for easier testing.
 		diff = decimal.Zero
 	} else {
