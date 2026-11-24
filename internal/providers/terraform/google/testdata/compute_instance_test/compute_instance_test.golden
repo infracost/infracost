@@ -16,7 +16,7 @@
  └─ NVIDIA L4 (on-demand)                                                  730  hours       $286.18   
                                                                                                       
  google_compute_instance.preemptible_gpu                                                              
- ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $283.78   
+ ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $297.97   
  ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
  └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $501.95   
                                                                                                       
@@ -45,19 +45,19 @@
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
                                                                                                       
  google_compute_instance.custom_preemptible                                                           
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $74.37   
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $33.22   
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $78.10   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $34.88   
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
+                                                                                                      
+ google_compute_instance.custom_n2d                                                                   
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $46.87   
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours        $31.40   
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
                                                                                                       
  google_compute_instance.custom_ext                                                                   
  ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 2 vCPUs)                730  hours        $33.92   
  ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 13 GB)                  730  hours        $29.53   
  ├─ Custom Instance Extended RAM (Linux/UNIX, on-demand, N1 2 GB)          730  hours         $9.76   
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
-                                                                                                      
- google_compute_instance.custom_n2d                                                                   
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $42.60   
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours        $28.54   
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
                                                                                                       
  google_compute_instance.local_ssd                                                                    
@@ -86,7 +86,7 @@
  ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $0.50   
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40   
                                                                                                       
- OVERALL TOTAL                                                                          $10,576.03 
+ OVERALL TOTAL                                                                          $10,602.73 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -99,7 +99,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃       $10,576 ┃           - ┃    $10,576 ┃
+┃ main                                               ┃       $10,603 ┃           - ┃    $10,603 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
